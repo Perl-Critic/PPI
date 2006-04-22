@@ -1,0 +1,53 @@
+PPI::Document
+  PPI::Statement
+    PPI::Token::Symbol  	'$foo'
+    PPI::Token::Whitespace  	' '
+    PPI::Token::Operator  	'<<'
+    PPI::Token::Whitespace  	' '
+    PPI::Token::Number  	'1'
+    PPI::Token::Structure  	';'
+  PPI::Token::Whitespace  	'\n'
+  PPI::Statement
+    PPI::Token::Symbol  	'$foo'
+    PPI::Token::Whitespace  	' '
+    PPI::Token::Operator  	'<<'
+    PPI::Token::Whitespace  	'\n'
+    PPI::Token::Number  	'1'
+    PPI::Token::Structure  	';'
+  PPI::Token::Whitespace  	'\n'
+  PPI::Statement
+    PPI::Token::Symbol  	'$foo'
+    PPI::Token::Whitespace  	' '
+    PPI::Token::Operator  	'<<'
+    PPI::Token::Whitespace  	' '
+    PPI::Token::Symbol  	'$bar'
+    PPI::Token::Structure  	';'
+  PPI::Token::Whitespace  	'\n'
+  PPI::Statement
+    PPI::Token::Operator  	'<<'
+    PPI::Token::Whitespace  	' '
+    PPI::Token::Word  	'foo'
+    PPI::Token::Structure  	';'
+  PPI::Token::Whitespace  	'\n'
+  PPI::Statement
+    PPI::Token::HereDoc  	'<<foo'
+    PPI::Token::Structure  	';'
+  PPI::Token::Whitespace  	'\n'
+  PPI::Statement
+    PPI::Token::Symbol  	'@foo'
+    PPI::Token::Whitespace  	' '
+    PPI::Token::Operator  	'='
+    PPI::Token::Whitespace  	' '
+    PPI::Token::HereDoc  	'<<EOF'
+    PPI::Token::Structure  	';'
+  PPI::Token::Whitespace  	'\n'
+  PPI::Statement
+    PPI::Token::Symbol  	'@foo'
+    PPI::Token::Whitespace  	' '
+    PPI::Token::Operator  	'='
+    PPI::Token::Whitespace  	' '
+    PPI::Structure::List  	( ... )
+      PPI::Statement::Expression
+        PPI::Token::HereDoc  	'<<EOF'
+    PPI::Token::Structure  	';'
+  PPI::Token::Whitespace  	'\n'

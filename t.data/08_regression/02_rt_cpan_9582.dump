@@ -1,0 +1,77 @@
+PPI::Document
+  PPI::Statement
+    PPI::Token::Regexp::Transliterate  	'y {abc} {def}'
+    PPI::Token::Structure  	';'
+  PPI::Token::Whitespace  	'\n'
+  PPI::Statement
+    PPI::Token::Symbol  	'$foo'
+    PPI::Token::Whitespace  	' '
+    PPI::Token::Operator  	'or'
+    PPI::Token::Whitespace  	' '
+    PPI::Token::Symbol  	'$bar'
+    PPI::Token::Structure  	';'
+  PPI::Token::Whitespace  	'\n'
+  PPI::Statement::Sub
+    PPI::Token::Word  	'sub'
+    PPI::Token::Whitespace  	' '
+    PPI::Token::Word  	'y'
+    PPI::Token::Whitespace  	' '
+    PPI::Structure::Block  	{ ... }
+      PPI::Token::Whitespace  	' '
+      PPI::Statement
+        PPI::Token::Number  	'1'
+      PPI::Token::Whitespace  	' '
+  PPI::Statement::Null
+    PPI::Token::Structure  	';'
+  PPI::Token::Whitespace  	'\n'
+  PPI::Statement::Sub
+    PPI::Token::Word  	'sub'
+    PPI::Token::Whitespace  	' '
+    PPI::Token::Word  	'or'
+    PPI::Token::Whitespace  	' '
+    PPI::Structure::Block  	{ ... }
+      PPI::Token::Whitespace  	' '
+      PPI::Statement
+        PPI::Token::Number  	'1'
+      PPI::Token::Whitespace  	' '
+  PPI::Statement::Null
+    PPI::Token::Structure  	';'
+  PPI::Token::Whitespace  	'\n'
+  PPI::Statement
+    PPI::Token::Word  	'foo'
+    PPI::Token::Operator  	'->'
+    PPI::Token::Word  	'y'
+    PPI::Structure::List  	( ... )
+    PPI::Token::Structure  	';'
+  PPI::Token::Whitespace  	'\n'
+  PPI::Statement
+    PPI::Token::Word  	'foo'
+    PPI::Token::Operator  	'->'
+    PPI::Token::Word  	'or'
+    PPI::Structure::List  	( ... )
+    PPI::Token::Structure  	';'
+  PPI::Token::Whitespace  	'\n'
+  PPI::Statement
+    PPI::Token::Word  	'y'
+    PPI::Token::Whitespace  	' '
+    PPI::Token::Operator  	'=>'
+    PPI::Token::Whitespace  	' '
+    PPI::Token::Number  	'1'
+    PPI::Token::Structure  	';'
+  PPI::Token::Whitespace  	'\n'
+  PPI::Statement
+    PPI::Token::Symbol  	'$foo'
+    PPI::Token::Operator  	'->'
+    PPI::Structure::Subscript  	{ ... }
+      PPI::Statement::Expression
+        PPI::Token::Word  	'q'
+    PPI::Token::Structure  	';'
+  PPI::Token::Whitespace  	'\n'
+  PPI::Statement
+    PPI::Token::Word  	'foo'
+    PPI::Token::Whitespace  	' '
+    PPI::Token::Operator  	'=>'
+    PPI::Token::Whitespace  	' '
+    PPI::Token::Quote::Literal  	'q'not bar''
+    PPI::Token::Structure  	';'
+  PPI::Token::Whitespace  	'\n'

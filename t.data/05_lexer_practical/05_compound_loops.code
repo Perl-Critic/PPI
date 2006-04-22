@@ -1,0 +1,10 @@
+while (1) {}
+foreach () {}
+LABEL: foreach $foo ( 1 .. 20 ) {
+}
+foreach my $foo () {}
+for my $foo () {}
+foreach $foo () {}
+for $foo () {}
+for (my $a = 0; $a < 10; $a++) {
+}

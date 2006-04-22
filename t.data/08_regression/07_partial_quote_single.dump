@@ -1,0 +1,5 @@
+PPI::Document
+  PPI::Statement
+    PPI::Token::Word  	'print'
+    PPI::Token::Whitespace  	' '
+    PPI::Token::Quote::Single  	''Hello...'

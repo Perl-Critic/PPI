@@ -1,0 +1,16 @@
+#!/usr/bin/perl
+
+# This is a simple perl script for testing PPI on
+
+print "Hello World!\n";
+
+foreach ( 1 .. 10 ) {
+	if ( rand() > 0.5 ) {
+		print "Big\n";
+	} else {
+		print "Small\n";
+	}
+}
+
+exit();
+

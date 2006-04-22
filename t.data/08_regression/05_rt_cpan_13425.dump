@@ -1,0 +1,17 @@
+PPI::Document
+  PPI::Statement
+    PPI::Token::Symbol  	'$p'
+    PPI::Structure::Subscript  	{ ... }
+      PPI::Statement::Expression
+        PPI::Token::Word  	'package'
+    PPI::Token::Structure  	';'
+  PPI::Token::Whitespace  	'\n'
+  PPI::Statement
+    PPI::Token::Symbol  	'$p'
+    PPI::Structure::Subscript  	{ ... }
+      PPI::Token::Whitespace  	' '
+      PPI::Statement::Expression
+        PPI::Token::Word  	'package'
+      PPI::Token::Whitespace  	' '
+    PPI::Token::Structure  	';'
+  PPI::Token::Whitespace  	'\n'

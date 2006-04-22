@@ -1,0 +1,17 @@
+PPI::Document
+  PPI::Statement
+    PPI::Token::Word  	'ok'
+    PPI::Structure::List  	( ... )
+      PPI::Token::Whitespace  	' '
+      PPI::Statement
+        PPI::Token::Word  	'sub'
+        PPI::Token::Whitespace  	' '
+        PPI::Structure::Block  	{ ... }
+          PPI::Statement
+            PPI::Token::Word  	'die'
+            PPI::Structure::List  	( ... )
+              PPI::Statement::Expression
+                PPI::Token::Quote::Double  	'"goodbye"'
+      PPI::Token::Whitespace  	' '
+    PPI::Token::Structure  	';'
+  PPI::Token::Whitespace  	'\n'

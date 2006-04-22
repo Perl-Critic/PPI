@@ -1,0 +1,17 @@
+#!/usr/bin/perl
+
+print "Hello World!\n";
+
+=pod
+
+=head1 Foo
+
+This is the first pod section
+
+=cut
+
+print "Goodbye World!";
+
+=head1 Bar
+
+This is the second pod section

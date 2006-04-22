@@ -1,0 +1,22 @@
+PPI::Document
+  PPI::Statement::Sub
+    PPI::Token::Word  	'sub'
+    PPI::Token::Whitespace  	' '
+    PPI::Token::Word  	'foo'
+    PPI::Token::Whitespace  	' '
+    PPI::Structure::Block  	{ ... }
+      PPI::Token::Whitespace  	'\n'
+      PPI::Token::Whitespace  	'    '
+      PPI::Statement
+        PPI::Token::Word  	'print'
+        PPI::Structure::List  	( ... ???
+          PPI::Token::Whitespace  	' '
+          PPI::Statement::Expression
+            PPI::Token::Quote::Double  	'"Foo"'
+            PPI::Token::Structure  	';'
+      PPI::Token::Whitespace  	'\n'
+  PPI::Token::Whitespace  	'\n'
+  PPI::Token::Whitespace  	'\n'
+  PPI::Statement::UnmatchedBrace
+    PPI::Token::Structure  	')'
+  PPI::Token::Whitespace  	'\n'
