@@ -62,6 +62,11 @@ sub __TOKENIZER__on_char {
 			return $t->_finalize_token->__TOKENIZER__on_char( $t );
 		}
 
+		if ( $_ eq '*' ) {
+			# Power operator '**'
+			return $t->_set_token_class( 'Operator' ) ? 1 : undef;
+		}
+
 		$t->_set_token_class( 'Operator' ) or return undef;
 		return $t->_finalize_token->__TOKENIZER__on_char( $t );
 
