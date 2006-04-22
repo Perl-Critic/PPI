@@ -47,7 +47,7 @@ use base 'PPI::Structure';
 
 use vars qw{$VERSION};
 BEGIN {
-	$VERSION = '1.110';
+	$VERSION = '1.111';
 }
 
 

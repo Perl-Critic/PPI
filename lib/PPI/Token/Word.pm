@@ -39,7 +39,7 @@ use base 'PPI::Token';
 
 use vars qw{$VERSION %QUOTELIKE %OPERATOR};
 BEGIN {
-	$VERSION = '1.110';
+	$VERSION = '1.111';
 
 	%QUOTELIKE = (
 		'q'  => 'Quote::Literal',
