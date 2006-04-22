@@ -1,5 +1,20 @@
 Revision history for Perl extension PPI
 
+1.111    Sat 22 Apr 2006
+	General
+	- Moved from SourceForge CVS to new collaborative SVN repository
+	- Fixed regressions other people had added since 1.110
+	- Upgraded to Module::Install 0.62
+
+	Details:
+	- SourceForge was too hard to get into, so moved to specially designed
+	  new SVN repository to make it easy for others to help out.
+	- Moved t.data to t/data in line with current style and to reduce complexity.
+	- Fixed t/data/08_regression/11_multiply_vs_glob_cast (added by unknown)
+	- Fixed t/data/08_regression/12_pow (added by unknown)
+	- Removed every use of UNIVERSAL::isa in the tests
+	- Upgraded to Module::Install 0.62 (my private prerelease)
+
 1.110    Fri Jan 27 2005
 	General
 	- Added test support for the third location component (Arjen Laarhoven)
