@@ -56,9 +56,44 @@ sub __TOKENIZER__on_char {
 			return $t->_set_token_class( 'Symbol' ) ? 1 : undef;
 		}
 
-		if ( $_ eq '{' or $_ eq '$' ) {
-			# GLOB cast
+		if ( $_ eq '{' ) {
+			# Obvious GLOB cast
 			$t->_set_token_class( 'Cast' ) or return undef;
+			return $t->_finalize_token->__TOKENIZER__on_char( $t );
+		}
+
+		if ( $_ eq '$' ) {
+			# Operator/operand-sensitive, multiple or GLOB cast
+			my $_class = undef;
+			my $tokens = $t->_previous_significant_tokens( 1 ) or return undef;
+			my $p0     = $tokens->[0];
+			if ( $p0 ) {
+				# Is it a token or a number
+				if ( $p0->isa('PPI::Token::Symbol') ) {
+					$_class = 'Operator';
+				} elsif ( $p0->isa('PPI::Token::Number') ) {
+					$_class = 'Operator';
+				} elsif (
+					$p0->isa('PPI::Token::Structure')
+					and
+					$p0->content =~ /^(?:\)|\])$/
+				) {
+					$_class = 'Operator';
+				} else {
+					### This is pretty weak, there's
+					### room for a dozen more tests
+					### before going with a default.
+					### Or even better, a proper
+					### operator/operand method :(
+					$_class = 'Cast';
+				}
+			} else {
+				# Nothing before it, must be glob cast
+				$_class = 'Cast';
+			}
+
+			# Set class and rerun
+			$t->_set_token_class( $_class ) or return undef;
 			return $t->_finalize_token->__TOKENIZER__on_char( $t );
 		}
 

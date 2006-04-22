@@ -271,7 +271,6 @@ sub _fill_braced {
 
 	# Advance into the second region
 	$t->{line_cursor}++;
-	$DB::single = 1;
 	$section->{position} = length($self->{content});
 	$section->{size}     = 0;
 
