@@ -7,7 +7,6 @@
 
 use strict;
 use lib ();
-use UNIVERSAL 'isa';
 use File::Spec::Functions ':ALL';
 BEGIN {
 	$| = 1;
@@ -15,7 +14,11 @@ BEGIN {
 		require FindBin;
 		$FindBin::Bin = $FindBin::Bin; # Avoid a warning
 		chdir catdir( $FindBin::Bin, updir() );
-		lib->import('blib', 'lib');
+		lib->import(
+			catdir('blib', 'arch'),
+			catdir('blib', 'lib' ),
+			catdir('lib'),
+			);
 	}
 }
 
@@ -44,7 +47,7 @@ unless ( %tests ) {
 }
 my @files = sort values %tests;
 
-# Find all the testable perl files in t.data
+# Find all the testable perl files in t/data
 foreach my $dir ( '05_lexer_practical', '08_regression', '11_util', '13_data', '15_transform' ) {
 	my @perl = find_files( $dir );
 	push @files, @perl;
@@ -109,10 +112,10 @@ foreach my $file ( @files ) {
 #####################################################################
 # Test Functions
 
-# Find file names in named t.data dirs
+# Find file names in named t/data dirs
 sub find_files {
 	my $dir  = shift;
-	my $testdir = catdir( 't.data', $dir );
+	my $testdir = catdir( 't', 'data', $dir );
 	
 	# Does the test directory exist?
 	-e $testdir and -d $testdir and -r $testdir or die "Failed to find test directory $testdir";

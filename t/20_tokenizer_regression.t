@@ -6,7 +6,6 @@
 
 use strict;
 use lib ();
-use UNIVERSAL 'isa';
 use File::Spec::Functions ':ALL';
 BEGIN {
 	$| = 1;
@@ -14,7 +13,11 @@ BEGIN {
 		require FindBin;
 		$FindBin::Bin = $FindBin::Bin; # Avoid a warning
 		chdir catdir( $FindBin::Bin, updir() );
-		lib->import('blib', 'lib');
+		lib->import(
+			catdir('blib', 'arch'),
+			catdir('blib', 'lib' ),
+			catdir('lib'),
+			);
 	}
 }
 
@@ -23,6 +26,7 @@ BEGIN { $PPI::XS_DISABLE = 1 }
 use PPI::Lexer;
 use PPI::Dumper;
 use Carp 'croak';
+use Params::Util '_INSTANCE';
 
 sub pause {
 	local $@;
@@ -105,9 +109,9 @@ sub test_code {
 		# $SIG{__WARN__} = sub { croak('Triggered a warning') };
 		PPI::Document->new(\$code);
 	};
-	ok( isa($Document, 'PPI::Document'),
+	ok( _INSTANCE($Document, 'PPI::Document'),
 		"\"$quotable\": Document parses ok" );
-	unless ( isa($Document, 'PPI::Document') ) {
+	unless ( _INSTANCE($Document, 'PPI::Document') ) {
 		diag( "\"$quotable\": Parsing failed" );
 		my $short = quotable(quickcheck($code));
 		diag( "Shortest failing substring: \"$short\"" );

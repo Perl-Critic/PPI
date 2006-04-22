@@ -4,7 +4,6 @@
 
 use strict;
 use lib ();
-use UNIVERSAL 'isa';
 use File::Spec::Functions ':ALL';
 BEGIN {
 	$| = 1;
@@ -12,7 +11,11 @@ BEGIN {
 		require FindBin;
 		$FindBin::Bin = $FindBin::Bin; # Avoid a warning
 		chdir catdir( $FindBin::Bin, updir() );
-		lib->import('blib', 'lib');
+		lib->import(
+			catdir('blib', 'arch'),
+			catdir('blib', 'lib' ),
+			catdir('lib'),
+			);
 	}
 }
 
@@ -24,8 +27,8 @@ use File::Remove  ();
 use Scalar::Util  'refaddr';
 use Test::More    tests => 42;
 
-my $this_file = catdir( 't.data', '03_empiric', 'test.dat' );
-my $cache_dir = catdir( 't.data', '18_cache' );
+my $this_file = catdir( 't', 'data', '03_empiric', 'test.dat' );
+my $cache_dir = catdir( 't', 'data', '18_cache' );
 
 # Define, create and clear the test cache
 File::Remove::remove( \1, $cache_dir ) if -e $cache_dir;

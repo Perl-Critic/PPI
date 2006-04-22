@@ -7,7 +7,6 @@
 
 use strict;
 use lib ();
-use UNIVERSAL 'isa';
 use File::Spec::Functions ':ALL';
 BEGIN {
 	$| = 1;
@@ -15,7 +14,11 @@ BEGIN {
 		require FindBin;
 		$FindBin::Bin = $FindBin::Bin; # Avoid a warning
 		chdir catdir( $FindBin::Bin, updir() );
-		lib->import('blib', 'lib');
+		lib->import(
+			catdir('blib', 'arch'),
+			catdir('blib', 'lib' ),
+			catdir('lib'),
+			);
 	}
 }
 
@@ -46,7 +49,7 @@ BEGIN {
 }
 
 sub omethod_fails {
-	my $object  = isa(ref $_[0], 'UNIVERSAL') ? shift : die "Failed to pass method_fails test an object";
+	my $object  = ref($_[0])->isa('UNIVERSAL') ? shift : die "Failed to pass method_fails test an object";
 	my $method  = (defined $_[0] and $_[0] =~ /$RE_IDENTIFIER/o) ? shift : die "Failed to pass method_fails an identifier";
 	my $arg_set = ( ref $_[0] eq 'ARRAY' and scalar(@{$_[0]}) ) ? shift : die "Failed to pass method_fails a set of arguments";
 

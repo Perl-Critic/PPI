@@ -5,10 +5,8 @@
 # This does an empiric test that when we try to parse something,
 # something ( anything ) comes out the other side.
 
-
 use strict;
 use lib ();
-use UNIVERSAL 'isa';
 use File::Spec::Functions ':ALL';
 BEGIN {
 	$| = 1;
@@ -16,7 +14,11 @@ BEGIN {
 		require FindBin;
 		$FindBin::Bin = $FindBin::Bin; # Avoid a warning
 		chdir catdir( $FindBin::Bin, updir() );
-		lib->import('blib', 'lib');
+		lib->import(
+			catdir('blib', 'arch'),
+			catdir('blib', 'lib' ),
+			catdir('lib'),
+			);
 	}
 }
 
@@ -27,7 +29,7 @@ use PPI;
 # Execute the tests
 use Test::More tests => 3;
 
-my $testdir = catdir( 't.data', '03_empiric' );
+my $testdir = catdir( 't', 'data', '03_empiric' );
 
 
 

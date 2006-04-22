@@ -6,7 +6,6 @@
 
 use strict;
 use lib ();
-use UNIVERSAL 'isa';
 use File::Spec::Functions ':ALL';
 BEGIN {
 	$| = 1;
@@ -14,7 +13,11 @@ BEGIN {
 		require FindBin;
 		$FindBin::Bin = $FindBin::Bin; # Avoid a warning
 		chdir catdir( $FindBin::Bin, updir() );
-		lib->import('blib', 'lib');
+		lib->import(
+			catdir('blib', 'arch'),
+			catdir('blib', 'lib' ),
+			catdir('lib'),
+			);
 	}
 }
 
@@ -36,13 +39,13 @@ sub pause {
 #####################################################################
 # Prepare
 
-# For each new item in t.data/08_regression add another 11 tests
+# For each new item in t/data/08_regression add another 11 tests
 
 use Test::More tests => 153;
 
 use vars qw{$testdir};
 BEGIN {
-	$testdir = catdir( 't.data', '08_regression' );
+	$testdir = catdir( 't', 'data', '08_regression' );
 }
 
 # Does the test directory exist?
@@ -70,8 +73,8 @@ foreach my $codefile ( @code ) {
 
 	# Create the lexer and get the Document object
 	my $Document = $Lexer->lex_file( $codefile );
-	ok( $Document,                          "$codefile: Lexer->Document returns true" );
-	ok( isa( $Document, 'PPI::Document' ),  "$codefile: Lexer creates Document object" );
+	ok( $Document, "$codefile: Lexer->Document returns true" );
+	isa_ok( $Document, 'PPI::Document' );
 
 	my $rv;
 	SKIP: {
@@ -87,7 +90,7 @@ foreach my $codefile ( @code ) {
 	
 		# Get the dump array ref for the Document object
 		my $Dumper = PPI::Dumper->new( $Document );
-		ok( isa( $Dumper, 'PPI::Dumper' ), "$codefile: Dumper created" );
+		isa_ok( $Dumper, 'PPI::Dumper' );
 		my @dump_list = $Dumper->list;
 		ok( scalar @dump_list, "$codefile: Got dump content from dumper" );
 	

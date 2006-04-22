@@ -4,7 +4,6 @@
 
 use strict;
 use lib ();
-use UNIVERSAL 'isa';
 use File::Spec::Functions ':ALL';
 BEGIN {
 	$| = 1;
@@ -12,7 +11,11 @@ BEGIN {
 		require FindBin;
 		$FindBin::Bin = $FindBin::Bin; # Avoid a warning
 		chdir catdir( $FindBin::Bin, updir() );
-		lib->import('blib', 'lib');
+		lib->import(
+			catdir('blib', 'arch'),
+			catdir('blib', 'lib' ),
+			catdir('lib'),
+			);
 	}
 }
 
@@ -26,10 +29,10 @@ use PPI::Util '_Document',
 # Execute the tests
 use Test::More tests => 8;
 
-my $testfile   = catfile( 't.data', '11_util', 'test.pm' );
+my $testfile   = catfile( 't', 'data', '11_util', 'test.pm' );
 my $testsource = 'print "Hello World!\n"';
 
-my $slurpfile = catfile( 't.data', 'basic.pl' );
+my $slurpfile = catfile( 't', 'data', 'basic.pl' );
 my $slurpcode = <<'END_FILE';
 #!/usr/bin/perl
 

@@ -2,7 +2,6 @@
 
 use strict;
 use lib ();
-use UNIVERSAL 'isa';
 use File::Spec::Functions ':ALL';
 BEGIN {
 	$| = 1;
@@ -10,7 +9,11 @@ BEGIN {
 		require FindBin;
 		$FindBin::Bin = $FindBin::Bin; # Avoid a warning
 		chdir catdir( $FindBin::Bin, updir() );
-		lib->import('blib', 'lib');
+		lib->import(
+			catdir('blib', 'arch'),
+			catdir('blib', 'lib' ),
+			catdir('lib'),
+			);
 	}
 }
 
@@ -66,7 +69,7 @@ is( $Foo::VALUE, 'my$foo="bar";', 'MyCleaner->apply( $Foo ) modifies code as exp
 use Scalar::Util 'refaddr';
 use File::Copy;
 
-my $testdir = catdir( 't.data', '15_transform');
+my $testdir = catdir( 't', 'data', '15_transform');
 
 # Does the test directory exist?
 ok( (-e $testdir and -d $testdir and -r $testdir), "Test directory $testdir found" );

@@ -4,7 +4,6 @@
 
 use strict;
 use lib ();
-use UNIVERSAL 'isa';
 use File::Spec::Functions ':ALL';
 BEGIN {
 	$| = 1;
@@ -12,7 +11,11 @@ BEGIN {
 		require FindBin;
 		$FindBin::Bin = $FindBin::Bin; # Avoid a warning
 		chdir catdir( $FindBin::Bin, updir() );
-		lib->import('blib', 'lib');
+		lib->import(
+			catdir('blib', 'arch'),
+			catdir('blib', 'lib' ),
+			catdir('lib'),
+			);
 	}
 }
 
@@ -20,6 +23,7 @@ BEGIN {
 BEGIN { $PPI::XS_DISABLE = 1 }
 use PPI;
 use Carp 'croak';
+use Params::Util '_INSTANCE';
 
 use vars qw{$MAX_CHARS $ITERATIONS $LENGTH @ALL_CHARS};
 BEGIN {
@@ -157,7 +161,7 @@ sub test_code {
 		diag( "Shortest failing substring: \"$short\"" );
 		return;
 	}
-	unless ( isa($Document, 'PPI::Document') ) {
+	unless ( _INSTANCE($Document, 'PPI::Document') ) {
 		$failures++;
 		diag( "\"$quotable\": Parser did not return a Document" );
 		return;

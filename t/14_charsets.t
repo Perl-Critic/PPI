@@ -8,10 +8,8 @@ BEGIN {
     }
 }
 
-use utf8;
 use strict;
 use lib ();
-use UNIVERSAL 'isa';
 use File::Spec::Functions ':ALL';
 BEGIN {
 	$| = 1;
@@ -19,22 +17,26 @@ BEGIN {
 		require FindBin;
 		$FindBin::Bin = $FindBin::Bin; # Avoid a warning
 		chdir catdir( $FindBin::Bin, updir() );
-		lib->import('blib', 'lib');
+		lib->import(
+			catdir('blib', 'arch'),
+			catdir('blib', 'lib' ),
+			catdir('lib'),
+			);
 	}
 }
 
 # Load the code to test
 BEGIN { $PPI::XS_DISABLE = 1 }
 use PPI;
-
+use Params::Util '_INSTANCE';
 use Test::More tests => 11;
 
 sub good_ok {
 	my $source  = shift;
 	my $message = shift;
 	my $doc = PPI::Document->new( \$source );
-	ok( isa(ref $doc, 'PPI::Document'), $message );
-	if (! isa(ref $doc, 'PPI::Document')) {
+	ok( _INSTANCE($doc, 'PPI::Document'), $message );
+	if ( ! INSTANCE($doc, 'PPI::Document') ) {
 		diag($PPI::Document::errstr);
 	}
 }

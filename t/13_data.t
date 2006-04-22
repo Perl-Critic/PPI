@@ -4,7 +4,6 @@
 
 use strict;
 use lib ();
-use UNIVERSAL 'isa';
 use File::Spec::Functions ':ALL';
 BEGIN {
 	$| = 1;
@@ -12,7 +11,11 @@ BEGIN {
 		require FindBin;
 		$FindBin::Bin = $FindBin::Bin; # Avoid a warning
 		chdir catdir( $FindBin::Bin, updir() );
-		lib->import('blib', 'lib');
+		lib->import(
+			catdir('blib', 'arch'),
+			catdir('blib', 'lib' ),
+			catdir('lib'),
+			);
 	}
 }
 
@@ -23,7 +26,7 @@ use PPI;
 # Execute the tests
 use Test::More tests => 7;
 
-my $module = catfile('t.data', '13_data', 'Foo.pm');
+my $module = catfile('t', 'data', '13_data', 'Foo.pm');
 ok( -f $module, 'Test file exists' );
 
 my $Document = PPI::Document->new( $module );
