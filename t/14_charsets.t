@@ -51,6 +51,12 @@ SKIP: {
 		skip( "Unicode support requires perl >= 5.8.5", 11 );
 	}
 
+	# In some (weird) cases with custom locales, things aren't words
+	# that should be
+	unless ( "ä" =~ /\w/ ) {
+		skip( "Bizare Unicode-incompatible locale detected", 11 );
+	}
+
 	# Testing accented characters in UTF-8
 	good_ok( 'sub func { }',           "Parsed code without accented chars" );
 	good_ok( 'rätselhaft();',          "Function with umlaut"               );
