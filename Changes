@@ -7,6 +7,8 @@ Revision history for Perl extension PPI
 	Details:
 	- Small typo in the unicode-specific section of 14_charsets.t
 	  prevents tests passing for anyone with a unicode-sane Perl version.
+	- Added a test for strange locales that can't handle unicode,
+	  and skip the unicode tests.
 
 1.111   Sat 22 Apr 2006
 	General
