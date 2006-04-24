@@ -36,7 +36,7 @@ sub good_ok {
 	my $message = shift;
 	my $doc = PPI::Document->new( \$source );
 	ok( _INSTANCE($doc, 'PPI::Document'), $message );
-	if ( ! INSTANCE($doc, 'PPI::Document') ) {
+	if ( ! _INSTANCE($doc, 'PPI::Document') ) {
 		diag($PPI::Document::errstr);
 	}
 }

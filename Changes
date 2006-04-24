@@ -1,6 +1,14 @@
 Revision history for Perl extension PPI
 
-1.111    Sat 22 Apr 2006
+1.112   Mon 24 Apr 2006
+	General:
+	- Emergency release to fix a bug that prevents install on perl > 5.8.4
+
+	Details:
+	- Small typo in the unicode-specific section of 14_charsets.t
+	  prevents tests passing for anyone with a unicode-sane Perl version.
+
+1.111   Sat 22 Apr 2006
 	General
 	- Moved from SourceForge CVS to new collaborative SVN repository
 	- Fixed regressions other people had added since 1.110
@@ -15,7 +23,7 @@ Revision history for Perl extension PPI
 	- Removed every use of UNIVERSAL::isa in the tests
 	- Upgraded to Module::Install 0.62 (my private prerelease)
 
-1.110    Fri Jan 27 2005
+1.110   Fri Jan 27 2005
 	General
 	- Added test support for the third location component (Arjen Laarhoven)
 	- Various bug fixes
@@ -31,7 +39,7 @@ Revision history for Perl extension PPI
 	- Added a third element to ->location return arrayref that contains the visual
 	  starting column of the token, taking into account tabbing.
 
-1.109    Fri Dec 30 2005
+1.109   Fri Dec 30 2005
 	General:
 	- Various bug fixes
 	- Minor structural cleanup
@@ -53,7 +61,7 @@ Revision history for Perl extension PPI
 	- Fixed CPAN #16671 $_ is not localized (JPIERCE)
 	  (I missed an unlocaled $_ hiding in the Node object destructor)
 
-1.108    Thu Dec 15 2005
+1.108   Thu Dec 15 2005
 	General:
 	- Fixing of some very minor bugs
 
@@ -61,7 +69,7 @@ Revision history for Perl extension PPI
 	- 8 wasn't an illegal character in an octal number (fixed)
 	- Two <<heredocs with no content on the final line didn't round-trip (fixed)
 
-1.107    Wed Dec 14 2005
+1.107   Wed Dec 14 2005
 	General:
 	- PPI is now Editor-compatible.
 	- You can create a PPI::Document from random ASCII line noise!
@@ -76,14 +84,14 @@ Revision history for Perl extension PPI
 	  completely random line noise Perl programs.
 	  (Apparently I'm still leaking 1k per document somewhere)
 
-1.106    Sun Dec 11 2005
+1.106   Sun Dec 11 2005
 	General:
 	- More changes to support all possible 4-character programs
 
 	Details:
 	- Various fixes to weird things like *::'
 
-1.105    Sat Dec 10 2005
+1.105   Sat Dec 10 2005
 	General:
 	- Improvements driven by Audrey Tang's pugs wishlist.
 	  (So pugs can parse Perl 5, eep)
