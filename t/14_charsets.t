@@ -54,7 +54,7 @@ SKIP: {
 	# In some (weird) cases with custom locales, things aren't words
 	# that should be
 	unless ( "ä" =~ /\w/ ) {
-		skip( "Bizare Unicode-incompatible locale detected", 11 );
+		skip( "Unicode-incompatible locale in use", 11 );
 	}
 
 	# Testing accented characters in UTF-8
