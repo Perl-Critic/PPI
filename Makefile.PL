@@ -26,5 +26,4 @@ include        'Class::Inspector';
 include        'Config::Tiny';
 include        'Hook::LexWrap';
 
-auto_install;
 WriteAll;
