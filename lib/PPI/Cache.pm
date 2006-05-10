@@ -57,7 +57,7 @@ use PPI::Document ();
 
 use vars qw{$VERSION};
 BEGIN {
-	$VERSION = '1.112';
+	$VERSION = '1.113';
 }
 
 sub import {
