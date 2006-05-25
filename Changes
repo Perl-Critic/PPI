@@ -1,12 +1,24 @@
 Revision history for Perl extension PPI
 
+1.114   Thu 25 May 2006
+	Summary:
+	- This release addresses only dependency issues
+
+	Details:
+	- Changed over from IO::Scalar to IO::String
+	- Added a dependency on Task::Weaken so that we can make
+	  various not-so-clueful downstream packagers play nicely.
+
 1.113   Wed 10 May 2006
-	# This release contains only build-time changes
+	Summary:
+	- This release contains only build-time changes
+
+	Details:
 	- Upgraded to Module::Install 0.62
 	- No features() used in this dist, so removing auto_install
 
 1.112   Mon 24 Apr 2006
-	General:
+	Summary:
 	- Emergency release to fix a bug that prevents install on perl > 5.8.4
 
 	Details:
@@ -47,7 +59,7 @@ Revision history for Perl extension PPI
 	  starting column of the token, taking into account tabbing.
 
 1.109   Fri Dec 30 2005
-	General:
+	Summary:
 	- Various bug fixes
 	- Minor structural cleanup
 
@@ -69,7 +81,7 @@ Revision history for Perl extension PPI
 	  (I missed an unlocaled $_ hiding in the Node object destructor)
 
 1.108   Thu Dec 15 2005
-	General:
+	Summary:
 	- Fixing of some very minor bugs
 
 	Details:
@@ -77,7 +89,7 @@ Revision history for Perl extension PPI
 	- Two <<heredocs with no content on the final line didn't round-trip (fixed)
 
 1.107   Wed Dec 14 2005
-	General:
+	Summary:
 	- PPI is now Editor-compatible.
 	- You can create a PPI::Document from random ASCII line noise!
 
@@ -92,14 +104,14 @@ Revision history for Perl extension PPI
 	  (Apparently I'm still leaking 1k per document somewhere)
 
 1.106   Sun Dec 11 2005
-	General:
+	Summary:
 	- More changes to support all possible 4-character programs
 
 	Details:
 	- Various fixes to weird things like *::'
 
 1.105   Sat Dec 10 2005
-	General:
+	Summary:
 	- Improvements driven by Audrey Tang's pugs wishlist.
 	  (So pugs can parse Perl 5, eep)
 	- Latin-1/Unicode improvements (but now requires perl >= 5.8.5)
@@ -176,7 +188,7 @@ Revision history for Perl extension PPI
 	  actual damage was done as a result of this.
 
 1.100_01 Sat Sep 03 2005
-	General:
+	Summary:
 	- Added integrated cache support
 
 	Details:
@@ -186,7 +198,7 @@ Revision history for Perl extension PPI
 	- PPI::Document can be given a cache to use
 
 1.003 Tue Aug 18 2005
-	General:
+	Summary:
 	- Bug fix release
 
 	Details:
@@ -197,14 +209,14 @@ Revision history for Perl extension PPI
 	- Fixed bug where 's' crashed the Tokenizer
 
 1.002 Thu Jul 14 2005
-	General:
+	Summary:
 	- Bug fix release
 
 	Details:
 	- Fixed CPAN #13655 - insert_before and insert_after broken.
 
 1.001 Tue Jul 12 2005
-	General:
+	Summary:
 	- Turning on Test::Inline scripts
 
 	Details:
@@ -217,7 +229,7 @@ Revision history for Perl extension PPI
 	- Added t/ppi_token_quote_interpolate.t
 
 1.000 Sat Jul  9 2005
-	General:
+	Summary:
 	- FIRST PRODUCTION RELEASE
 	- Finalising POD, corrected the Copyright dates
 	- Rewrote much of the main PPI.pm docs
@@ -232,7 +244,7 @@ Revision history for Perl extension PPI
 	- Added PPI::Document::STORABLE_freeze and PPI::Document::STORABLE_thaw
 
 0.996 Fri Jul  8 2005
-	General:
+	Summary:
 	- RELEASE CANDIDATE 2
 	- Clearing all remaining RT bugs
 	- Removing and inlining dependencies
@@ -249,7 +261,7 @@ Revision history for Perl extension PPI
 	  when almost all the files we will read are under 50k.
 
 0.995 Sun Jul  3 2005
-	General:
+	Summary:
 	- RELEASE CANDIDATE 1
 	- Added some internals to help with XML compatibility
 	- Completed primary POD docs
@@ -271,7 +283,7 @@ Revision history for Perl extension PPI
 0.994 skipped
 
 0.993 Tue Jun 21 2005
-	General:
+	Summary:
 	- Various minor code, packaging and POD cleanups
 
 	Details:
@@ -282,7 +294,7 @@ Revision history for Perl extension PPI
 	- Until it fixes the problem, explicitly include ExtUtils::AutoInstall
 
 0.992 Sun Jun 12 2005
-	General:
+	Summary:
 	- Added the PPI::Transform API
 
 0.991 Fri Jun 10 2005
@@ -291,14 +303,14 @@ Revision history for Perl extension PPI
 	  This was confusing people as to why.
 
 0.990 Wed Jun  8 2005
-	General:
+	Summary:
 	- Last version (hopefully) to make API changes
 	- Slight API shuffle in the constructors
 	- Completed all PPI::Statement::* API documentation
 	- Enabled latin-1 support in the appropriate places
 
 0.906 Thu Apr 28 2005
-	General:
+	Summary:
 	- Completed location support and added related unit tests
 	- Added API for future support of tab widths
 
@@ -313,7 +325,7 @@ Revision history for Perl extension PPI
 	  (to remove the ->{tab_width} attributes and later other things)
 
 0.905 Wed Apr 20 2005
-	General:
+	Summary:
 	- Completely forgot to write unit tests for PPI::Util,
 	  and a bug slipped in. Fixed and added tests
 
@@ -322,7 +334,7 @@ Revision history for Perl extension PPI
 	- Added 11_util.t
 
 0.904 Wed Apr 20 2005
-	General:
+	Summary:
 	- Improvements to PPI::Normal
 	- Method renaming to parse-time PDOM private methods
 	- Various bug fixes and POD tweaks
@@ -347,7 +359,7 @@ Revision history for Perl extension PPI
 	- Added exportable function PPI::Util::_Document
 
 0.903 Fri Mar 25 2005
-	General:
+	Summary:
 	- PPI::Document and other PPI::Node-subclasses will now implicitly
 	  DESTROY correctly.
 	- Now that PPI.pm is just a module loader, merge the main
@@ -366,7 +378,7 @@ Revision history for Perl extension PPI
 	- Fixed a POD bug in Element.pm
 
 0.902 Sun Feb  6 2005
-	General:
+	Summary:
 	- Added Document Normalization functions from old Perl::Compare
 	  (although it is very very limited in function at this point)
 
@@ -379,7 +391,7 @@ Revision history for Perl extension PPI
 	       but then returning the original :( Fixed
 
 0.901 Sat Jan 29 2005
-	General:
+	Summary:
 	- Moved all up-to-date code over to SourceForge
 	- Various fixes to allow the release of File::Find::Rule::PPI
 
@@ -393,7 +405,7 @@ Revision history for Perl extension PPI
 	- Added a stub and docs for PPI::Statement::stable
 
 0.900 Mon Jan 17 2005
-	General:
+	Summary:
 	- Final removal of PPI::Base
 	- Completed majority of crash bugs in the Tokenizer
 
@@ -415,7 +427,7 @@ Revision history for Perl extension PPI
 	- PPI::XS - Added all C<significant> methods
 
 0.846 Mon Jan 17 2005
-	General:
+	Summary:
 	- Added proper support for <FILE>
 	- Last release before beta 1 if all looks good
 
@@ -426,7 +438,7 @@ Revision history for Perl extension PPI
 	- A few other minor bug fixes
 
 0.845 Sat Jan 15 2005
-	General:
+	Summary:
 	- Adding integration with PPI::XS, autoloading if installed
 
 	Details:
@@ -437,7 +449,7 @@ Revision history for Perl extension PPI
 	- PPI::Element::significant implemented in XS (as a trial)
 
 0.844 Fri Jan 14 2005
-	General:
+	Summary:
 	- Found a massive performance bug when parsing large perl constructs
 	- Fixed some install problems
 
@@ -447,7 +459,7 @@ Revision history for Perl extension PPI
 	- The core tests still expect Transform to be in the core. Fixed.
 
 0.843 Tue Jan 12 2005
-	General:
+	Summary:
 	- Starting the process of removing PPI::Base.
 	  It only does does error handling now, which will be split up.
 	- Fixing some packaging and "play well with others" issues
@@ -467,7 +479,7 @@ Revision history for Perl extension PPI
 	- Fixed Tokenizer Bug: C< $foo->{s} > was being seen as a regex
 
 0.842 Tue Jan 11 2005
-	General:
+	Summary:
 	- Lots of debugging based on Tinderbox results
 
 	Details:
@@ -482,7 +494,7 @@ Revision history for Perl extension PPI
 	- Added an very early filter to prevent non-basic chars going in
 
 0.841 Mon Jan 10 2005
-	General:
+	Summary:
 	- Completed much more documentation on the core classes
 	- PPI::Tester back in sync again (seperate distribution)
 	- PPI::Processor and PPI::Tinderbox completed (seperate distribution)
@@ -498,7 +510,7 @@ Revision history for Perl extension PPI
 	- Fixed similar case with C< foo->y() >
 
 0.840 Thu Dec 21 2004
-	General:
+	Summary:
 	- Changed the PPI summary to no longer use the devisive word "parse"
 	  Now: "PPI - Analyze and manipulate Perl code without using perl itself"
 	- Total rewrite of all the ->location code
@@ -529,7 +541,7 @@ Revision history for Perl extension PPI
 	- Updated Class::Autouse dependency to newest version
 
 0.840_01 Tue Dec 21 2004
-	General:
+	Summary:
 	- Perl Foundation Funding Commences
 	- Changes separated into General and Details from here on
 	- Complete re-organisation of the quote-like token classes.

@@ -7,7 +7,7 @@ requires       'Clone'            => '0.17';
 requires       'List::Util'       => '1.17'; # Should be 1.18 ASAP
 requires       'List::MoreUtils'  => '0.13';
 requires       'Params::Util'     => '0.10';
-requires       'IO::Scalar'       => '2.105';
+requires       'IO::String'       => '1.07';
 
 # Modules needed for PPI::Cache
 requires       'Digest::MD5'      => '2.27';
@@ -25,5 +25,9 @@ include        'File::Remove';
 include        'Class::Inspector';
 include        'Config::Tiny';
 include        'Hook::LexWrap';
+
+# Force the existance of the weaken function
+# (which some distributions annoying don't have)
+requires       'Task::Weaken';
 
 WriteAll;

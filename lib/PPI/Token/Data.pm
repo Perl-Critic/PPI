@@ -29,7 +29,7 @@ our parent L<PPI::Token> and L<PPI::Element> classes.
 
 use strict;
 use base 'PPI::Token';
-use IO::Scalar ();
+use IO::String ();
 
 use vars qw{$VERSION};
 BEGIN {
@@ -47,7 +47,7 @@ BEGIN {
 
 =head2 handle
 
-The C<handle> method returns a L<IO::Scalar> handle that allows you
+The C<handle> method returns a L<IO::String> handle that allows you
 to do all the normal handle'y things to the contents of the __DATA__
 section of the file.
 
@@ -55,13 +55,13 @@ Unlike in perl itself, this means you can also do things like C<print>
 new data onto the end of the __DATA__ section, or modify it with
 any other process that can accept an L<IO::Handle> as input or output.
 
-Returns an L<IO::Scalar> object
+Returns an L<IO::String> object.
 
 =cut
 
 sub handle {
 	my $self = shift;
-	IO::Scalar->new( \$self->{content} );
+	IO::String->new( \$self->{content} );
 }
 
 sub __TOKENIZER__on_char { 1 }
