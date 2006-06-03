@@ -667,9 +667,12 @@ sub _statement_continues {
 	if ( $type eq 'while' ) {
 		# LABEL while (EXPR) BLOCK
 		# LABEL while (EXPR) BLOCK continue BLOCK
+		# LABEL until (EXPR) BLOCK
+		# LABEL until (EXPR) BLOCK continue BLOCK
 		# The only case not covered is the while ...
-		if ( $LastChild->isa('PPI::Token::Word') and $LastChild->content eq 'while' ) {
+		if ( $LastChild->isa('PPI::Token::Word') and $LastChild->content eq 'while' or $LastChild->content eq 'until' ) {
 			# LABEL while ...
+			# LABEL until ...
 			# Only a condition structure will do
 			return $Token->isa('PPI::Token::Structure') && $Token->content eq '(';
 		}
