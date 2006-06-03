@@ -62,6 +62,7 @@ BEGIN {
 		'if'      => 'if',
 		'unless'  => 'if',
 		'while'   => 'while',
+		'until'   => 'while',
 		'foreach' => 'foreach',
 		);
 }
