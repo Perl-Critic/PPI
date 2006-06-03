@@ -1,5 +1,12 @@
 Revision history for Perl extension PPI
 
+1.115   ...
+	Summary:
+	- Bug fixes
+
+	Details:
+	- Fixed #19614: Suspicious code in PPI::Structure
+
 1.114   Thu 25 May 2006
 	Summary:
 	- This release addresses only dependency issues
