@@ -319,6 +319,7 @@ BEGIN {
 		'for'      => 'PPI::Statement::Compound',
 		'foreach'  => 'PPI::Statement::Compound',
 		'while'    => 'PPI::Statement::Compound',
+		'until'    => 'PPI::Statement::Compound',
 
 		# Various ways of breaking out of scope
 		'redo'     => 'PPI::Statement::Break',
