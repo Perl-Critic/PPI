@@ -1,5 +1,5 @@
 PPI::Document
-  PPI::Statement
+  PPI::Statement::Expression
     PPI::Structure::List  	( ... )
       PPI::Statement
         PPI::Token::Number  	'0'
