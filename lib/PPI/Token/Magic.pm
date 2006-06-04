@@ -46,7 +46,7 @@ use base 'PPI::Token::Symbol';
 
 use vars qw{$VERSION %magic};
 BEGIN {
-	$VERSION = '1.114';
+	$VERSION = '1.115';
 
 	# Magic variables taken from perlvar.
 	# Several things added separately to avoid warnings.
