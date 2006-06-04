@@ -42,7 +42,7 @@ sub pause {
 
 # For each new item in t/data/08_regression add another 11 tests
 
-use Test::More tests => 153;
+use Test::More tests => 164;
 
 use vars qw{$testdir};
 BEGIN {
