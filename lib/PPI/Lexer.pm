@@ -244,6 +244,17 @@ sub _lex_document {
 		if ( $Token->__LEXER__opens ) {
 			# Resolve the class for the Structure and create it
 			my $_class = $self->_resolve_new_structure($Document, $Token) or return undef;
+			if ( $_class eq 'PPI::Structure::List' ) {
+				# This should actually have a Statement
+				$self->_rollback( $Token );
+				my $Statement = PPI::Statement->new          or return undef;
+				$self->_add_delayed( $Document )             or return undef;
+				$self->_lex_statement( $Statement )          or return undef;
+				$self->_add_element( $Document, $Statement ) or return undef;
+				next;
+			}
+
+			# Create the structure
 			my $Structure = $_class->new( $Token ) or return undef;
 
 			# Move the lexing down into the structure
