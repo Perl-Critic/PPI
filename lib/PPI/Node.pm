@@ -558,6 +558,7 @@ sub prune {
 				# Delete the child
 				$element->delete or return undef;
 				$pruned++;
+				next;
 			}
 
 			# Support the undef == "don't descend"
