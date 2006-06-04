@@ -2,11 +2,14 @@ Revision history for Perl extension PPI
 
 1.115   ...
 	Summary:
-	- Bug fixes
+	- Fixing rt.cpan.org bugs
 
 	Details:
 	- Fixed #19614: Suspicious code in PPI::Structure
-	- Fixed #16831 until () { } not parsed as compound statement
+	- Fixed #16831: until () { } not parsed as compound statement
+	- NOTABUG #16834: "$a = 1 if ($a == 2)" vs "$a = 1 if $a == 2"
+	- Fixed #19629: End of list mistakenly seen as end of statement
+	- Fixed #18413: PPI::Node prune() implementation broken
 
 1.114   Thu 25 May 2006
 	Summary:
