@@ -35,7 +35,7 @@ sub _Document {
 	undef;
 }
 
-# Provide a single _slurp implementation
+# Provide a simple _slurp implementation
 sub _slurp {
 	my $file = shift;
 	local $/ = undef;
