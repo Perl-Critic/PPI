@@ -911,6 +911,15 @@ sub _lex_structure {
 			###         Statement::Expression in here somewhere.
 			# Determine the class for the structure and create it
 			my $_class = $self->_resolve_new_structure($Structure, $Token) or return undef;
+			if ( $_class eq 'PPI::Structure::List' ) {
+				# This should actually have a Statement
+				$self->_rollback( $Token );
+				my $Statement = PPI::Statement->new           or return undef;
+				$self->_add_delayed( $Structure )             or return undef;
+				$self->_lex_statement( $Statement )           or return undef;
+				$self->_add_element( $Structure, $Statement ) or return undef;
+				next;
+			}
 			my $Structure2 = $_class->new( $Token ) or return undef;
 
 			# Move the lexing down into the Structure
