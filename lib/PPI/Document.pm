@@ -238,6 +238,7 @@ sub get_cache {
 
 =head2 save $file
 
+  $document->save 
 The C<save> method serializes the C<PPI::Document> object and saves the
 resulting Perl document to a file. Returns C<undef> on failure to open
 or write to the file.
