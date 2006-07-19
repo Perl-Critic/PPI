@@ -482,7 +482,7 @@ sub index_locations {
 
 		# Found the first Token without a location
 		# Calculate the new location if needed.
-		$location = $first
+		$location = $_
 			? $self->_add_location( $location, $Tokens[$_ - 1], \$heredoc )
 			: [ 1, 1, 1 ];
 		$first = $_;
