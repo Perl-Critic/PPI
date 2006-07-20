@@ -5,20 +5,11 @@
 # This test script only tests that the tree compiles
 
 use strict;
-use lib ();
 use File::Spec::Functions ':ALL';
 BEGIN {
 	$| = 1;
-	unless ( $ENV{HARNESS_ACTIVE} ) {
-		require FindBin;
-		$FindBin::Bin = $FindBin::Bin; # Avoid a warning
-		chdir catdir( $FindBin::Bin, updir() );
-		lib->import(
-			catdir('blib', 'arch'),
-			catdir('blib', 'lib' ),
-			catdir('lib'),
-			);
-	}
+	$PPI::XS_DISABLE = 1;
+	$PPI::XS_DISABLE = 1; # Prevent warning
 }
 
 use Test::More tests => 18;
@@ -31,10 +22,6 @@ use Test::More tests => 18;
 ok( $] >= 5.005, "Your perl is new enough" );
 
 # Does the module load
-BEGIN {
-	$PPI::XS_DISABLE = 1;
-	$PPI::XS_DISABLE = 1; # Kill warning
-}
 use_all_ok( qw{
 	PPI
 	PPI::Tokenizer

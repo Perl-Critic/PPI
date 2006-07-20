@@ -6,24 +6,12 @@
 # Using PPI to analyse it's own code at install-time? Fuck yeah! :)
 
 use strict;
-use lib ();
 use File::Spec::Functions ':ALL';
 BEGIN {
 	$| = 1;
-	unless ( $ENV{HARNESS_ACTIVE} ) {
-		require FindBin;
-		$FindBin::Bin = $FindBin::Bin; # Avoid a warning
-		chdir catdir( $FindBin::Bin, updir() );
-		lib->import(
-			catdir('blib', 'arch'),
-			catdir('blib', 'lib' ),
-			catdir('lib'),
-			);
-	}
+	$PPI::XS_DISABLE = 1;
+	$PPI::XS_DISABLE = 1; # Prevent warning
 }
-
-# Load the code to test
-BEGIN { $PPI::XS_DISABLE = 1 }
 use PPI;
 use Class::Inspector;
 use constant CI => 'Class::Inspector';

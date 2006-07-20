@@ -3,10 +3,14 @@ Revision history for Perl extension PPI
 1.116   ...
 	Summary:
         - PPI::Document::File
-	- Fixing bugs
+	- Adding readonly attribute
+	- Various accumulated bugs
 
 	Details:
+	- Upgraded to Module::Install 0.63
         - Add a new file-only subclass of PPI::Document
+	- Added the readonly attribute to the PPI::Document->new constructor
+	- Added method PPI::Document->readonly method
         - 'goto' is a PPI::Statement::Break
 	- Re-fixed #19629: End of list mistakenly seen as end of statement
 

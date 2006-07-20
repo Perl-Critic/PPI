@@ -93,20 +93,42 @@ my $CACHE = undef;
 
 =pod
 
-=head2 new $file, \$source
+=head2 new
+
+  # Simple construction
+  $doc = PPI::Document->new( $filename );
+  $doc = PPI::Document->new( \$source  );
+  
+  # With the readonly attribute set
+  $doc = PPI::Document->new( $filename,
+          readonly => 1,
+          );
 
 The C<new> constructor takes as argument a variety of different sources of
-Perl code, and attempt to create a single cohesive Perl C<PPI::Document>
+Perl code, and creates a single cohesive Perl C<PPI::Document>
 for it.
 
 If passed a file name as a normal string, it will attempt to load the
 document from the file.
 
-If passed a reference to a SCALAR, this is taken to be source code and
+If passed a reference to a C<SCALAR>, this is taken to be source code and
 parsed directly to create the document.
 
 If passed zero arguments, a "blank" document will be created that contains
 no content at all.
+
+In all cases, the document is considered to be "anonymous" and not tied back
+to where it was created from. Specifically, if you create a PPI::Document from
+a filename, the document will B<not> remember where it was created from.
+
+The constructor also takes attribute flags.
+
+At this time, the only available attribute is the C<readonly> flag.
+
+Setting C<readonly> to true will allow various systems to provide
+additional optimisations and caching. Note that because C<readonly> is an
+optimisation flag, it is off by default and you will need to explicitly
+enable it.
 
 Returns a C<PPI::Document> object, or C<undef> if parsing fails.
 
@@ -115,27 +137,28 @@ Returns a C<PPI::Document> object, or C<undef> if parsing fails.
 sub new {
 	local $_; # An extra one, just in case
 	my $class = ref $_[0] ? ref shift : shift;
-	
+
 	unless ( @_ ) {
 		my $self = $class->SUPER::new;
+		$self->{readonly}  = ! 1;
 		$self->{tab_width} = 1;
 		return $self;
 	}
 
-	# Check the source code
-	if ( ! defined $_[0] ) {
+	# Check the data source
+	my $source = shift;
+	if ( ! defined $source ) {
 		$class->_error("An undefined value was passed to PPI::Document::new");
 
-	} elsif ( ! ref $_[0] ) {
+	} elsif ( ! ref $source ) {
 		# Catch people using the old API
-		if ( $_[0] =~ /(?:\012|\015)/ ) {
+		if ( $source =~ /(?:\012|\015)/ ) {
 			Carp::croak("API CHANGE: Source code should only be passed to PPI::Document->new as a SCALAR reference");
 		}
 
-		# When loading from a filename, use the caching
-		# layer if it exists.
+		# When loading from a filename, use the caching layer if it exists.
 		if ( $CACHE ) {
-			my $file   = shift;
+			my $file   = $source;
 			my $source = PPI::Util::_slurp( $file );
 			unless ( ref $source ) {
 				# Errors returned as plain string
@@ -143,23 +166,23 @@ sub new {
 			}
 
 			# Retrieve the document from the cache
-			my $Document = $CACHE->get_document($source);
-			return $Document if $Document;
+			my $document = $CACHE->get_document($source);
+			return $class->_setattr( $document, @_ ) if $document;
 
-			$Document = PPI::Lexer->lex_source( $$source );
-			if ( $Document ) {
+			$document = PPI::Lexer->lex_source( $$source );
+			if ( $document ) {
 				# Save in the cache
-				$CACHE->store_document( $Document );
-				return $Document;
+				$CACHE->store_document( $document );
+				return $class->_setattr( $document, @_ );
 			}
 		} else {
-			my $Document = PPI::Lexer->lex_file( shift );
-			return $Document if $Document;
+			my $document = PPI::Lexer->lex_file( $source );
+			return $class->_setattr( $document, @_ ) if $document;
 		}
 
-	} elsif ( _SCALAR($_[0]) ) {
-		my $Document = PPI::Lexer->lex_source( ${$_[0]} );
-		return $Document if $Document;
+	} elsif ( _SCALAR($source) ) {
+		my $document = PPI::Lexer->lex_source( $$source );
+		return $class->_setattr( $document, @_ ) if $document;
 
 	} else {
 		$class->_error("An unknown object or reference was passed to PPI::Document::new");
@@ -174,6 +197,12 @@ sub new {
 
 sub load {
 	Carp::croak("API CHANGE: File names should now be passed to PPI::Document->new to load a file");
+}
+
+sub _setattr {
+	my ($class, $document, %attr) = @_;
+	$document->{readonly} = !! $attr{readonly};
+	return $document;
 }
 
 =pod
@@ -200,6 +229,7 @@ Returns true on success, or C<undef> if not passed a valid param.
 
 sub set_cache {
 	my $class  = ref $_[0] ? ref shift : shift;
+
 	if ( defined $_[0] ) {
 		# Enable the cache
 		my $object = _INSTANCE(shift, 'PPI::Cache') or return undef;
@@ -208,6 +238,7 @@ sub set_cache {
 		# Disable the cache
 		$CACHE = undef;
 	}
+
 	1;
 }
 
@@ -236,9 +267,49 @@ sub get_cache {
 
 =pod
 
-=head2 save $file
+=head2 readonly
 
-  $document->save 
+The C<readonly> attribute indicates if the document is intended to be
+read-only, and will never be modified. This is an advisory flag, that
+writers of L<PPI>-related systems may or may not use to enable
+optimisations and caches for your document.
+
+Returns true if the document is read-only or false if not.
+
+=cut
+
+sub readonly {
+	$_[0]->{readonly};
+}
+
+=pod
+
+=head2 tab_width [ $width ]
+
+In order to handle support for C<location> correctly, C<Documents>
+need to understand the concept of tabs and tab width. The C<tab_width>
+method is used to get and set the size of the tab width.
+
+At the present time, PPI only supports "naive" (width 1) tabs, but we do
+plan on supporting arbittrary, default and auto-sensing tab widths later.
+
+Returns the tab width as an integer, or C<die>s if you attempt to set the
+tab width.
+
+=cut
+
+sub tab_width {
+	my $self = shift;
+	return $self->{tab_width} unless @_;
+	$self->{tab_width} = shift;
+}
+
+=pod
+
+=head2 save
+
+  $document->save( $file )
+ 
 The C<save> method serializes the C<PPI::Document> object and saves the
 resulting Perl document to a file. Returns C<undef> on failure to open
 or write to the file.
@@ -251,28 +322,6 @@ sub save {
 	print PPIOUTPUT $self->serialize or return undef;
 	close PPIOUTPUT                  or return undef;
 	1;
-}
-
-=pod
-
-=head2 tab_width [ $width ]
-
-In order to handle support for C<location> correctly, C<Documents>
-need to understand the concept of tabs and tab width. The C<tab_width>
-method is used to get and set the size of the tab width.
-
-At the present time, PPI only support "naive" (width 1) tabs, but we do
-plan on supporting artibtrary, default and auto-sensing tab widths.
-
-Returns the tab width as an integer, or C<die>s if you attempt to set the
-tab width.
-
-=cut
-
-sub tab_width {
-	my $self = shift;
-	return $self->{tab_width} unless @_;
-	$self->{tab_width} = shift;
 }
 
 =pod
@@ -711,7 +760,11 @@ See the L<support section|PPI/SUPPORT> in the main module
 
 =head1 AUTHOR
 
-Adam Kennedy, L<http://ali.as/>, cpan@ali.as
+Adam Kennedy E<lt>adamk@cpan.orgE<gt>
+
+=head1 SEE ALSO
+
+L<PPI>, L<http://ali.as/>
 
 =head1 COPYRIGHT
 
