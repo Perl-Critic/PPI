@@ -43,7 +43,7 @@ SCOPE: {
 		readonly => 2,
 		);
 	isa_ok( $doc3, 'PPI::Document' );
-	is( $doc3->readonly, '', '->readonly is true for explicit true' );
+	is( $doc3->readonly, 1, '->readonly is true for explicit true' );
 }
 
 exit(0);

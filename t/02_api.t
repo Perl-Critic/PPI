@@ -15,7 +15,7 @@ use PPI::Find;
 use PPI::Transform;
 
 # Execute the tests
-use Test::More tests => 2189;
+use Test::More tests => 2191;
 use Test::ClassAPI;
 
 # Ignore various imported or special functions
