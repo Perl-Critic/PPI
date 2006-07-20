@@ -12,6 +12,7 @@ PPI::Statement::Break - Statements which break out of normal statement flow
   goto FOO;
   next if condition();
   return $foo;
+  redo;
 
 =head1 INHERITANCE
 
@@ -23,8 +24,8 @@ PPI::Statement::Break - Statements which break out of normal statement flow
 =head1 DESCRIPTION
 
 C<PPI::Statement::Break> is intended to represent statements that break
-out of the normal statement flow control. This covers the four basic
-types C<'goto'>, C<'next'>, C<'last'> and C<'return'>.
+out of the normal statement flow control. This covers the basic
+types C<'redo'>, C<'goto'>, C<'next'>, C<'last'> and C<'return'>.
 
 =head1 METHODS
 

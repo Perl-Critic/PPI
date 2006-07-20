@@ -1,0 +1,13 @@
+PPI::Document
+  PPI::Statement
+    PPI::Token::Word  	'sub'
+    PPI::Token::Whitespace  	' '
+    PPI::Structure::Block  	{ ... }
+      PPI::Token::Whitespace  	' '
+      PPI::Statement::Break
+        PPI::Token::Word  	'goto'
+        PPI::Token::Whitespace  	' '
+        PPI::Token::Word  	'FOO'
+        PPI::Token::Structure  	';'
+      PPI::Token::Whitespace  	' '
+  PPI::Token::Whitespace  	'\n'
