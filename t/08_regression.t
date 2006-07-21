@@ -30,7 +30,7 @@ sub pause {
 
 # For each new item in t/data/08_regression add another 11 tests
 
-use Test::More tests => 186;
+use Test::More tests => 187;
 
 use vars qw{$testdir};
 BEGIN {
@@ -211,5 +211,17 @@ SCOPE: {
 	isa_ok( $Document, 'PPI::Document' );
 }
 is( $_, 1234, 'Remains after document creation and destruction' );
+
+#####################################################################
+# Regression Test for rt.cpan.org #20612
+
+SCOPE: {
+my $code = <<'CODE';
+my @clients = @{ $dbh->selectall_arrayref( <<'CLIENTS' ) || [] };
+   ... some sql statements here ...
+CLIENTS
+CODE
+is(PPI::Document->new(\$code)->content, $code, 'RT 20612: rendering HEREDOC');
+}
 
 exit();
