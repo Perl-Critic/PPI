@@ -27,11 +27,6 @@ in the various types that Perl supports.
 
 =head1 METHODS
 
-There are no additional methods beyond those provided by the parent
-L<PPI::Token> and L<PPI::Element> classes.
-
-Got any ideas for methods? Submit a report to rt.cpan.org!
-
 =cut
 
 use strict;
@@ -42,8 +37,16 @@ BEGIN {
 	$VERSION = '1.115';
 }
 
+=head2 base
 
+Returns the base for the number.  This is 10 for decimal, 16 for hexadecimal, etc.
 
+=cut
+
+sub base {
+	my $self = shift;
+	return $self->{_base} || 10;
+}
 
 
 #####################################################################
@@ -63,13 +66,13 @@ sub __TOKENIZER__on_char {
 	if ( $token->{content} =~ /^-?0_*$/ ) {
 		# This could be special
 		if ( $char eq 'x' ) {
-			$token->{_subtype} = 'hex';
+			$token->{_base} = 16;
 			return 1;
 		} elsif ( $char eq 'b' ) {
-			$token->{_subtype} = 'binary';
+			$token->{_base} = 2;
 			return 1;
 		} elsif ( $char =~ /\d/ ) {
-			$token->{_subtype} = 'octal';
+			$token->{_base} = 8;
 			return 1;
 		} elsif ( $char eq '.' ) {
 			return 1;
@@ -79,7 +82,9 @@ sub __TOKENIZER__on_char {
 		}
 	}
 
-	if ( ! $token->{_subtype} or $token->{_subtype} eq 'base256' ) {
+	$token->{_base} = 10 unless $token->{_base};
+
+	if ( $token->{_base} == 10 or $token->{_base} == 256 ) {
 		# Handle the easy case, integer or real.
 		return 1 if $char =~ /\d/o;
 
@@ -97,13 +102,13 @@ sub __TOKENIZER__on_char {
 					return 1;
 				} else {
 					# Flag as a base256.
-					$token->{_subtype} = 'base256';
+					$token->{_base} = 256;
 					return 1;
 				}
 			}
 		}
 
-	} elsif ( $token->{_subtype} eq 'octal' ) {
+	} elsif ( $token->{_base} == 8 ) {
 		if ( $char =~ /\d/ ) {
 			# You cannot have 8s and 9s on octals
 			if ( $char eq '8' or $char eq '9' ) {
@@ -112,7 +117,7 @@ sub __TOKENIZER__on_char {
 			return 1;
 		}
 
-	} elsif ( $token->{_subtype} eq 'hex' ) {
+	} elsif ( $token->{_base} == 16 ) {
 		if ( $char =~ /\w/ ) {
 			unless ( $char =~ /[\da-f]/ ) {
 				# Add a warning if it contains non-hex chars
@@ -121,7 +126,7 @@ sub __TOKENIZER__on_char {
 			return 1;
 		}
 
-	} elsif ( $token->{_subtype} eq 'binary' ) {
+	} elsif ( $token->{_base} == 2 ) {
 		if ( $char =~ /[\w\d]/ ) {
 			unless ( $char eq '1' or $char eq '0' ) {
 				# Add a warning if it contains non-hex chars
@@ -131,7 +136,7 @@ sub __TOKENIZER__on_char {
 		}
 
 	} else {
-		Carp::croak("Unknown number type '$token->{_subtype}'");
+		Carp::croak("Unknown number type 'base$token->{_base}'");
 	}
 
 	# Doesn't fit a special case, or is after the end of the token
@@ -146,6 +151,8 @@ sub __TOKENIZER__on_char {
 =head1 TO DO
 
 - Add proper unit testing to this
+
+- Add support for exponential notation
 
 - What the hell is a base256 number and why did I use it.
   Surely it should be something more like "base1000" or "version".
