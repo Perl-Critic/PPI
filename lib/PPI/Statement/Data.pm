@@ -45,7 +45,7 @@ use base 'PPI::Statement';
 
 use vars qw{$VERSION};
 BEGIN {
-	$VERSION = '1.115';
+	$VERSION = '1.116';
 }
 
 1;

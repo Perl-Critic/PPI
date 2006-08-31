@@ -2,7 +2,7 @@ Revision history for Perl extension PPI
 
 1.116   ...
 	Summary:
-        - PPI::Document::File
+        - PPI::Document::File first release
 	- Adding readonly attribute
 	- Fixed various accumulated bugs
 
@@ -22,6 +22,7 @@ Revision history for Perl extension PPI
 	- Resolved NOTABUG #20038 (PPI installation)
 	- Fixed #19883: 'package' bareword used as hash key is detected as package statement
 	- Fixed #19629: End of list mistakenly seen as end of statement
+	- Fixed #15043: (no description)  # He wanted PPI::Document::File
 
 1.115   Sat 03 Jun 2006
 	Summary:
