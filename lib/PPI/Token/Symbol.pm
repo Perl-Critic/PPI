@@ -8,7 +8,7 @@ PPI::Token::Symbol - A token class for variables and other symbols
 
 =head1 INHERITANCE
 
-  PPI::Token::Word
+  PPI::Token::Symbol
   isa PPI::Token
       isa PPI::Element
 

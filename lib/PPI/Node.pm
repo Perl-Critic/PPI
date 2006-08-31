@@ -536,6 +536,7 @@ print "\n";
 
 exit;
 END_PERL
+
 isa_ok( $document, 'PPI::Document' );
 ok( defined($document->prune ('PPI::Statement::Sub')),
 	'Pruned multiple subs ok' );

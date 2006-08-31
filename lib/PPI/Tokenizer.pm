@@ -766,8 +766,8 @@ sub _last_significant_token {
 # Returns array ref on success.
 # Returns 0 on not enough tokens
 sub _previous_significant_tokens {
-	my $self = shift;
-	my $count = shift || 1;
+	my $self   = shift;
+	my $count  = shift || 1;
 	my $cursor = $#{ $self->{tokens} };
 
 	my ($token, @tokens);
@@ -785,6 +785,42 @@ sub _previous_significant_tokens {
 	}
 
 	\@tokens;
+}
+
+my %OBVIOUS_CLASS = (
+	'PPI::Token::Symbol'     => 'operator',
+	'PPI::Token::Magic'      => 'operator',
+	'PPI::Token::Number'     => 'operator',
+	'PPI::Token::ArrayIndex' => 'operator',
+	'PPI::Token::Quote'      => 'operator',
+);
+my %OBVIOUS_CONTENT = (
+	'(' => 'operand',
+	'{' => 'operand',
+	'[' => 'operand',
+	';' => 'operand',
+);
+
+# Try to determine operator/operand context, is possible.
+# Returns "operator", "operand", or "" if unknown.
+sub _opcontext {
+	my $self   = shift;
+	my $tokens = $self->_previous_significant_tokens( 1 );
+	my $p0     = $tokens->[0];
+
+	# Map the obvious cases
+	my $c0 = ref $p0;
+	return $OBVIOUS_CLASS{$c0}   if defined $OBVIOUS_CLASS{$c0};
+	return $OBVIOUS_CONTENT{$p0} if defined $OBVIOUS_CONTENT{$p0};
+
+	# Most of the time after an operator, we are an operand
+	return 'operand' if $p0->isa('PPI::Token::Operator');
+
+	# If there's NOTHING, it's operand
+	return 'operand' if $p0->content eq '';
+
+	# Otherwise, we don't know
+	return ''
 }
 
 

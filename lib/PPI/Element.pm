@@ -650,7 +650,7 @@ sub location {
 	unless ( exists $self->{_location} ) {
 		# Are we inside a normal document?
 		my $Document = $self->document or return undef;
-		unless ( $Document->isa('PPI::Document::Fragment') ) {
+		if ( $Document->isa('PPI::Document::Fragment') ) {
 			# Because they can't be serialized, document fragments
 			# do not support the concept of location.
 			return undef;

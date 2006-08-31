@@ -30,7 +30,7 @@ sub pause {
 
 # For each new item in t/data/08_regression add another 11 tests
 
-use Test::More tests => 197;
+use Test::More tests => 204;
 
 use vars qw{$testdir};
 BEGIN {
@@ -212,4 +212,60 @@ SCOPE: {
 }
 is( $_, 1234, 'Remains after document creation and destruction' );
 
-exit();
+
+
+
+
+#####################################################################
+# Bug 16815: location of Structure::List is not defined.
+
+SCOPE: {
+	my $code = '@foo = (1,2)';
+	my $doc = PPI::Document->new(\$code);
+	isa_ok( $doc, 'PPI::Document' );
+	ok( $doc->find_first('Structure::List')->location, '->location for a ::List returns true' );
+}
+
+
+
+
+
+#####################################################################
+# Bug 18413: PPI::Node prune() implementation broken
+
+SCOPE: {
+	my $doc = PPI::Document->new( \<<'END_PERL' );
+#!/usr/bin/perl
+
+use warnings;
+
+sub one { 1 }
+sub two { 2 }
+sub three { 3 }
+
+print one;
+print "\n";
+print three;
+print "\n";
+
+exit;
+END_PERL
+	isa_ok( $doc, 'PPI::Document' );
+	ok( defined $doc->prune('PPI::Statement::Sub'), '->prune ok' );
+}
+
+
+
+
+
+#####################################################################
+# Bug 19883: 'package' bareword used as hash key is detected as package statement
+
+SCOPE: {
+	my $doc = PPI::Document->new( \'(package => 123)' );
+	isa_ok( $doc, 'PPI::Document' );
+	isa_ok( $doc->child(0)->child(0)->child(0), 'PPI::Statement' );
+	isa_ok( $doc->child(0)->child(0)->child(0), 'PPI::Statement::Expression' );
+}
+
+exit(0);

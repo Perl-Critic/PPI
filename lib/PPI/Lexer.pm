@@ -351,6 +351,33 @@ sub _resolve_new_statement {
 	# my $Parent = _INSTANCE(shift, 'PPI::Node')  or die "Bad param 1";
 	# my $Token  = _INSTANCE(shift, 'PPI::Token') or die "Bad param 2";
 
+	# Check for things like ( parent => ... )
+	if ( $Parent->isa('PPI::Structure::List') ) {
+		if ( $Token->isa('PPI::Token::Word') ) {
+			# Is the next significant token a =>
+			# Read ahead to the next significant token
+			my $Next;
+			while ( $Next = $self->_get_token ) {
+				unless ( $Next->significant ) {
+					$self->_delay_element( $Next ) or return undef;
+					next;
+				}
+
+				# Got the next token
+				if ( $Next->isa('PPI::Token::Operator') and $Next->content eq '=>' ) {
+					# Is an ordinary expression
+					$self->_rollback( $Next );
+					return 'PPI::Statement::Expression';
+				} else {
+					last;
+				}
+			}
+
+			# Rollback and continue
+			$self->_rollback( $Next );
+		}
+	}
+
 	# Is it a token in our known classes list
 	my $class = $STATEMENT_CLASSES{$Token->content};
 

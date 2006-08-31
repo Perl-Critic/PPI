@@ -4,7 +4,7 @@ Revision history for Perl extension PPI
 	Summary:
         - PPI::Document::File
 	- Adding readonly attribute
-	- Various accumulated bugs
+	- Fixed various accumulated bugs
 
 	Details:
 	- Upgraded to Module::Install 0.63
@@ -14,6 +14,13 @@ Revision history for Perl extension PPI
         - 'goto' is a PPI::Statement::Break
 	- Re-fixed #19629: End of list mistakenly seen as end of statement
 	- Applied #16892: [PATCH] docs and comments
+	- Fixed #16815 (location of Structure::List is not defined.)
+	- Fixed misparsing of C< 1-1 >
+	- Fixed #18413: PPI::Node prune() implementation broken
+	- Fixed #20428 (minor doc bug in PPI::Token::Symbol)
+	- Resolved NOTABUG #20031 (PPI installation)
+	- Resolved NOTABUG #20038 (PPI installation)
+	- Fixed #19883: 'package' bareword used as hash key is detected as package statement
 
 1.115   Sat 03 Jun 2006
 	Summary:
