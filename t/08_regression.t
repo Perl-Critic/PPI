@@ -30,7 +30,7 @@ sub pause {
 
 # For each new item in t/data/08_regression add another 11 tests
 
-use Test::More tests => 204;
+use Test::More tests => 210;
 
 use vars qw{$testdir};
 BEGIN {
@@ -266,6 +266,31 @@ SCOPE: {
 	isa_ok( $doc, 'PPI::Document' );
 	isa_ok( $doc->child(0)->child(0)->child(0), 'PPI::Statement' );
 	isa_ok( $doc->child(0)->child(0)->child(0), 'PPI::Statement::Expression' );
+}
+
+
+
+
+
+#####################################################################
+# Bug 19629: End of list mistakenly seen as end of statement
+
+SCOPE: {
+	my $doc = PPI::Document->new( \'()' );
+	isa_ok( $doc, 'PPI::Document' );
+	isa_ok( $doc->child(0), 'PPI::Statement' );
+}
+
+SCOPE: {
+	my $doc = PPI::Document->new( \'{}' );
+	isa_ok( $doc, 'PPI::Document' );
+	isa_ok( $doc->child(0), 'PPI::Statement' );
+}
+
+SCOPE: {
+	my $doc = PPI::Document->new( \'[]' );
+	isa_ok( $doc, 'PPI::Document' );
+	isa_ok( $doc->child(0), 'PPI::Statement' );
 }
 
 exit(0);

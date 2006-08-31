@@ -21,6 +21,7 @@ Revision history for Perl extension PPI
 	- Resolved NOTABUG #20031 (PPI installation)
 	- Resolved NOTABUG #20038 (PPI installation)
 	- Fixed #19883: 'package' bareword used as hash key is detected as package statement
+	- Fixed #19629: End of list mistakenly seen as end of statement
 
 1.115   Sat 03 Jun 2006
 	Summary:
