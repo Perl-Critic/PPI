@@ -19,8 +19,8 @@ different types of word-like things, and is one of the most common Token
 classes found in typical documents.
 
 Specifically, it includes not only barewords, but also any other valid
-Perl identifier included non-operator keywords and core functions, and
-any can include C<::> separators inside it, as long as it fits the
+Perl identifier including non-operator keywords and core functions, and
+any include C<::> separators inside it, as long as it fits the
 format of a class, function, etc.
 
 =head1 METHODS
@@ -301,15 +301,15 @@ sub __TOKENIZER__literal {
 
 =head1 SUPPORT
 
-See the L<support section|PPI/SUPPORT> in the main module
+See the L<support section|PPI/SUPPORT> in the main module.
 
 =head1 AUTHOR
 
-Adam Kennedy, L<http://ali.as/>, cpan@ali.as
+Adam Kennedy E<lt>adamk@cpan.orgE<gt>
 
 =head1 COPYRIGHT
 
-Copyright (c) 2001 - 2005 Adam Kennedy. All rights reserved.
+Copyright 2001 - 2006 Adam Kennedy.
 
 This program is free software; you can redistribute
 it and/or modify it under the same terms as Perl itself.

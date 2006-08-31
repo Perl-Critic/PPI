@@ -19,7 +19,7 @@ PPI::Token::Prototype - A subroutine prototype descriptor
 =head1 DESCRIPTION
 
 Although it sort of looks like a list or condition, a subroutine
-prototype is a lot more like a string. It's job is to provide hints
+prototype is a lot more like a string. Its job is to provide hints
 to the perl compiler on what type of arguments a particular subroutine
 expects, which the compiler uses to validate parameters at compile-time,
 and allows programmers to use the functions without explicit parameter
@@ -32,7 +32,7 @@ the language and create things that act like keywords and core functions.
   # Create something that acts like a constant
   sub MYCONSTANT () { 10 }
   
-  # Create the any core-looking function
+  # Create the "any" core-looking function
   sub any (&@) { ... }
   
   if ( any { $_->sexy } @chicks ) {
@@ -73,7 +73,7 @@ sub __TOKENIZER__on_char {
 
 =head2 prototype
 
-The C<prototype> accessor returns the actual prototype patter, stripped
+The C<prototype> accessor returns the actual prototype pattern, stripped
 of braces and any whitespace inside the pattern.
 
 =cut
@@ -91,15 +91,15 @@ sub prototype {
 
 =head1 SUPPORT
 
-See the L<support section|PPI/SUPPORT> in the main module
+See the L<support section|PPI/SUPPORT> in the main module.
 
 =head1 AUTHOR
 
-Adam Kennedy, L<http://ali.as/>, cpan@ali.as
+Adam Kennedy E<lt>adamk@cpan.orgE<gt>
 
 =head1 COPYRIGHT
 
-Copyright (c) 2001 - 2005 Adam Kennedy. All rights reserved.
+Copyright 2001 - 2006 Adam Kennedy.
 
 This program is free software; you can redistribute
 it and/or modify it under the same terms as Perl itself.

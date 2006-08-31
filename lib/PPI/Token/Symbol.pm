@@ -22,8 +22,8 @@ variables and other things that start with a sigil.
 This class has several methods beyond what is provided by its
 L<PPI::Token> and L<PPI::Element> parent classes.
 
-Most are provided to help work out what the object is actually pointing at,
-rather than what it might appear to be pointing at.
+Most methods are provided to help work out what the object is actually
+pointing at, rather than what it might appear to be pointing at.
 
 =cut
  
@@ -113,8 +113,8 @@ sub symbol {
 
 =head2 raw_type
 
-The C<raw_type> method returns the apparent type of the symbol in the
-form of it's sigil.
+The C<raw_type> method returns the B<apparent> type of the symbol in the
+form of its sigil.
 
 Returns the sigil as a string.
 
@@ -129,8 +129,8 @@ sub raw_type {
 
 =head2 symbol_type
 
-The C<symbol_type> method returns the actual type of the symbol in the
-form of it's sigil.
+The C<symbol_type> method returns the B<actual> type of the symbol in the
+form of its sigil.
 
 Returns the sigil as a string.
 
@@ -213,15 +213,15 @@ sub __TOKENIZER__on_char {
 
 =head1 SUPPORT
 
-See the L<support section|PPI/SUPPORT> in the main module
+See the L<support section|PPI/SUPPORT> in the main module.
 
 =head1 AUTHOR
 
-Adam Kennedy, L<http://ali.as/>, cpan@ali.as
+Adam Kennedy E<lt>adamk@cpan.orgE<gt>
 
 =head1 COPYRIGHT
 
-Copyright (c) 2001 - 2005 Adam Kennedy. All rights reserved.
+Copyright 2001 - 2006 Adam Kennedy.
 
 This program is free software; you can redistribute
 it and/or modify it under the same terms as Perl itself.

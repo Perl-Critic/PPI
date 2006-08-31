@@ -21,19 +21,19 @@ input.
 They jump ahead and nab lines directly off the input buffer. Whitespace
 and newlines may not matter in most Perl code, but they matter in here-docs.
 
-They are also tricky to store as ab object. They look sort of like an
+They are also tricky to store as an object. They look sort of like an
 operator and a string, but they don't act like it. And they have a second
 section that should be something like a separate token, but isn't because a
 strong can span from above the here-doc content to below it.
 
 So when parsing, this is what we do.
 
-Firstly, the PPI::Token::HereDoc object, does not represent the <<
+Firstly, the PPI::Token::HereDoc object, does not represent the C<<< << >>>
 operator, or the "END_FLAG", or the content, or even the terminator.
 
 It represents all of them at once.
 
-The token itself has a as it's "content" just the declaration part.
+The token itself has only the declaration part as its "content".
 
   # This is what the content of a HereDoc token is
   <<FOO
@@ -45,10 +45,10 @@ The token itself has a as it's "content" just the declaration part.
   <<      'FOO'
 
 That is, the "operator", any whitespace seperator, and the quoted or bare
-terminator. When you call the C<content> method on a HereDoc token, you
+terminator. So when you call the C<content> method on a HereDoc token, you
 get '<< "FOO"'.
 
-As for the content and terminator, when treated purely in "content" terms
+As for the content and the terminator, when treated purely in "content" terms
 they do not exist.
 
 The content is made available with the C<heredoc> method, and the name of
@@ -58,28 +58,29 @@ To make things work in the way you expect, PPI has to play some games
 when doing line/column location calculation for tokens, and also during
 the content parsing and generation processes.
 
-Document cannot simply by recreated by stitching together the token
+Documents cannot simply by recreated by stitching together the token
 contents, and involve a somewhat more expensive procedure, but the extra
 expense should be relatively negligable unless you are doing huge
-quantaties of them.
+quantities of them.
 
 Please note that due to the immature nature of PPI in general, we expect
-here-docs to be a rich (bad) source of corner-case bugs for quite a while,
+C<HereDocs> to be a rich (bad) source of corner-case bugs for quite a while,
 but for the most part they should more or less DWYM.
 
 =head2 Comparison to other string types
 
-Although technically it can be consider a quote, for the time being HereDocs
-are being treated as a completely seperate Token subclass, and will not be
-found in a search for PPI::Token::Quote or PPI::Token::QuoteLike objects.
+Although technically it can be considered a quote, for the time being
+C<HereDocs> are being treated as a completely seperate C<Token> subclass,
+and will not be found in a search for L<PPI::Token::Quote> or
+L<PPI::Token::QuoteLike objects>.
 
 This may change in the future, with it most likely to end up under
 QuoteLike.
 
 =head1 METHODS
 
-Although it has the standard set of Token methods, HereDoc objects have
-a relatively large number of unique methods all of their own.
+Although it has the standard set of C<Token> methods, C<HereDoc> objects
+have a relatively large number of unique methods all of their own.
 
 =cut
 
@@ -103,7 +104,7 @@ BEGIN {
 =head2 heredoc
 
 The C<heredoc> method is the authorative method for accessing the contents
-of the here-doc.
+of the C<HereDoc> object.
 
 It returns the contents of the here-doc as a list of newline-terminated
 strings. If called in scalar context, it returns the number of lines in
@@ -262,15 +263,15 @@ sub __TOKENIZER__on_char {
 
 =head1 SUPPORT
 
-See the L<support section|PPI/SUPPORT> in the main module
+See the L<support section|PPI/SUPPORT> in the main module.
 
 =head1 AUTHOR
 
-Adam Kennedy, L<http://ali.as/>, cpan@ali.as
+Adam Kennedy E<lt>adamk@cpan.orgE<gt>
 
 =head1 COPYRIGHT
 
-Copyright (c) 2001 - 2005 Adam Kennedy. All rights reserved.
+Copyright 2001 - 2006 Adam Kennedy.
 
 This program is free software; you can redistribute
 it and/or modify it under the same terms as Perl itself.

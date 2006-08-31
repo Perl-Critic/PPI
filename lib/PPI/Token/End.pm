@@ -17,9 +17,9 @@ PPI::Token::End - Completely useless content after the __END__ tag
 If you've read L<PPI::Token::Whitespace>, you should understand by now
 the concept of documents "floating in a sea of PPI::Token::Whitespace".
 
-Well not after the __END__ tag it doesn't.
+Well it doesn't after the __END__ tag.
 
-Once you __END__ it's all over. Anything after that tag isn't even fit
+Once you __END__, it's all over. Anything after that tag isn't even fit
 to be called whitespace. It just simply doesn't exist as far as perl
 (the interpreter) is concerned.
 
@@ -35,7 +35,7 @@ Basically, the completely worthless bits of the file :)
 
 =head1 METHODS
 
-This class has no method beyond what is provided by it's L<PPI::Token> and
+This class has no method beyond what is provided by its L<PPI::Token> and
 L<PPI::Element> parent classes.
 
 =cut
@@ -94,15 +94,15 @@ sub __TOKENIZER__on_line_start {
 
 =head1 SUPPORT
 
-See the L<support section|PPI/SUPPORT> in the main module
+See the L<support section|PPI/SUPPORT> in the main module.
 
 =head1 AUTHOR
 
-Adam Kennedy, L<http://ali.as/>, cpan@ali.as
+Adam Kennedy E<lt>adamk@cpan.orgE<gt>
 
 =head1 COPYRIGHT
 
-Copyright (c) 2001 - 2005 Adam Kennedy. All rights reserved.
+Copyright 2001 - 2006 Adam Kennedy.
 
 This program is free software; you can redistribute
 it and/or modify it under the same terms as Perl itself.

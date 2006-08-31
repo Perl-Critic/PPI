@@ -28,7 +28,7 @@ In PPI, comments are represented by C<PPI::Token::Comment> objects.
 
 These come in two flavours, line comment and inline comments.
 
-A line comment is a comment that stands on it's own line. These comments
+A C<line comment> is a comment that stands on its own line. These comments
 hold their own newline and whitespace (both leading and trailing) as part
 of the one C<PPI::Token::Comment> object.
 
@@ -128,15 +128,15 @@ sub line {
 
 =head1 SUPPORT
 
-See the L<support section|PPI/SUPPORT> in the main module
+See the L<support section|PPI/SUPPORT> in the main module.
 
 =head1 AUTHOR
 
-Adam Kennedy, L<http://ali.as/>, cpan@ali.as
+Adam Kennedy E<lt>adamk@cpan.orgE<gt>
 
 =head1 COPYRIGHT
 
-Copyright (c) 2001 - 2005 Adam Kennedy. All rights reserved.
+Copyright 2001 - 2006 Adam Kennedy.
 
 This program is free software; you can redistribute
 it and/or modify it under the same terms as Perl itself.

@@ -8,9 +8,9 @@ PPI::Document::Normalized - A normalized Perl Document
 
 =head1 DESCRIPTION
 
-A Normalized Document object is the result of the normalization process
-contained in the L<PPI::Normal> class. See its documentation for more
-information.
+A C<Normalized Document> object is the result of the normalization process
+contained in the L<PPI::Normal> class. See the documentation for
+L<PPI::Normal> for more information.
 
 The object contains a version stamp and function list for the version
 of L<PPI::Normal> used to create it, and a processed and delinked
@@ -20,10 +20,11 @@ Typically, the Document object will have been mangled by the normalization
 process in a way that would make it fatal to try to actually DO anything
 with it.
 
-Put simply, B<never> use the Document object. B<YOU HAVE BEEN WARNED!>
+Put simply, B<never> use the Document object after normalization.
+B<YOU HAVE BEEN WARNED!>
 
 The object is designed the way it is to provide a bias towards false
-negatives. A comparison between to ::Normalized object will only return
+negatives. A comparison between two ::Normalized object will only return
 true if they were produced by the same version of PPI::Normal, with the
 same set of normalization functions (in the same order).
 
@@ -296,11 +297,11 @@ sub DESTROY {
 
 =head1 SUPPORT
 
-See the L<support section|PPI/SUPPORT> in the main module
+See the L<support section|PPI/SUPPORT> in the main module.
 
 =head1 AUTHOR
 
-Adam Kennedy, L<http://ali.as/>, cpan@ali.as
+Adam Kennedy E<lt>adamk@cpan.orgE<gt>
 
 =head1 COPYRIGHT
 

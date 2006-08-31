@@ -19,7 +19,7 @@ generaly tree structure or code.
 
 This consists of seven characters. These are the six brace characters from
 the "round", "curly" and "square" pairs, plus the semi-colon statement
-separator C<";">.
+separator C<;>.
 
 =head1 METHODS
 
@@ -190,15 +190,15 @@ sub previous_token {
 
 =head1 SUPPORT
 
-See the L<support section|PPI/SUPPORT> in the main module
+See the L<support section|PPI/SUPPORT> in the main module.
 
 =head1 AUTHOR
 
-Adam Kennedy, L<http://ali.as/>, cpan@ali.as
+Adam Kennedy E<lt>adamk@cpan.orgE<gt>
 
 =head1 COPYRIGHT
 
-Copyright (c) 2001 - 2005 Adam Kennedy. All rights reserved.
+Copyright 2001 - 2006 Adam Kennedy.
 
 This program is free software; you can redistribute
 it and/or modify it under the same terms as Perl itself.

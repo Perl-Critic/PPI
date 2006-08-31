@@ -21,15 +21,19 @@ exclude the string quotes and regular expressions.
 
 The subclasses of C<PPI::Token::QuoteLike> are:
 
-qw{} - L<PPI::Token::QuoteLike::Words>
+=over 2
 
-`` - L<PPI::Token::QuoteLike::Backtick>
+=item qw{} - L<PPI::Token::QuoteLike::Words>
 
-qx{} - L<PPI::Token::QuoteLike::Command>
+=item `` - L<PPI::Token::QuoteLike::Backtick>
 
-qr// - L<PPI::Token::QuoteLike::Regexp>
+=item qx{} - L<PPI::Token::QuoteLike::Command>
 
-<FOO> - L<PPI::Token::QuoteLike::Readline>
+=item qr// - L<PPI::Token::QuoteLike::Regexp>
+
+=item <FOO> - L<PPI::Token::QuoteLike::Readline>
+
+=back
 
 The names are hopefully obvious enough not to have to explain what
 each class is. See their pages for more details.
@@ -55,15 +59,15 @@ BEGIN {
 
 =head1 SUPPORT
 
-See the L<support section|PPI/SUPPORT> in the main module
+See the L<support section|PPI/SUPPORT> in the main module.
 
 =head1 AUTHOR
 
-Adam Kennedy, L<http://ali.as/>, cpan@ali.as
+Adam Kennedy E<lt>adamk@cpan.orgE<gt>
 
 =head1 COPYRIGHT
 
-Copyright (c) 2001 - 2005 Adam Kennedy. All rights reserved.
+Copyright 2001 - 2006 Adam Kennedy.
 
 This program is free software; you can redistribute
 it and/or modify it under the same terms as Perl itself.

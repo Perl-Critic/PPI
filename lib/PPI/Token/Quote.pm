@@ -22,20 +22,24 @@ double quotes with interpolated elements inside them).
 
 The subclasses of C<PPI::Token::Quote> are:
 
-C<''> - L<PPI::Token::Quote::Single>
+=over 2
 
-C<q{}> - L<PPI::Token::Quote::Literal>
+=item C<''> - L<PPI::Token::Quote::Single>
 
-C<""> - L<PPI::Token::Quote::Double>
+=item C<q{}> - L<PPI::Token::Quote::Literal>
 
-C<qq{}> - L<PPI::Token::Quote::Interpolate>
+=item C<""> - L<PPI::Token::Quote::Double>
+
+=item C<qq{}> - L<PPI::Token::Quote::Interpolate>
+
+=back
 
 The names are hopefully obvious enough not to have to explain what
 each class is here. See their respective pages for more details.
 
 Please note that although the here-doc B<does> represent a literal
 string, it is such a nasty piece of work that in L<PPI> it is given the
-honor of it's own token class (L<PPI::Token::HereDoc>).
+honor of its own token class (L<PPI::Token::HereDoc>).
 
 =head1 METHODS
 
@@ -106,15 +110,15 @@ foreach my $Quote ( @$quotes ) {
 
 =head1 SUPPORT
 
-See the L<support section|PPI/SUPPORT> in the main module
+See the L<support section|PPI/SUPPORT> in the main module.
 
 =head1 AUTHOR
 
-Adam Kennedy, L<http://ali.as/>, cpan@ali.as
+Adam Kennedy E<lt>adamk@cpan.orgE<gt>
 
 =head1 COPYRIGHT
 
-Copyright (c) 2001 - 2005 Adam Kennedy. All rights reserved.
+Copyright 2001 - 2006 Adam Kennedy.
 
 This program is free software; you can redistribute
 it and/or modify it under the same terms as Perl itself.

@@ -18,11 +18,15 @@ The C<PPI::Token::Regexp> class is never instantiated, and simply
 provides a common abstract base class for the three regular expression
 classes. These being:
 
-m// - L<PPI::Token::Regexp::Match>
+=over 2
 
-s/// - L<PPI::Token::Regexp::Substitute>
+=item m// - L<PPI::Token::Regexp::Match>
 
-tr/// - L<PPI::Token::Regexp::Transliterate>
+=item s/// - L<PPI::Token::Regexp::Substitute>
+
+=item tr/// - L<PPI::Token::Regexp::Transliterate>
+
+=back
 
 The names are hopefully obvious enough not to have to explain what
 each class is. See their pages for more details.
@@ -48,15 +52,15 @@ BEGIN {
 
 =head1 SUPPORT
 
-See the L<support section|PPI/SUPPORT> in the main module
+See the L<support section|PPI/SUPPORT> in the main module.
 
 =head1 AUTHOR
 
-Adam Kennedy, L<http://ali.as/>, cpan@ali.as
+Adam Kennedy E<lt>adamk@cpan.orgE<gt>
 
 =head1 COPYRIGHT
 
-Copyright (c) 2001 - 2005 Adam Kennedy. All rights reserved.
+Copyright 2001 - 2006 Adam Kennedy.
 
 This program is free software; you can redistribute
 it and/or modify it under the same terms as Perl itself.

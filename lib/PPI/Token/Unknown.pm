@@ -14,15 +14,16 @@ PPI::Token::Unknown - Token of unknown or as-yet indetermined type
 
 =head1 DESCRIPTION
 
-Object of type C<PPI::Token::Unknown> exist primarily inside the tokenizer,
-where they are temporarily brought into existing for a very short time to
-represent a token that could be one of a number of types.
+Object of the type C<PPI::Token::Unknown> exist primarily inside the
+tokenizer, where they are temporarily brought into existing for a very
+short time to represent a token that could be one of a number of types.
 
 Generally, they only exist for a character or two, after which they are
 resolved and converted into the correct type. For an object of this type
 to survive the parsing process is considered a major bug.
 
-Please report any you encounter in a L<PPI::Document> object.
+Please report any C<PPI::Token::Unknown> you encounter in a L<PPI::Document>
+object as a bug.
 
 =cut
 
@@ -288,15 +289,15 @@ sub __TOKENIZER__is_an_attribute {
 
 =head1 SUPPORT
 
-See the L<support section|PPI/SUPPORT> in the main module
+See the L<support section|PPI/SUPPORT> in the main module.
 
 =head1 AUTHOR
 
-Adam Kennedy, L<http://ali.as/>, cpan@ali.as
+Adam Kennedy E<lt>adamk@cpan.orgE<gt>
 
 =head1 COPYRIGHT
 
-Copyright (c) 2001 - 2005 Adam Kennedy. All rights reserved.
+Copyright 2001 - 2006 Adam Kennedy.
 
 This program is free software; you can redistribute
 it and/or modify it under the same terms as Perl itself.

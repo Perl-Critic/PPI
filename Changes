@@ -13,6 +13,7 @@ Revision history for Perl extension PPI
 	- Added method PPI::Document->readonly method
         - 'goto' is a PPI::Statement::Break
 	- Re-fixed #19629: End of list mistakenly seen as end of statement
+	- Applied #16892: [PATCH] docs and comments
 
 1.115   Sat 03 Jun 2006
 	Summary:

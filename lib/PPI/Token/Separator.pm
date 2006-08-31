@@ -17,7 +17,7 @@ PPI::Token::Separator - The __DATA__ and __END__ tags
 
 Although superficially looking like a normal L<PPI::Token::Word> object,
 when the C<__DATA__> and C<__END__> compiler tags appear at the beginning of
-a line on (supposedly) their own line, these tags become file section
+a line (on supposedly) their own line, these tags become file section
 separators.
 
 The indicate that the time for Perl code is over, and the rest of the
@@ -46,15 +46,15 @@ BEGIN {
 
 =head1 SUPPORT
 
-See the L<support section|PPI/SUPPORT> in the main module
+See the L<support section|PPI/SUPPORT> in the main module.
 
 =head1 AUTHOR
 
-Adam Kennedy, L<http://ali.as/>, cpan@ali.as
+Adam Kennedy E<lt>adamk@cpan.orgE<gt>
 
 =head1 COPYRIGHT
 
-Copyright (c) 2001 - 2005 Adam Kennedy. All rights reserved.
+Copyright 2001 - 2006 Adam Kennedy.
 
 This program is free software; you can redistribute
 it and/or modify it under the same terms as Perl itself.
