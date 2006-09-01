@@ -1,0 +1,5 @@
+PPI::Document
+  PPI::Statement
+    PPI::Token::Operator  	'-t'
+    PPI::Token::Structure  	';'
+  PPI::Token::Whitespace  	'\n'
