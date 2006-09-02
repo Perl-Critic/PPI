@@ -1,6 +1,19 @@
 Revision history for Perl extension PPI
 
-1.116   ...
+1.117   Sat 02 Sep 2006
+	Summary:
+	- Fixing bugs introduced in 1.116
+
+	Details:
+	- Simple compound statements "{ 1 }" were not end-detecting properly	
+	- The new handling for the "-" character was shortcutting naively
+	- Labelled compound statements were not end-detecting properly
+	- { package => 1 } was treating package incorrectly
+	- Fixed bugs in test cases submitted by the Perl::Critic team
+	- Added a number of extra test cases, and introduced Test::Object
+          based testing for PPI::Document objects.
+
+1.116   Thu 31 Aug 2006
 	Summary:
         - PPI::Document::File first release
 	- Adding readonly attribute

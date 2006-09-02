@@ -1,5 +1,5 @@
 PPI::Document
-  PPI::Statement
+  PPI::Statement::Compound
     PPI::Structure::Block  	{ ... }
       PPI::Statement
         PPI::Structure::List  	( ... )

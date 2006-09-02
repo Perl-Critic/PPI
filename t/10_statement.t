@@ -12,7 +12,7 @@ BEGIN {
 use PPI::Lexer ();
 
 # Execute the tests
-use Test::More tests => 6;
+use Test::More tests => 8;
 use Scalar::Util 'refaddr';
 
 
@@ -42,6 +42,19 @@ END_PERL
 	is( $packages->[1]->namespace, 'Bar::Baz', 'Package 2 returns correct namespace' );
 	is( $packages->[0]->file_scoped, 1,  '->file_scoped returns true for package 1' );
 	is( $packages->[1]->file_scoped, '', '->file_scoped returns false for package 2' );
+}
+
+
+
+
+
+#####################################################################
+# Basic subroutine test
+
+SCOPE: {
+	my $doc = PPI::Document->new( \"sub foo { 1 }" );
+	isa_ok( $doc, 'PPI::Document' );
+	isa_ok( $doc->child(0), 'PPI::Statement::Sub' );
 }
 
 1;

@@ -17,7 +17,8 @@ use Class::Inspector;
 use constant CI => 'Class::Inspector';
 use Params::Util '_CLASS', '_ARRAY', '_INSTANCE';
 use Test::More; # Plan comes later
-
+use Test::Object;
+use t::lib::PPI;
 
 
 
@@ -42,7 +43,7 @@ foreach my $dir ( '05_lexer_practical', '08_regression', '11_util', '13_data', '
 }
 
 # Declare our plan
-Test::More::plan( tests => scalar(@files) * 2 + 3 );
+Test::More::plan( tests => scalar(@files) * 6 + 3 );
 
 
 
@@ -91,6 +92,9 @@ foreach my $file ( @files ) {
 		}
 	}
 	is_deeply( $rv, '', "$file: All class names in ->isa calls exist" );
+
+	# Test with Test::Object stuff
+	object_ok( $Document );
 }
 
 

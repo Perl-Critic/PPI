@@ -30,7 +30,9 @@ sub pause {
 
 # For each new item in t/data/08_regression add another 11 tests
 
-use Test::More tests => 232;
+use Test::More tests => 262;
+use Test::Object;
+use t::lib::PPI;
 
 use vars qw{$testdir};
 BEGIN {
@@ -71,14 +73,9 @@ foreach my $codefile ( @code ) {
 	SKIP: {
 		skip "No Document to test", 7 unless $Document;
 
-		# Are there any unknown things?
-		is( $Document->find_any('Token::Unknown'), '',
-			"$codename: Contains no PPI::Token::Unknown elements" );
-		is( $Document->find_any('Structure::Unknown'), '',
-			"$codename: Contains no PPI::Structure::Unknown elements" );
-		is( $Document->find_any('Statement::Unknown'), '',
-			"$codename: Contains no PPI::Statement::Unknown elements" );
-	
+		# Check standard things
+		object_ok( $Document );
+
 		# Get the dump array ref for the Document object
 		my $Dumper = PPI::Dumper->new( $Document );
 		ok( _INSTANCE($Dumper, 'PPI::Dumper'), "$codename: Object isa PPI::Dumper" );

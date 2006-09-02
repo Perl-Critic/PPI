@@ -44,7 +44,16 @@ BEGIN {
 #####################################################################
 # Prepare
 
-use Test::More tests => ($MAX_CHARS + $ITERATIONS + 1);
+use Test::More tests => ($MAX_CHARS + $ITERATIONS + 2);
+
+
+
+
+
+#####################################################################
+# Retest Previous Failures
+
+test_code2( "( {8" );
 
 
 
@@ -118,6 +127,7 @@ foreach my $i ( 1 .. $ITERATIONS ) {
 is( scalar(keys %PPI::Element::PARENT), 0,
 	'No stale \%PARENT entries at the end of testing' );
 %PPI::Element::PARENT = %PPI::Element::PARENT;
+
 
 
 

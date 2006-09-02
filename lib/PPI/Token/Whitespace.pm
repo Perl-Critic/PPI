@@ -46,7 +46,7 @@ use base 'PPI::Token';
 
 use vars qw{$VERSION};
 BEGIN {
-	$VERSION = '1.116';
+	$VERSION = '1.117';
 }
 
 =pod
@@ -358,8 +358,6 @@ sub __TOKENIZER__on_char {
 		my $context = $t->_opcontext;
 		if ( $context eq 'operator' ) {
 			return 'Operator';
-		} elsif ( $context eq 'operand' ) {
-			return 'Number';
 		} else {
 			# More logic needed
 			return 'Unknown';

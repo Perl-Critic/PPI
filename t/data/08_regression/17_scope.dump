@@ -1,0 +1,14 @@
+PPI::Document
+  PPI::Statement::Compound
+    PPI::Token::Label  	'SCOPE:'
+    PPI::Token::Whitespace  	' '
+    PPI::Structure::Block  	{ ... }
+      PPI::Token::Whitespace  	'\n'
+      PPI::Token::Whitespace  	'\t'
+      PPI::Statement
+        PPI::Token::Word  	'print'
+        PPI::Token::Whitespace  	' '
+        PPI::Token::Number  	'1'
+        PPI::Token::Structure  	';'
+      PPI::Token::Whitespace  	'\n'
+  PPI::Token::Whitespace  	'\n'

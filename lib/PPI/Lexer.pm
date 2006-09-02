@@ -61,7 +61,7 @@ use PPI::Document ();
 
 use vars qw{$VERSION $errstr};
 BEGIN {
-	$VERSION = '1.116';
+	$VERSION = '1.117';
 	$errstr  = '';
 }
 
@@ -245,7 +245,6 @@ sub _lex_document {
 			# This should actually have a Statement instead
 			$self->_rollback( $Token );
 			my $Statement = PPI::Statement->new          or return undef;
-			$self->_add_delayed( $Document )             or return undef;
 			$self->_lex_statement( $Statement )          or return undef;
 			$self->_add_element( $Document, $Statement ) or return undef;
 			next;
@@ -537,6 +536,12 @@ sub _statement_continues {
 	# my $Statement = _INSTANCE(shift, 'PPI::Statement') or die "Bad param 1";
 	# my $Token     = _INSTANCE(shift, 'PPI::Token')     or die "Bad param 2";
 
+	# Handle the simple block case
+	# { print 1; }
+	if ( $Statement->schildren == 1 and $Statement->schild(0)->isa('PPI::Structure::Block') ) {
+		return '';
+	}
+
 	# Alrighty then, there are only three implied end statement types,
 	# ::Scheduled blocks, ::Sub declarations, and ::Compound statements.
 	unless ( ref($Statement) =~ /\b(?:Scheduled|Sub|Compound)$/ ) {
@@ -610,14 +615,14 @@ sub _statement_continues {
 		# LABEL foreach VAR (LIST) BLOCK continue BLOCK
 		# LABEL BLOCK continue BLOCK
 
-		# Handle cases with a work after the label
+		# Handle cases with a word after the label
 		if ( $Token->isa('PPI::Token::Word')
 		and $Token->content =~ /^(?:while|for|foreach)$/ ) {
 			return 1;
 		}
-	
+
 		# Handle labelled blocks
-		if ( $Token->isa('PPI::Structure::Block') ) {
+		if ( $Token->isa('PPI::Token::Structure') && $Token->content eq '{' ) {
 			return 1;
 		}
 
@@ -877,12 +882,50 @@ sub _resolve_new_structure_curly {
 		return 'PPI::Structure::Block';
 	}
 
-	# Is this an anonymous hashref constructor
-	### FIXME - Much harder...
+	# Unless we are at the start of the line, everything should be a block
+	if ( $Element ) {
+		return 'PPI::Structure::Block';
+	}
 
-	# Otherwise, we assume at this point
-	# that it is a block of some sort.
-	'PPI::Structure::Block';
+	# We need to scan ahead.
+	my $Next;
+	my $position = 0;
+	my @delayed  = ();
+	while ( $Next = $self->_get_token ) {
+		unless ( $Next->significant ) {
+			push @delayed, $Next;
+			next;
+		}
+
+		# If a closing curly, this is an anonymous hash-ref
+		if ( ++$position == 1 and $Next->content eq '}' ) {
+			$self->_buffer( splice( @delayed ), $Next );
+			return 'PPI::Structure::Subscript';
+		}
+
+		# If it contains a => as the second thing,
+		# this is also an anonymous hash-ref.
+		if ( $position == 2 and $Next->content eq '=>' ) {
+			$self->_buffer( splice( @delayed ), $Next );
+			return 'PPI::Structure::Subscript';
+		}
+
+		# We only check the first two, then default to block
+		if ( $position >= 3 ) {
+			$self->_buffer( splice( @delayed ), $Next );
+			last;
+		}
+
+		# Delay and continue
+		push @delayed, $Next;
+	}
+
+	# Hit the end of the document, or bailed out, go with block
+	$self->_buffer( splice @delayed );
+	if ( ref($Parent) eq 'PPI::Statement' ) {
+		bless $Parent, 'PPI::Statement::Compound';
+	}
+	return 'PPI::Structure::Block';
 }
 
 sub _lex_structure {
@@ -1070,6 +1113,18 @@ sub _rollback {
 	# Then, put back anything delayed
 	if ( @{$self->{delayed}} ) {
 		unshift @{$self->{buffer}}, splice @{$self->{delayed}};
+	}
+
+	1;
+}
+
+# Partial rollback, just return a single list to the buffer
+sub _buffer {
+	my $self = shift;
+
+	# Put any passed objects back
+	if ( @_ ) {
+		unshift @{$self->{buffer}}, splice @_;
 	}
 
 	1;
