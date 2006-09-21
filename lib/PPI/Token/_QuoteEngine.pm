@@ -9,7 +9,7 @@ PPI::Token::_QuoteEngine - The PPI Quote Engine
 =head1 DESCRIPTION
 
 The C<PPI::Token::_QuoteEngine> package is designed hold functionality
-for processing quotes and quote like operators, including regex's.
+for processing quotes and quote like operators, including regexes.
 These have special requirements in parsing.
 
 The C<PPI::Token::_QuoteEngine> package itself provides various parsing

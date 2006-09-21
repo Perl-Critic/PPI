@@ -48,7 +48,7 @@ BEGIN {
 =head2 handle
 
 The C<handle> method returns a L<IO::String> handle that allows you
-to do all the normal handle'y things to the contents of the __DATA__
+to do all the normal handle-y things to the contents of the __DATA__
 section of the file.
 
 Unlike in perl itself, this means you can also do things like C<print>

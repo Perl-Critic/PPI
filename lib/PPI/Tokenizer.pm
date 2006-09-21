@@ -35,9 +35,9 @@ By the time you are reading this, you probably need to know a little
 about the difference between how perl parses Perl "code" and how PPI
 parsers Perl "documents".
 
-"perl" itself (the intepreter) uses a heavily modified lex specification
+"perl" itself (the interpreter) uses a heavily modified lex specification
 to specify it's parsing logic, maintains several types of state as it
-goes, and both tokenises and lexes AND EXECUTES at the same time.
+goes, and both tokenizes and lexes AND EXECUTES at the same time.
 In fact, it's provably impossible to use perl's parsing method without
 BEING perl.
 
@@ -51,7 +51,7 @@ it can handle it.
 It was touch and go for a long time whether we could get it close enough,
 but in the end it turned out that it could be done.
 
-In this approach, the tokenizer C<PPI::Tokenizer> is seperate from the
+In this approach, the tokenizer C<PPI::Tokenizer> is separate from the
 lexer L<PPI::Lexer>. The job of C<PPI::Tokenizer> is to take pure source
 as a string and break it up into a stream/set of tokens.
 
@@ -286,7 +286,7 @@ sub get_token {
 
 =head2 all_tokens
 
-When noy being used as an iterator, the C<all_tokens> method tells
+When not being used as an iterator, the C<all_tokens> method tells
 the Tokenizer to parse the entire file and return all of the tokens
 in a single ARRAY reference.
 
@@ -868,7 +868,7 @@ sub errstr {
 
 Understanding the Tokenizer is not for the feint-hearted. It is by far
 the most complex and twisty piece of perl I've ever written that is actually
-still built properly and isn't a terrible spagetti-like mess. In fact, you
+still built properly and isn't a terrible spaghetti-like mess. In fact, you
 probably want to skip this section.
 
 But if you really want to understand, well then here goes.
@@ -877,7 +877,7 @@ But if you really want to understand, well then here goes.
 
 The Tokenizer starts by taking source in a variety of forms, sucking it
 all in and merging into one big string, and doing our own internal line
-split, using a "universal line seperator" which allows the Tokenizer to
+split, using a "universal line separator" which allows the Tokenizer to
 take source for any platform (and even supports a few known types of
 broken newlines caused by mixed mac/pc/*nix editor screw ups).
 
@@ -937,7 +937,7 @@ recognise different "base" or "substrate" classes. When a Token such as a
 comment or a number is finalised by the tokenizer, it "falls back" to the
 base state.
 
-This allows proper tokenisation of special areas such as __DATA__
+This allows proper tokenization of special areas such as __DATA__
 and __END__ blocks, which also contain things like comments and POD,
 without allowing the creation of any significant Tokens inside these areas.
 
@@ -951,7 +951,7 @@ that is currently being built by the Tokenizer. For certain types, it
 can be manipulated and morphed and change class quite a bit while being
 assembled, as the Tokenizer's understanding of the token content changes.
 
-When the Tokeniser is confident that it has seen the end of the Token, it
+When the Tokenizer is confident that it has seen the end of the Token, it
 will be "finalized", which adds it to the output token array and resets
 the current class to that of the zone that we are currently in.
 
@@ -964,14 +964,14 @@ set to, without actually having accumulated any characters in the Token.
 =head2 Making It Faster
 
 As I'm sure you can imagine, calling several different methods for each
-character and running regexs and other complex heuristics made the first
+character and running regexes and other complex heuristics made the first
 fully working version of the tokenizer extremely slow.
 
 During testing, I created a metric to measure parsing speed called
 LPGC, or "lines per gigacycle" . A gigacycle is simple a billion CPU
 cycles on a typical single-core CPU, and so a Tokenizer running at
 "1000 lines per gigacycle" should generate around 1200 lines of tokenized
-code when running on a 1200Mhz processor.
+code when running on a 1200 MHz processor.
 
 The first working version of the tokenizer ran at only 350 LPGC, so to
 tokenize a typical large module such as L<ExtUtils::MakeMaker> took
@@ -998,7 +998,7 @@ and a few other minor special cases.
 The second stage of the optimisation involved inlining a small
 number of critical methods that were repeated an extremely high number
 of times. Profiling suggested that there were about 1,000,000 individual
-method calls per gigacycle, and by cutting these by two thirds a signficant
+method calls per gigacycle, and by cutting these by two thirds a significant
 speed improvement was gained, in the order of about 50%.
 
 You may notice that many methods in the C<PPI::Tokenizer> code look
@@ -1009,7 +1009,7 @@ versions of the parser was also removed, as it was determined that
 it was consuming around 15% of the CPU for the entire parser, while
 making the core more complicated.
 
-A judgement call was made that with the difficulties likely to be
+A judgment call was made that with the difficulties likely to be
 encountered with future planned enhancements, and given the relatively
 high cost involved, the statistics features would be removed from the
 Tokenizer.
@@ -1042,7 +1042,7 @@ As it became evident that great speed increases were available by using
 this "skipping ahead" mechanism, a new handler method was added that
 explicitly handles the parsing of an entire token, where the structure
 of the token is relatively simple. Tokens such as symbols fit this case,
-as once we are passed the initial sygil and word char, we know that we
+as once we are passed the initial sigil and word char, we know that we
 can skip ahead and "complete" the rest of the token much more easily.
 
 A number of these have been added for most or possibly all of the common
@@ -1062,7 +1062,7 @@ of the Lexer, and this has allowed the full parser to maintain around
 
 While it would be extraordinarily difficult to port all of the Tokenizer
 to C, work has started on a L<PPI::XS> "accelerator" package which acts as
-a seperate and automatically-detected add-on to the main PPI package.
+a separate and automatically-detected add-on to the main PPI package.
 
 L<PPI::XS> implements faster versions of a variety of functions scattered
 over the entire PPI codebase, from the Tokenizer Core, Quote Engine, and
@@ -1070,7 +1070,7 @@ various other places, and implements them identically in XS/C.
 
 In particular, the skip-ahead methods from the Quote Engine would appear
 to be extremely amenable to being done in C, and a number of other
-functions could be cheryy-picked one at a time and implemented in C.
+functions could be cherry-picked one at a time and implemented in C.
 
 Each method is heavily tested to ensure that the functionality is
 identical, and a versioning mechanism is included to ensure that if a

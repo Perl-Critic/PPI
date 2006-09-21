@@ -211,7 +211,7 @@ or whatever. All the sort of things you'd want from a L<Perl::Editor>.
 =item Layout
 
 Change the layout of code without changing its meaning. This includes
-techniques such as tidying (like L<perltidy>), obfuscation, compressiong and
+techniques such as tidying (like L<perltidy>), obfuscation, compressing and
 "squishing", or to implement formatting preferences or policies.
 
 =item Presentation
@@ -286,7 +286,7 @@ will serialize back out to the same string of code that was read in,
 repairing the parser's mistake as it heads back out to the file.
 
 The end result is that if you parse in a file and serialize it back out
-without changing the tree, you are guarenteed to get the same file you
+without changing the tree, you are guaranteed to get the same file you
 started with. PPI does this correctly and reliably for 100% of all known
 cases.
 
@@ -335,7 +335,7 @@ codebase. Speaking of which...
 
 The Tokenizer takes source code and converts it into a series of tokens. It
 does this using a slow but thorough character by character manual process,
-rather than using a pattern system or complex regexs.
+rather than using a pattern system or complex regexes.
 
 Or at least it does so conceptually. If you were to actually trace the code
 you would find it's not truly character by character due to a number of
@@ -477,7 +477,7 @@ assumed isolation, PPI cannot accurately determine precedence of operators
 or which tokens are implicit arguments to a sub call.
 
 So rather than lead you on with a bad guess, PPI does not attempt to
-determine precedence or sub paramaters at all.
+determine precedence or sub parameters at all.
 
 At a fundamental level, it only knows that this series of elements represents
 a single Statement as perl sees it, and does so with reasonable certainty.
@@ -580,7 +580,7 @@ The Document object, the root of the PDOM.
 
 A cohesive fragment of a larger Document. Although not of any real current
 use, it is planned for use in certain internal tree manipulation
-algortihms.
+algorithms.
 
 For example, doing things like cut/copy/paste etc. Very similar to a
 L<PPI::Document>, but has some additional methods and does not represent
@@ -653,7 +653,7 @@ treads carefully when working with it.
 
 Most of the complication is the result of optimizations which have tripled
 the tokenization speed, at the expense of maintainability. We cope with the
-spagetti by heavily commenting everything.
+spaghetti by heavily commenting everything.
 
 =item L<PPI::Transform>
 
@@ -780,7 +780,7 @@ If I missed someone who wasn't in my email history, thank you too :)
 
 And to single one person out, Randal Schwartz who (mostly) patiently
 spent a great number of hours in IRC over a critical 6 month period
-"aggresively explaining" why Perl is impossibly unparsable and
+"aggressively explaining" why Perl is impossibly unparsable and
 shoving evil and ugly corner cases in my face. He remains a tireless
 devil's advocate and without his continued support this project
 genuinely could never have been completed. He has my deepest thanks.

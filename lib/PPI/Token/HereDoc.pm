@@ -44,7 +44,7 @@ The token itself has only the declaration part as its "content".
   # Or even this
   <<      'FOO'
 
-That is, the "operator", any whitespace seperator, and the quoted or bare
+That is, the "operator", any whitespace separator, and the quoted or bare
 terminator. So when you call the C<content> method on a HereDoc token, you
 get '<< "FOO"'.
 
@@ -60,7 +60,7 @@ the content parsing and generation processes.
 
 Documents cannot simply by recreated by stitching together the token
 contents, and involve a somewhat more expensive procedure, but the extra
-expense should be relatively negligable unless you are doing huge
+expense should be relatively negligible unless you are doing huge
 quantities of them.
 
 Please note that due to the immature nature of PPI in general, we expect
@@ -70,7 +70,7 @@ but for the most part they should more or less DWYM.
 =head2 Comparison to other string types
 
 Although technically it can be considered a quote, for the time being
-C<HereDocs> are being treated as a completely seperate C<Token> subclass,
+C<HereDocs> are being treated as a completely separate C<Token> subclass,
 and will not be found in a search for L<PPI::Token::Quote> or
 L<PPI::Token::QuoteLike objects>.
 
@@ -103,7 +103,7 @@ BEGIN {
 
 =head2 heredoc
 
-The C<heredoc> method is the authorative method for accessing the contents
+The C<heredoc> method is the authoritative method for accessing the contents
 of the C<HereDoc> object.
 
 It returns the contents of the here-doc as a list of newline-terminated

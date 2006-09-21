@@ -58,7 +58,7 @@ BEGIN {
 Because we treat whitespace and other non-code items as Tokens (in order to
 be able to "round trip" the L<PPI::Document> back to a file) the
 C<significant> method allows us to distinguish between tokens that form a
-part of the code, and tokens that arn't significant, such as whitespace,
+part of the code, and tokens that aren't significant, such as whitespace,
 POD, or the portion of a file after (and including) the C<__END__> token.
 
 Returns true if the Element is significant, or false it not.
@@ -74,7 +74,7 @@ sub significant { 1 }
 
 The C<class> method is provided as a convenience, and really does nothing
 more than returning C<ref($self)>. However, some people have found that
-they appreciate the lazyness of C<$Foo-E<gt>class eq 'whatever'>, so I
+they appreciate the laziness of C<$Foo-E<gt>class eq 'whatever'>, so I
 have caved to popular demand and included it.
 
 Returns the class of the Element as a string
@@ -638,7 +638,7 @@ C<[ $line, $rowchar, $col ]>. The values are in a human format, with the
 first character of the file located at C<[ 1, 1, 1 ]>. 
 
 The second and third numbers are similar, except that the second is the
-literal horozontal character, and the third is the visual column, taking
+literal horizontal character, and the third is the visual column, taking
 into account tabbing.
 
 Returns C<undef> on error, or if the L<PPI::Document> object has not been indexed.

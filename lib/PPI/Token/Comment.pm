@@ -41,7 +41,7 @@ This is largely a convenience, simplifying a lot of normal code relating
 to the common things people do with comments.
 
 Most commonly, it means when you C<prune> or C<delete> a comment, a line
-comment disapears taking the entire line with it, and an inline comment
+comment disappears taking the entire line with it, and an inline comment
 is removed from the inside of the line, allowing the newline to drop
 back onto the end of the code, as you would expect.
 

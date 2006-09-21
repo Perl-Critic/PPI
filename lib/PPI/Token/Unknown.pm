@@ -4,7 +4,7 @@ package PPI::Token::Unknown;
 
 =head1 NAME
 
-PPI::Token::Unknown - Token of unknown or as-yet indetermined type
+PPI::Token::Unknown - Token of unknown or as-yet undetermined type
 
 =head1 INHERITANCE
 

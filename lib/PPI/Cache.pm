@@ -29,8 +29,8 @@ other object will B<not> be cached.
 
 =head2 Using PPI::Cache
 
-The most common way of using C<PPI::Cache> is to provide paramaters to
-the C<use> statment at the beginning of your program.
+The most common way of using C<PPI::Cache> is to provide parameters to
+the C<use> statement at the beginning of your program.
 
   # Load the class but do not set a cache
   use PPI::Cache;

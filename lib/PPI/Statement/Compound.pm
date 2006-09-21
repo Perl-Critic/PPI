@@ -85,8 +85,8 @@ The C<type> method returns the fundamental type of the compound statement.
 
 There are three basic compound statement types.
 
-The C<'if'> type includes all vatiations of the if and unless statements,
-including any C<'elsif'> or C<'else'> parts of the compount statement.
+The C<'if'> type includes all variations of the if and unless statements,
+including any C<'elsif'> or C<'else'> parts of the compound statement.
 
 The C<'while'> type describes the standard while statement, but again does
 B<not> describes simple statements with a trailing while.

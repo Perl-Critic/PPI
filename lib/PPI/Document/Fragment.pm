@@ -10,7 +10,7 @@ PPI::Document::Fragment - A fragment of a Perl Document
 
 In some situations you might want to work with a fragment of a larger
 document. C<PPI::Document::Fragment> is a class intended for this purpose.
-It is functionaly almost identical to a normal L<PPI::Document>, except
+It is functionally almost identical to a normal L<PPI::Document>, except
 that it is not possible to get line/column positions for the elements
 within it, and it does not represent a scope.
 

@@ -117,7 +117,7 @@ The C<clone> method creates another instance of the same Find object.
 
 The cloning is done safely, so if your existing Find object is in the
 middle of an iteration, the cloned Find object will not also be in the
-iteration and can be safely used independantly.
+iteration and can be safely used independently.
 
 Returns a duplicate PPI::Find object.
 
@@ -218,7 +218,7 @@ sub in {
 
 =head2 start $Element
 
-The C<start> method lets the Find object act as an interator. The method
+The C<start> method lets the Find object act as an iterator. The method
 is passed the parent PPI::Element object as for the C<in> method, but does
 not accept any parameters.
 
@@ -289,7 +289,7 @@ sub match {
 
 =head2 finish
 
-The C<finish> method provides a mechanism to end interation if you wish to
+The C<finish> method provides a mechanism to end iteration if you wish to
 stop the iteration prematurely. It resets the Find object and allows it to
 be safely reused.
 

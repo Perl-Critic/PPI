@@ -71,7 +71,7 @@ sub canonical {
 
 The C<symbol> method returns the ACTUAL symbol this token refers to.
 
-A token of C<$foo> might actually be refering to C<@foo>, if it is found
+A token of C<$foo> might actually be referring to C<@foo>, if it is found
 in the form C<$foo[1]>.
 
 This method attempts to resolve these issues to determine the actual

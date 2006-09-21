@@ -22,7 +22,7 @@ PPI::Token::Regexp::Transliterate - A transliteration regular expression token
 A C<PPI::Token::Regexp::Transliterate> object represents a single
 transliteration regular expression.
 
-I'm afraid you'll have to excuse the rediculously long class name, but
+I'm afraid you'll have to excuse the ridiculously long class name, but
 when push came to shove I ended up going for pedantically correct
 names for things (practically cut and paste from the various docs).
 

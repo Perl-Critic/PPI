@@ -80,7 +80,7 @@ True/false value, on by default.
 =item content
 
 Should the dumper show the content of each element. True/false value,
-on by defauilt.
+on by default.
 
 =item whitespace
 

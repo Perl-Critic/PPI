@@ -43,13 +43,13 @@ the root node in a tree.
 
 =head2 Storable Support
 
-C<PPI::Document> implements the necesary C<STORABLE_freeze> and
+C<PPI::Document> implements the necessary C<STORABLE_freeze> and
 C<STORABLE_thaw> hooks to provide native support for L<Storable>,
 if you have it installed.
 
-However if you want to clone clone a Document, you are highly recommeded
+However if you want to clone clone a Document, you are highly recommended
 to use the internal C<$Document-E<gt>clone> method rather than Storable's
-C<dclone> function (although dclone should still work).
+C<dclone> function (although C<dclone> should still work).
 
 =head1 METHODS
 
@@ -291,7 +291,7 @@ need to understand the concept of tabs and tab width. The C<tab_width>
 method is used to get and set the size of the tab width.
 
 At the present time, PPI only supports "naive" (width 1) tabs, but we do
-plan on supporting arbittrary, default and auto-sensing tab widths later.
+plan on supporting arbitrary, default and auto-sensing tab widths later.
 
 Returns the tab width as an integer, or C<die>s if you attempt to set the
 tab width.
@@ -480,13 +480,13 @@ sub serialize {
 The C<hex_id> method generates an unique identifier for the Perl document.
 
 This identifier is basically just the serialized document, with
-Unix-specific newlines, passed through MD5 to produce a hexidecimal string.
+Unix-specific newlines, passed through MD5 to produce a hexadecimal string.
 
 This identifier is used by a variety of systems (such as L<PPI::Cache>
 and L<Perl::Metrics>) as a unique key against which to store or cache
 information about a document (or indeed, to cache the document itself).
 
-Returns a 32 character hexidecimal string.
+Returns a 32 character hexadecimal string.
 
 =cut
 
