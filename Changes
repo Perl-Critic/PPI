@@ -2,6 +2,7 @@ Revision history for Perl extension PPI
 
 1.xxx
 	Details:
+        - Fixed parsing of /= and *=
 	- Fixed #21571 symbol() returns just sigil with adjacent braces
 	- Fixed #21575 variables() chokes on list with whitespace
 

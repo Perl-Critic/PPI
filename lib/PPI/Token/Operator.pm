@@ -58,7 +58,7 @@ BEGIN {
 		< > <= >= lt gt le ge
 		== != <=> eq ne cmp
 		& | ^ && || // .. ...
-		? : = += -= *= .=
+		? : = += -= *= /= .=
 		=> <>
 		and or dor not
 		}, ',' 	# Avoids "comma in qw{}" warning

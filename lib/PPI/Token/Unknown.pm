@@ -98,8 +98,8 @@ sub __TOKENIZER__on_char {
 			return $t->_finalize_token->__TOKENIZER__on_char( $t );
 		}
 
-		if ( $_ eq '*' ) {
-			# Power operator '**'
+		if ( $_ eq '*' || $_ eq '=' ) {
+			# Power operator '**' or mult-assign '*='
 			return $t->_set_token_class( 'Operator' ) ? 1 : undef;
 		}
 
