@@ -1,11 +1,15 @@
 Revision history for Perl extension PPI
 
+1.xxx
+	Details:
+	- Fixed #21571 symbol() returns just sigil with adjacent braces
+
 1.117   Sat 02 Sep 2006
 	Summary:
 	- Fixing bugs introduced in 1.116
 
 	Details:
-	- Simple compound statements "{ 1 }" were not end-detecting properly	
+	- Simple compound statements "{ 1 }" were not end-detecting properly
 	- The new handling for the "-" character was shortcutting naively
 	- Labelled compound statements were not end-detecting properly
 	- { package => 1 } was treating package incorrectly

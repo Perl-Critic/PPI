@@ -30,7 +30,7 @@ sub pause {
 
 # For each new item in t/data/08_regression add another 11 tests
 
-use Test::More tests => 262;
+use Test::More tests => 268;
 use Test::Object;
 use t::lib::PPI;
 
@@ -288,6 +288,32 @@ SCOPE: {
 	my $doc = PPI::Document->new( \'[]' );
 	isa_ok( $doc, 'PPI::Document' );
 	isa_ok( $doc->child(0), 'PPI::Statement' );
+}
+
+#####################################################################
+# Bug 21571: PPI::Token::Symbol::symbol does not properly handle
+#            variables with adjacent braces
+
+SCOPE: {
+	my $doc = PPI::Document->new( \'$foo{bar}' );
+	my $symbol = $doc->child(0)->child(0);
+	isa_ok( $symbol, 'PPI::Token::Symbol' );
+	is( $symbol->symbol, '%foo', 'symbol() for $foo{bar}' );
+}
+
+SCOPE: {
+	my $doc = PPI::Document->new( \'$foo[0]' );
+	my $symbol = $doc->child(0)->child(0);
+	isa_ok( $symbol, 'PPI::Token::Symbol' );
+	is( $symbol->symbol, '@foo', 'symbol() for $foo[0]' );
+}
+
+
+SCOPE: {
+	my $doc = PPI::Document->new( \'@foo{bar}' );
+	my $symbol = $doc->child(0)->child(0);
+	isa_ok( $symbol, 'PPI::Token::Symbol' );
+	is( $symbol->symbol, '%foo', 'symbol() for @foo{bar}' );
 }
 
 exit(0);

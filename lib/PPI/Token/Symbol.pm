@@ -98,11 +98,11 @@ sub symbol {
 	my $braces = $after->braces;
 	return $symbol unless defined $braces;
 	if ( $type eq '$' ) {
-		return substr( $symbol, 0, 1, '@' ) if $braces eq '[]';
-		return substr( $symbol, 0, 1, '%' ) if $braces eq '{}';
+		substr( $symbol, 0, 1, '@' ) if $braces eq '[]';
+		substr( $symbol, 0, 1, '%' ) if $braces eq '{}';
 
 	} elsif ( $type eq '@' ) {
-		return substr( $symbol, 0, 1, '%' ) if $braces eq '{}';
+		substr( $symbol, 0, 1, '%' ) if $braces eq '{}';
 
 	}
 
