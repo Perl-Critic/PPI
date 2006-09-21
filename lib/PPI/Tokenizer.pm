@@ -617,14 +617,15 @@ sub _process_next_char {
 	return 0 if ++$self->{line_cursor} >= $self->{line_length};
 
 	# Pass control to the token class
-	unless ( $_ = $self->{class}->__TOKENIZER__on_char( $self ) ) {
+        my $result;
+	unless ( $result = $self->{class}->__TOKENIZER__on_char( $self ) ) {
 		# undef is error. 0 is "Did stuff ourself, you don't have to do anything"
-		return defined $_ ? 1 : undef;
+		return defined $result ? 1 : undef;
 	}
 
 	# We will need the value of the current character
 	my $char = substr( $self->{line}, $self->{line_cursor}, 1 );
-	if ( $_ eq '1' ) {
+	if ( $result eq '1' ) {
 		# If __TOKENIZER__on_char returns 1, it is signaling that it thinks that
 		# the character is part of it.
 
@@ -639,9 +640,9 @@ sub _process_next_char {
 	}
 
 	# We have been provided with the name of a class
-	if ( $self->{class} ne "PPI::Token::$_" ) {
+	if ( $self->{class} ne "PPI::Token::$result" ) {
 		# New class
-		$self->_new_token( $_, $char );
+		$self->_new_token( $result, $char );
 	} elsif ( defined $self->{token} ) {
 		# Same class as current
 		$self->{token}->{content} .= $char;
