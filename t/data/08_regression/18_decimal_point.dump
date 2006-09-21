@@ -1,0 +1,3 @@
+PPI::Document
+  PPI::Statement
+    PPI::Token::Number  	'.1234'
