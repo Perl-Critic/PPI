@@ -30,7 +30,7 @@ sub pause {
 
 # For each new item in t/data/08_regression add another 11 tests
 
-use Test::More tests => 268;
+use Test::More tests => 270;
 use Test::Object;
 use t::lib::PPI;
 
@@ -314,6 +314,18 @@ SCOPE: {
 	my $symbol = $doc->child(0)->child(0);
 	isa_ok( $symbol, 'PPI::Token::Symbol' );
 	is( $symbol->symbol, '%foo', 'symbol() for @foo{bar}' );
+}
+
+
+#####################################################################
+# Bug 21575: PPI::Statement::Variable::variables breaks for lists
+#            with leading whitespace
+
+SCOPE: {
+	my $doc = PPI::Document->new( \'my ( $self, $param ) = @_;' );
+	my $stmt = $doc->child(0);
+	isa_ok( $stmt, 'PPI::Statement::Variable' );
+	is_deeply( [$stmt->variables], ['$self', '$param'], 'variables() for my list with whitespace' );
 }
 
 exit(0);

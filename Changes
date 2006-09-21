@@ -3,6 +3,7 @@ Revision history for Perl extension PPI
 1.xxx
 	Details:
 	- Fixed #21571 symbol() returns just sigil with adjacent braces
+	- Fixed #21575 variables() chokes on list with whitespace
 
 1.117   Sat 02 Sep 2006
 	Summary:

@@ -135,7 +135,7 @@ sub variables {
 
 	# If it's a list, return as a list
 	if ( _INSTANCE($schild[1], 'PPI::Structure::List') ) {
-		my $Expression = $schild[1]->child(0);
+		my $Expression = $schild[1]->schild(0);
 		$Expression and
 		$Expression->isa('PPI::Statement::Expression') or return ();
 
