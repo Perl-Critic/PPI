@@ -1,0 +1,7 @@
+PPI::Document
+  PPI::Statement
+    PPI::Token::Symbol  	'$a'
+    PPI::Token::Whitespace  	' '
+    PPI::Token::Operator  	'/='
+    PPI::Token::Whitespace  	' '
+    PPI::Token::Number  	'2'
