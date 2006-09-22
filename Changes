@@ -8,6 +8,7 @@ Revision history for Perl extension PPI
 	Details:
 	- Upgraded to Module::Install 0.64
 	- Improving support for dor and added //= operators
+        - Fixed parsing of binary, octal and hex numbers
         - Fixed parsing of /= and *=
 	- Fixed #21571 symbol() returns just sigil with adjacent braces
 	- Fixed #21575 variables() chokes on list with whitespace
