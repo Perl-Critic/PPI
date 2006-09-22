@@ -15,12 +15,13 @@ use PPI;
 use Test::More tests => 3;
 
 # =begin testing string 3
-SCOPE: {
-	my $Document = PPI::Document->new( \"print 'foo';" );
-	isa_ok( $Document, 'PPI::Document' );
-	my $Single = $Document->find_first('Token::Quote::Single');
-	isa_ok( $Single, 'PPI::Token::Quote::Single' );
-	is( $Single->string, 'foo', '->string returns as expected' );
+{
+my $Document = PPI::Document->new( \"print 'foo';" );
+isa_ok( $Document, 'PPI::Document' );
+my $Single = $Document->find_first('Token::Quote::Single');
+isa_ok( $Single, 'PPI::Token::Quote::Single' );
+is( $Single->string, 'foo', '->string returns as expected' );
 }
+
 
 1;
