@@ -12,20 +12,20 @@ BEGIN {
 use PPI;
 
 # Execute the tests
-use Test::More tests => 23;
+use Test::More tests => 41;
+use t::lib::PPI;
 
-my $testdir = catdir( 't', 'data', '07_token' );
+#####################################################################
+# Code/Dump Testing
+# ntests = 2 + 12 * nfiles
 
-
-
-
-
-
+t::lib::PPI->run_testdir( catdir( 't', 'data', '07_token' ) );
 
 
 
 #####################################################################
 # PPI::Token::Symbol Unit Tests
+# Note: braces and the symbol() method are tested in regression.t
 
 {
 	# Test both creation methods
@@ -51,6 +51,26 @@ my $testdir = catdir( 't', 'data', '07_token' );
 		is( $Symbol->content,   $value, "Symbol '$value' returns ->content   '$value'" );
 		is( $Symbol->canonical, $canon, "Symbol '$value' returns ->canonical '$canon'" );
 	}
+}
+
+
+#####################################################################
+# PPI::Token::Number Unit Tests
+
+SCOPE: {
+	my $T = PPI::Tokenizer->new( \'08' );
+	my $token = $T->get_token();
+	is("$token", '08', 'tokenize octal');
+	ok($token->{_error} && $token->{_error} =~ m/octal/i,
+	   'invalid octal number should trigger parse error');
+}
+
+SCOPE: {
+	my $T = PPI::Tokenizer->new( \'0779' );
+	my $token = $T->get_token();
+	is("$token", '0779', 'tokenize octal');
+	ok($token->{_error} && $token->{_error} =~ m/octal/i,
+	   'invalid octal number should trigger parse error');
 }
 
 1;

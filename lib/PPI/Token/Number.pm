@@ -73,6 +73,10 @@ sub __TOKENIZER__on_char {
 			return 1;
 		} elsif ( $char =~ /\d/ ) {
 			$token->{_base} = 8;
+			# You cannot have 8s and 9s on octals
+			if ( $char eq '8' or $char eq '9' ) {
+				$token->{_error} = "Illegal character in octal number '$char'";
+			}
 			return 1;
 		} elsif ( $char eq '.' ) {
 			return 1;

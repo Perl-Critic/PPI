@@ -4,6 +4,7 @@ use File::Spec::Functions ':ALL';
 use Test::More;
 use Test::Object;
 use Params::Util '_INSTANCE';
+use PPI::Dumper;
 
 use vars qw{$VERSION};
 BEGIN {
