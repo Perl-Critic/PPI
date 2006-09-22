@@ -77,10 +77,20 @@ sub __TOKENIZER__on_char {
 	my $char = substr( $t->{line}, $t->{line_cursor}, 1 );
 
 	# Are we still an operator if we add the next character
-	return 1 if $OPERATOR{ $t->{token}->{content} . $char };
+	my $content = $t->{token}->{content};
+	return 1 if $OPERATOR{ $content . $char };
+
+	# Handle the special case of a .1234 decimal number
+	if ( $content eq '.' ) {
+		if ( $char =~ /^[0-9]$/ ) {
+			# This is a decimal number
+			$t->_set_token_class('Number');
+			return $t->{class}->__TOKENIZER__on_char( $t );
+		}
+	}
 
 	# Handle the special case if we might be a here-doc
-	if ( $t->{token}->{content} eq '<<' ) {
+	if ( $content eq '<<' ) {
 		my $line = substr( $t->{line}, $t->{line_cursor} );
 		if ( $line =~ /^(?:(?!\d)\w|\s*['"`])/ ) {
 			# This is a here-doc.
@@ -91,7 +101,7 @@ sub __TOKENIZER__on_char {
 	}
 
 	# Handle the special case of the null Readline
-	if ( $t->{token}->{content} eq '<>' ) {
+	if ( $content eq '<>' ) {
 		$t->_set_token_class('QuoteLike::Readline');
 	}
 
