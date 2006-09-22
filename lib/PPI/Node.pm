@@ -520,8 +520,11 @@ returns C<undef> on error, which you probably B<should> test for.
 
 =begin testing prune 2
 
-my $document = PPI::Document->new( \<<'END_PERL' );
-#!/usr/bin/perl
+# Avoids a bug in old Perls relating to the detection of scripts
+# Known to occur in ActivePerl 5.6.1 and at least one 5.6.2 install.
+my $hashbang = reverse 'lrep/nib/rsu/!#'; 
+my $document = PPI::Document->new( \<<"END_PERL" );
+$hashbang
 
 use strict;
 
