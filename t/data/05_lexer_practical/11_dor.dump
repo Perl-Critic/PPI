@@ -1,5 +1,5 @@
 PPI::Document
-  PPI::Statement::Expression
+  PPI::Statement
     PPI::Token::Symbol  	'$a'
     PPI::Token::Whitespace  	' '
     PPI::Token::Operator  	'//='

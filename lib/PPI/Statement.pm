@@ -155,7 +155,7 @@ use PPI::Statement::Variable       ();
 
 use vars qw{$VERSION};
 BEGIN {
-	$VERSION = '1.117';
+	$VERSION = '1.118';
 }
 
 # "Normal" statements end at a statement terminator ;

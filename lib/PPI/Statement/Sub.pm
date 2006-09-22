@@ -37,7 +37,7 @@ use Params::Util '_INSTANCE';
 
 use vars qw{$VERSION};
 BEGIN {
-	$VERSION = '1.117';
+	$VERSION = '1.118';
 }
 
 # Lexer clue

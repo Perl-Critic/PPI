@@ -1,10 +1,16 @@
 Revision history for Perl extension PPI
 
-1.xxx
+1.118   Fri 22 Sep 2006
+	Summary:
+	- Better 5.10 support
+	- Fixing various parsing bugs
+
 	Details:
+	- Improving support for dor and added //= operators
         - Fixed parsing of /= and *=
 	- Fixed #21571 symbol() returns just sigil with adjacent braces
 	- Fixed #21575 variables() chokes on list with whitespace
+	- Fixed #20480 (Misparse of some floating-point numbers.)
 
 1.117   Sat 02 Sep 2006
 	Summary:
