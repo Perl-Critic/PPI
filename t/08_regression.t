@@ -30,83 +30,15 @@ sub pause {
 
 # For each new item in t/data/08_regression add another 11 tests
 
-use Test::More tests => 303;
+use Test::More tests => 306;
 use Test::Object;
 use t::lib::PPI;
 
-use vars qw{$testdir};
-BEGIN {
-	$testdir = catdir( 't', 'data', '08_regression' );
-}
-
-# Does the test directory exist?
-ok( (-e $testdir and -d $testdir and -r $testdir), "Test directory $testdir found" );
-
-# Find the .code test files
-opendir( TESTDIR, $testdir ) or die "opendir: $!";
-my @code = map { catfile( $testdir, $_ ) } sort grep { /\.code$/ } readdir(TESTDIR);
-closedir( TESTDIR ) or die "closedir: $!";
-ok( scalar @code, 'Found at least one code file' );
-
-
-
-
-
 #####################################################################
 # Code/Dump Testing
+# ntests = 2 + 11 * nfiles
 
-my $Lexer = PPI::Lexer->new;
-foreach my $codefile ( @code ) {
-	# Does the .code file have a matching .dump file
-	my $dumpfile = $codefile;
-	$dumpfile =~ s/\.code$/\.dump/;
-	my $codename = $codefile;
-	$codename =~ s/\.code$//;
-	ok( (-f $dumpfile and -r $dumpfile), "$codename: Found matching .dump file" );
-
-	# Create the lexer and get the Document object
-	my $Document = $Lexer->lex_file( $codefile );
-	ok( $Document, "$codename: Lexer->Document returns true" );
-	ok( _INSTANCE($Document, 'PPI::Document'), "$codename: Object isa PPI::Document" );
-
-	my $rv;
-	SKIP: {
-		skip "No Document to test", 7 unless $Document;
-
-		# Check standard things
-		object_ok( $Document );
-
-		# Get the dump array ref for the Document object
-		my $Dumper = PPI::Dumper->new( $Document );
-		ok( _INSTANCE($Dumper, 'PPI::Dumper'), "$codename: Object isa PPI::Dumper" );
-		my @dump_list = $Dumper->list;
-		ok( scalar @dump_list, "$codename: Got dump content from dumper" );
-	
-		# Try to get the .dump file array
-		open( DUMP, $dumpfile ) or die "open: $!";
-		my @content = <DUMP>;
-		close( DUMP ) or die "close: $!";
-		chomp @content;
-	
-		# Compare the two
-		is_deeply( \@dump_list, \@content, "$codename: Generated dump matches stored dump" );
-	
-		# Also, do a round-trip check
-		$rv = open( CODEFILE, '<', $codefile );
-		ok( $rv, "$codename: Opened file" );
-	}
-	SKIP: {
-		unless ( $Document and $rv ) {
-			skip "Missing file", 1;
-		}
-		my $source = do { local $/ = undef; <CODEFILE> };
-		$source =~ s/(?:\015{1,2}\012|\015|\012)/\n/g;
-
-		is( $Document->serialize, $source, "$codename: Round-trip back to source was ok" );
-	}
-}
-
-
+t::lib::PPI->run_testdir( catdir( 't', 'data', '08_regression' ) );
 
 
 
