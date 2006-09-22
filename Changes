@@ -6,6 +6,7 @@ Revision history for Perl extension PPI
 	- Fixing various parsing bugs
 
 	Details:
+	- Upgraded to Module::Install 0.64
 	- Improving support for dor and added //= operators
         - Fixed parsing of /= and *=
 	- Fixed #21571 symbol() returns just sigil with adjacent braces
