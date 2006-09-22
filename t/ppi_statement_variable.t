@@ -20,7 +20,7 @@ use Test::More 'no_plan';
 my $Document = PPI::Document->new(\<<'END_PERL');
 package Bar;
 my $foo = 1;
-my ($foo, $bar) = (1, 2);
+my ( $foo, $bar) = (1, 2);
 our $foo = 1;
 local $foo;
 local $foo = 1;
