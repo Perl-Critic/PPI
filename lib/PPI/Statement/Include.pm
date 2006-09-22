@@ -128,7 +128,7 @@ pragma.
 sub pragma {
 	my $self = shift;
 	my $module = $self->module or return '';
-	$module =~ /^[a-z]$/ ? $module : '';
+	$module =~ /^[a-z]+$/ ? $module : '';
 }
 
 =pod
