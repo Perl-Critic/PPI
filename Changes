@@ -13,6 +13,8 @@ Revision history for Perl extension PPI
 	- Fixed #20480 (Misparse of some floating-point numbers.)
 	- Fixed #19999: Make test fails (undeclared global variable $document) under Perl 5.6.2
 	  (or at least, I think I have. This needs double-checking on Perl 5.6.2)
+	- Partially Fixed #16952: [PATCH] Speed up tokenizer char-by-char
+	  (Did not apply the patch, but fixed a bug noted as an aside in the report)
 
 1.117   Sat 02 Sep 2006
 	Summary:
