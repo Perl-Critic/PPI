@@ -70,10 +70,6 @@ sub __TOKENIZER__on_char {
 			return 1;
 		} elsif ( $char eq 'b' ) {
 			$token->{_base} = 2;
-			unless ( $char eq '1' or $char eq '0' ) {
-				# Add a warning if it contains non-hex chars
-				$token->{_error} = "Illegal character in binary number '$char'";
-			}
 			return 1;
 		} elsif ( $char =~ /\d/ ) {
 			$token->{_base} = 8;
@@ -107,12 +103,10 @@ sub __TOKENIZER__on_char {
 			} else {
 				# Will this be the first .?
 				if ( $token->{content} =~ /\./ ) {
-					return 1;
-				} else {
 					# Flag as a base256.
 					$token->{_base} = 256;
-					return 1;
 				}
+				return 1;
 			}
 		}
 
