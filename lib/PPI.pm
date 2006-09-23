@@ -696,43 +696,56 @@ C<Parse::Perl> project itself.
 
 =head1 TO DO
 
-- Many more analysis and utility methods for PDOM classes (post 1.000)
+- Many more analysis and utility methods for PDOM classes
 
-- Creation of a PPI::Tutorial document (post 1.000)
+- Creation of a PPI::Tutorial document
 
-- We can _always_ write more and better unit tests
+- Add many more key functions to PPI::XS
 
-- Add better support for tabs (1.100)
+- We can B<always> write more and better unit tests
 
-- Add better handling of non-local newlines (due 1.100)
+- Refactor PPI::Token::Number into multiple subclasses (1.200)
 
-- Full understanding of scoping (due 1.100)
+- Complete the full implementation of -E<gt>literal (1.200)
 
-- Add many more key functions to PPI::XS (post 1.000)
+- Full understanding of scoping (due 1.300)
 
 =head1 SUPPORT
 
-Bugs should be always be reported via the following URI
+This module is stored in an Open Repository at the following address.
+
+L<http://svn.phase-n.com/svn/cpan/trunk/PPI>
+
+Write access to the repository is made available automatically to any
+published CPAN author, and to most other volunteers on request.
+
+If you are able to submit your bug report in the form of new (failing)
+unit tests, or can apply your fix directly instead of submitting a patch,
+you are B<strongly> encouraged to do so, as the author currently maintains
+over 100 modules and it can take some time to deal with non-"Critical" bug
+reports or patches.
+
+This will also guarentee that your issue will be addressed in the next
+release of the module.
+
+For large changes though, please consider creating a branch so that they
+can be properly reviewed and trialed before being applied to the trunk.
+
+If you cannot provide a direct test or fix, or don't have time to do so,
+then regular bug reports are still accepted and appreciated via the CPAN
+bug tracker.
 
 L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=PPI>
-
-When reporting bugs, you are B<highly> recommended to include test
-cases if at all possible, as the odds are by the time you are
-submitting a bug you understand what should actually happen better
-than the authors.
-
-Test fragments are fine, or in larger cases simply copy/paste one of
-the other small test scripts and replace the contents with your own
-tests.
 
 For other issues or questions, contact the C<Parse::Perl> project mailing
 list.
 
-For commercial or media issues, contact the author.
+For commercial or media-related enquiries, or to have your SVN commit bit
+enabled, contact the author.
 
 =head1 AUTHOR
 
-Adam Kennedy <cpan@ali.as>, L<http://ali.as/>
+Adam Kennedy E<adamk@cpan.org>
 
 =head1 ACKNOWLEDGMENTS
 
@@ -744,10 +757,18 @@ Another big thank you to The Perl Foundation
 (L<http://www.perlfoundation.org/>) for funding for the final big
 refactoring and completion run.
 
+Also, to the various co-maintainers that have contributed both large and
+small with tests and patches and the especially those rare few who have
+deep-dived into the guts to (gasp) add a feature.
+
+  - Dan Brook       : PPIx::XPath, Acme::PerlML
+  - Audrey Tang     : "Line Noise" Testing
+  - Arjen Laarhoven : Three-element -E<gt>location
+
 Most of all, thanks to those brave soles willing to dive in and use,
-test drive and provide feedback on PPI, in a few cases before it was
-tamed and ready, and still did extremely distasteful things to you like
-eating 50 meg of RAM a second.
+test drive and provide feedback on PPI before version 1.000, in some
+cases before it made it to beta quality, and still did extremely
+distasteful things (like eating 50 meg of RAM a second).
 
 I owe you all a beer. Corner me somewhere and collect at your convenience.
 If I missed someone who wasn't in my email history, thank you too :)
@@ -778,12 +799,14 @@ If I missed someone who wasn't in my email history, thank you too :)
   - Johnny Lee
   - Johan Lindstrom
 
-And to single one person out, Randal Schwartz who (mostly) patiently
+And to single one person out, thanks go to Randal Schwartz who (mostly)
 spent a great number of hours in IRC over a critical 6 month period
-"aggressively explaining" why Perl is impossibly unparsable and
-shoving evil and ugly corner cases in my face. He remains a tireless
-devil's advocate and without his continued support this project
-genuinely could never have been completed. He has my deepest thanks.
+explaining why Perl is impossibly unparsable and constantly shoving evil
+and ugly corner cases in my face. He remained a tireless devil's advocate
+and without his support this project genuinely could never have been
+completed.
+
+So for my schooling in the Deep Magik, you have my deepest gratitude Randal.
 
 =head1 COPYRIGHT
 

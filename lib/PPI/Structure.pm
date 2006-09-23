@@ -1,6 +1,84 @@
 package PPI::Structure;
 
-# An abstract parent and a set of classes representing structures
+=pod
+
+=head1 NAME
+
+PPI::Structure - The base class for Perl braced structures
+
+=head1 INHERITANCE
+
+  PPI::Structure
+  isa PPI::Node
+      isa PPI::Element
+
+=head1 DESCRIPTION
+
+PPI::Structure is the root class for all Perl bracing structures. This
+covers all forms of C< [ ... ] >, C< { ... } >, and C< ( ... ) > brace
+types, and includes cases where only one half of the pair exist.
+
+The class PPI::Structure itself is full abstract and no objects of that
+type should actually exist in the tree.
+
+=head2 Elements vs Children
+
+A B<PPI::Structure> has an unusual existance. Unlike a L<PPI::Document>
+or L<PPI::Statement>, which both simply contain other elements, a
+structure B<both> contains and consists of content.
+
+That is, the brace tokens are B<not> considered to be "children" of the
+structure, but are part of it.
+
+In practice, this will mean that while the -E<gt>elements and -E<gt>tokens
+methods (and related) B<will> return a list with the brace tokens at either
+end, the -E<gt>children method explicitly will B<not> return the brace.
+
+=head1 STRUCTURE CLASSES
+
+Excluding the transient L<PPI::Structure::Unknown> that exists briefly
+inside the parser, there are six types of structure.
+
+=head2 L<PPI::Structure::List>
+
+This covers all round braces used for function arguments, in C<foreach>
+loops, literal lists, and braces used for precedence-ordering purposes.
+
+=head2 L<PPI::Structure::ForLoop>
+
+Although B<not> used for the C<foreach> loop list, this B<is> used for
+the special case of the round-brace three-part semicolon-seperated C<for>
+loop expression (the traditional C style for loop).
+
+=head2 L<PPI::Structure::Condition>
+
+This round-brace structure covers boolean conditional braces, such as
+for C<if> and C<while> blocks.
+
+=head2 L<PPI::Structure::Block>
+
+This curly-brace and common structure is used for all form of code
+blocks. This includes those for C<if>, C<do> and similar, as well
+as C<grep>, C<map>, C<sort>, C<sub> and (labelled or anonymous) 
+scoping blocks.
+
+=head2 L<PPI::Structure::Constructor>
+
+This class covers brace structures used for the construction of
+anonymous C<ARRAY> and C<HASH> references.
+
+=head2 L<PPI::Structure::Subscript>
+
+This class covers square-braces and curly-braces used after a
+-E<gt> pointer to access the subscript of an C<ARRAY> or C<HASH>.
+
+=head1 METHODS
+
+C<PPI::Structure> itself has very few methods. Most of the time, you will be
+working with the more generic L<PPI::Element> or L<PPI::Node> methods, or one
+of the methods that are subclass-specific.
+
+=cut
 
 use strict;
 use base 'PPI::Node';
@@ -69,10 +147,55 @@ sub _set_finish {
 #####################################################################
 # PPI::Structure API methods
 
+=pod
+
+=head2 start
+
+For lack of better terminology (like "open" and "close") that has not
+already in use for some other more important purpose, the two individual
+braces for the structure are known within PPI as the "start" and "finish"
+braces (at least for method purposes).
+
+The C<start> method returns the start brace for the structure (i.e. the
+opening brace).
+
+Returns the brace as a L<PPI::Token::Structure> or C<undef> if the
+structure does not have a starting brace.
+
+Under normal parsing circumstances this should never occur, but may happen
+due to manipulation of the PDOM tree.
+
+=cut
+
 sub start  { $_[0]->{start}  }
+
+=pod
+
+=head2 finish
+
+The C<finish> method returns the finish brace for the structure (i.e. the
+closing brace).
+
+Returns the brace as a L<PPI::Token::Structure> or C<undef> if the
+structure does not have a starting brace. This can be quite common if
+the document is not complete (for example, from an editor where the user
+may be halfway through typeing a subroutine).
+
+=cut
+
 sub finish { $_[0]->{finish} }
 
-# What general brace type are we
+=pod
+
+=head2 braces
+
+The C<braces> method is a utility method which returns the brace type.
+
+Returns on of the three strings C<'[]'>, C<'{}'>, or C<'()'>, or C<undef>
+on error (primarily not having a start brace, as mentioned above).
+
+=cut
+
 sub braces {
 	my $self = $_[0]->{start} ? shift : return undef;
 	return { '[' => '[]', '(' => '()', '{' => '{}' }->{ $self->{start}->{content} };
@@ -171,3 +294,25 @@ sub insert_after {
 }
 
 1;
+
+=pod
+
+=head1 SUPPORT
+
+See the L<support section|PPI/SUPPORT> in the main module.
+
+=head1 AUTHOR
+
+Adam Kennedy E<lt>adamk@cpan.orgE<gt>
+
+=head1 COPYRIGHT
+
+Copyright 2001 - 2006 Adam Kennedy.
+
+This program is free software; you can redistribute
+it and/or modify it under the same terms as Perl itself.
+
+The full text of the license can be found in the
+LICENSE file included with this module.
+
+=cut

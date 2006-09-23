@@ -56,8 +56,17 @@ sub new {
 	# Load the Document
 	my $self = $class->SUPER::new( $filename, @_ ) or return undef;
 
+	# Unlike a normal inheritance situation, due to our need to stay
+	# compatible with caching magic, this actually returns a regular
+	# anonymous document. We need to rebless if
+	if ( ref($self) eq 'PPI::Document' ) {
+		bless $self, 'PPI::Document::File';
+	} else {
+		die "PPI::Document::File SUPER call returned an object of the wrong type";
+	}
+
 	# Save the filename
-	$self->{filename} = $self->{filename};
+	$self->{filename} = $filename;
 
 	$self;
 }
