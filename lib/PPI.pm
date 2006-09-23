@@ -745,7 +745,7 @@ enabled, contact the author.
 
 =head1 AUTHOR
 
-Adam Kennedy E<adamk@cpan.org>
+Adam Kennedy I<adamk@cpan.org>
 
 =head1 ACKNOWLEDGMENTS
 
