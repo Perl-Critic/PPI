@@ -194,7 +194,7 @@ sub __TOKENIZER__on_char {
 
 
 	} elsif ( $c eq '-' ) {
-		if ( /\d/o ) {
+		if ( /[\d\.]/o ) {
 			# Number
 			return $t->_set_token_class( 'Number' ) ? 1 : undef;
 		}

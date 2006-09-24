@@ -13,7 +13,7 @@ BEGIN {
 use PPI;
 
 # Execute the tests
-use Test::More tests => 135;
+use Test::More tests => 138;
 use t::lib::PPI;
 
 #####################################################################
@@ -64,6 +64,7 @@ SCOPE: {
 		'0'    => 10,
 		'1'    => 10,
 		'.0'   => 10,
+		'-.0'  => 10,
 		'0.'   => 10,
 		'0.0'  => 10,
 		'0b'   => 2,
@@ -91,7 +92,7 @@ SCOPE: {
 		$code =~ s/(.)/${1}__/gs;
 		$T = PPI::Tokenizer->new( \$code );
 		$token = $T->get_token();
-		if ($code =~ m/\A\./) { # decimal point followed by underscore is not a number
+		if ($code =~ m/\A(?:-__)?\./) { # decimal point followed by underscore is not a number
 			isnt("$token", $code, "'$code' is not a single token");
 		} else {
 			is("$token", $code, "'$code' is a single token");
