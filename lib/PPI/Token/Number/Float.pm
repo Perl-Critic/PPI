@@ -73,11 +73,11 @@ sub __TOKENIZER__on_char {
 			$t->_new_token('Operator', '..') or return undef;
 			return 0;
 		} elsif ( $t->{token}->{content} !~ /_/ ) {
-			# Underscore means not a Version
+			# Underscore means not a Version, fall through to end token
 			return $t->_set_token_class( 'Number::Version' ) ? 1 : undef;
 		}
 	}
-	# TODO: else ($char eq 'e' || $char eq 'E')
+	# TODO: if ($char eq 'e' || $char eq 'E') { ... }
 
 	# Doesn't fit a special case, or is after the end of the token
 	# End of token.
@@ -94,7 +94,7 @@ See the L<support section|PPI/SUPPORT> in the main module.
 
 =head1 AUTHOR
 
-Chris Dolan E<lt>cdolank@cpan.orgE<gt>
+Chris Dolan E<lt>cdolan@cpan.orgE<gt>
 
 =head1 COPYRIGHT
 

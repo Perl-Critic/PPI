@@ -75,7 +75,7 @@ See the L<support section|PPI/SUPPORT> in the main module.
 
 =head1 AUTHOR
 
-Chris Dolan E<lt>cdolank@cpan.orgE<gt>
+Chris Dolan E<lt>cdolan@cpan.orgE<gt>
 
 =head1 COPYRIGHT
 

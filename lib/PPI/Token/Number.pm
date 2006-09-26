@@ -75,11 +75,6 @@ sub __TOKENIZER__on_char {
 				$token->{_error} = "Illegal character in octal number '$char'";
 			}
 			return $t->_set_token_class( 'Number::Octal' ) ? 1 : undef;
-		} elsif ( $char eq '.' ) {
-			return $t->_set_token_class( 'Number::Float' ) ? 1 : undef;
-		} else {
-			# End of the number... its just 0
-			return $t->_finalize_token->__TOKENIZER__on_char( $t );
 		}
 	}
 
@@ -89,7 +84,7 @@ sub __TOKENIZER__on_char {
 	if ( $char eq '.' ) {
 		return $t->_set_token_class( 'Number::Float' ) ? 1 : undef;
 	}
-	# TODO: else ($char eq 'e' || $char eq 'E')
+	# TODO: if ($char eq 'e' || $char eq 'E') { ... }
 
 	# Doesn't fit a special case, or is after the end of the token
 	# End of token.
