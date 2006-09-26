@@ -1,4 +1,4 @@
 PPI::Document
   PPI::Statement
-    PPI::Token::Number  	'0x'
+    PPI::Token::Number::Hex  	'0x'
     PPI::Token::Word  	'g'

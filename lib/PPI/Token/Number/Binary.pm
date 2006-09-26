@@ -1,0 +1,94 @@
+package PPI::Token::Number::Binary;
+
+=pod
+
+=head1 NAME
+
+PPI::Token::Number::Binary - Token class for a binary number
+
+=head1 SYNOPSIS
+
+  $n = 0b1110011;  # binary integer
+
+=head1 INHERITANCE
+
+  PPI::Token::Number::Binary
+  isa PPI::Token::Number
+      isa PPI::Token
+          isa PPI::Element
+
+=head1 DESCRIPTION
+
+The C<PPI::Token::Number::Binary> class is used for tokens that
+represent base-2 numbers.
+
+=head1 METHODS
+
+=cut
+
+use strict;
+use base 'PPI::Token::Number';
+
+use vars qw{$VERSION};
+BEGIN {
+	$VERSION = '1.118';
+}
+
+=head2 base
+
+Returns the base for the number: 2.
+
+=cut
+
+sub base {
+	return 2;
+}
+
+
+#####################################################################
+# Tokenizer Methods
+
+sub __TOKENIZER__on_char {
+	my $class = shift;
+	my $t     = shift;
+	my $char  = substr( $t->{line}, $t->{line_cursor}, 1 );
+
+	# Allow underscores straight through
+	return 1 if $char eq '_';
+
+	if ( $char =~ /[\w\d]/ ) {
+		unless ( $char eq '1' or $char eq '0' ) {
+			# Add a warning if it contains non-hex chars
+			$t->{token}->{_error} = "Illegal character in binary number '$char'";
+		}
+		return 1;
+	}
+
+	# Doesn't fit a special case, or is after the end of the token
+	# End of token.
+	$t->_finalize_token->__TOKENIZER__on_char( $t );
+}
+
+1;
+
+=pod
+
+=head1 SUPPORT
+
+See the L<support section|PPI/SUPPORT> in the main module.
+
+=head1 AUTHOR
+
+Chris Dolan E<lt>cdolank@cpan.orgE<gt>
+
+=head1 COPYRIGHT
+
+Copyright 2006 Chris Dolan.
+
+This program is free software; you can redistribute
+it and/or modify it under the same terms as Perl itself.
+
+The full text of the license can be found in the
+LICENSE file included with this module.
+
+=cut
