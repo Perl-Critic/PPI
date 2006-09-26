@@ -45,8 +45,7 @@ This is 10 for decimal, 16 for hexadecimal, 2 for binary, etc.
 =cut
 
 sub base {
-	my $self = shift;
-	return $self->{_base} || 10;
+	return 10;
 }
 
 
@@ -77,39 +76,18 @@ sub __TOKENIZER__on_char {
 			}
 			return $t->_set_token_class( 'Number::Octal' ) ? 1 : undef;
 		} elsif ( $char eq '.' ) {
-			# TODO: class -> ::Float
-			return 1;
+			return $t->_set_token_class( 'Number::Float' ) ? 1 : undef;
 		} else {
 			# End of the number... its just 0
 			return $t->_finalize_token->__TOKENIZER__on_char( $t );
 		}
 	}
 
-	$token->{_base} = 10 unless $token->{_base};
-
 	# Handle the easy case, integer or real.
 	return 1 if $char =~ /\d/o;
 
 	if ( $char eq '.' ) {
-		if ( $token->{content} =~ /\.$/ ) {
-			# We have a .., which is an operator.
-			# Take the . off the end of the token..
-			# and finish it, then make the .. operator.
-			chop $t->{token}->{content};
-			$t->_new_token('Operator', '..') or return undef;
-			return 0;
-		} else {
-			# Will this be the first .?
-			if ( $token->{content} =~ /\./ ) {
-				# TODO: class -> ::VersionString
-				#   but see http://perlmonks.org/?node_id=574573
-
-				# Flag as a base256.
-				$token->{_base} = 256;
-			}
-			return 1;
-		}
-		# TODO: else class -> ::Float
+		return $t->_set_token_class( 'Number::Float' ) ? 1 : undef;
 	}
 	# TODO: else ($char eq 'e' || $char eq 'E')
 
@@ -125,8 +103,6 @@ sub __TOKENIZER__on_char {
 =head1 TO DO
 
 - Add support for exponential notation
-
-- Break out floats and v-strings into their own modules
 
 - Treak v-strings as binary strings or barewords, not as "base-256"
   numbers

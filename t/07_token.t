@@ -13,7 +13,7 @@ BEGIN {
 use PPI;
 
 # Execute the tests
-use Test::More tests => 138;
+use Test::More tests => 169;
 use t::lib::PPI;
 
 #####################################################################
@@ -60,13 +60,13 @@ t::lib::PPI->run_testdir( catdir( 't', 'data', '07_token' ) );
 
 SCOPE: {
 	my @examples = (
-		# code => base
+		# code => base | '10f'
 		'0'    => 10,
 		'1'    => 10,
-		'.0'   => 10,
-		'-.0'  => 10,
-		'0.'   => 10,
-		'0.0'  => 10,
+		'.0'   => '10f',
+		'-.0'  => '10f',
+		'0.'   => '10f',
+		'0.0'  => '10f',
 		'0b'   => 2,
 		'0b0'  => 2,
 		'0b10' => 2,
@@ -84,22 +84,40 @@ SCOPE: {
 
 	my $iterator = List::MoreUtils::natatime(2, @examples);
 	while (my ($code, $base) = $iterator->()) {
+		my $float = $base =~ s/f//;
 		my $T = PPI::Tokenizer->new( \$code );
 		my $token = $T->get_token();
 		is("$token", $code, "'$code' is a single token");
 		is($token->base(), $base, "base of '$code' is $base");
+		if ($float) {
+			ok($token->isa('PPI::Token::Number::Float'), "'$code' is ::Float");
+		} else {
+			ok(!$token->isa('PPI::Token::Number::Float'), "'$code' not ::Float");
+		}
 
 		$code =~ s/(.)/${1}__/gs;
 		$T = PPI::Tokenizer->new( \$code );
 		$token = $T->get_token();
-		if ($code =~ m/\A(?:-__)?\./) { # decimal point followed by underscore is not a number
+		if ($base == 256 || $code =~ m/\A(?:-__)?\./) { # decimal point followed by underscore is not a number
 			isnt("$token", $code, "'$code' is not a single token");
 		} else {
 			is("$token", $code, "'$code' is a single token");
 			is($token->base(), $base, "base of '$code' is $base");
+			if ($float) {
+				ok($token->isa('PPI::Token::Number::Float'), "'$code' is ::Float");
+			} else {
+				ok(!$token->isa('PPI::Token::Number::Float'), "'$code' not ::Float");
+			}
 		}
 	}
 }
+
+foreach my $code ( '1.0._0', '1.0.0.0_0' ) {
+	my $T = PPI::Tokenizer->new( \$code );
+	my $token = $T->get_token();
+	isnt("$token", $code, 'tokenize bad version');
+}
+
 
 foreach my $code ( '08', '09', '0778', '0779' ) {
 	my $T = PPI::Tokenizer->new( \$code );

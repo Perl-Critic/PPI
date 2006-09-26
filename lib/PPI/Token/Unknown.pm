@@ -194,9 +194,14 @@ sub __TOKENIZER__on_char {
 
 
 	} elsif ( $c eq '-' ) {
-		if ( /[\d\.]/o ) {
+		if ( /\d/o ) {
 			# Number
 			return $t->_set_token_class( 'Number' ) ? 1 : undef;
+		}
+
+		if ( $_ eq '.' ) {
+			# Number::Float
+			return $t->_set_token_class( 'Number::Float' ) ? 1 : undef;
 		}
 
 		if ( /[a-zA-Z]/ ) {

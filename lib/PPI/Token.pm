@@ -40,6 +40,8 @@ use PPI::Token::Number                ();
 use PPI::Token::Number::Binary        ();
 use PPI::Token::Number::Octal         ();
 use PPI::Token::Number::Hex           ();
+use PPI::Token::Number::Float         ();
+use PPI::Token::Number::Version       ();
 use PPI::Token::Word                  ();
 use PPI::Token::DashedWord            ();
 use PPI::Token::Symbol                ();

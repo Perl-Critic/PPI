@@ -384,7 +384,7 @@ syntax.
 
 =head2 The PDOM Class Tree
 
-The following lists all of the 65 current PDOM classes, listing with indentation
+The following lists all of the 67 current PDOM classes, listing with indentation
 based on inheritance.
 
    PPI::Element
@@ -421,6 +421,8 @@ based on inheritance.
             PPI::Token::Number::Binary
             PPI::Token::Number::Octal
             PPI::Token::Number::Hex
+            PPI::Token::Number::Float
+            PPI::Token::Number::Version
          PPI::Token::Word
          PPI::Token::DashedWord
          PPI::Token::Symbol

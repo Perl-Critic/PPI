@@ -84,7 +84,7 @@ sub __TOKENIZER__on_char {
 	if ( $content eq '.' ) {
 		if ( $char =~ /^[0-9]$/ ) {
 			# This is a decimal number
-			$t->_set_token_class('Number');
+			$t->_set_token_class('Number::Float');
 			return $t->{class}->__TOKENIZER__on_char( $t );
 		}
 	}
