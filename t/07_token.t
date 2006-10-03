@@ -13,7 +13,7 @@ BEGIN {
 use PPI;
 
 # Execute the tests
-use Test::More tests => 169;
+use Test::More tests => 259;
 use t::lib::PPI;
 
 #####################################################################
@@ -67,6 +67,14 @@ SCOPE: {
 		'-.0'  => '10f',
 		'0.'   => '10f',
 		'0.0'  => '10f',
+		'.0e0'    => '10e',
+		'-.0e0'   => '10e',
+		'0.e1'    => '10e',
+		'0.0e-1'  => '10e',
+		'0.0e+1'  => '10e',
+		'0.0e-10' => '10e',
+		'0.0e+10' => '10e',
+		'0.0e100' => '10e',
 		'0b'   => 2,
 		'0b0'  => 2,
 		'0b10' => 2,
@@ -84,7 +92,8 @@ SCOPE: {
 
 	my $iterator = List::MoreUtils::natatime(2, @examples);
 	while (my ($code, $base) = $iterator->()) {
-		my $float = $base =~ s/f//;
+		my $exp = $base =~ s/e//;
+		my $float = $exp || $base =~ s/f//;
 		my $T = PPI::Tokenizer->new( \$code );
 		my $token = $T->get_token();
 		is("$token", $code, "'$code' is a single token");
@@ -94,11 +103,18 @@ SCOPE: {
 		} else {
 			ok(!$token->isa('PPI::Token::Number::Float'), "'$code' not ::Float");
 		}
+		if ($exp) {
+			ok($token->isa('PPI::Token::Number::Exp'), "'$code' is ::Exp");
+		} else {
+			ok(!$token->isa('PPI::Token::Number::Exp'), "'$code' not ::Exp");
+		}
 
 		$code =~ s/(.)/${1}__/gs;
 		$T = PPI::Tokenizer->new( \$code );
 		$token = $T->get_token();
-		if ($base == 256 || $code =~ m/\A(?:-__)?\./) { # decimal point followed by underscore is not a number
+		if ($base == 256 ||
+		    $code =~ m/\A(?:-__)?\./ || # decimal point followed by underscore is not a number
+		    $code =~ m/e__[\-\+]/) {
 			isnt("$token", $code, "'$code' is not a single token");
 		} else {
 			is("$token", $code, "'$code' is a single token");
@@ -107,6 +123,11 @@ SCOPE: {
 				ok($token->isa('PPI::Token::Number::Float'), "'$code' is ::Float");
 			} else {
 				ok(!$token->isa('PPI::Token::Number::Float'), "'$code' not ::Float");
+			}
+			if ($exp) {
+				ok($token->isa('PPI::Token::Number::Exp'), "'$code' is ::Exp");
+			} else {
+				ok(!$token->isa('PPI::Token::Number::Exp'), "'$code' not ::Exp");
 			}
 		}
 	}

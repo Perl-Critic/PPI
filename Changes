@@ -3,6 +3,7 @@ Revision history for Perl extension PPI
 1.xxx
 	Details:
 	- Split out PPI::Token::Number subclasses
+	- Implement numbers with exponential notation
 
 1.118   Fri 22 Sep 2006
 	Summary:

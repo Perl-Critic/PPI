@@ -422,6 +422,7 @@ based on inheritance.
             PPI::Token::Number::Octal
             PPI::Token::Number::Hex
             PPI::Token::Number::Float
+               PPI::Token::Number::Exp
             PPI::Token::Number::Version
          PPI::Token::Word
          PPI::Token::DashedWord
@@ -708,8 +709,6 @@ C<Parse::Perl> project itself.
 - Add many more key functions to PPI::XS
 
 - We can B<always> write more and better unit tests
-
-- Refactor PPI::Token::Number into multiple subclasses (1.200)
 
 - Complete the full implementation of -E<gt>literal (1.200)
 

@@ -1,0 +1,52 @@
+PPI::Document
+  PPI::Statement
+    PPI::Token::Number::Exp  	'0E0'
+    PPI::Token::Structure  	';'
+  PPI::Token::Whitespace  	'\n'
+  PPI::Statement
+    PPI::Token::Number::Exp  	'1.0e-02'
+    PPI::Token::Structure  	';'
+  PPI::Token::Whitespace  	'\n'
+  PPI::Statement
+    PPI::Token::Number::Exp  	'1.0E-2'
+    PPI::Token::Structure  	';'
+  PPI::Token::Whitespace  	'\n'
+  PPI::Statement
+    PPI::Token::Number::Exp  	'1e+10'
+    PPI::Token::Structure  	';'
+  PPI::Token::Whitespace  	'\n'
+  PPI::Statement
+    PPI::Token::Number::Exp  	'1E+10'
+    PPI::Token::Structure  	';'
+  PPI::Token::Whitespace  	'\n'
+  PPI::Statement
+    PPI::Token::Word  	'e'
+    PPI::Token::Number  	'-1'
+    PPI::Token::Structure  	';'
+  PPI::Token::Whitespace  	'\n'
+  PPI::Statement
+    PPI::Token::Number  	'0'
+    PPI::Token::Whitespace  	' '
+    PPI::Token::Word  	'e0'
+    PPI::Token::Structure  	';'
+  PPI::Token::Whitespace  	'\n'
+  PPI::Statement
+    PPI::Token::Number  	'1'
+    PPI::Token::Operator  	'.'
+    PPI::Token::Word  	'e'
+    PPI::Structure::List  	( ... )
+    PPI::Token::Structure  	';'
+  PPI::Token::Whitespace  	'\n'
+  PPI::Statement
+    PPI::Token::Number  	'1'
+    PPI::Token::Operator  	'.'
+    PPI::Token::Word  	'exp'
+    PPI::Structure::List  	( ... )
+      PPI::Statement::Expression
+        PPI::Token::Number  	'1'
+    PPI::Token::Structure  	';'
+  PPI::Token::Whitespace  	'\n'
+  PPI::Statement
+    PPI::Token::Number::Exp  	'1__E+__1__0'
+    PPI::Token::Structure  	';'
+  PPI::Token::Whitespace  	'\n'

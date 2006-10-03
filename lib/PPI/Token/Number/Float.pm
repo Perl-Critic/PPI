@@ -9,8 +9,6 @@ PPI::Token::Number::Float - Token class for a floating-point number
 =head1 SYNOPSIS
 
   $n = 1.234;
-  $n = 1.0e-2;  # not yet supported
-  $n = 1e+2;  # not yet supported
 
 =head1 INHERITANCE
 
@@ -22,8 +20,9 @@ PPI::Token::Number::Float - Token class for a floating-point number
 =head1 DESCRIPTION
 
 The C<PPI::Token::Number::Float> class is used for tokens that
-represent floating point numbers.  A float is identified by either an
-decimal point or exponential notation (the C<e> or C<E>).
+represent floating point numbers.  A float is identified by n decimal
+point.  Exponential notation (the C<e> or C<E>) is handled by the
+PPI::Token::Number::Exp class.
 
 =head1 METHODS
 
@@ -77,7 +76,9 @@ sub __TOKENIZER__on_char {
 			return $t->_set_token_class( 'Number::Version' ) ? 1 : undef;
 		}
 	}
-	# TODO: if ($char eq 'e' || $char eq 'E') { ... }
+	if ($char eq 'e' || $char eq 'E') {
+		return $t->_set_token_class( 'Number::Exp' ) ? 1 : undef;		
+	}
 
 	# Doesn't fit a special case, or is after the end of the token
 	# End of token.

@@ -84,7 +84,9 @@ sub __TOKENIZER__on_char {
 	if ( $char eq '.' ) {
 		return $t->_set_token_class( 'Number::Float' ) ? 1 : undef;
 	}
-	# TODO: if ($char eq 'e' || $char eq 'E') { ... }
+	if ( $char eq 'e' || $char eq 'E' ) {
+		return $t->_set_token_class( 'Number::Exp' ) ? 1 : undef;
+	}
 
 	# Doesn't fit a special case, or is after the end of the token
 	# End of token.
