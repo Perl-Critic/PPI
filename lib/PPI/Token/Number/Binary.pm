@@ -52,6 +52,7 @@ Return the numeric value of this token.
 
 sub literal {
 	my $self = shift;
+	return if $self->{_error};
 	my $str = $self->_literal;
 	my $neg = $str =~ s/^\-//;
 	$str =~ s/^0b//;

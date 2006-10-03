@@ -13,7 +13,7 @@ BEGIN {
 use PPI;
 
 # Execute the tests
-use Test::More tests => 255;
+use Test::More tests => 271;
 use t::lib::PPI;
 
 #####################################################################
@@ -140,24 +140,30 @@ foreach my $code ( '1.0._0', '1.0.0.0_0' ) {
 foreach my $code ( '08', '09', '0778', '0779' ) {
 	my $T = PPI::Tokenizer->new( \$code );
 	my $token = $T->get_token();
-	is("$token", $code, 'tokenize bad octal');
+	isa_ok($token, 'PPI::Token::Number::Octal');
+	is("$token", $code, "tokenize bad octal '$code'");
 	ok($token->{_error} && $token->{_error} =~ m/octal/i,
 	   'invalid octal number should trigger parse error');
+	is($token->literal, undef, "literal('$code') is undef");
 }
 
 foreach my $code ( '0b2', '0b012' ) {
 	my $T = PPI::Tokenizer->new( \$code );
 	my $token = $T->get_token();
-	is("$token", $code, 'tokenize bad binary');
+	isa_ok($token, 'PPI::Token::Number::Binary');
+	is("$token", $code, "tokenize bad binary '$code'");
 	ok($token->{_error} && $token->{_error} =~ m/binary/i,
 	   'invalid binary number should trigger parse error');
+	is($token->literal, undef, "literal('$code') is undef");
 }
 
 foreach my $code ( '0xg', '0x0g' ) {
 	my $T = PPI::Tokenizer->new( \$code );
 	my $token = $T->get_token();
-	isnt("$token", $code, 'tokenize bad hex');
+	isa_ok($token, 'PPI::Token::Number::Hex');
+	isnt("$token", $code, "tokenize bad hex '$code'");
 	ok(!$token->{_error}, 'invalid hexadecimal digit triggers end of token');
+	is($token->literal, 0, "literal('$code') is 0");
 }
 
 1;
