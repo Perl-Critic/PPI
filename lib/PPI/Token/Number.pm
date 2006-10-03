@@ -48,6 +48,25 @@ sub base {
 	return 10;
 }
 
+=head2 literal
+
+Return the numeric value of this token.
+
+=cut
+
+sub literal {
+	my $self = shift;
+	return 0+$self->_literal;
+}
+
+sub _literal {
+	# De-sugar the string representation
+	my $self = shift;
+	my $str = $self->content;
+	$str =~ s/^\+//;
+	$str =~ s/_//g;
+	return $str;
+}
 
 #####################################################################
 # Tokenizer Methods
@@ -97,9 +116,15 @@ sub __TOKENIZER__on_char {
 
 =pod
 
-=head1 TO DO
+=head1 CAVEATS
 
-- Add support for exponential notation
+Compared to Perl, the number tokenizer is too liberal about allowing
+underscores anywhere.  For example, the following is a syntax error in
+Perl, but is allowed in PPI:
+
+   0_b10
+
+=head1 TO DO
 
 - Treak v-strings as binary strings or barewords, not as "base-256"
   numbers

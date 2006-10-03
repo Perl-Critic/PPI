@@ -47,6 +47,17 @@ sub base {
 	return 256;
 }
 
+=head2 literal
+
+Return the numeric value of this token.
+
+=cut
+
+sub literal {
+	my $self = shift;
+	return; # not yet implemented
+}
+
 
 #####################################################################
 # Tokenizer Methods

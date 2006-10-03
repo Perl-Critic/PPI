@@ -15,7 +15,7 @@ use PPI::Find;
 use PPI::Transform;
 
 # Execute the tests
-use Test::More tests => 2192;
+use Test::More tests => 2193;
 use Test::ClassAPI;
 
 # Ignore various imported or special functions
@@ -152,6 +152,7 @@ PPI::Token=isa
 [PPI::Token::Number]
 PPI::Token=isa
 base=method
+literal=method
 
 [PPI::Token::Symbol]
 PPI::Token=isa

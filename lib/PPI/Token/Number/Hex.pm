@@ -44,6 +44,20 @@ sub base {
 	return 16;
 }
 
+=head2 literal
+
+Return the numeric value of this token.
+
+=cut
+
+sub literal {
+	my $self = shift;
+	my $str = $self->_literal;
+	my $neg = $str =~ s/^\-//;
+	my $val = hex $str;
+	return $neg ? -$val : $val;
+}
+
 
 #####################################################################
 # Tokenizer Methods

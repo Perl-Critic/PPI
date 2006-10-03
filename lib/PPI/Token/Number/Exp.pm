@@ -36,6 +36,24 @@ BEGIN {
 	$VERSION = '1.118';
 }
 
+
+=head2 literal
+
+Return the numeric value of this token.
+
+=cut
+
+sub literal {
+	my $self = shift;
+	return if $self->{_error};
+	my ($mantissa, $exponent) = split m/e/i, $self->_literal;
+	my $neg = $mantissa =~ s/^\-//;
+	$mantissa =~ s/^\./0./;
+	$exponent =~ s/^\+//;
+	my $val = $mantissa * 10 ** $exponent;
+	return $neg ? -$val : $val;
+}
+
 #####################################################################
 # Tokenizer Methods
 

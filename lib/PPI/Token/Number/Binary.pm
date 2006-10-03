@@ -44,6 +44,24 @@ sub base {
 	return 2;
 }
 
+=head2 literal
+
+Return the numeric value of this token.
+
+=cut
+
+sub literal {
+	my $self = shift;
+	my $str = $self->_literal;
+	my $neg = $str =~ s/^\-//;
+	$str =~ s/^0b//;
+	my $val = 0;
+	for my $bit ($str =~ m/(.)/g) {
+		$val = $val * 2 + $bit;
+	}
+	return $neg ? -$val : $val;
+}
+
 
 #####################################################################
 # Tokenizer Methods

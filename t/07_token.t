@@ -13,7 +13,7 @@ BEGIN {
 use PPI;
 
 # Execute the tests
-use Test::More tests => 259;
+use Test::More tests => 255;
 use t::lib::PPI;
 
 #####################################################################
@@ -60,13 +60,18 @@ t::lib::PPI->run_testdir( catdir( 't', 'data', '07_token' ) );
 
 SCOPE: {
 	my @examples = (
-		# code => base | '10f'
-		'0'    => 10,
-		'1'    => 10,
-		'.0'   => '10f',
-		'-.0'  => '10f',
-		'0.'   => '10f',
-		'0.0'  => '10f',
+		# code => base | '10f' | '10e'
+		'0'       => 10,
+		'1'       => 10,
+		'10'      => 10,
+		'1_0'     => 10,
+		'.0'      => '10f',
+		'.0_0'    => '10f',
+		'-.0'     => '10f',
+		'0.'      => '10f',
+		'0.0'     => '10f',
+		'0.0_0'   => '10f',
+		'1_0.'    => '10f',
 		'.0e0'    => '10e',
 		'-.0e0'   => '10e',
 		'0.e1'    => '10e',
@@ -75,15 +80,19 @@ SCOPE: {
 		'0.0e-10' => '10e',
 		'0.0e+10' => '10e',
 		'0.0e100' => '10e',
-		'0b'   => 2,
-		'0b0'  => 2,
-		'0b10' => 2,
-		'00'   => 8,
-		'01'   => 8,
-		'010'  => 8,
-		'0x'   => 16,
-		'0x0'  => 16,
-		'0x10' => 16,
+		'1_0e1_0' => '10e',
+		'0b'      => 2,
+		'0b0'     => 2,
+		'0b10'    => 2,
+		'0b1_0'   => 2,
+		'00'      => 8,
+		'01'      => 8,
+		'010'     => 8,
+		'01_0'    => 8,
+		'0x'      => 16,
+		'0x0'     => 16,
+		'0x10'    => 16,
+		'0x1_0'   => 16,
 		'0.0.0'       => 256,
 		'.0.0'        => 256,
 		'127.0.0.1'   => 256,
@@ -109,25 +118,13 @@ SCOPE: {
 			ok(!$token->isa('PPI::Token::Number::Exp'), "'$code' not ::Exp");
 		}
 
-		$code =~ s/(.)/${1}__/gs;
-		$T = PPI::Tokenizer->new( \$code );
-		$token = $T->get_token();
-		if ($base == 256 ||
-		    $code =~ m/\A(?:-__)?\./ || # decimal point followed by underscore is not a number
-		    $code =~ m/e__[\-\+]/) {
-			isnt("$token", $code, "'$code' is not a single token");
-		} else {
-			is("$token", $code, "'$code' is a single token");
-			is($token->base(), $base, "base of '$code' is $base");
-			if ($float) {
-				ok($token->isa('PPI::Token::Number::Float'), "'$code' is ::Float");
+		if ($base != 256) {
+			no warnings;
+			my $literal = eval $code;
+			if ($@) {
+				is($token->literal, undef, "literal('$code'), $@");
 			} else {
-				ok(!$token->isa('PPI::Token::Number::Float'), "'$code' not ::Float");
-			}
-			if ($exp) {
-				ok($token->isa('PPI::Token::Number::Exp'), "'$code' is ::Exp");
-			} else {
-				ok(!$token->isa('PPI::Token::Number::Exp'), "'$code' not ::Exp");
+				cmp_ok($token->literal, '==', $literal, "literal('$code')");
 			}
 		}
 	}
