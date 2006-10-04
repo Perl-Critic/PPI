@@ -39,6 +39,7 @@ sub _Document {
 sub _slurp {
 	my $file = shift;
 	local $/ = undef;
+	local *PPIUTIL;
 	open( PPIUTIL, '<', $file ) or return "open($file) failed: $!";
 	my $source = <PPIUTIL>;
 	close( PPIUTIL ) or return "close($file) failed: $!";

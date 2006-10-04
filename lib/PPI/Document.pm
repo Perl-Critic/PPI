@@ -318,6 +318,7 @@ or write to the file.
 
 sub save {
 	my $self = shift;
+	local *PPIOUTPUT;
 	open( PPIOUTPUT, ">", $_[0] )    or return undef;
 	print PPIOUTPUT $self->serialize or return undef;
 	close PPIOUTPUT                  or return undef;
