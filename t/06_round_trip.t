@@ -31,7 +31,8 @@ unless ( %tests ) {
 my @files = sort values %tests;
 
 # Find all the testable perl files in t.data
-foreach my $dir ( '05_lexer_practical', '08_regression', '11_util', '13_data', '15_transform' ) {
+foreach my $dir ( '05_lexer_practical', '07_token', '08_regression',
+                  '11_util', '13_data', '15_transform' ) {
 	my @perl = find_files( $dir );
 	push @files, @perl;
 }
