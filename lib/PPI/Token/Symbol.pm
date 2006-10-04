@@ -193,7 +193,7 @@ sub __TOKENIZER__on_char {
 		(?: : (?!:) | # Allow single-colon non-magic vars
 			(?: \w+ | \' (?!\d) \w+ | \:: \w+ )
 			(?:
-				# Allow both :: and ' in namespace seperators
+				# Allow both :: and ' in namespace separators
 				(?: \' (?!\d) \w+ | \:: \w+ )
 			)*
 			(?: :: )? # Technically a compiler-magic hash, but keep it here

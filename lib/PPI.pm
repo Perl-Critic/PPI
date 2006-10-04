@@ -294,7 +294,7 @@ B<What goes in, will come out. Every time.>
 
 The one minor exception at this time is that if the newlines for your file
 are wrong (meaning not matching the platform newline format), PPI will
-localisation of them for you. (It isn't to be convenient, supporting
+localise them for you. (It isn't to be convenient, supporting
 arbitrary newlines would make some of the code more complicated)
 
 Better control of the newline type is on the wish list though, and
