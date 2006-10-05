@@ -1,0 +1,61 @@
+PPI::Document
+  PPI::Statement
+    PPI::Token::Word  	'map'
+    PPI::Token::Whitespace  	' '
+    PPI::Structure::Block  	{ ... }
+      PPI::Statement
+        PPI::Token::Magic  	'$_'
+        PPI::Token::Whitespace  	' '
+        PPI::Token::Operator  	'=>'
+        PPI::Token::Whitespace  	' '
+        PPI::Token::Number  	'1'
+    PPI::Token::Whitespace  	' '
+    PPI::Token::Symbol  	'@foo'
+    PPI::Token::Structure  	';'
+  PPI::Token::Whitespace  	'\n'
+  PPI::Statement
+    PPI::Token::Word  	'map'
+    PPI::Structure::List  	( ... )
+      PPI::Statement::Expression
+        PPI::Structure::Block  	{ ... }
+          PPI::Statement
+            PPI::Token::Magic  	'$_'
+            PPI::Token::Whitespace  	' '
+            PPI::Token::Operator  	'=>'
+            PPI::Token::Whitespace  	' '
+            PPI::Token::Number  	'1'
+        PPI::Token::Whitespace  	' '
+        PPI::Token::Symbol  	'@foo'
+    PPI::Token::Structure  	';'
+  PPI::Token::Whitespace  	'\n'
+  PPI::Statement
+    PPI::Token::Word  	'foo'
+    PPI::Token::Whitespace  	' '
+    PPI::Structure::Block  	{ ... }
+      PPI::Statement
+        PPI::Token::Magic  	'$_'
+        PPI::Token::Whitespace  	' '
+        PPI::Token::Operator  	'=>'
+        PPI::Token::Whitespace  	' '
+        PPI::Token::Number  	'1'
+    PPI::Token::Operator  	','
+    PPI::Token::Whitespace  	' '
+    PPI::Token::Symbol  	'@foo'
+    PPI::Token::Structure  	';'
+  PPI::Token::Whitespace  	'\n'
+  PPI::Statement
+    PPI::Token::Word  	'foo'
+    PPI::Structure::List  	( ... )
+      PPI::Statement::Expression
+        PPI::Structure::Constructor  	{ ... }
+          PPI::Statement
+            PPI::Token::Magic  	'$_'
+            PPI::Token::Whitespace  	' '
+            PPI::Token::Operator  	'=>'
+            PPI::Token::Whitespace  	' '
+            PPI::Token::Number  	'1'
+        PPI::Token::Operator  	','
+        PPI::Token::Whitespace  	' '
+        PPI::Token::Symbol  	'@foo'
+    PPI::Token::Structure  	';'
+  PPI::Token::Whitespace  	'\n'
