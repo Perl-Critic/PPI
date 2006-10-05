@@ -87,7 +87,7 @@ my $expected = bless {
 		size     => 3,
 		type     => '<>',
 	} ],
-	seperator => undef,
+	separator => undef,
 	};
 is_deeply( { %$regexp }, $expected, 'Complex regexp matches expected' );
 }
@@ -118,7 +118,7 @@ my $expected = bless {
 		size     => 0,
 		type     => '',
 	} ],
-	seperator => undef,
+	separator => undef,
 	};
 is_deeply( { %$regexp }, $expected, 'Badly short regexp matches expected' );
 }

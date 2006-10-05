@@ -416,7 +416,7 @@ import=method
 remove_insignificant_elements=method
 remove_useless_attributes=method
 remove_useless_pragma=method
-remove_statement_seperator=method
+remove_statement_separator=method
 remove_useless_return=method
 
 [PPI::Document::Normalized]

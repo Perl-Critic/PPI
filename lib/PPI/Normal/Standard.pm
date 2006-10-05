@@ -34,7 +34,7 @@ my @METHODS = (
 	remove_insignificant_elements => 1,
 	remove_useless_attributes     => 1,
 	remove_useless_pragma         => 2,
-	remove_statement_seperator    => 2,
+	remove_statement_separator    => 2,
 	remove_useless_return         => 2,
 	);
 
@@ -87,7 +87,7 @@ sub remove_useless_pragma {
 }
 
 # Remove all semi-colons at the end of statements
-sub remove_statement_seperator {
+sub remove_statement_separator {
 	my $Document = shift;
 	$Document->prune( sub {
 		$_[1]->isa('PPI::Token::Structure') or return '';

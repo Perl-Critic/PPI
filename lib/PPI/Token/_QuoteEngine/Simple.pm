@@ -16,14 +16,14 @@ BEGIN {
 
 sub new {
 	my $class     = shift;
-	my $seperator = shift or return undef;
+	my $separator = shift or return undef;
 
-	# Create a new token containing the seperator
+	# Create a new token containing the separator
 	### This manual SUPER'ing ONLY works because none of
 	### Token::Quote, Token::QuoteLike and Token::Regexp
 	### implement a new function of their own.
-	my $self = PPI::Token::new( $class, $seperator ) or return undef;
-	$self->{seperator} = $seperator;
+	my $self = PPI::Token::new( $class, $separator ) or return undef;
+	$self->{separator} = $separator;
 
 	$self;
 }
@@ -33,8 +33,8 @@ sub _fill {
 	my $t     = shift;
 	my $self  = $t->{token} or return undef;
 
-	# Scan for the end seperator
-	my $string = $self->_scan_for_unescaped_character( $t, $self->{seperator} );
+	# Scan for the end separator
+	my $string = $self->_scan_for_unescaped_character( $t, $self->{separator} );
 	return undef unless defined $string;
 	if ( ref $string ) {
 		# End of file

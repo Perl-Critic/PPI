@@ -22,27 +22,27 @@ BEGIN {
 	# For each quote type, the extra fields that should be set.
 	# This should give us faster initialization.
 	%quotes = (
-		'q'   => { operator => 'q',   braced => undef, seperator => undef, _sections => 1 },
-		'qq'  => { operator => 'qq',  braced => undef, seperator => undef, _sections => 1 },
-		'qx'  => { operator => 'qx',  braced => undef, seperator => undef, _sections => 1 },
-		'qw'  => { operator => 'qw',  braced => undef, seperator => undef, _sections => 1 },
-		'qr'  => { operator => 'qr',  braced => undef, seperator => undef, _sections => 1, modifiers => 1 },
-		'm'   => { operator => 'm',   braced => undef, seperator => undef, _sections => 1, modifiers => 1 },
-		's'   => { operator => 's',   braced => undef, seperator => undef, _sections => 2, modifiers => 1 },
-		'tr'  => { operator => 'tr',  braced => undef, seperator => undef, _sections => 2, modifiers => 1 },
+		'q'   => { operator => 'q',   braced => undef, separator => undef, _sections => 1 },
+		'qq'  => { operator => 'qq',  braced => undef, separator => undef, _sections => 1 },
+		'qx'  => { operator => 'qx',  braced => undef, separator => undef, _sections => 1 },
+		'qw'  => { operator => 'qw',  braced => undef, separator => undef, _sections => 1 },
+		'qr'  => { operator => 'qr',  braced => undef, separator => undef, _sections => 1, modifiers => 1 },
+		'm'   => { operator => 'm',   braced => undef, separator => undef, _sections => 1, modifiers => 1 },
+		's'   => { operator => 's',   braced => undef, separator => undef, _sections => 2, modifiers => 1 },
+		'tr'  => { operator => 'tr',  braced => undef, separator => undef, _sections => 2, modifiers => 1 },
 
 		# Y is the little used varient of tr
-		'y'   => { operator => 'y',   braced => undef, seperator => undef, _sections => 2, modifiers => 1 },
+		'y'   => { operator => 'y',   braced => undef, separator => undef, _sections => 2, modifiers => 1 },
 
-		'/'   => { operator => undef, braced => 0,     seperator => '/',   _sections => 1, modifiers => 1 },
+		'/'   => { operator => undef, braced => 0,     separator => '/',   _sections => 1, modifiers => 1 },
 
 		# Angle brackets quotes mean "readline(*FILEHANDLE)"
-		'<'   => { operator => undef, braced => 1,     seperator => undef, _sections => 1, },
+		'<'   => { operator => undef, braced => 1,     separator => undef, _sections => 1, },
 
 		# The final ( and kind of depreciated ) "first match only" one is not
 		# used yet, since I'm not sure on the context differences between
 		# this and the trinary operator, but its here for completeness.
-		'?'   => { operator => undef, braced => 0,     seperator => '?',   _sections => 1, modifieds => 1 },
+		'?'   => { operator => undef, braced => 0,     separator => '?',   _sections => 1, modifieds => 1 },
 		);
 }
 
@@ -107,7 +107,7 @@ sub _fill {
 	# Load in the operator stuff if needed
 	if ( $self->{operator} ) {
 		# In an operator based quote-like, handle the gap between the
-		# operator and the opening seperator.
+		# operator and the opening separator.
 		if ( substr( $t->{line}, $t->{line_cursor}, 1 ) =~ /\s/ ) {
 			# Go past the gap
 			my $gap = $self->_scan_quote_like_operator_gap( $t );
@@ -120,7 +120,7 @@ sub _fill {
 			$self->{content} .= $gap;
 		}
 
-		# The character we are now on is the seperator. Capture,
+		# The character we are now on is the separator. Capture,
 		# and advance into the first section.
 		my $sep = substr( $t->{line}, $t->{line_cursor}++, 1 );
 		$self->{content} .= $sep;
@@ -131,7 +131,7 @@ sub _fill {
 			$self->{sections}->[0] = Clone::clone($section);
 		} else {
 			$self->{braced}    = 0;
-			$self->{seperator} = $sep;
+			$self->{separator} = $sep;
 		}
 	}
 
@@ -160,8 +160,8 @@ sub _fill_normal {
 	my $self = shift;
 	my $t    = shift;
 
-	# Get the content up to the next seperator
-	my $string = $self->_scan_for_unescaped_character( $t, $self->{seperator} );
+	# Get the content up to the next separator
+	my $string = $self->_scan_for_unescaped_character( $t, $self->{separator} );
 	return undef unless defined $string;
 	if ( ref $string ) {
 		# End of file
@@ -184,8 +184,8 @@ sub _fill_normal {
 	# Advance into the next section
 	$t->{line_cursor}++;
 
-	# Get the content up to the end seperator
-	$string = $self->_scan_for_unescaped_character( $t, $self->{seperator} );
+	# Get the content up to the end separator
+	$string = $self->_scan_for_unescaped_character( $t, $self->{separator} );
 	return undef unless defined $string;
 	if ( ref $string ) {
 		# End of file
