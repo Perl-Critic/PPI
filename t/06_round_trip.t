@@ -24,7 +24,7 @@ use Test::More; # Plan comes later
 # Find all of the files to be checked
 my %tests = map { $_ => $INC{$_} } grep { ! /\bXS\.pm/ } grep { /^PPI\b/ } keys %INC;
 my @files = sort values %tests;
-unless ( %tests ) {
+unless ( @files ) {
 	Test::More::plan( tests => 1 );
 	ok( undef, "Failed to find any files to test" );
 	exit();
