@@ -129,23 +129,23 @@ BEGIN {
 
 sub __TOKENIZER__on_line_start {
 	my $t = $_[1];
-	$_ = $t->{line};
+	my $line = $t->{line};
 
 	# Can we classify the entire line in one go
-	if ( /^\s*$/ ) {
+	if ( $line =~ /^\s*$/ ) {
 		# A whitespace line
-		$t->_new_token( 'Whitespace', $t->{line} ) or return undef;
+		$t->_new_token( 'Whitespace', $line ) or return undef;
 		return 0;
 
-	} elsif ( /^\s*#/ ) {
+	} elsif ( $line =~ /^\s*#/ ) {
 		# Add the comment token, and finalize it immediately
-		$t->_new_token( 'Comment', $_ ) or return undef;
+		$t->_new_token( 'Comment', $line ) or return undef;
 		$t->_finalize_token;
 		return 0;
 
-	} elsif ( /^=(\w+)/ ) {
+	} elsif ( $line =~ /^=(\w+)/ ) {
 		# A Pod tag... change to pod mode
-		$t->_new_token( 'Pod', $t->{line} ) or return undef;
+		$t->_new_token( 'Pod', $line ) or return undef;
 		if ( $1 eq 'cut' ) {
 			# This is an error, but one we'll ignore
 			# Don't go into Pod mode, since =cut normally
@@ -161,15 +161,15 @@ sub __TOKENIZER__on_line_start {
 
 sub __TOKENIZER__on_char {
 	my $t = $_[1];
-	$_ = ord substr $t->{line}, $t->{line_cursor}, 1;
+	my $char = ord substr $t->{line}, $t->{line_cursor}, 1;
 
 	# Do we definately know what something is?
-	return $COMMITMAP[$_]->__TOKENIZER__commit($t) if $COMMITMAP[$_];
+	return $COMMITMAP[$char]->__TOKENIZER__commit($t) if $COMMITMAP[$char];
 
 	# Handle the simple option first
-	return $CLASSMAP[$_] if $CLASSMAP[$_];
+	return $CLASSMAP[$char] if $CLASSMAP[$char];
 
-	if ( $_ == 40 ) {  # $_ eq '('
+	if ( $char == 40 ) {  # $char eq '('
 		# Finalise any whitespace token...
 		$t->_finalize_token if $t->{token};
 
@@ -214,7 +214,7 @@ sub __TOKENIZER__on_char {
 		# This is a normal open bracket
 		return 'Structure';
 
-	} elsif ( $_ == 60 ) { # $_ eq '<'
+	} elsif ( $char == 60 ) { # $char eq '<'
 		# Finalise any whitespace token...
 		$t->_finalize_token if $t->{token};
 
@@ -266,7 +266,7 @@ sub __TOKENIZER__on_char {
 		# until this more comprehensive section was created.
 		return 'Operator';
 
-	} elsif ( $_ == 47 ) { #  $_ eq '/'
+	} elsif ( $char == 47 ) { #  $char eq '/'
 		# Finalise any whitespace token...
 		$t->_finalize_token if $t->{token};
 
@@ -338,7 +338,7 @@ sub __TOKENIZER__on_char {
 		# Add more tests here as potential cases come to light
 		return 'Operator';
 
-	} elsif ( $_ == 120 ) { # $_ eq 'x'
+	} elsif ( $char == 120 ) { # $char eq 'x'
 		# Handle an arcane special case where "string"x10 means the x is an operator.
 		# String in this case means ::Single, ::Double or ::Execute, or the operator versions or same.
 		my $nextchar = substr $t->{line}, $t->{line_cursor} + 1, 1;
@@ -353,7 +353,7 @@ sub __TOKENIZER__on_char {
 		# Otherwise, commit like a normal bareword
 		return PPI::Token::Word->__TOKENIZER__commit($t);
 
-	} elsif ( $_ == 45 ) { # $_ eq '-'
+	} elsif ( $char == 45 ) { # $char eq '-'
 		# Look for an obvious operator operand context
 		my $context = $t->_opcontext;
 		if ( $context eq 'operator' ) {
@@ -363,7 +363,7 @@ sub __TOKENIZER__on_char {
 			return 'Unknown';
 		}
 
-	} elsif ( $_ >= 128 ) { # Outside ASCII
+	} elsif ( $char >= 128 ) { # Outside ASCII
             return 'PPI::Token::Word'->__TOKENIZER__commit($t) if $t =~ /\w/;
             return 'Whitespace' if $t =~ /\s/;
         }
@@ -371,7 +371,7 @@ sub __TOKENIZER__on_char {
 
 	# All the whitespaces are covered, so what to do
 	### For now, die
-	return $t->_error("Encountered unexpected character '$_'");
+	return $t->_error("Encountered unexpected character '$char'");
 }
 
 sub __TOKENIZER__on_line_end { $_[1]->_finalize_token if $_[1]->{token} }

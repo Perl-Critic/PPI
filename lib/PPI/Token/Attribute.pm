@@ -130,14 +130,15 @@ sub __TOKENIZER__scan_for_end {
 	my $depth = 0;
 	while ( exists $t->{line} ) {
 		# Get the search area
-		$_ = $t->{line_cursor}
+		my $search_area
+			= $t->{line_cursor}
 			? substr( $t->{line}, $t->{line_cursor} )
 			: $t->{line};
 
 		# Look for a match
-		unless ( /^(.*?(?:\(|\)))/ ) {
+		unless ( $search_area =~ /^(.*?(?:\(|\)))/ ) {
 			# Load in the next line
-			$string .= $_;
+			$string .= $search_area;
 			return undef unless defined $t->_fill_line;
 			$t->{line_cursor} = 0;
 			next;

@@ -45,25 +45,25 @@ BEGIN {
 sub __TOKENIZER__on_char {
 	my $t = $_[1];                                    # Tokenizer object
 	my $c = $t->{token}->{content};                   # Current token contents
-	$_ = substr( $t->{line}, $t->{line_cursor}, 1 );  # Current character
+	my $char = substr( $t->{line}, $t->{line_cursor}, 1 );  # Current character
 
 
 	# Now, we split on the different values of the current content
 
 
 	if ( $c eq '*' ) {
-		if ( /(?:(?!\d)\w|\:)/ ) {
+		if ( $char =~ /(?:(?!\d)\w|\:)/ ) {
 			# Symbol
 			return $t->_set_token_class( 'Symbol' ) ? 1 : undef;
 		}
 
-		if ( $_ eq '{' ) {
+		if ( $char eq '{' ) {
 			# Obvious GLOB cast
 			$t->_set_token_class( 'Cast' ) or return undef;
 			return $t->_finalize_token->__TOKENIZER__on_char( $t );
 		}
 
-		if ( $_ eq '$' ) {
+		if ( $char eq '$' ) {
 			# Operator/operand-sensitive, multiple or GLOB cast
 			my $_class = undef;
 			my $tokens = $t->_previous_significant_tokens( 1 ) or return undef;
@@ -98,7 +98,7 @@ sub __TOKENIZER__on_char {
 			return $t->_finalize_token->__TOKENIZER__on_char( $t );
 		}
 
-		if ( $_ eq '*' || $_ eq '=' ) {
+		if ( $char eq '*' || $char eq '=' ) {
 			# Power operator '**' or mult-assign '*='
 			return $t->_set_token_class( 'Operator' ) ? 1 : undef;
 		}
@@ -109,12 +109,12 @@ sub __TOKENIZER__on_char {
 
 
 	} elsif ( $c eq '$' ) {
-		if ( /[a-z_]/i ) {
+		if ( $char =~ /[a-z_]/i ) {
 			# Symbol
 			return $t->_set_token_class( 'Symbol' ) ? 1 : undef;
 		}
 
-		if ( $PPI::Token::Magic::magic{ $c . $_ } ) {
+		if ( $PPI::Token::Magic::magic{ $c . $char } ) {
 			# Magic variable
 			return $t->_set_token_class( 'Magic' ) ? 1 : undef;
 		}
@@ -126,12 +126,12 @@ sub __TOKENIZER__on_char {
 
 
 	} elsif ( $c eq '@' ) {
-		if ( /[\w:]/ ) {
+		if ( $char =~ /[\w:]/ ) {
 			# Symbol
 			return $t->_set_token_class( 'Symbol' ) ? 1 : undef;
 		}
 
-		if ( /[\-\+\*]/ ) {
+		if ( $char =~ /[\-\+\*]/ ) {
 			# Magic variable
 			return $t->_set_token_class( 'Magic' ) ? 1 : undef;
 		}
@@ -144,18 +144,18 @@ sub __TOKENIZER__on_char {
 
 	} elsif ( $c eq '%' ) {
 		# Is it a number?
-		if ( /\d/ ) {
+		if ( $char =~ /\d/ ) {
 			# This is %2 (modulus number)
 			$t->_set_token_class( 'Operator' ) or return undef;
 			return $t->_finalize_token->__TOKENIZER__on_char( $t );
 		}
 
 		# Is it a symbol?
-		if ( /[\w:]/ ) {
+		if ( $char =~ /[\w:]/ ) {
 			return $t->_set_token_class( 'Symbol' ) ? 1 : undef;
 		}
 
-		if ( /[\$@%{]/ ) {
+		if ( $char =~ /[\$@%{]/ ) {
 			# It's a cast
 			$t->_set_token_class( 'Cast' ) or return undef;
 			return $t->_finalize_token->__TOKENIZER__on_char( $t );
@@ -170,18 +170,18 @@ sub __TOKENIZER__on_char {
 
 	} elsif ( $c eq '&' ) {
 		# Is it a number?
-		if ( /\d/ ) {
+		if ( $char =~ /\d/ ) {
 			# This is &2 (bitwise-and number)
 			$t->_set_token_class( 'Operator' ) or return undef;
 			return $t->_finalize_token->__TOKENIZER__on_char( $t );
 		}
 
 		# Is it a symbol
-		if ( /[\w:]/ ) {
+		if ( $char =~ /[\w:]/ ) {
 			return $t->_set_token_class( 'Symbol' ) ? 1 : undef;
 		}
 
-		if ( /[\$@%{]/ ) {
+		if ( $char =~ /[\$@%{]/ ) {
 			# The ampersand is a cast
 			$t->_set_token_class( 'Cast' ) or return undef;
 			return $t->_finalize_token->__TOKENIZER__on_char( $t );
@@ -194,17 +194,17 @@ sub __TOKENIZER__on_char {
 
 
 	} elsif ( $c eq '-' ) {
-		if ( /\d/o ) {
+		if ( $char =~ /\d/o ) {
 			# Number
 			return $t->_set_token_class( 'Number' ) ? 1 : undef;
 		}
 
-		if ( $_ eq '.' ) {
+		if ( $char eq '.' ) {
 			# Number::Float
 			return $t->_set_token_class( 'Number::Float' ) ? 1 : undef;
 		}
 
-		if ( /[a-zA-Z]/ ) {
+		if ( $char =~ /[a-zA-Z]/ ) {
 			return $t->_set_token_class( 'DashedWord' ) ? 1 : undef;
 		}
 
@@ -215,7 +215,7 @@ sub __TOKENIZER__on_char {
 
 
 	} elsif ( $c eq ':' ) {
-		if ( $_ eq ':' ) {
+		if ( $char eq ':' ) {
 			# ::foo style bareword
 			return $t->_set_token_class( 'Word' ) ? 1 : undef;
 		}

@@ -69,19 +69,21 @@ BEGIN {
 
 sub __TOKENIZER__on_char {
 	my $t = $_[1];
-	$_ = $t->{token}->{content} . substr( $t->{line}, $t->{line_cursor}, 1 );
+
+	# $c is the candidate new content
+	my $c = $t->{token}->{content} . substr( $t->{line}, $t->{line_cursor}, 1 );
 
 	# Do a quick first test so we don't have to do more than this one.
 	# All of the tests below match this one, so it should provide a
 	# small speed up. This regex should be updated to match the inside
 	# tests if they are changed.
-	if ( /^  \$  .*  [  \w  :  \$  \{  ]  $/x ) {
+	if ( $c =~ /^  \$  .*  [  \w  :  \$  \{  ]  $/x ) {
 
-		if ( /^(\$(?:\_[\w:]|::))/ or /^\$\'[\w]/ ) {
+		if ( $c =~ /^(\$(?:\_[\w:]|::))/ or $c =~ /^\$\'[\w]/ ) {
 			# If and only if we have $'\d, it is not a
 			# symbol. (this was apparently a concious choice)
 			# Note that $::0 on the other hand is legal
-			if ( /^\$\'\d$/ ) {
+			if ( $c =~ /^\$\'\d$/ ) {
 				# In this case, we have a magic plus a digit.
 				# Save the CURRENT token, and rerun the on_char
 				return $t->_finalize_token->__TOKENIZER__on_char( $t );
@@ -93,7 +95,7 @@ sub __TOKENIZER__on_char {
 			return PPI::Token::Symbol->__TOKENIZER__on_char( $t );
 		}
 
-		if ( /^\$\$\w/ ) {
+		if ( $c =~ /^\$\$\w/ ) {
 			# This is really a scalar dereference. ( $$foo )
 			# Add the current token as the cast...
 			$t->{token} = PPI::Token::Cast->new( '$' );
@@ -104,25 +106,25 @@ sub __TOKENIZER__on_char {
 			return 1;
 		}
 
-		if ( $_ eq '$#$' or $_ eq '$#{' ) {
+		if ( $c eq '$#$' or $c eq '$#{' ) {
 			# This is really an index dereferencing cast, although
 			# it has the same two chars as the magic variable $#.
 			$t->_set_token_class('Cast');
 			return $t->_finalize_token->__TOKENIZER__on_char( $t );
 		}
 
-		if ( /^(\$\#)\w/ ) {
+		if ( $c =~ /^(\$\#)\w/ ) {
 			# This is really an array index thingy ( $#array )
 			$t->{token} = PPI::Token::ArrayIndex->new( $1 );
 			return PPI::Token::ArrayIndex->__TOKENIZER__on_char( $t );
 		}
 
-		if ( /^\$\^\w/o ) {
+		if ( $c =~ /^\$\^\w/o ) {
 			# It's an escaped char magic... maybe ( like $^M )
 			return 1;
 		}
 
-		if ( /^\$\#\{/ ) {
+		if ( $c =~ /^\$\#\{/ ) {
 			# The $# is actually a case, and { is its block
 			# Add the current token as the cast...
 			$t->{token} = PPI::Token::Cast->new( '$#' );

@@ -122,24 +122,24 @@ sub _fill {
 
 		# The character we are now on is the seperator. Capture,
 		# and advance into the first section.
-		$_ = substr( $t->{line}, $t->{line_cursor}++, 1 );
-		$self->{content} .= $_;
+		my $sep = substr( $t->{line}, $t->{line_cursor}++, 1 );
+		$self->{content} .= $sep;
 
 		# Determine if these are normal or braced type sections
-		if ( my $section = $sections{$_} ) {
+		if ( my $section = $sections{$sep} ) {
 			$self->{braced}        = 1;
 			$self->{sections}->[0] = Clone::clone($section);
 		} else {
 			$self->{braced}    = 0;
-			$self->{seperator} = $_;
+			$self->{seperator} = $sep;
 		}
 	}
 
 	# Parse different based on whether we are normal or braced
-	$_ = $self->{braced}
+	my $rv = $self->{braced}
 		? $self->_fill_braced($t)
-		: $self->_fill_normal($t)
-		or return $_;
+ 		: $self->_fill_normal($t);
+	return $rv if !$rv;
 
 	# Return now unless it has modifiers ( i.e. s/foo//eieio )
 	return 1 unless $self->{modifiers};
@@ -210,18 +210,18 @@ sub _fill_braced {
 
 	# Get the content up to the close character
 	my $section = $self->{sections}->[0];
-	$_ = $self->_scan_for_brace_character( $t, $section->{_close} );
-	return undef unless defined $_;
-	if ( ref $_ ) {
+	my $brace_str = $self->_scan_for_brace_character( $t, $section->{_close} );
+	return undef unless defined $brace_str;
+	if ( ref $brace_str ) {
 		# End of file
-		$self->{content} .= $$_;
+		$self->{content} .= $$brace_str;
 		return 0;
 	}
 
 	# Complete the properties of the first section
 	$section->{position} = length $self->{content};
-	$section->{size}     = length($_) - 1;
-	$self->{content} .= $_;
+	$section->{size}     = length($brace_str) - 1;
+	$self->{content} .= $brace_str;
 	delete $section->{_close};
 
 	# We are done if there is only one section
@@ -233,14 +233,14 @@ sub _fill_braced {
 	my $char = substr( $t->{line}, ++$t->{line_cursor}, 1 );
 	if ( $char =~ /\s/ ) {
 		# Go past the gap
-		$_ = $self->_scan_quote_like_operator_gap( $t );
-		return undef unless defined $_;
-		if ( ref $_ ) {
+		my $gap_str = $self->_scan_quote_like_operator_gap( $t );
+		return undef unless defined $gap_str;
+		if ( ref $gap_str ) {
 			# End of file
-			$self->{content} .= $$_;
+			$self->{content} .= $$gap_str;
 			return 0;
 		}
-		$self->{content} .= $_;
+		$self->{content} .= $gap_str;
 		$char = substr( $t->{line}, $t->{line_cursor}, 1 );
 	}
 
@@ -275,18 +275,18 @@ sub _fill_braced {
 	$section->{size}     = 0;
 
 	# Get the content up to the close character
-	$_ = $self->_scan_for_brace_character( $t, $section->{_close} );
-	return undef unless defined $_;
-	if ( ref $_ ) {
+	$brace_str = $self->_scan_for_brace_character( $t, $section->{_close} );
+	return undef unless defined $brace_str;
+	if ( ref $brace_str ) {
 		# End of file
-		$self->{content} .= $$_;
-		$section->{size} = length($$_);
+		$self->{content} .= $$brace_str;
+		$section->{size} = length($$brace_str);
 		delete $section->{_close};
 		return 0;
 	} else {
 		# Complete the properties for the second section
-		$self->{content} .= $_;
-		$section->{size} = length($_) - 1;
+		$self->{content} .= $brace_str;
+		$section->{size} = length($brace_str) - 1;
 		delete $section->{_close};
 	}
 

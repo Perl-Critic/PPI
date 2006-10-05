@@ -64,10 +64,9 @@ sub __TOKENIZER__on_line_start {
 	my $t = $_[1];
 
 	# Can we classify the entire line in one go
-	$_ = $t->{line};
-	if ( /^=(\w+)/ ) {
+	if ( $t->{line} =~ /^=(\w+)/ ) {
 		# A Pod tag... change to pod mode
-		$t->_new_token( 'Pod', $_ ) or return undef;
+		$t->_new_token( 'Pod', $t->{line} ) or return undef;
 		unless ( $1 eq 'cut' ) {
 			# Normal start to pod
 			$t->{class} = 'PPI::Token::Pod';

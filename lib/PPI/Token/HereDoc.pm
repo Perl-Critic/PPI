@@ -147,14 +147,13 @@ sub __TOKENIZER__on_char {
 	my $token = $t->{token} or return undef;
 
 	# We are currently located on the first char after the <<
-	# Get the rest of the line
-	$_ = substr( $t->{line}, $t->{line_cursor} );
 
 	# Handle the most common form first for simplicity and speed reasons
 	### FIXME - This regex, and this method in general, do not yet allow
 	### for the null here-doc, which terminates at the first
 	### empty line.
-	unless ( /^(\s*(?:"[^"]*"|'[^']*'|`[^`]*`|\w+))/ ) {
+	my $rest_of_line = substr( $t->{line}, $t->{line_cursor} );
+	unless ( $rest_of_line =~ /^(\s*(?:"[^"]*"|'[^']*'|`[^`]*`|\w+))/ ) {
 		# Degenerate to a left-shift operation
 		$token->set_class('Operator') or return undef;
 		return $t->_finalize_token->__TOKENIZER__on_char( $t );

@@ -240,20 +240,22 @@ sub get_token {
 	}
 
 	# Return the next token if we can
-	if ( $_ = $self->{tokens}->[ $self->{token_cursor} ] ) {
+	if ( my $token = $self->{tokens}->[ $self->{token_cursor} ] ) {
 		$self->{token_cursor}++;
-		return $_;
+		return $token;
 	}
+
+	my $line_rv;
 
 	# Catch exceptions and return undef, so that we
 	# can start to convert code to exception-based code.
 	my $rv = eval {
 		# No token, we need to get some more
-		while ( $_ = $self->_process_next_line ) {
+		while ( $line_rv = $self->_process_next_line ) {
 			# If there is something in the buffer, return it
-			if ( $_ = $self->{tokens}->[ $self->{token_cursor} ] ) {
+			if ( my $token = $self->{tokens}->[ $self->{token_cursor} ] ) {
 				$self->{token_cursor}++;
-				return $_;
+				return $token;
 			}
 		}
 		return undef;
@@ -266,11 +268,11 @@ sub get_token {
 		return $rv;
 	}
 
-	if ( defined $_ ) {
+	if ( defined $line_rv ) {
 		# End of file, but we can still return things from the buffer
-		if ( $_ = $self->{tokens}->[ $self->{token_cursor} ] ) {
+		if ( my $token = $self->{tokens}->[ $self->{token_cursor} ] ) {
 			$self->{token_cursor}++;
-			return $_;
+			return $token;
 		}
 
 		# Set our token end of file flag

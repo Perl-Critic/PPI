@@ -86,14 +86,14 @@ sub __TOKENIZER__commit {
 	my $t = $_[1];
 
 	# Get the rest of the line
-	$_ = substr( $t->{line}, $t->{line_cursor} );
-	if ( chomp ) { # Include the newline separately
+	my $rest_of_line = substr( $t->{line}, $t->{line_cursor} );
+	if ( chomp $rest_of_line) { # Include the newline separately
 		# Add the current token, and the newline
-		$t->_new_token('Comment', $_);
+		$t->_new_token('Comment', $rest_of_line);
 		$t->_new_token('Whitespace', "\n");
 	} else {
 		# Add this token only
-		$t->_new_token('Comment', $_);
+		$t->_new_token('Comment', $rest_of_line);
 	}
 
 	# Advance the line cursor to the end
