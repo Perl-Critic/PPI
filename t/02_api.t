@@ -15,7 +15,7 @@ use PPI::Find;
 use PPI::Transform;
 
 # Execute the tests
-use Test::More tests => 2193;
+use Test::More tests => 2229;
 use Test::ClassAPI;
 
 # Ignore various imported or special functions
@@ -185,6 +185,11 @@ parameters=method
 
 [PPI::Token::DashedWord]
 PPI::Token=isa
+
+[PPI::Token::HereDoc]
+PPI::Token=isa
+heredoc=method
+terminator=method
 
 [PPI::Token::_QuoteEngine]
 

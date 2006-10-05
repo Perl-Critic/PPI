@@ -23,12 +23,12 @@ use Test::More; # Plan comes later
 
 # Find all of the files to be checked
 my %tests = map { $_ => $INC{$_} } grep { ! /\bXS\.pm/ } grep { /^PPI\b/ } keys %INC;
+my @files = sort values %tests;
 unless ( %tests ) {
 	Test::More::plan( tests => 1 );
 	ok( undef, "Failed to find any files to test" );
 	exit();
 }
-my @files = sort values %tests;
 
 # Find all the testable perl files in t.data
 foreach my $dir ( '05_lexer_practical', '07_token', '08_regression',
