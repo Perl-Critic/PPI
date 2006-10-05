@@ -49,3 +49,11 @@ PPI::Document
     PPI::Token::HereDoc  	'<<SECOND'
     PPI::Token::Structure  	';'
   PPI::Token::Whitespace  	'\n'
+  PPI::Token::Whitespace  	'\n'
+  PPI::Token::Comment  	'# End of document (missing newline)\n'
+  PPI::Statement
+    PPI::Token::Word  	'print'
+    PPI::Token::Whitespace  	' '
+    PPI::Token::HereDoc  	'<<END'
+    PPI::Token::Structure  	';'
+  PPI::Token::Whitespace  	'\n'
