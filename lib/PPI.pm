@@ -780,7 +780,7 @@ deep-dived into the guts to (gasp) add a feature.
 
   - Dan Brook       : PPIx::XPath, Acme::PerlML
   - Audrey Tang     : "Line Noise" Testing
-  - Arjen Laarhoven : Three-element -E<gt>location support
+  - Arjen Laarhoven : Three-element ->location support
 
 And finally, thanks to those brave ( and foolish :) ) soles willing to dive
 in and use, test drive and provide feedback on PPI before version 1.000,
