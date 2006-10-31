@@ -86,9 +86,9 @@ sub nested_statements {
 	my $doc = shift;
 
 	ok( ! $doc->find_any( sub {
-		$_[1]->isa('PPI::Statement')
+		_INSTANCE($_[1], 'PPI::Statement')
 		and
-		any { $_->isa('PPI::Statement') } $_[1]->children
+		any { _INSTANCE($_, 'PPI::Statement') } $_[1]->children
 		} ),
 		'Document contains no nested statements',
 	);	
@@ -104,9 +104,9 @@ sub nested_strucures {
 	my $doc = shift;
 
 	ok( ! $doc->find_any( sub {
-		$_[1]->isa('PPI::Structure')
+		_INSTANCE($_[1], 'PPI::Structure')
 		and
-		any { $_->isa('PPI::Structure') } $_[1]->children
+		any { _INSTANCE($_, 'PPI::Structure') } $_[1]->children
 		} ),
 		'Document contains no nested structures',
 	);	
