@@ -33,7 +33,7 @@ use base 'PPI::Token::Number';
 
 use vars qw{$VERSION};
 BEGIN {
-	$VERSION = '1.199_01';
+	$VERSION = '1.199_02';
 }
 
 =head2 base

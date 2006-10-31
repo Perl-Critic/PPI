@@ -64,20 +64,24 @@ Document-specific.
 
 use strict;
 use base 'PPI::Node';
-use Carp                    ();
-use List::MoreUtils         ();
-use Params::Util            '_INSTANCE',
-                            '_SCALAR';
-use Digest::MD5             ();
-use PPI                     ();
-use PPI::Util               ();
-use PPI::Document::Fragment ();
-use overload 'bool'         => sub () { 1 };
-use overload '""'           => 'content';
+use Carp                          ();
+use List::MoreUtils               ();
+use Params::Util                  '_INSTANCE',
+                                  '_SCALAR';
+use Digest::MD5                   ();
+use PPI                           ();
+use PPI::Util                     ();
+use PPI::Document::Fragment       ();
+use PPI::Exception::ParserTimeout ();
+use overload 'bool'               => sub () { 1 };
+use overload '""'                 => 'content';
+use constant HAS_ALARM            => (
+	$^O eq 'MSWin32' or $^O eq 'cygwin'
+	) ? 0 : 1;
 
 use vars qw{$VERSION $errstr};
 BEGIN {
-	$VERSION = '1.199_01';
+	$VERSION = '1.199_02';
 	$errstr  = '';
 }
 
@@ -145,8 +149,15 @@ sub new {
 		return $self;
 	}
 
+	# Check constructor attributes
+	my $source  = shift;
+	my %attr    = @_;
+	my $timeout = delete $attr{timeout};
+	if ( $timeout and ! HAS_ALARM ) {
+		Carp::croak("This platform does not support PPI timeouts");
+	}
+
 	# Check the data source
-	my $source = shift;
 	if ( ! defined $source ) {
 		$class->_error("An undefined value was passed to PPI::Document::new");
 
@@ -167,30 +178,70 @@ sub new {
 
 			# Retrieve the document from the cache
 			my $document = $CACHE->get_document($source);
-			return $class->_setattr( $document, @_ ) if $document;
+			return $class->_setattr( $document, %attr ) if $document;
 
-			$document = PPI::Lexer->lex_source( $$source );
+			if ( $timeout ) {
+				eval {
+					local $SIG{ALRM} = sub { die "alarm\n" };
+					alarm( $timeout );
+					$document = PPI::Lexer->lex_source( $$source );
+					alarm( 0 );
+				};
+			} else {
+				$document = PPI::Lexer->lex_source( $$source );
+			}
 			if ( $document ) {
 				# Save in the cache
 				$CACHE->store_document( $document );
-				return $class->_setattr( $document, @_ );
+				return $class->_setattr( $document, %attr );
 			}
 		} else {
-			my $document = PPI::Lexer->lex_file( $source );
-			return $class->_setattr( $document, @_ ) if $document;
+			if ( $timeout ) {
+				eval {
+					local $SIG{ALRM} = sub { die "alarm\n" };
+					alarm( $timeout );
+					my $document = PPI::Lexer->lex_file( $source );
+					return $class->_setattr( $document, %attr ) if $document;
+					alarm( 0 );
+				};
+			} else {
+				my $document = PPI::Lexer->lex_file( $source );
+				return $class->_setattr( $document, %attr ) if $document;
+			}
 		}
 
 	} elsif ( _SCALAR($source) ) {
-		my $document = PPI::Lexer->lex_source( $$source );
-		return $class->_setattr( $document, @_ ) if $document;
+		if ( $timeout ) {
+			eval {
+				local $SIG{ALRM} = sub { die "alarm\n" };
+				alarm( $timeout );
+				my $document = PPI::Lexer->lex_source( $$source );
+				return $class->_setattr( $document, %attr ) if $document;
+				alarm( 0 );
+			}
+		} else {
+			my $document = PPI::Lexer->lex_source( $$source );
+			return $class->_setattr( $document, %attr ) if $document;
+		}
 
 	} else {
 		$class->_error("An unknown object or reference was passed to PPI::Document::new");
 	}
 
 	# Pull and store the error from the lexer
-	my $errstr = PPI::Lexer->errstr
-		|| "Unknown error returned by PPI::Lexer";
+	my $errstr;
+	if ( _INSTANCE($@, 'PPI::Exception::Timeout') ) {
+		$errstr = 'Timed out while parsing document';
+	} elsif ( _INSTANCE($@, 'PPI::Exception') ) {
+		$errstr = $@->message;
+	} elsif ( $@ ) {
+		$errstr = $@;
+		$errstr =~ s/\sat line\s.+$//;
+	} elsif ( PPI::Lexer->errstr ) {
+		$errstr = PPI::Lexer->errstr;
+	} else {
+		$errstr = "Unknown error parsing Perl document";
+	}
 	PPI::Lexer->_clear;
 	$class->_error( $errstr );
 }

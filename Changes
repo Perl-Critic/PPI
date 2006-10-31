@@ -1,10 +1,23 @@
 Revision history for Perl extension PPI
 
-1.199_01
+1.199_02 ****
+	Summary:
+	- Added parser timeout support
+
+	Details:
+	- Created PPI::Exception with an eye to moving towards
+	  using exceptions more for error handling (for speed).
+	  The goal is to get rid of the "or return undef"s.
+	- Added the timeout param to the PPI::Document constructor
+	  which uses alarm to implement basic timeout support.
+          This should help when parsing a large corpus on Unix.
+	  (Not available on Win32)
+
+1.199_01 Tue 31 Oct 2006
 	Summary:
 	- Improved lexing correctness
-	- Initial implementation of Number classes
 	- Partial implementation of literal
+	- Initial implementation of Number classes (Chris Dolan)
 
 	Details:
 	- Split out PPI::Token::Number subclasses

@@ -79,7 +79,7 @@ use PPI::Util       ();
 
 use vars qw{$VERSION $errstr};
 BEGIN {
-	$VERSION = '1.199_01';
+	$VERSION = '1.199_02';
 	$errstr  = '';
 }
 
