@@ -1,14 +1,14 @@
 PPI::Document
   PPI::Statement
     PPI::Structure::List  	( ... )
-      PPI::Statement::Expression
+      PPI::Statement
         PPI::Structure::Constructor  	[ ... ]
         PPI::Token::Operator  	','
         PPI::Structure::Constructor  	[ ... ]
     PPI::Token::Structure  	';'
   PPI::Statement
     PPI::Structure::List  	( ... )
-      PPI::Statement::Expression
+      PPI::Statement
         PPI::Structure::Constructor  	{ ... }
         PPI::Token::Operator  	','
         PPI::Structure::Constructor  	{ ... }

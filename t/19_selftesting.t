@@ -43,7 +43,7 @@ foreach my $dir ( '05_lexer_practical', '08_regression', '11_util', '13_data', '
 }
 
 # Declare our plan
-Test::More::plan( tests => scalar(@files) * 6 + 3 );
+Test::More::plan( tests => scalar(@files) * 8 + 3 );
 
 
 

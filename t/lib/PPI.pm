@@ -100,7 +100,7 @@ Test::Object->register(
 	code  => \&nested_structures,
 );
 
-sub nested_strucures {
+sub nested_structures {
 	my $doc = shift;
 
 	ok( ! $doc->find_any( sub {

@@ -16,7 +16,7 @@ PPI::Document
   PPI::Statement
     PPI::Token::Word  	'map'
     PPI::Structure::List  	( ... )
-      PPI::Statement::Expression
+      PPI::Statement
         PPI::Structure::Block  	{ ... }
           PPI::Statement
             PPI::Token::Magic  	'$_'
@@ -46,7 +46,7 @@ PPI::Document
   PPI::Statement
     PPI::Token::Word  	'foo'
     PPI::Structure::List  	( ... )
-      PPI::Statement::Expression
+      PPI::Statement
         PPI::Structure::Constructor  	{ ... }
           PPI::Statement
             PPI::Token::Magic  	'$_'

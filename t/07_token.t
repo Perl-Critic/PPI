@@ -13,7 +13,7 @@ BEGIN {
 use PPI;
 
 # Execute the tests
-use Test::More tests => 271;
+use Test::More tests => 277;
 use t::lib::PPI;
 
 #####################################################################

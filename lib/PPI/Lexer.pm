@@ -858,10 +858,11 @@ sub _resolve_new_structure_curly {
 
 	# Get the last significant element in the parent
 	my $Element = $Parent->schild(-1);
+	my $content = $Element ? $Element->content : '';
 
 	# Is this a subscript, like $foo[1] or $foo{expr}
 	if ( $Element ) {
-		if ( $Element->isa('PPI::Token::Operator') and $Element->content eq '->' ) {
+		if ( $Element->isa('PPI::Token::Operator') and $content eq '->' ) {
 			# $foo->{}
 			$Element->{_dereference} = 1;
 			return 'PPI::Structure::Subscript';
@@ -870,7 +871,7 @@ sub _resolve_new_structure_curly {
 			# $foo[]{}
 			return 'PPI::Structure::Subscript';
 		}
-		if ( $Element->isa('PPI::Token::Symbol') and $Element->content =~ /^(?:\$|\@)/ ) {
+		if ( $Element->isa('PPI::Token::Symbol') and $content =~ /^(?:\$|\@)/ ) {
 			# $foo{}, @foo{}
 			return 'PPI::Structure::Subscript';
 		}
@@ -882,7 +883,13 @@ sub _resolve_new_structure_curly {
 		return 'PPI::Structure::Block';
 	}
 
-	# Unless we are at the start of the line, everything should be a block
+	# Are we the operand of an assignment
+	### The fancy regex just means "all (something)= except == and !="
+	if ( $content =~ /^[^!=]*=$/ ) {
+		return 'PPI::Structure::Constructor';
+	}
+
+	# Unless we are at the start of the line, everything else should be a block
 	if ( $Element ) {
 		return 'PPI::Structure::Block';
 	}
@@ -962,28 +969,11 @@ sub _lex_structure {
 
 		# Is this the opening of another structure directly inside us?
 		if ( $Token->__LEXER__opens ) {
-			### FIXME - Now, we really shouldn't be creating Structures
-			###         inside of Structures. There really should be an
-			###         Statement::Expression in here somewhere.
-			# Determine the class for the structure and create it
-			my $_class = $self->_resolve_new_structure($Structure, $Token) or return undef;
-			if ( $_class eq 'PPI::Structure::List' ) {
-				# This should actually have a Statement
-				$self->_rollback( $Token );
-				my $Statement = PPI::Statement->new           or return undef;
-				$self->_add_delayed( $Structure )             or return undef;
-				$self->_lex_statement( $Statement )           or return undef;
-				$self->_add_element( $Structure, $Statement ) or return undef;
-				next;
-			}
-			my $Structure2 = $_class->new( $Token ) or return undef;
-
-			# Move the lexing down into the Structure
-			$self->_add_delayed( $Structure ) or return undef;
-			$self->_lex_structure( $Structure2 ) or return undef;
-
-			# Add the completed Structure to the statement
-			$self->_add_element( $Structure, $Structure2 ) or return undef;
+			# Rollback the Token, and recurse into the statement
+			$self->_rollback( $Token );
+			my $Statement = PPI::Statement->new          or return undef;
+			$self->_lex_statement( $Statement )          or return undef;
+			$self->_add_element( $Structure, $Statement ) or return undef;
 			next;
 		}
 
