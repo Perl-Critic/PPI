@@ -762,7 +762,7 @@ enabled, contact the author.
 
 =head1 AUTHOR
 
-Adam Kennedy I<adamk@cpan.org>
+Adam Kennedy E<lt>adamk@cpan.orgE<gt>
 
 =head1 ACKNOWLEDGMENTS
 
@@ -775,16 +775,16 @@ Another big thank you to The Perl Foundation
 refactoring and completion run.
 
 Also, to the various co-maintainers that have contributed both large and
-small with tests and patches and the especially those rare few who have
+small with tests and patches and especially to those rare few who have
 deep-dived into the guts to (gasp) add a feature.
 
   - Dan Brook       : PPIx::XPath, Acme::PerlML
   - Audrey Tang     : "Line Noise" Testing
-  - Arjen Laarhoven : Three-element -E<gt>location
+  - Arjen Laarhoven : Three-element -E<gt>location support
 
-Most of all, thanks to those brave soles willing to dive in and use,
-test drive and provide feedback on PPI before version 1.000, in some
-cases before it made it to beta quality, and still did extremely
+And finally, thanks to those brave ( and foolish :) ) soles willing to dive
+in and use, test drive and provide feedback on PPI before version 1.000,
+in some cases before it made it to beta quality, and still did extremely
 distasteful things (like eating 50 meg of RAM a second).
 
 I owe you all a beer. Corner me somewhere and collect at your convenience.
@@ -816,14 +816,14 @@ If I missed someone who wasn't in my email history, thank you too :)
   - Johnny Lee
   - Johan Lindstrom
 
-And to single one person out, thanks go to Randal Schwartz who (mostly)
+And to single one person out, thanks go to Randal Schwartz who
 spent a great number of hours in IRC over a critical 6 month period
 explaining why Perl is impossibly unparsable and constantly shoving evil
-and ugly corner cases in my face. He remained a tireless devil's advocate
+and ugly corner cases in my face. He remained a tireless devil's advocate,
 and without his support this project genuinely could never have been
 completed.
 
-So for my schooling in the Deep Magik, you have my deepest gratitude Randal.
+So for my schooling in the Deep Magiks, you have my deepest gratitude Randal.
 
 =head1 COPYRIGHT
 
