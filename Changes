@@ -1,10 +1,20 @@
 Revision history for Perl extension PPI
 
-1.xxx
+1.199_01
+	Summary:
+	- Improved lexing correctness
+	- Initial implementation of Number classes
+	- Partial implementation of literal
+
 	Details:
 	- Split out PPI::Token::Number subclasses
 	- Implement numbers with exponential notation
         - Implement literal() for ::Number classes (except ::Version)
+	- Implement literal() for ::Token::Quote::Single
+	- Added -T for inline tests
+	- Add tests for nested statements and nested structures
+	- Fixed some bugs as a result
+	- Improved detection of the correct curly brace structure types
 
 1.118   Fri 22 Sep 2006
 	Summary:

@@ -9,7 +9,7 @@ use Carp  ();
 
 use vars qw{$VERSION %quotes %sections};
 BEGIN {
-	$VERSION = '1.118';
+	$VERSION = '1.199_01';
 
 	# Prototypes for the different braced sections
 	%sections = (
