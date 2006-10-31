@@ -233,10 +233,9 @@ sub _lex_document {
 
 			# Move the lexing down into the statement
 			$self->_add_delayed( $Document )    or return undef;
+			$self->_add_element( $Document, $Statement ) or return undef;
 			$self->_lex_statement( $Statement ) or return undef;
 
-			# Add the completed Statement to the document
-			$self->_add_element( $Document, $Statement ) or return undef;
 			next;
 		}
 
@@ -245,8 +244,8 @@ sub _lex_document {
 			# This should actually have a Statement instead
 			$self->_rollback( $Token );
 			my $Statement = PPI::Statement->new          or return undef;
-			$self->_lex_statement( $Statement )          or return undef;
 			$self->_add_element( $Document, $Statement ) or return undef;
+			$self->_lex_statement( $Statement )          or return undef;
 			next;
 		}
 
@@ -494,10 +493,8 @@ sub _lex_statement {
 
 		# Move the lexing down into the Structure
 		$self->_add_delayed( $Statement )   or return undef;
-		$self->_lex_structure( $Structure ) or return undef;
-
-		# Add the completed Structure to the statement
 		$self->_add_element( $Statement, $Structure ) or return undef;
+		$self->_lex_structure( $Structure ) or return undef;
 	}
 
 	# Was it an error in the tokenizer?
@@ -774,10 +771,10 @@ BEGIN {
 # Given a parent element, and a token which will open a structure, determine
 # the class that the structure should be.
 sub _resolve_new_structure {
-	my ($self, $Parent, $Token) = @_;
 	# my $self   = shift;
 	# my $Parent = _INSTANCE(shift, 'PPI::Node')             or die "Bad param 1";
 	# my $Token  = _INSTANCE(shift, 'PPI::Token::Structure') or die "Bad param 2";
+	my ($self, $Parent, $Token) = @_;
 
 	return $self->_resolve_new_structure_round ($Parent) if $Token->content eq '(';
 	return $self->_resolve_new_structure_square($Parent) if $Token->content eq '[';
@@ -788,9 +785,9 @@ sub _resolve_new_structure {
 # Given a parent element, and a ( token to open a structure, determine
 # the class that the structure should be.
 sub _resolve_new_structure_round {
-	my ($self, $Parent) = @_;
 	# my $self   = shift;
 	# my $Parent = _INSTANCE(shift, 'PPI::Node') or die "Bad param 1";
+	my ($self, $Parent) = @_;
 
 	# Get the last significant element in the parent
 	my $Element = $Parent->schild(-1);
@@ -819,9 +816,9 @@ sub _resolve_new_structure_round {
 # Given a parent element, and a [ token to open a structure, determine
 # the class that the structure should be.
 sub _resolve_new_structure_square {
-	my ($self, $Parent) = @_;
 	# my $self   = shift;
 	# my $Parent = _INSTANCE(shift, 'PPI::Node') or die "Bad param 1";
+	my ($self, $Parent) = @_;
 
 	# Get the last significant element in the parent
 	my $Element = $Parent->schild(-1);
@@ -849,6 +846,24 @@ sub _resolve_new_structure_square {
 	'PPI::Structure::Constructor';
 }
 
+use vars qw{%CURLY_CLASSES};
+BEGIN {
+	# Keyword -> Structure class maps
+	%CURLY_CLASSES = (
+		# Blocks
+		'sub'  => 'PPI::Structure::Block',
+		'grep' => 'PPI::Structure::Block',
+		'map'  => 'PPI::Structure::Block',
+		'sort' => 'PPI::Structure::Block',
+		'do'   => 'PPI::Structure::Block',
+
+		# Hash constructors
+		'='    => 'PPI::Structure::Constructor',
+		'||='  => 'PPI::Structure::Constructor',
+		','    => 'PPI::Structure::Constructor',
+		);
+}
+
 # Given a parent element, and a { token to open a structure, determine
 # the class that the structure should be.
 sub _resolve_new_structure_curly {
@@ -862,7 +877,7 @@ sub _resolve_new_structure_curly {
 
 	# Is this a subscript, like $foo[1] or $foo{expr}
 	if ( $Element ) {
-		if ( $Element->isa('PPI::Token::Operator') and $content eq '->' ) {
+		if ( $content eq '->' and $Element->isa('PPI::Token::Operator') ) {
 			# $foo->{}
 			$Element->{_dereference} = 1;
 			return 'PPI::Structure::Subscript';
@@ -875,6 +890,10 @@ sub _resolve_new_structure_curly {
 			# $foo{}, @foo{}
 			return 'PPI::Structure::Subscript';
 		}
+		if ( $CURLY_CLASSES{$content} ) {
+			# Known type
+			return $CURLY_CLASSES{$content};
+		}
 	}
 
 	# Are we in a compound statement
@@ -883,15 +902,28 @@ sub _resolve_new_structure_curly {
 		return 'PPI::Structure::Block';
 	}
 
-	# Are we the operand of an assignment
-	### The fancy regex just means "all (something)= except == and !="
-	if ( $content =~ /^[^!=]*=$/ ) {
+	# Are we an operand an something we know is a constructor
+	if ( $content =~ /^.{,2}=$/ ) {
 		return 'PPI::Structure::Constructor';
 	}
 
-	# Unless we are at the start of the line, everything else should be a block
+	# Unless we are at the start of the statement, everything else should be a block
+	### FIXME This is possibly a bad choice, but will have to do for now.
 	if ( $Element ) {
 		return 'PPI::Structure::Block';
+	}
+
+	# Special case: Are we the param of a core function
+	# i.e. map({ $_ => 1 } @foo)
+	if (
+		$Parent->isa('PPI::Statement')
+		and
+		_INSTANCE($Parent->parent, 'PPI::Structure::List')
+	) {
+		my $function = $Parent->parent->parent->schild(-2);
+		if ( $function and $function->content =~ /^(?:map|grep|sort)$/ ) {
+			return 'PPI::Structure::Block';
+		}
 	}
 
 	# We need to scan ahead.
@@ -907,14 +939,14 @@ sub _resolve_new_structure_curly {
 		# If a closing curly, this is an anonymous hash-ref
 		if ( ++$position == 1 and $Next->content eq '}' ) {
 			$self->_buffer( splice( @delayed ), $Next );
-			return 'PPI::Structure::Subscript';
+			return 'PPI::Structure::Constructor';
 		}
 
 		# If it contains a => as the second thing,
 		# this is also an anonymous hash-ref.
 		if ( $position == 2 and $Next->content eq '=>' ) {
 			$self->_buffer( splice( @delayed ), $Next );
-			return 'PPI::Structure::Subscript';
+			return 'PPI::Structure::Constructor';
 		}
 
 		# We only check the first two, then default to block
@@ -957,13 +989,12 @@ sub _lex_structure {
 
 			# Determine the class for the Statement and create it
 			my $_class = $self->_resolve_new_statement($Structure, $Token) or return undef;
-			my $Statement = $_class->new( $Token ) or return undef;
+			my $Statement = $_class->new( $Token )        or return undef;
 
 			# Move the lexing down into the Statement
-			$self->_lex_statement( $Statement ) or return undef;
-
-			# Add the completed statement to our elements
 			$self->_add_element( $Structure, $Statement ) or return undef;
+			$self->_lex_statement( $Statement )           or return undef;
+
 			next;
 		}
 
@@ -972,8 +1003,8 @@ sub _lex_structure {
 			# Rollback the Token, and recurse into the statement
 			$self->_rollback( $Token );
 			my $Statement = PPI::Statement->new          or return undef;
-			$self->_lex_statement( $Statement )          or return undef;
 			$self->_add_element( $Structure, $Statement ) or return undef;
+			$self->_lex_statement( $Statement )          or return undef;
 			next;
 		}
 
