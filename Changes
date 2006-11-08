@@ -12,6 +12,7 @@ Revision history for Perl extension PPI
 	  which uses alarm to implement basic timeout support.
           This should help when parsing a large corpus on Unix.
 	  (Not available on Win32)
+	- Fixed incorrect location() for PPI::Structure instances.
 
 1.199_01 Tue 31 Oct 2006
 	Summary:

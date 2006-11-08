@@ -30,7 +30,7 @@ sub pause {
 
 # For each new item in t/data/08_regression add another 11 tests
 
-use Test::More tests => 406;
+use Test::More tests => 408;
 use t::lib::PPI;
 
 #####################################################################
@@ -257,6 +257,18 @@ SCOPE: {
 	my $stmt = $doc->child(0);
 	isa_ok( $stmt, 'PPI::Statement::Variable' );
 	is_deeply( [$stmt->variables], ['$self', '$param'], 'variables() for my list with whitespace' );
+}
+
+#####################################################################
+# Chris Laco on users@perlcritic.tigris.org (sorry no direct URL...)
+#   http://perlcritic.tigris.org/servlets/SummarizeList?listName=users
+# Empty constructor has no location
+
+SCOPE: {
+	my $doc = PPI::Document->new( \'$h={};' );
+	my $hash = $doc->find('PPI::Structure::Constructor')->[0];
+	ok($hash, 'location for empty constructor - fetched a constructor');
+	is_deeply( $hash->location(), [1,4,4], 'location for empty constructor');
 }
 
 exit(0);

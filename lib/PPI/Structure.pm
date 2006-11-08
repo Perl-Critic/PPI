@@ -239,6 +239,12 @@ sub last_element {
 }
 
 
+# Location is same as the start token, if any
+sub location {
+	my $self  = shift;
+	my $first = $self->first_element or return undef;
+	$first->location;
+}
 
 
 
