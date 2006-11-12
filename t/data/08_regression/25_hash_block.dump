@@ -1,0 +1,24 @@
+PPI::Document
+  PPI::Statement
+    PPI::Token::Symbol  	'$x'
+    PPI::Token::Whitespace  	' '
+    PPI::Token::Operator  	'='
+    PPI::Token::Whitespace  	' '
+    PPI::Structure::Constructor  	{ ... }
+      PPI::Token::Whitespace  	' '
+      PPI::Statement
+        PPI::Token::Word  	'f'
+        PPI::Token::Whitespace  	' '
+        PPI::Token::Operator  	'=>'
+        PPI::Token::Whitespace  	' '
+        PPI::Structure::Constructor  	{ ... }
+          PPI::Token::Whitespace  	' '
+          PPI::Statement
+            PPI::Token::Word  	'f'
+            PPI::Token::Whitespace  	' '
+            PPI::Token::Operator  	'=>'
+            PPI::Token::Whitespace  	' '
+            PPI::Token::Number  	'1'
+          PPI::Token::Whitespace  	' '
+      PPI::Token::Whitespace  	' '
+  PPI::Token::Whitespace  	'\n'
