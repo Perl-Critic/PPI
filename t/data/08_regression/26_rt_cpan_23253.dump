@@ -18,5 +18,17 @@ PPI::Document
     PPI::Structure::Subscript  	{ ... }
       PPI::Statement::Expression
         PPI::Token::Word  	'our'
+    PPI::Token::Operator  	','
+    PPI::Token::Whitespace  	' '
+    PPI::Token::Symbol  	'$h'
+    PPI::Structure::Subscript  	{ ... }
+      PPI::Statement::Expression
+        PPI::Token::Word  	'state'
+    PPI::Token::Operator  	','
+    PPI::Token::Whitespace  	' '
+    PPI::Token::Symbol  	'$h'
+    PPI::Structure::Subscript  	{ ... }
+      PPI::Statement::Expression
+        PPI::Token::Word  	'foo'
     PPI::Token::Structure  	';'
   PPI::Token::Whitespace  	'\n'
