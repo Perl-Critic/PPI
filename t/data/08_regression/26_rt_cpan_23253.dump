@@ -1,0 +1,22 @@
+PPI::Document
+  PPI::Statement
+    PPI::Token::Word  	'print'
+    PPI::Token::Whitespace  	' '
+    PPI::Token::Symbol  	'$h'
+    PPI::Structure::Subscript  	{ ... }
+      PPI::Statement::Expression
+        PPI::Token::Word  	'local'
+    PPI::Token::Operator  	','
+    PPI::Token::Whitespace  	' '
+    PPI::Token::Symbol  	'$h'
+    PPI::Structure::Subscript  	{ ... }
+      PPI::Statement::Expression
+        PPI::Token::Word  	'my'
+    PPI::Token::Operator  	','
+    PPI::Token::Whitespace  	' '
+    PPI::Token::Symbol  	'$h'
+    PPI::Structure::Subscript  	{ ... }
+      PPI::Statement::Expression
+        PPI::Token::Word  	'our'
+    PPI::Token::Structure  	';'
+  PPI::Token::Whitespace  	'\n'
