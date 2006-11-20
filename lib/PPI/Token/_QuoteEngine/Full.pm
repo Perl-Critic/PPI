@@ -42,7 +42,7 @@ BEGIN {
 		# The final ( and kind of depreciated ) "first match only" one is not
 		# used yet, since I'm not sure on the context differences between
 		# this and the trinary operator, but its here for completeness.
-		'?'   => { operator => undef, braced => 0,     separator => '?',   _sections => 1, modifieds => 1 },
+		'?'   => { operator => undef, braced => 0,     separator => '?',   _sections => 1, modifiers => 1 },
 		);
 }
 
