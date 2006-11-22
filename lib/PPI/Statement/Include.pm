@@ -117,8 +117,9 @@ This is done though the use of modules that do various types of internals
 magic.
 
 For now, PPI assumes that any "module name" that is only a set of
-lowercase letters. This behaviour is expected to change, most likely to
-something that knows the specific names of the various "pragmas".
+lowercase letters (and perhaps numbers, like C<use utf8;>). This
+behaviour is expected to change, most likely to something that knows
+the specific names of the various "pragmas".
 
 Returns the name of the pragma, or false ('') if the include is not a
 pragma.
@@ -128,7 +129,7 @@ pragma.
 sub pragma {
 	my $self = shift;
 	my $module = $self->module or return '';
-	$module =~ /^[a-z]+$/ ? $module : '';
+	$module =~ /^[a-z][a-z\d]*$/ ? $module : '';
 }
 
 =pod

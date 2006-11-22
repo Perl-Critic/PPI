@@ -30,7 +30,7 @@ sub pause {
 
 # For each new item in t/data/08_regression add another 11 tests
 
-use Test::More tests => 408;
+use Test::More tests => 410;
 use t::lib::PPI;
 
 #####################################################################
@@ -269,6 +269,16 @@ SCOPE: {
 	my $hash = $doc->find('PPI::Structure::Constructor')->[0];
 	ok($hash, 'location for empty constructor - fetched a constructor');
 	is_deeply( $hash->location(), [1,4,4], 'location for empty constructor');
+}
+
+#####################################################################
+# Perl::MinimumVersion regression
+
+SCOPE: {
+	my $doc = PPI::Document->new( \'use utf8;' );
+	my $stmt = $doc->child(0);
+	isa_ok( $stmt, 'PPI::Statement::Include' );
+	is( $stmt->pragma, 'utf8', 'pragma() with numbers' );
 }
 
 exit(0);
