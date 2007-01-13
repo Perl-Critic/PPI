@@ -154,7 +154,7 @@ sub run_testdir {
 			skip "No Document to test", 7 unless $Document;
 
 			# Check standard things
-			object_ok( $Document ); # 3 tests contained within
+			object_ok( $Document ); # 5 tests contained within
 
 			# Get the dump array ref for the Document object
 			my $Dumper = PPI::Dumper->new( $Document );
