@@ -4,6 +4,7 @@ Revision history for Perl extension PPI
 	Summary:
 	- Added parser timeout support
 	- Fixing various regression cases
+	- Adding some housekeeping tweaks
 
 	Details:
 	- Created PPI::Exception with an eye to moving towards
@@ -15,6 +16,9 @@ Revision history for Perl extension PPI
 	  (Not available on Win32)
 	- Fixed incorrect location() for PPI::Structure instances.
 	- Adding better parsing of hash constructors.
+	- Pushing Clone dependency to 0.22 to get closer to taint support)
+	- Pushing deps on bundled test modules to prevent accidentally
+	  bundling old versions.
 
 1.199_01 Tue 31 Oct 2006
 	Summary:
