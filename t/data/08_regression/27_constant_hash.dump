@@ -1,0 +1,35 @@
+PPI::Document
+  PPI::Statement::Include
+    PPI::Token::Word  	'use'
+    PPI::Token::Whitespace  	' '
+    PPI::Token::Word  	'constant'
+    PPI::Token::Whitespace  	' '
+    PPI::Structure::Constructor  	{ ... }
+      PPI::Token::Whitespace  	' '
+      PPI::Statement
+        PPI::Token::Word  	'foo'
+        PPI::Token::Whitespace  	' '
+        PPI::Token::Operator  	'=>'
+        PPI::Token::Whitespace  	' '
+        PPI::Token::Quote::Single  	''bar''
+      PPI::Token::Whitespace  	' '
+    PPI::Token::Structure  	';'
+  PPI::Token::Whitespace  	'\n'
+  PPI::Statement::Variable
+    PPI::Token::Word  	'my'
+    PPI::Token::Whitespace  	' '
+    PPI::Token::Symbol  	'$code'
+    PPI::Token::Whitespace  	' '
+    PPI::Token::Operator  	'='
+    PPI::Token::Whitespace  	' '
+    PPI::Structure::Constructor  	{ ... }
+      PPI::Token::Whitespace  	' '
+      PPI::Statement
+        PPI::Token::Word  	'foo'
+        PPI::Token::Whitespace  	' '
+        PPI::Token::Operator  	'=>'
+        PPI::Token::Whitespace  	' '
+        PPI::Token::Quote::Single  	''bar''
+      PPI::Token::Whitespace  	' '
+    PPI::Token::Structure  	';'
+  PPI::Token::Whitespace  	'\n'

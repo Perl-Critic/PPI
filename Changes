@@ -3,6 +3,7 @@ Revision history for Perl extension PPI
 1.199_02 ****
 	Summary:
 	- Added parser timeout support
+	- Fixing various regression cases
 
 	Details:
 	- Created PPI::Exception with an eye to moving towards
@@ -13,6 +14,7 @@ Revision history for Perl extension PPI
           This should help when parsing a large corpus on Unix.
 	  (Not available on Win32)
 	- Fixed incorrect location() for PPI::Structure instances.
+	- Adding better parsing of hash constructors.
 
 1.199_01 Tue 31 Oct 2006
 	Summary:

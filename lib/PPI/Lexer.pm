@@ -366,12 +366,36 @@ sub _resolve_new_statement {
 
 	# Handle potential barewords for subscripts
 	if ( $Parent->isa('PPI::Structure::Subscript') ) {
-		if ( $class and $class->isa('PPI::Statement::Expression') ) {
-			# Still allowable in this context
-			return $class;
-		} else {
+		# Fast obvious case, just an expression
+		unless ( $class and $class->isa('PPI::Statement::Expression') ) {
 			return 'PPI::Statement::Expression';
 		}
+
+		# This is something like "my" or "our" etc... more subtle.
+		# Check if the next token is a closing curly brace.
+		# This means we are something like $h{my}
+		my $Next;
+		while ( $Next = $self->_get_token ) {
+			unless ( $Next->significant ) {
+				$self->_delay_element( $Next ) or return undef;
+				next;
+			}
+
+			# Found the next significant token.
+			# Is it a closing curly brace?
+			if ( $Next->content eq '}' ) {
+				$self->_rollback( $Next );
+				return 'PPI::Statement::Expression';
+			} else {
+				$self->_rollback( $Next );
+				return $class;
+			}
+		}
+
+		# End of file... this means it is something like $h{our
+		# which is probably going to be $h{our} ... I think
+		$self->_rollback( $Next );
+		return 'PPI::Statement::Expression';
 	}
 
 	# If it's a token in our list, use that class
@@ -861,6 +885,8 @@ BEGIN {
 		'='    => 'PPI::Structure::Constructor',
 		'||='  => 'PPI::Structure::Constructor',
 		','    => 'PPI::Structure::Constructor',
+		'=>'   => 'PPI::Structure::Constructor',
+		
 		);
 }
 
@@ -902,9 +928,12 @@ sub _resolve_new_structure_curly {
 		return 'PPI::Structure::Block';
 	}
 
-	# Are we an operand an something we know is a constructor
-	if ( $content =~ /^.{,2}=$/ ) {
-		return 'PPI::Structure::Constructor';
+	# Are we the second argument of use
+	if ( $Parent->isa('PPI::Statement::Include') ) {
+		if ( $Parent->schildren == 2 ) {
+			# This is something like use constant { ... };
+			return 'PPI::Structure::Constructor';
+		}
 	}
 
 	# Unless we are at the start of the statement, everything else should be a block
