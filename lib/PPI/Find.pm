@@ -325,7 +325,7 @@ sub _execute {
 	my @queue  = ( $self->{in} );
 
 	# Pull entries off the queue and hand them off to the wanted function
-	while ( my $Element = shift @{$self->{queue}} ) {
+	while ( my $Element = shift @queue ) {
 		my $rv = &$wanted( $Element, $self->{in} );
 
 		# Add to the matches if returns true
@@ -346,8 +346,6 @@ sub _execute {
 		}
 	}
 
-	# Save the queue and return
-	$self->{queue} = \@queue;
 	1;
 }
 
