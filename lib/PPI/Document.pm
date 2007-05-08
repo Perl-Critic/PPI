@@ -154,7 +154,7 @@ sub new {
 	my %attr    = @_;
 	my $timeout = delete $attr{timeout};
 	if ( $timeout and ! HAS_ALARM ) {
-		Carp::croak("This platform does not support PPI timeouts");
+		Carp::croak("This platform does not support PPI parser timeouts");
 	}
 
 	# Check the data source

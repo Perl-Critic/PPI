@@ -12,7 +12,7 @@ BEGIN {
 use PPI::Lexer ();
 
 # Execute the tests
-use Test::More tests => 8;
+use Test::More tests => 11;
 use Scalar::Util 'refaddr';
 
 
@@ -55,6 +55,20 @@ SCOPE: {
 	my $doc = PPI::Document->new( \"sub foo { 1 }" );
 	isa_ok( $doc, 'PPI::Document' );
 	isa_ok( $doc->child(0), 'PPI::Statement::Sub' );
+}
+
+
+
+
+
+#####################################################################
+# Regression test, make sure utf8 is a pragma
+
+SCOPE: {
+	my $doc = PPI::Document->new( \"use utf8;" );
+	isa_ok( $doc, 'PPI::Document' );
+	isa_ok( $doc->child(0), 'PPI::Statement::Include' );
+	is( $doc->child(0)->pragma, 'utf8', 'use utf8 is a pragma' );
 }
 
 1;
