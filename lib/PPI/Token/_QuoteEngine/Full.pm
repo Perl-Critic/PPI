@@ -63,6 +63,51 @@ foreach my $name ( qw{Token::Quote Token::QuoteLike Token::Regexp} ) {
 		"$name does not have a new function" );
 }
 
+# This primarily to ensure that qw() with non-balanced types
+# are treated the same as those with balanced types.
+SCOPE: {
+	my @seps   = ( undef, undef, '/', '#', ','  );
+	my @types  = ( '()', '<>', '//', '##', ',,' );
+	my @braced = ( qw{ 1 1 0 0 0 } );
+	my $i      = 0;
+	for my $q ('qw()', 'qw<>', 'qw//', 'qw##', 'qw,,') {
+		my $d = PPI::Document->new(\$q);
+		my $o = $d->{children}->[0]->{children}->[0];
+		my $s = $o->{sections}->[0];
+		is( $o->{operator},  'qw',      "$q correct operator"  );
+		is( $o->{_sections}, 1,         "$q correct _sections" );
+		is( $o->{braced}, $braced[$i],  "$q correct braced"    );
+		is( $o->{seperator}, $seps[$i], "$q correct seperator" );
+		is( $o->{content},   $q,        "$q correct content"   );
+		is( $s->{position},  3,         "$q correct position"  );
+		is( $s->{type}, $types[$i],     "$q correct type"      );
+		is( $s->{size},      0,         "$q correct size"      );
+		$i++;
+	}
+}
+
+SCOPE: {
+	my @stuff  = ( qw-( ) < > / / -, '#', '#', ',',',' );
+	my @seps   = ( undef, undef, '/', '#', ','  );
+	my @types  = ( '()', '<>', '//', '##', ',,' );
+	my @braced = ( qw{ 1 1 0 0 0 } );
+	my $i      = 0;
+	while ( @stuff ) {
+		my $opener = shift @stuff;
+		my $closer = shift @stuff;
+		my $d = PPI::Document->new(\"qw$opener");
+		my $o = $d->{children}->[0]->{children}->[0];
+		my $s = $o->{sections}->[0];
+		is( $o->{operator},  'qw',        "qw$opener correct operator"  );
+		is( $o->{_sections}, 1,           "qw$opener correct _sections" );
+		is( $o->{braced}, $braced[$i],    "qw$opener correct braced"    );
+		is( $o->{seperator}, $seps[$i],   "qw$opener correct seperator" );
+		is( $o->{content},   "qw$opener", "qw$opener correct content"   );
+		is( $s->{_close},    $closer,     "qw$opener correct _close"    );
+		is( $s->{type}, "$opener$closer", "qw$opener correct type"      );
+	}
+}
+
 =end testing
 
 =cut
@@ -130,8 +175,8 @@ sub _fill {
 			$self->{braced}        = 1;
 			$self->{sections}->[0] = Clone::clone($section);
 		} else {
-			$self->{braced}    = 0;
-			$self->{separator} = $sep;
+			$self->{braced}        = 0;
+			$self->{separator}     = $sep;
 		}
 	}
 
@@ -172,7 +217,8 @@ sub _fill_normal {
 	# Complete the properties of the first section
 	$self->{sections}->[0] = {
 		position => length $self->{content},
-		size     => length($string) - 1
+		size     => length($string) - 1,
+		type     => "$self->{separator}$self->{separator}"
 		};
 	$self->{content} .= $string;
 

@@ -42,60 +42,6 @@ BEGIN {
 
 1;
 
-=pod
-
-=begin testing
-
-use PPI;
-
-# This primarily to ensure that qw() with non-balanced types
-# are treated the same as those with balanced types.
-
-for my $q ('qw()', 'qw<>', 'qw//', 'qw##', 'qw,,') {
-  my $d = PPI::Document->new(\$q);
-  my $o = $d->{children}->[0]->{children}->[0];
-
-  no warnings 'deprecated'; # pseudohashes--
-  for my $x ( [operator  => 'qw'   ],
-              [_sections => 1      ],
-              [braced    => 1      ],
-              [separator => undef ],
-              [content   => $q     ] ) {
-    is($o->{$x->[0]}, $x->[1], "correct $x->[0]")
-  }
-  for my $x ( [position => 3    ],
-              [type     => '()' ],
-              [size     => 0    ] ) {
-    is($o->{sections}->[0]->{$x->[0]}, $x->[1], "correct sections/$x->[0]")
-  }
-}
-
-# And again, for incomplete qw()
-
-for my $q ( [ qw-( )- ],
-            [ qw-< >- ],
-            [ qw-/ /- ],
-            [ '#','#' ],
-            [ ',',',' ] ) {
-  my $d = PPI::Document->new(\"qw$q->[0]");
-  my $o = $d->{children}->[0]->{children}->[0];
-
-  no warnings 'deprecated'; # pseudohashes--
-  for my $x ( [operator => 'qw'       ],
-              [_sections => 1         ],
-              [braced => 1            ],
-              [separator => undef     ],
-              [content => "qw$q->[0]" ] ) {
-    is($o->{$x->[0]}, $x->[1], "correct $x->[0]")
-  }
-  for my $x ( [_close => $q->[1]           ],
-              [type =>   $q->[0] . $q->[1] ] ) {
-    is($o->{sections}->[0]->{$x->[0]}, $x->[1], "correct sections/$x->[0]")
-  }
-}
-
-=end testing
-
 =head1 SUPPORT
 
 See the L<support section|PPI/SUPPORT> in the main module.
