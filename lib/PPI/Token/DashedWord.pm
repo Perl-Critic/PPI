@@ -53,10 +53,10 @@ sub __TOKENIZER__on_char {
 	# Are we a file test operator?
 	if ( $t->{token}->{content} =~ /^\-[rwxoRWXOezsfdlpSbctugkTBMAC]$/ ) {
 		# File test operator
-		$t->_set_token_class( 'Operator' ) or return undef;
+		$t->{class} = $t->{token}->set_class( 'Operator' );
 	} else {
 		# No, normal dashed bareword
-		$t->_set_token_class( 'Word' ) or return undef;
+		$t->{class} = $t->{token}->set_class( 'Word' );
 	}
 
 	$t->_finalize_token->__TOKENIZER__on_char( $t );

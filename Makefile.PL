@@ -35,4 +35,8 @@ include        'Hook::LexWrap';
 # (which some distributions annoyingly don't have)
 requires       'Task::Weaken';
 
+# Maintainers should probably also install this
+# so that they can regenerate the inline tests
+# build_requires 'Test::Inline' => '2.203';
+
 WriteAll;

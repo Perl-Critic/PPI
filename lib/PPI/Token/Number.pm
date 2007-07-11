@@ -85,15 +85,18 @@ sub __TOKENIZER__on_char {
 	if ( $token->{content} =~ /^-?0_*$/ ) {
 		# This could be special
 		if ( $char eq 'x' ) {
-			return $t->_set_token_class( 'Number::Hex' ) ? 1 : undef;
+			$t->{class} = $t->{token}->set_class( 'Number::Hex' );
+			return 1;
 		} elsif ( $char eq 'b' ) {
-			return $t->_set_token_class( 'Number::Binary' ) ? 1 : undef;
+			$t->{class} = $t->{token}->set_class( 'Number::Binary' );
+			return 1;
 		} elsif ( $char =~ /\d/ ) {
 			# You cannot have 8s and 9s on octals
 			if ( $char eq '8' or $char eq '9' ) {
 				$token->{_error} = "Illegal character in octal number '$char'";
 			}
-			return $t->_set_token_class( 'Number::Octal' ) ? 1 : undef;
+			$t->{class} = $t->{token}->set_class( 'Number::Octal' );
+			return 1;
 		}
 	}
 
@@ -101,10 +104,12 @@ sub __TOKENIZER__on_char {
 	return 1 if $char =~ /\d/o;
 
 	if ( $char eq '.' ) {
-		return $t->_set_token_class( 'Number::Float' ) ? 1 : undef;
+		$t->{class} = $t->{token}->set_class( 'Number::Float' );
+		return 1;
 	}
 	if ( $char eq 'e' || $char eq 'E' ) {
-		return $t->_set_token_class( 'Number::Exp' ) ? 1 : undef;
+		$t->{class} = $t->{token}->set_class( 'Number::Exp' );
+		return 1;
 	}
 
 	# Doesn't fit a special case, or is after the end of the token

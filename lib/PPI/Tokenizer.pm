@@ -71,11 +71,13 @@ in private methods.
 # don't have to go and load all of PPI.
 use strict;
 use List::MoreUtils ();
-use Params::Util    '_SCALAR',
+use Params::Util    '_INSTANCE',
+                    '_SCALAR',
                     '_ARRAY';
 use PPI::Element    ();
 use PPI::Token      ();
 use PPI::Util       ();
+use PPI::Exception  ();
 
 use vars qw{$VERSION $errstr};
 BEGIN {
@@ -261,6 +263,9 @@ sub get_token {
 		return undef;
 	};
 	if ( $@ ) {
+		if ( _INSTANCE($@, 'PPI::Exception') ) {
+			return $self->_error( $@->message );
+		}
 		my $errstr = $@;
 		$errstr =~ s/^(.*) at line .+$/$1/;
 		return $self->_error( $errstr );
@@ -474,14 +479,16 @@ sub _process_next_line {
 		if ( ref $self->{source} eq 'ARRAY' and ! @{$self->{source}} ) {
 			$self->_clean_eof;
 		}
-		return defined $rv ? 1 # Defined but false signals "go to next line"
-			: $self->_error( "Error at line $self->{line_count}" );
+
+		# Defined but false means next line
+		return 1 if defined $rv;
+		throw PPI::Exception("Error at line $self->{line_count}");
 	}
 
 	# If we can't deal with the entire line, process char by char
 	while ( $rv = $self->_process_next_char ) {}
 	unless ( defined $rv ) {
-		return $self->_error( "Error at line $self->{line_count}, character $self->{line_cursor}" );
+		throw PPI::Exception("Error at line $self->{line_count}, character $self->{line_cursor}");
 	}
 
 	# Trigger any action that needs to happen at the end of a line
@@ -549,7 +556,7 @@ sub _handle_raw_input {
 		$tString .= "\n";
 
 		# Change the class of the terminator token to the appropriate one
-		$terminator->set_class( 'RawInput::Terminator' ) or return undef;
+		$terminator->set_class( 'RawInput::Terminator' );
 
 		# Create the token
 		my $rawinput = PPI::Token::RawInput::String->new( '' ) or return undef;
@@ -680,7 +687,7 @@ sub _finalize_token {
 # Creates a new token and sets it in the tokenizer
 sub _new_token {
 	my $self = shift;
-	return undef unless @_;
+	# throw PPI::Exception() unless @_;
 	my $class = substr( $_[0], 0, 12 ) eq 'PPI::Token::'
 		? shift : 'PPI::Token::' . shift;
 
@@ -688,23 +695,8 @@ sub _new_token {
 	$self->_finalize_token if $self->{token};
 
 	# Create the new token and update the parse class
-	$self->{token} = $class->new($_[0]) or return undef;
+	$self->{token} = $class->new($_[0]) or throw PPI::Exception();
 	$self->{class} = $class;
-
-	1;
-}
-
-# Changes the token class
-sub _set_token_class {
-	my $self = shift;
-	return $self->_error( "No token to change" ) unless $self->{token};
-
-	# Change the token class
-	$self->{token}->set_class( $_[0] )
-		or $self->_error( "Failed to change token class to '$_[0]'" );
-
-	# Update our parse class
-	$self->{class} = ref $self->{token};
 
 	1;
 }
@@ -808,7 +800,7 @@ my %OBVIOUS_CONTENT = (
 # Returns "operator", "operand", or "" if unknown.
 sub _opcontext {
 	my $self   = shift;
-	my $tokens = $self->_previous_significant_tokens( 1 );
+	my $tokens = $self->_previous_significant_tokens(1);
 	my $p0     = $tokens->[0];
 
 	# Map the obvious cases

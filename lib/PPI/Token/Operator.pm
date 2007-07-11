@@ -84,7 +84,7 @@ sub __TOKENIZER__on_char {
 	if ( $content eq '.' ) {
 		if ( $char =~ /^[0-9]$/ ) {
 			# This is a decimal number
-			$t->_set_token_class('Number::Float');
+			$t->{class} = $t->{token}->set_class('Number::Float');
 			return $t->{class}->__TOKENIZER__on_char( $t );
 		}
 	}
@@ -92,17 +92,20 @@ sub __TOKENIZER__on_char {
 	# Handle the special case if we might be a here-doc
 	if ( $content eq '<<' ) {
 		my $line = substr( $t->{line}, $t->{line_cursor} );
-		if ( $line =~ /^(?:(?!\d)\w|\s*['"`])/ ) {
+		# Either <<FOO or << 'FOO' or <<\FOO
+		### Is the zero-width look-ahead assertion really
+		### supposed to be there?
+		if ( $line =~ /^(?: (?!\d)\w | \s*['"`] | \\\w ) /x ) {
 			# This is a here-doc.
 			# Change the class and move to the HereDoc's own __TOKENIZER__on_char method.
-			$t->_set_token_class('HereDoc');
+			$t->{class} = $t->{token}->set_class('HereDoc');
 			return $t->{class}->__TOKENIZER__on_char( $t );
 		}
 	}
 
 	# Handle the special case of the null Readline
 	if ( $content eq '<>' ) {
-		$t->_set_token_class('QuoteLike::Readline');
+		$t->{class} = $t->{token}->set_class('QuoteLike::Readline');
 	}
 
 	# Finalize normally

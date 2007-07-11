@@ -13,7 +13,7 @@ BEGIN {
 use PPI;
 
 # Execute the tests
-use Test::More tests => 277;
+use Test::More tests => 276;
 use t::lib::PPI;
 
 #####################################################################
@@ -31,8 +31,6 @@ t::lib::PPI->run_testdir( catdir( 't', 'data', '07_token' ) );
 {
 	# Test both creation methods
 	my $Token = PPI::Token::Symbol->new( '$foo' );
-	isa_ok( $Token, 'PPI::Token::Symbol' );
-	$Token = PPI::Token->new( 'Symbol', '$foo' );
 	isa_ok( $Token, 'PPI::Token::Symbol' );
 	
 	# Check the creation of a number of different values

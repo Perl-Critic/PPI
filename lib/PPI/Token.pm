@@ -23,6 +23,7 @@ a L<PPI::Element> that directly represents bytes of source code.
 use strict;
 use base 'PPI::Element';
 use Params::Util '_INSTANCE';
+use PPI::Exception ();
 
 use vars qw{$VERSION};
 BEGIN {
@@ -80,26 +81,12 @@ use PPI::Token::Unknown               ();
 # Constructor and Related
 
 sub new {
-	if ( @_ == 2 ) {
-		# PPI::Token->new( $content );
-		my $class = $_[0] eq __PACKAGE__ ? 'PPI::Token::Whitespace' : shift;
-		return bless {
-			content => (defined $_[0] ? "$_[0]" : '')
-			}, $class;
-	} elsif ( @_ == 3 ) {
-		# PPI::Token->new( $class, $content );
-		my $class = substr( $_[0], 0, 12 ) eq 'PPI::Token::' ? $_[1] : "PPI::Token::$_[1]";
-		return bless {
-			content => (defined $_[2] ? "$_[2]" : '')
-			},  $class;
-	}
-
-	# Invalid argument count
-	undef;
+	bless { content => (defined $_[1] ? "$_[1]" : '') }, $_[0];
 }
 
 sub set_class {
-	my $self  = shift; @_ or return undef;
+	my $self  = shift;
+	# @_ or throw Exception("No arguments to set_class");
 	my $class = substr( $_[0], 0, 12 ) eq 'PPI::Token::' ? shift : 'PPI::Token::' . shift;
 
 	# Find out if the current and new classes are complex
@@ -112,15 +99,15 @@ sub set_class {
 	# If we are changing to or from a Quote style token, we
 	# can't just rebless and need to do some extra thing
 	# Otherwise, we have done enough
-	return 1 if ($old_quote - $new_quote) == 0;
+	return $class if ($old_quote - $new_quote) == 0;
 
 	# Make a new token from the old content, and overwrite the current
 	# token's attributes with the new token's attributes.
-	my $token = $class->new( $self->{content} ) or return undef;
-	delete $self->{$_} foreach keys %$self;
-	$self->{$_} = $token->{$_} foreach keys %$token;
+	my $token = $class->new( $self->{content} );
+	%$self = %$token;
 
-	1;
+	# Return the class as a convenience
+	return $class;
 }
 
 

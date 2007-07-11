@@ -83,20 +83,20 @@ sub __TOKENIZER__on_char {
 	# We might be a subroutine attribute.
 	my $tokens = $t->_previous_significant_tokens(1);
 	if ( $tokens and $tokens->[0]->{_attribute} ) {
-		$t->_set_token_class( 'Attribute' );
+		$t->{class} = $t->{token}->set_class( 'Attribute' );
 		return $t->{class}->__TOKENIZER__commit( $t );
 	}
 
 	# Check for a quote like operator
 	my $word = $t->{token}->{content};
 	if ( $QUOTELIKE{$word} and ! $class->__TOKENIZER__literal($t, $word, $tokens) ) {
-		$t->_set_token_class( $QUOTELIKE{$word} );
+		$t->{class} = $t->{token}->set_class( $QUOTELIKE{$word} );
 		return $t->{class}->__TOKENIZER__on_char( $t );
 	}
 
 	# Or one of the word operators
 	if ( $OPERATOR{$word} and ! $class->__TOKENIZER__literal($t, $word, $tokens) ) {
-	 	$t->_set_token_class( 'Operator' );
+	 	$t->{class} = $t->{token}->set_class( 'Operator' );
  		return $t->_finalize_token->__TOKENIZER__on_char( $t );
 	}
 
@@ -112,11 +112,11 @@ sub __TOKENIZER__on_char {
 	if ( $char eq ':' ) {
 		$t->{token}->{content} .= ':';
 		$t->{line_cursor}++;
-		$t->_set_token_class( 'Label' );
+		$t->{class} = $t->{token}->set_class( 'Label' );
 
 	# If not a label, '_' on its own is the magic filehandle
 	} elsif ( $word eq '_' ) {
-		$t->_set_token_class( 'Magic' );
+		$t->{class} = $t->{token}->set_class( 'Magic' );
 
 	}
 

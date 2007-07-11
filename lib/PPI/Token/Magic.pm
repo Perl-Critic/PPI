@@ -91,7 +91,7 @@ sub __TOKENIZER__on_char {
 
 			# A symbol in the style $_foo or $::foo or $'foo.
 			# Overwrite the current token
-			$t->_set_token_class('Symbol');
+			$t->{class} = $t->{token}->set_class('Symbol');
 			return PPI::Token::Symbol->__TOKENIZER__on_char( $t );
 		}
 
@@ -102,14 +102,13 @@ sub __TOKENIZER__on_char {
 			$t->_finalize_token;
 
 			# ... and create a new token for the symbol
-			$t->_new_token( 'Symbol', '$' ) or return undef;
-			return 1;
+			return $t->_new_token( 'Symbol', '$' );
 		}
 
 		if ( $c eq '$#$' or $c eq '$#{' ) {
 			# This is really an index dereferencing cast, although
 			# it has the same two chars as the magic variable $#.
-			$t->_set_token_class('Cast');
+			$t->{class} = $t->{token}->set_class('Cast');
 			return $t->_finalize_token->__TOKENIZER__on_char( $t );
 		}
 
@@ -131,8 +130,7 @@ sub __TOKENIZER__on_char {
 			$t->_finalize_token;
 
 			# ... and create a new token for the block
-			$t->_new_token( 'Structure', '{' ) or return undef;
-			return 1;
+			return $t->_new_token( 'Structure', '{' );
 		}
 	}
 

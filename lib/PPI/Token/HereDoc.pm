@@ -144,7 +144,6 @@ sub terminator {
 # Parse in the entire here-doc in one call
 sub __TOKENIZER__on_char {
 	my $t     = $_[1];
-	my $token = $t->{token} or return undef;
 
 	# We are currently located on the first char after the <<
 
@@ -153,14 +152,15 @@ sub __TOKENIZER__on_char {
 	### for the null here-doc, which terminates at the first
 	### empty line.
 	my $rest_of_line = substr( $t->{line}, $t->{line_cursor} );
-	unless ( $rest_of_line =~ /^(\s*(?:"[^"]*"|'[^']*'|`[^`]*`|\w+))/ ) {
+	unless ( $rest_of_line =~ /^( \s* (?: "[^"]*" | '[^']*' | `[^`]*` | \\?\w+ ) )/x  ) {
 		# Degenerate to a left-shift operation
-		$token->set_class('Operator') or return undef;
+		$t->{token}->set_class('Operator');
 		return $t->_finalize_token->__TOKENIZER__on_char( $t );
 	}
 
 	# Add the rest of the token, work out what type it is,
 	# and suck in the content until the end.
+	my $token = $t->{token};
 	$token->{content} .= $1;
 	$t->{line_cursor} += length $1;
 
@@ -189,6 +189,11 @@ sub __TOKENIZER__on_char {
 		$token->{_mode}       = 'command';
 		$token->{_terminator} = $1;
 		$token->{_terminator} =~ s/\\`/`/g;
+
+	} elsif ( $content =~ /^\<\<\\(\w+)$/ ) {
+		# Legacy forward-slashed bareword
+		$token->{_mode}       = 'literal';
+		$token->{_terminator} = $1;
 
 	} else {
 		# WTF?

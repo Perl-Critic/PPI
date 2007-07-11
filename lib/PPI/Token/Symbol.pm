@@ -161,7 +161,7 @@ sub __TOKENIZER__on_char {
 	# Handle magic things
 	my $content = $t->{token}->{content};	
 	if ( $content eq '@_' or $content eq '$_' ) {
-		$t->_set_token_class( 'Magic' );
+		$t->{class} = $t->{token}->set_class( 'Magic' );
 		return $t->_finalize_token->__TOKENIZER__on_char( $t );
 	}
 
@@ -172,7 +172,7 @@ sub __TOKENIZER__on_char {
 		if ( $nextchar eq '|' ) {
 			$t->{token}->{content} .= $nextchar;
 			$t->{line_cursor}++;
-			$t->_set_token_class( 'Magic' );
+			$t->{class} = $t->{token}->set_class( 'Magic' );
 		}
 		return $t->_finalize_token->__TOKENIZER__on_char( $t );
 	}
@@ -183,7 +183,7 @@ sub __TOKENIZER__on_char {
 		return $t->_finalize_token->__TOKENIZER__on_char( $t );
 	}
 	if ( $content =~ /^(?:\$|\@)\d+/ ) {
-		$t->_set_token_class( 'Magic' );
+		$t->{class} = $t->{token}->set_class( 'Magic' );
 		return $t->_finalize_token->__TOKENIZER__on_char( $t );
 	}
 

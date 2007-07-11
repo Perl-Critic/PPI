@@ -83,16 +83,18 @@ sub __TOKENIZER__on_char {
 			# Take the . off the end of the token..
 			# and finish it, then make the .. operator.
 			chop $t->{token}->{content};
-                        $t->_set_token_class( 'Number' );
-			$t->_new_token('Operator', '..') or return undef;
+                        $t->{class} = $t->{token}->set_class( 'Number' );
+			$t->_new_token('Operator', '..');
 			return 0;
 		} elsif ( $t->{token}->{content} !~ /_/ ) {
 			# Underscore means not a Version, fall through to end token
-			return $t->_set_token_class( 'Number::Version' ) ? 1 : undef;
+			$t->{class} = $t->{token}->set_class( 'Number::Version' );
+			return 1;
 		}
 	}
 	if ($char eq 'e' || $char eq 'E') {
-		return $t->_set_token_class( 'Number::Exp' ) ? 1 : undef;		
+		$t->{class} = $t->{token}->set_class( 'Number::Exp' );
+		return 1;
 	}
 
 	# Doesn't fit a special case, or is after the end of the token

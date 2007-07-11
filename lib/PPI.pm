@@ -14,6 +14,7 @@ BEGIN {
 }
 
 # Load everything
+use PPI::Exception            ();
 use PPI::Element              ();
 use PPI::Token                ();
 use PPI::Statement            ();

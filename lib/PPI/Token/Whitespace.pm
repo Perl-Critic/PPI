@@ -43,6 +43,7 @@ provided by the parent L<PPI::Token> and L<PPI::Element> classes.
 
 use strict;
 use base 'PPI::Token';
+use Clone ();
 
 use vars qw{$VERSION};
 BEGIN {
@@ -71,7 +72,12 @@ actual characters.
 
 =cut
 
-sub null { $_[0]->new('') }
+my $null = undef;
+
+sub null {
+	$null ||= $_[0]->new('');
+	Clone::clone($null);
+}
 
 ### XS -> PPI/XS.xs:_PPI_Token_Whitespace__significant 0.900+
 sub significant { '' }
@@ -91,8 +97,7 @@ in its own L<PPI::Token::Pod> object.
 =cut
 
 sub tidy {
-	my $self = shift;
-	$self->{content} =~ s/^\s+?(?>\n)//;
+	$_[0]->{content} =~ s/^\s+?(?>\n)//;
 	1;
 }
 
@@ -134,18 +139,18 @@ sub __TOKENIZER__on_line_start {
 	# Can we classify the entire line in one go
 	if ( $line =~ /^\s*$/ ) {
 		# A whitespace line
-		$t->_new_token( 'Whitespace', $line ) or return undef;
+		$t->_new_token( 'Whitespace', $line );
 		return 0;
 
 	} elsif ( $line =~ /^\s*#/ ) {
 		# Add the comment token, and finalize it immediately
-		$t->_new_token( 'Comment', $line ) or return undef;
+		$t->_new_token( 'Comment', $line );
 		$t->_finalize_token;
 		return 0;
 
 	} elsif ( $line =~ /^=(\w+)/ ) {
 		# A Pod tag... change to pod mode
-		$t->_new_token( 'Pod', $line ) or return undef;
+		$t->_new_token( 'Pod', $line );
 		if ( $1 eq 'cut' ) {
 			# This is an error, but one we'll ignore
 			# Don't go into Pod mode, since =cut normally
@@ -180,7 +185,7 @@ sub __TOKENIZER__on_char {
 		# 3. The one before that is a 'structure'
 
 		# Get the three previous significant tokens
-		my $tokens = $t->_previous_significant_tokens( 3 );
+		my $tokens = $t->_previous_significant_tokens(3);
 		if ( $tokens ) {
 			# A normal subroutine declaration
 			my $p1 = $tokens->[1];

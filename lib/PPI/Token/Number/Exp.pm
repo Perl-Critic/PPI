@@ -78,9 +78,9 @@ sub __TOKENIZER__on_char {
 		# Invalid character in exponent.  Recover
 		if ( $t->{token}->{content} =~ s/\.(e)$//i ) {
 			my $word = $1;
-			$t->_set_token_class('Number');
-			$t->_new_token('Operator', '.') or return undef;
-			$t->_new_token('Word', $word) or return undef;
+			$t->{class} = $t->{token}->set_class('Number');
+			$t->_new_token('Operator', '.');
+			$t->_new_token('Word', $word);
 			return $t->{class}->__TOKENIZER__on_char( $t );
 		}
 		else {
