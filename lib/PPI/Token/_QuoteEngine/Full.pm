@@ -9,7 +9,7 @@ use Carp  ();
 
 use vars qw{$VERSION %quotes %sections};
 BEGIN {
-	$VERSION = '1.199_02';
+	$VERSION = '1.199_03';
 
 	# Prototypes for the different braced sections
 	%sections = (
@@ -48,7 +48,7 @@ BEGIN {
 
 =pod
 
-=begin testing new 3
+=begin testing new 70
 
 # Verify that Token::Quote, Token::QuoteLike and Token::Regexp
 # do not have ->new functions
@@ -91,6 +91,7 @@ SCOPE: {
 	my @seps   = ( undef, undef, '/', '#', ','  );
 	my @types  = ( '()', '<>', '//', '##', ',,' );
 	my @braced = ( qw{ 1 1 0 0 0 } );
+	my @secs   = ( qw{ 1 1 0 0 0 } );
 	my $i      = 0;
 	while ( @stuff ) {
 		my $opener = shift @stuff;
@@ -99,11 +100,13 @@ SCOPE: {
 		my $o = $d->{children}->[0]->{children}->[0];
 		my $s = $o->{sections}->[0];
 		is( $o->{operator},  'qw',        "qw$opener correct operator"  );
-		is( $o->{_sections}, 1,           "qw$opener correct _sections" );
+		is( $o->{_sections}, $secs[$i],   "qw$opener correct _sections" );
 		is( $o->{braced}, $braced[$i],    "qw$opener correct braced"    );
 		is( $o->{separator}, $seps[$i],   "qw$opener correct seperator" );
 		is( $o->{content},   "qw$opener", "qw$opener correct content"   );
-		is( $s->{type}, "$opener$closer", "qw$opener correct type"      );
+		if ( $secs[$i] ) {
+			is( $s->{type}, "$opener$closer", "qw$opener correct type"      );
+		}
 		$i++;
 	}
 }
@@ -211,6 +214,19 @@ sub _fill_normal {
 	if ( ref $string ) {
 		# End of file
 		$self->{content} .= $$string;
+		if ( length($$string) > 1 )  {
+			# Complete the properties for the first section
+			my $str = $$string;
+			chop $str;
+			$self->{sections}->[0] = {
+				position => length($self->{content}),
+				size     => length($string),
+				type     => "$self->separator$self->separator",
+			};
+		} else {
+			# No sections at all
+			$self->{_sections} = 0;
+		}
 		return 0;
 	}
 

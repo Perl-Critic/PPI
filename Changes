@@ -1,6 +1,6 @@
 Revision history for Perl extension PPI
 
-1.199_03
+1.199_03 Thu 12 Jul 2007
 	Summary:
 	- Support for a few more rare/legacy Perl syntax
 	- Tokenizer simplification, optimization and exception'ification
@@ -16,6 +16,7 @@ Revision history for Perl extension PPI
 	- Removed some superfluous parameter checks on private methods,
 	  for conditions that would cause explosions and be noticed anyway.
 	- Removed the fancy options from PPI::Token::new
+        - More consistent structure of incomplete quotes
 
 1.199_02 Mon  5 Mar 2007
 	Summary:

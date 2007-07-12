@@ -37,7 +37,7 @@ use overload 'bool' => sub () { 1 },
 
 use vars qw{$VERSION $errstr %_PARENT};
 BEGIN {
-	$VERSION = '1.199_02';
+	$VERSION = '1.199_03';
 	$errstr  = '';
 
 	# Master Child -> Parent index

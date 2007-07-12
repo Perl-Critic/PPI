@@ -5,7 +5,7 @@ use base 'PPI::Exception::ParserTimeout';
 
 use vars qw{$VERSION};
 BEGIN {
-	$VERSION = '1.199_02';
+	$VERSION = '1.199_03';
 }
 
 1;
