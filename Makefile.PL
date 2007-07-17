@@ -5,9 +5,7 @@ name           'PPI';
 all_from       'lib/PPI.pm';
 requires       'Carp'            => 0;
 requires       'Clone'           => '0.22';
-requires       'List::Util'      => $^O =~ /^(?:MSWin32|cygwin)$/
-                                    ? '1.17'
-                                    : '1.18';
+requires       'List::Util'      => '1.19';
 requires       'List::MoreUtils' => '0.13';
 requires       'Params::Util'    => '0.10';
 requires       'IO::String'      => '1.07';

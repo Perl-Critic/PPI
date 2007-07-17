@@ -1,5 +1,13 @@
 Revision history for Perl extension PPI
 
+1.199_04 Tue 17 Jul 2007
+	Summary:
+	- Build tweaks
+
+	Details:
+	- Increasing List::Util dependency to 1.19
+	  (Removes a memory leak on Win32)
+
 1.199_03 Thu 12 Jul 2007
 	Summary:
 	- Support for a few more rare/legacy Perl syntax
