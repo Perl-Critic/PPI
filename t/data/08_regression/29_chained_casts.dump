@@ -1,0 +1,13 @@
+PPI::Document
+  PPI::Statement::Variable
+    PPI::Token::Word  	'my'
+    PPI::Token::Whitespace  	' '
+    PPI::Token::Symbol  	'$bar'
+    PPI::Token::Whitespace  	' '
+    PPI::Token::Operator  	'='
+    PPI::Token::Whitespace  	' '
+    PPI::Token::Cast  	'\'
+    PPI::Token::Cast  	'%'
+    PPI::Token::Cast  	'*'
+    PPI::Token::Symbol  	'$foo'
+    PPI::Token::Structure  	';'
