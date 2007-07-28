@@ -1,8 +1,9 @@
 Revision history for Perl extension PPI
 
-1.199_04 Tue 17 Jul 2007
+1.199_04 
 	Summary:
 	- Build tweaks
+	- More regression changes
 
 	Details:
 	- Increasing List::Util dependency to 1.19

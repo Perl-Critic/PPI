@@ -33,7 +33,7 @@ use PPI::Exception ();
 
 use vars qw{$VERSION};
 BEGIN {
-	$VERSION = '1.199_03';
+	$VERSION = '1.199_04';
 }
 
 
@@ -44,9 +44,9 @@ BEGIN {
 # Tokenizer Methods
 
 sub __TOKENIZER__on_char {
-	my $t    = $_[1];                                       # Tokenizer object
-	my $c    = $t->{token}->{content};                      # Current token contents
-	my $char = substr( $t->{line}, $t->{line_cursor}, 1 );  # Current character
+	my $t    = $_[1];                                      # Tokenizer object
+	my $c    = $t->{token}->{content};                     # Current token
+	my $char = substr( $t->{line}, $t->{line_cursor}, 1 ); # Current character
 
 	# Now, we split on the different values of the current content
 	if ( $c eq '*' ) {
@@ -160,7 +160,7 @@ sub __TOKENIZER__on_char {
 			return 1;
 		}
 
-		if ( $char =~ /[\$@%{]/ ) {
+		if ( $char =~ /[\$@%*{]/ ) {
 			# It's a cast
 			$t->{class} = $t->{token}->set_class( 'Cast' );
 			return $t->_finalize_token->__TOKENIZER__on_char( $t );
