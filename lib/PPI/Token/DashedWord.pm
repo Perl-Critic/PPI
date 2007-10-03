@@ -16,12 +16,13 @@ PPI::Token::DashedWord - A dashed bareword token
 
 The "dashed bareword" token represents literal values like C<-foo>.
 
+NOTE: this class is currently unused.  All tokens that should be
+PPI::Token::DashedWords are just normal PPI::Token::Word instead.
+That actually makes sense, since there really is nothing special about
+this class except that dashed words cannot subroutine names or
+keywords.  As such, this class may be removed from PPI in the future.
+
 =head1 METHODS
-
-There are no additional methods beyond those provided by the parent
-L<PPI::Token> and L<PPI::Element> classes.
-
-Got any ideas for methods? Submit a report to rt.cpan.org!
 
 =cut
 
@@ -33,7 +34,34 @@ BEGIN {
 	$VERSION = '1.199_04';
 }
 
+=head2 literal
 
+Returns the value of the dashed word as a string.  This differs from
+C<content> because C<-Foo'Bar> expands to C<-Foo::Bar>.
+
+=begin testing literal 9
+
+my @pairs = (
+	"-foo",        '-foo',
+	"-Foo::Bar",   '-Foo::Bar',
+	"-Foo'Bar",    '-Foo::Bar',
+);
+while ( @pairs ) {
+	my $from  = shift @pairs;
+	my $to    = shift @pairs;
+	my $doc   = PPI::Document->new( \"(<$from => 1);" );
+	isa_ok( $doc, 'PPI::Document' );
+	my $word = $doc->find_first('Token::DashedWord');
+	local $TODO = 'PPI::Token::DashedWord is currently deactivated';
+	isa_ok( $word, 'PPI::Token::DashedWord' );
+	is( $word && $word->literal, $to, "The source $from becomes $to ok" );
+}
+
+=end testing 
+
+=cut
+
+*literal = *PPI::Token::Word::literal;
 
 
 
