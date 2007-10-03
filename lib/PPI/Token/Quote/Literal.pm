@@ -70,6 +70,8 @@ sub string {
 	substr( $self->{content}, $str->{position}, $str->{size} );	
 }
 
+*literal = *PPI::Token::Quote::Single::Literal;
+
 1;
 
 =pod

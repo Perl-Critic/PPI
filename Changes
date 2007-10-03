@@ -1,5 +1,13 @@
 Revision history for Perl extension PPI
 
+	Summary:
+	- Fix some parser corner cases
+
+	Details:
+	- Fixed parsing of %!, $^\w, and %^H
+	- Fixed parsing of @{$foo}-1
+	- Fixed parsing of <$fh1>, <$fh2>
+
 1.199_04 
 	Summary:
 	- Build tweaks

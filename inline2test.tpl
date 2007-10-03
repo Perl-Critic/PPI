@@ -16,3 +16,5 @@ use PPI;
 use Test::More [% plan %];
 
 [% tests %]
+
+1;

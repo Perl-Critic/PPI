@@ -30,7 +30,8 @@ provided by its L<PPI::Token> and L<PPI::Element> parent
 classes.
 
 We expect to add additional methods to help further resolve a Word as
-a function, method, etc over time.
+a function, method, etc over time.  If you need such a thing right
+now, look at L<Perl::Critic::Utils>.
 
 =cut
 
@@ -55,6 +56,44 @@ BEGIN {
 
 	# Copy in OPERATOR from PPI::Token::Operator
 	*OPERATOR = *PPI::Token::Operator::OPERATOR;
+}
+
+=head2 literal
+
+Returns the value of the Word as a string.  This assumes (often
+incorrectly) that the Word is a bareword and not a function, method,
+keyword, etc.  This differs from C<content> because C<Foo'Bar> expands
+to C<Foo::Bar>.
+
+=begin testing literal 9
+
+my @pairs = (
+	"F",          'F',
+	"Foo::Bar",   'Foo::Bar',
+	"Foo'Bar",    'Foo::Bar',
+);
+while ( @pairs ) {
+	my $from  = shift @pairs;
+	my $to    = shift @pairs;
+	my $doc   = PPI::Document->new( \"$from;" );
+	isa_ok( $doc, 'PPI::Document' );
+	my $word = $doc->find_first('Token::Word');
+	isa_ok( $word, 'PPI::Token::Word' );
+	is( $word->literal, $to, "The source $from becomes $to ok" );
+}
+
+=end testing 
+
+=cut
+
+sub literal {
+	my $self = shift;
+	my $word  = $self->content;
+
+	# Expand Foo'Bar to Foo::Bar
+	$word =~ s/\'/::/g;
+
+	return $word;
 }
 
 sub __TOKENIZER__on_char {
