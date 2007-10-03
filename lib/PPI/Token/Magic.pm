@@ -59,7 +59,7 @@ BEGIN {
 
 		$^L $^A $^E $^C $^D $^F $^H
 		$^I $^M $^N $^O $^P $^R $^S
-		$^T $^V $^W $^X
+		$^T $^V $^W $^X %^H
 
 		$::|
 	}, '$}', '$,', '$#', '$#+', '$#-' ) {
@@ -120,7 +120,9 @@ sub __TOKENIZER__on_char {
 
 		if ( $c =~ /^\$\^\w/o ) {
 			# It's an escaped char magic... maybe ( like $^M )
-			return 1;
+			return undef if !$magic{$c};
+			$t->{token}->{content} = $c;
+			$t->{line_cursor}++;
 		}
 
 		if ( $c =~ /^\$\#\{/ ) {
@@ -132,6 +134,12 @@ sub __TOKENIZER__on_char {
 			# ... and create a new token for the block
 			return $t->_new_token( 'Structure', '{' );
 		}
+	} elsif ($c =~ /^%\^/) {
+		return 1 if $c eq '%^';
+		# It's an escaped char magic... maybe ( like %^H )
+		return undef if !$magic{$c};
+		$t->{token}->{content} = $c;
+		$t->{line_cursor}++;
 	}
 
 	# End the current magic token, and recheck

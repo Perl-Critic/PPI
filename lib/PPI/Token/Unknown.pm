@@ -154,8 +154,14 @@ sub __TOKENIZER__on_char {
 			return $t->_finalize_token->__TOKENIZER__on_char( $t );
 		}
 
+		# Is it a magic variable?
+		if ( $char =~ /[!^]/ ) {
+			$t->{class} = $t->{token}->set_class( 'Magic' );
+			return 1;
+		}
+
 		# Is it a symbol?
-		if ( $char =~ /[\w:^!]/ ) {
+		if ( $char =~ /[\w:]/ ) {
 			$t->{class} = $t->{token}->set_class( 'Symbol' );
 			return 1;
 		}
