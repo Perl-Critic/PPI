@@ -794,6 +794,7 @@ my %OBVIOUS_CONTENT = (
 	'{' => 'operand',
 	'[' => 'operand',
 	';' => 'operand',
+	'}' => 'operator',
 );
 
 # Try to determine operator/operand context, is possible.
