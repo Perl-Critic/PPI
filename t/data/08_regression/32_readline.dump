@@ -1,0 +1,12 @@
+PPI::Document
+  PPI::Statement
+    PPI::Token::Symbol  	'@foo'
+    PPI::Token::Whitespace  	' '
+    PPI::Token::Operator  	'='
+    PPI::Token::Whitespace  	' '
+    PPI::Structure::List  	( ... )
+      PPI::Statement::Expression
+        PPI::Token::QuoteLike::Readline  	'<$fh1>'
+        PPI::Token::Operator  	','
+        PPI::Token::Whitespace  	' '
+        PPI::Token::QuoteLike::Readline  	'<$fh2>'

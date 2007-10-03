@@ -1,0 +1,9 @@
+PPI::Document
+  PPI::Statement
+    PPI::Token::Cast  	'@'
+    PPI::Structure::Block  	{ ... }
+      PPI::Statement
+        PPI::Token::Symbol  	'$arr_ref'
+    PPI::Token::Operator  	'-'
+    PPI::Token::Number  	'1'
+  PPI::Token::Whitespace  	'\n'

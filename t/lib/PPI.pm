@@ -118,7 +118,7 @@ sub nested_structures {
 
 #####################################################################
 # Process a .code/.dump file pair
-# plan: 2 + 11 * npairs
+# plan: 2 + 14 * npairs
 
 sub run_testdir {
 	my $pkg = shift;
@@ -151,10 +151,10 @@ sub run_testdir {
 		my $rv;
 		local *CODEFILE;
 		SKIP: {
-			skip "No Document to test", 7 unless $Document;
+			skip "No Document to test", 10 unless $Document;
 
 			# Check standard things
-			object_ok( $Document ); # 5 tests contained within
+			object_ok( $Document ); # 6 tests contained within
 
 			# Get the dump array ref for the Document object
 			my $Dumper = PPI::Dumper->new( $Document );

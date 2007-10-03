@@ -1,0 +1,6 @@
+PPI::Document
+  PPI::Statement
+    PPI::Token::Magic  	'%^H'
+    PPI::Token::Operator  	'='
+    PPI::Structure::List  	( ... )
+  PPI::Token::Whitespace  	'\n'
