@@ -1,0 +1,8 @@
+PPI::Document
+  PPI::Statement
+    PPI::Token::Magic  	'$^WIDE_SYSTEM_CALLS '
+    PPI::Token::Operator  	'='
+    PPI::Token::Whitespace  	' '
+    PPI::Token::Number  	'1'
+    PPI::Token::Structure  	';'
+  PPI::Token::Whitespace  	'\n'

@@ -118,11 +118,15 @@ sub __TOKENIZER__on_char {
 			return PPI::Token::ArrayIndex->__TOKENIZER__on_char( $t );
 		}
 
-		if ( $c =~ /^\$\^\w/o ) {
+		if ( $c =~ /^\$\^\w+$/o ) {
 			# It's an escaped char magic... maybe ( like $^M )
-			if ($magic{$c}) {
+			my $next = substr( $t->{line}, $t->{line_cursor}+1, 1 ); # Peek ahead
+			if ($magic{$c} && (!$next || $next !~ /\w/)) {
 				$t->{token}->{content} = $c;
 				$t->{line_cursor}++;
+			} else {
+				# Maybe it's a long magic variable like $^WIDE_SYSTEM_CALLS
+				return 1;
 			}
 		}
 
