@@ -255,6 +255,9 @@ sub __TOKENIZER__on_char {
 		if ( $prev->isa('PPI::Token::Operator') and $prec eq '=' ) {
 			return 'QuoteLike::Readline';
 		}
+		if ( $prev->isa('PPI::Token::Operator') and $prec eq ',' ) {
+			return 'QuoteLike::Readline';
+		}
 
 		if ( $prev->isa('PPI::Token::Structure') and $prec eq '}' ) {
 			# Could go either way... do a regex check

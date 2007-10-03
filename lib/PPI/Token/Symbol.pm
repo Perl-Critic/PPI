@@ -187,6 +187,11 @@ sub __TOKENIZER__on_char {
 		return $t->_finalize_token->__TOKENIZER__on_char( $t );
 	}
 
+	if ( $content eq '%^H' or $content eq '%!' ) {
+		$t->{class} = $t->{token}->set_class( 'Magic' );
+		return $t->_finalize_token->__TOKENIZER__on_char( $t );
+	}
+
 	# Trim off anything we oversucked...
 	$content =~ /^(
 		[\$@%&*]

@@ -155,7 +155,7 @@ sub __TOKENIZER__on_char {
 		}
 
 		# Is it a symbol?
-		if ( $char =~ /[\w:]/ ) {
+		if ( $char =~ /[\w:^!]/ ) {
 			$t->{class} = $t->{token}->set_class( 'Symbol' );
 			return 1;
 		}

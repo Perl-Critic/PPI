@@ -10,3 +10,4 @@ PPI::Document
         PPI::Token::Operator  	','
         PPI::Token::Whitespace  	' '
         PPI::Token::QuoteLike::Readline  	'<$fh2>'
+  PPI::Token::Whitespace  	'\n'
