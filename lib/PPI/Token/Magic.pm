@@ -120,9 +120,10 @@ sub __TOKENIZER__on_char {
 
 		if ( $c =~ /^\$\^\w/o ) {
 			# It's an escaped char magic... maybe ( like $^M )
-			return undef if !$magic{$c};
-			$t->{token}->{content} = $c;
-			$t->{line_cursor}++;
+			if ($magic{$c}) {
+				$t->{token}->{content} = $c;
+				$t->{line_cursor}++;
+			}
 		}
 
 		if ( $c =~ /^\$\#\{/ ) {
@@ -137,9 +138,15 @@ sub __TOKENIZER__on_char {
 	} elsif ($c =~ /^%\^/) {
 		return 1 if $c eq '%^';
 		# It's an escaped char magic... maybe ( like %^H )
-		return undef if !$magic{$c};
-		$t->{token}->{content} = $c;
-		$t->{line_cursor}++;
+		if ($magic{$c}) {
+			$t->{token}->{content} = $c;
+			$t->{line_cursor}++;
+		} else {
+			# Back off, treat '%' as an operator
+			chop $t->{token}->{content};
+			bless $t->{token}, $t->{class} = 'PPI::Token::Operator';
+			$t->{line_cursor}--;
+		}
 	}
 
 	# End the current magic token, and recheck
