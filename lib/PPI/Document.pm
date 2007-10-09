@@ -724,6 +724,18 @@ sub scope { 1 }
 #####################################################################
 # PPI::Element Methods
 
+# Is the document complete.
+# Cascase to the last significant child
+sub complete {
+	my $self  = shift;
+	my $child = $self->schild(-1);
+	return !! (
+		$child
+		and
+		$child->complete
+	);
+}
+
 sub insert_before {
 	return undef;
 	# die "Cannot insert_before a PPI::Document";

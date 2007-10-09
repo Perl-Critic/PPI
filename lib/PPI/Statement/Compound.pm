@@ -63,6 +63,7 @@ BEGIN {
 		'unless'  => 'if',
 		'while'   => 'while',
 		'until'   => 'while',
+		'for'     => 'for',
 		'foreach' => 'foreach',
 		);
 }
@@ -77,11 +78,9 @@ sub __LEXER__normal { '' }
 #####################################################################
 # PPI::Statement::Compound analysis methods
 
-=pod
-
 =head2 type
 
-The C<type> method returns the fundamental type of the compound statement.
+The C<type> method returns the syntactic type of the compound statement.
 
 There are three basic compound statement types.
 
@@ -133,6 +132,34 @@ sub type {
 
 sub scope {
 	1;
+}
+
+
+
+
+
+#####################################################################
+# PPI::Element Methods
+
+sub _complete {
+	my $self = shift;
+	my $type = $self->type or die "Illegal compound statement type";
+
+	# Check the different types of compound statements
+	if ( $type eq 'if' ) {
+		# Unless the last significant child is a complete
+		# block, it must be incomplete.
+		my $child = $self->schild(-1) or return '';
+		$child->isa('PPI::Structure') or return '';
+		$child->braces eq '{}'        or return '';
+		$child->_complete             or return '';
+
+		# It can STILL be 
+	} elsif ( $type eq 'while' ) {
+		die "CODE INCOMPLETE";
+	} else {
+		die "CODE INCOMPLETE";
+	}
 }
 
 1;

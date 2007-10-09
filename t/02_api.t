@@ -15,7 +15,7 @@ use PPI::Find;
 use PPI::Transform;
 
 # Execute the tests
-use Test::More tests => 2230;
+use Test::More tests => 2235;
 use Test::ClassAPI;
 
 # Ignore various imported or special functions
@@ -139,6 +139,7 @@ line=method
 
 [PPI::Token::Word]
 PPI::Token=isa
+literal=method
 
 [PPI::Token::Separator]
 PPI::Token::Word=isa
@@ -185,6 +186,7 @@ parameters=method
 
 [PPI::Token::DashedWord]
 PPI::Token=isa
+literal=method
 
 [PPI::Token::HereDoc]
 PPI::Token=isa
@@ -354,6 +356,7 @@ hex_id=method
 index_locations=method
 flush_locations=method
 normalized=method
+complete=method
 errstr=method
 STORABLE_freeze=method
 STORABLE_thaw=method

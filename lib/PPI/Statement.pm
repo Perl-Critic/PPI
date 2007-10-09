@@ -236,6 +236,20 @@ sub stable {
 #####################################################################
 # PPI::Element Methods
 
+# Is the statement complete.
+# By default for a statement, we need a semi-colon at the end.
+sub _complete {
+	my $self = shift;
+	my $semi = $self->schild(-1);
+	return !! (
+		$semi
+		and
+		$semi->isa('PPI::Token::Structure')
+		and
+		$semi->content eq ';'
+	);
+}
+
 # You can insert either a statement, or a non-significant token.
 sub insert_before {
 	my $self    = shift;

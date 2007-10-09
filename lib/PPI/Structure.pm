@@ -275,6 +275,11 @@ sub content {
 	$content;
 }
 
+# Is the structure completed
+sub _complete {
+	!! ( defined $_[0]->{finish} );
+}
+
 # You can insert either another structure, or a token
 sub insert_before {
 	my $self    = shift;
