@@ -1,4 +1,4 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
 # Exhaustively test all possible Perl programs to a particular length
 

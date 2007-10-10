@@ -81,7 +81,7 @@ use constant HAS_ALARM            => (
 
 use vars qw{$VERSION $errstr};
 BEGIN {
-	$VERSION = '1.199_05';
+	$VERSION = '1.199_06';
 	$errstr  = '';
 }
 

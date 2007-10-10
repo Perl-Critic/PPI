@@ -1,4 +1,4 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
 # Load ALL of the PPI files, and look for a collection
 # of known problems, implemented using PPI itself.

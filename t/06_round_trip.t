@@ -1,4 +1,4 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
 # Load ALL of the PPI files, lex them in, dump them
 # out, and verify that the code goes in and out cleanly.

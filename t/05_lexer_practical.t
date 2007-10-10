@@ -1,4 +1,4 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
 # Compare a large number of specific constructs
 # with the expected Lexer dumps.

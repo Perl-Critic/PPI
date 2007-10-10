@@ -1,4 +1,4 @@
-﻿#!/usr/bin/perl -w
+﻿#!/usr/bin/perl
 
 BEGIN {
     if ($] < 5.008) {

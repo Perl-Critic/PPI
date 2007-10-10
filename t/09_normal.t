@@ -1,4 +1,4 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
 # Testing of the normalization functions.
 # (only very basic at this point)

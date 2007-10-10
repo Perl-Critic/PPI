@@ -1,4 +1,4 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
 # Formal unit tests for specific PPI::Token classes
 
@@ -21,6 +21,8 @@ use t::lib::PPI;
 # ntests = 2 + 12 * nfiles
 
 t::lib::PPI->run_testdir( catdir( 't', 'data', '07_token' ) );
+
+
 
 
 
@@ -59,49 +61,56 @@ t::lib::PPI->run_testdir( catdir( 't', 'data', '07_token' ) );
 SCOPE: {
 	my @examples = (
 		# code => base | '10f' | '10e'
-		'0'       => 10,
-		'1'       => 10,
-		'10'      => 10,
-		'1_0'     => 10,
-		'.0'      => '10f',
-		'.0_0'    => '10f',
-		'-.0'     => '10f',
-		'0.'      => '10f',
-		'0.0'     => '10f',
-		'0.0_0'   => '10f',
-		'1_0.'    => '10f',
-		'.0e0'    => '10e',
-		'-.0e0'   => '10e',
-		'0.e1'    => '10e',
-		'0.0e-1'  => '10e',
-		'0.0e+1'  => '10e',
-		'0.0e-10' => '10e',
-		'0.0e+10' => '10e',
-		'0.0e100' => '10e',
-		'1_0e1_0' => '10e',
-		'0b'      => 2,
-		'0b0'     => 2,
-		'0b10'    => 2,
-		'0b1_0'   => 2,
-		'00'      => 8,
-		'01'      => 8,
-		'010'     => 8,
-		'01_0'    => 8,
-		'0x'      => 16,
-		'0x0'     => 16,
-		'0x10'    => 16,
-		'0x1_0'   => 16,
+		'0'           => 10,
+		'1'           => 10,
+		'10'          => 10,
+		'1_0'         => 10,
+		'.0'          => '10f',
+		'.0_0'        => '10f',
+		'-.0'         => '10f',
+		'0.'          => '10f',
+		'0.0'         => '10f',
+		'0.0_0'       => '10f',
+		'1_0.'        => '10f',
+		'.0e0'        => '10e',
+		'-.0e0'       => '10e',
+		'0.e1'        => '10e',
+		'0.0e-1'      => '10e',
+		'0.0e+1'      => '10e',
+		'0.0e-10'     => '10e',
+		'0.0e+10'     => '10e',
+		'0.0e100'     => '10e',
+		'1_0e1_0'     => '10e', # Known to fail on 5.6.2
+		'0b'          => 2,
+		'0b0'         => 2,
+		'0b10'        => 2,
+		'0b1_0'       => 2,
+		'00'          => 8,
+		'01'          => 8,
+		'010'         => 8,
+		'01_0'        => 8,
+		'0x'          => 16,
+		'0x0'         => 16,
+		'0x10'        => 16,
+		'0x1_0'       => 16,
 		'0.0.0'       => 256,
 		'.0.0'        => 256,
 		'127.0.0.1'   => 256,
 		'1.1.1.1.1.1' => 256,
 	);
 
-	my $iterator = List::MoreUtils::natatime(2, @examples);
-	while (my ($code, $base) = $iterator->()) {
-		my $exp = $base =~ s/e//;
+	while ( @examples ) {
+		my $code  = shift @examples;
+		my $base  = shift @examples;
+		if ( $] == 5.006002 and $code eq '1_0e1_0' ) {
+			SKIP: {
+				skip( 'Ignoring known-bad case on Perl 5.6.2', 5 );
+			}
+			next;
+		}
+		my $exp   = $base =~ s/e//;
 		my $float = $exp || $base =~ s/f//;
-		my $T = PPI::Tokenizer->new( \$code );
+		my $T     = PPI::Tokenizer->new( \$code );
 		my $token = $T->get_token();
 		is("$token", $code, "'$code' is a single token");
 		is($token->base(), $base, "base of '$code' is $base");
