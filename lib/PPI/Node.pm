@@ -58,7 +58,7 @@ use Params::Util    '_INSTANCE',
 
 use vars qw{$VERSION *_PARENT};
 BEGIN {
-	$VERSION = '1.199_06';
+	$VERSION = '1.199_07';
 	*_PARENT = *PPI::Element::_PARENT;
 }
 

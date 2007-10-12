@@ -1,5 +1,13 @@
 Revision history for Perl extension PPI
 
+1.199_07 Fri 12 Oct 2007
+	Summary:
+	- This is the third release candidate for 1.200
+	- Minor tweak
+
+	Details:
+	- Changed the way to detect Perl 5.6 to ignore the 1_0e1_0 failure
+
 1.199_06 Wed 10 Oct 2007
 	Summary:
 	- This is the second release candidate for 1.200

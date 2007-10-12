@@ -102,7 +102,7 @@ SCOPE: {
 	while ( @examples ) {
 		my $code  = shift @examples;
 		my $base  = shift @examples;
-		if ( $] == 5.006002 and $code eq '1_0e1_0' ) {
+		if ( $] >= 5.006 and $] < 5.008 and $code eq '1_0e1_0' ) {
 			SKIP: {
 				skip( 'Ignoring known-bad case on Perl 5.6.2', 5 );
 			}
