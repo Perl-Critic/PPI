@@ -1,5 +1,13 @@
 Revision history for Perl extension PPI
 
+1.201    Mon 22 Oct 2007
+	Summary:
+	- Minor bug fix release
+
+	Details:
+	- The internal exception class PPI::Exception::ParserTimeout was
+	  inheriting from itself.
+
 1.200    Mon 15 Oct 2007
 	Summary:
 	- Production Release

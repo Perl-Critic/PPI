@@ -1,7 +1,7 @@
 package PPI::Exception::ParserTimeout;
 
 use strict;
-use base 'PPI::Exception::ParserTimeout';
+use base 'PPI::Exception::Parser';
 
 use vars qw{$VERSION};
 BEGIN {
