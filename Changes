@@ -1,5 +1,12 @@
 Revision history for Perl extension PPI
 
+1.xxx    Xxx xx Xxx 200x
+	Summary:
+	- Minor bug fix release
+
+	Details:
+	- RT #30469: calling length() on PPI::Token gives error
+
 1.201    Mon 22 Oct 2007
 	Summary:
 	- Minor bug fix release

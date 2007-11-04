@@ -153,7 +153,7 @@ The C<length> method returns the length of the string in a Token.
 
 =cut
 
-sub length { &CORE::length($_[0]->{content}) }
+sub length { CORE::length($_[0]->{content}) }
 
 
 
