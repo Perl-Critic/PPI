@@ -18,6 +18,7 @@ BEGIN {
 use PPI;
 use Params::Util '_INSTANCE';
 use Test::More tests => 11;
+use utf8;
 
 sub good_ok {
 	my $source  = shift;
