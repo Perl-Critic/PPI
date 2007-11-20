@@ -1,11 +1,13 @@
 Revision history for Perl extension PPI
 
-1.xxx    Xxx xx Xxx 200x
+1.202_01 Tue 20 Nov 2007
 	Summary:
 	- Minor bug fix release
 
 	Details:
 	- RT #30469: calling length() on PPI::Token gives error
+	- 14_charsets.t was incorrectly skipping in situations
+	  that it should have been running.
 
 1.201    Mon 22 Oct 2007
 	Summary:

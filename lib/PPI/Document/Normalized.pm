@@ -46,7 +46,7 @@ use Params::Util '_INSTANCE',
 
 use vars qw{$VERSION};
 BEGIN {
-	$VERSION = '1.201';
+	$VERSION = '1.202_01';
 }
 
 # For convenience (and since this isn't really a public class), import
