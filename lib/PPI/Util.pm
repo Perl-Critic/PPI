@@ -3,14 +3,15 @@ package PPI::Util;
 # Provides some common utility functions that can be imported
 
 use strict;
-use base 'Exporter';
-use Digest::MD5   ();
+use Exporter     ()
+use Digest::MD5  ();
 use Params::Util '_INSTANCE',
                  '_SCALAR';
 
-use vars qw{$VERSION @EXPORT_OK};
+use vars qw{$VERSION @ISA @EXPORT_OK};
 BEGIN {
 	$VERSION   = '1.202_01';
+	@ISA       = qw{Exporter};
 	@EXPORT_OK = qw{_Document _slurp};
 }
 
