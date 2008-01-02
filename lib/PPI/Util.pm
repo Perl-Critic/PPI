@@ -3,7 +3,7 @@ package PPI::Util;
 # Provides some common utility functions that can be imported
 
 use strict;
-use Exporter     ()
+use Exporter     ();
 use Digest::MD5  ();
 use Params::Util '_INSTANCE',
                  '_SCALAR';
