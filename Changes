@@ -1,5 +1,14 @@
 Revision history for Perl extension PPI
 
+1.202_02 Wed  2 Jan 2008
+	Summary:
+	- Back-compatibility and 1.203 release candidate
+
+	Details:
+	- Removing the use of use base 'Exporter';
+	- Updating Test::SubCalls dep to 1.07 to get
+	  the use base 'Exporter' fix for that too.
+
 1.202_01 Tue 20 Nov 2007
 	Summary:
 	- Minor bug fix release

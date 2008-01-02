@@ -18,7 +18,7 @@ requires       'Storable'        => '2.14';
 build_requires 'Test::More'      => '0.47';
 build_requires 'Test::Object'    => '0.07';
 build_requires 'Test::ClassAPI'  => '1.03';
-build_requires 'Test::SubCalls'  => '1.06';
+build_requires 'Test::SubCalls'  => '1.07';
 build_requires 'File::Spec'      => '0.84';
 build_requires 'File::Remove'    => '0.34';
 include        'Test::Object';

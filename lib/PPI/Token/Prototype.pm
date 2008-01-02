@@ -51,7 +51,7 @@ use base 'PPI::Token';
 
 use vars qw{$VERSION};
 BEGIN {
-	$VERSION = '1.202_01';
+	$VERSION = '1.202_02';
 }
 
 sub __TOKENIZER__on_char {
