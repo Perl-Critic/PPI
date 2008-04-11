@@ -15,12 +15,12 @@ requires       'Digest::MD5'     => '2.27';
 requires       'Storable'        => '2.14';
 
 # Test-time dependencies (include as many as we can)
-build_requires 'Test::More'      => '0.47';
-build_requires 'Test::Object'    => '0.07';
-build_requires 'Test::ClassAPI'  => '1.03';
-build_requires 'Test::SubCalls'  => '1.07';
-build_requires 'File::Spec'      => '0.84';
-build_requires 'File::Remove'    => '0.34';
+test_requires 'Test::More'      => '0.47';
+test_requires 'Test::Object'    => '0.07';
+test_requires 'Test::ClassAPI'  => '1.03';
+test_requires 'Test::SubCalls'  => '1.07';
+test_requires 'File::Spec'      => '0.84';
+test_requires 'File::Remove'    => '0.34';
 include        'Test::Object';
 include        'Test::ClassAPI';
 include        'Test::SubCalls';
@@ -35,6 +35,6 @@ requires       'Task::Weaken';
 
 # Maintainers should probably also install this
 # so that they can regenerate the inline tests
-# build_requires 'Test::Inline' => '2.203';
+# test_requires 'Test::Inline' => '2.203';
 
 WriteAll;
