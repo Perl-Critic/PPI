@@ -23,9 +23,10 @@ PPI::Document - Object representation of a Perl document
   $Document->prune('PPI::Token::Comment');
   
   # Find all the named subroutines
-  my @subs = $Document->find( 
+  my $sub_nodes = $Document->find( 
   	sub { $_[1]->isa('PPI::Statement::Sub') and $_[1]->name }
   	);
+  my @sub_names = map { $_->name } @$sub_nodes;
   
   # Save the file
   $Document->save('My/Module.pm.stripped');
