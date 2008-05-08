@@ -1,0 +1,21 @@
+PPI::Document
+  PPI::Statement::Compound
+    PPI::Token::Label  	'BEGIN:'
+    PPI::Token::Whitespace  	' '
+    PPI::Structure::Block  	{ ... }
+      PPI::Token::Whitespace  	' '
+      PPI::Statement
+        PPI::Token::Number  	'1'
+        PPI::Token::Structure  	';'
+      PPI::Token::Whitespace  	' '
+  PPI::Token::Whitespace  	'\n'
+  PPI::Statement::Scheduled
+    PPI::Token::Label  	'BEGIN :'
+    PPI::Token::Whitespace  	' '
+    PPI::Structure::Block  	{ ... }
+      PPI::Token::Whitespace  	' '
+      PPI::Statement
+        PPI::Token::Number  	'1'
+        PPI::Token::Structure  	';'
+      PPI::Token::Whitespace  	' '
+  PPI::Token::Whitespace  	'\n'
