@@ -145,12 +145,12 @@ sub __TOKENIZER__on_char {
 		return $t->_finalize_token->__TOKENIZER__on_char( $t );
 	}
 
-	# If the NEXT character in the line is a colon, this
+	# If the NEXT non-whitespace character in the line is a colon, this
 	# is a label.
-	my $char = substr( $t->{line}, $t->{line_cursor}, 1 );
-	if ( $char eq ':' ) {
-		$t->{token}->{content} .= ':';
-		$t->{line_cursor}++;
+	my $rest = substr( $t->{line}, $t->{line_cursor} );
+	if ( $rest =~ /^(\s*:)/ ) {
+		$t->{token}->{content} .= $1;
+		$t->{line_cursor} += length $1;
 		$t->{class} = $t->{token}->set_class( 'Label' );
 
 	# If not a label, '_' on its own is the magic filehandle
@@ -268,10 +268,10 @@ sub __TOKENIZER__commit {
 
 	} else {
 		# Now, if the next character is a :, its a label
-		my $char = substr( $t->{line}, $t->{line_cursor}, 1 );
-		if ( $char eq ':' ) {
-			$word .= ':';
-			$t->{line_cursor}++;
+		my $rest = substr( $t->{line}, $t->{line_cursor} );
+		if ( $rest =~ /^(\s*:)/ ) {
+			$word .= $1;
+			$t->{line_cursor} += length $1;
 			$token_class = 'Label';
 		} elsif ( $word eq '_' ) {
 			$token_class = 'Magic';

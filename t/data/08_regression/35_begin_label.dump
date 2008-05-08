@@ -9,7 +9,7 @@ PPI::Document
         PPI::Token::Structure  	';'
       PPI::Token::Whitespace  	' '
   PPI::Token::Whitespace  	'\n'
-  PPI::Statement::Scheduled
+  PPI::Statement::Compound
     PPI::Token::Label  	'BEGIN :'
     PPI::Token::Whitespace  	' '
     PPI::Structure::Block  	{ ... }
