@@ -72,7 +72,6 @@ use Params::Util                  '_INSTANCE',
 use Digest::MD5                   ();
 use PPI                           ();
 use PPI::Util                     ();
-use PPI::Document::Fragment       ();
 use PPI::Exception::ParserTimeout ();
 use overload 'bool'               => sub () { 1 };
 use overload '""'                 => 'content';
@@ -82,9 +81,11 @@ use constant HAS_ALARM            => (
 
 use vars qw{$VERSION $errstr};
 BEGIN {
-	$VERSION = '1.202_02';
+	$VERSION = '1.202_03';
 	$errstr  = '';
 }
+
+use PPI::Document::Fragment ();
 
 # Document cache
 my $CACHE = undef;
@@ -370,11 +371,11 @@ or write to the file.
 
 sub save {
 	my $self = shift;
-	local *PPIOUTPUT;
-	open( PPIOUTPUT, ">", $_[0] )    or return undef;
-	print PPIOUTPUT $self->serialize or return undef;
-	close PPIOUTPUT                  or return undef;
-	1;
+	local *FILE;
+	open( FILE, '>', $_[0] )    or return undef;
+	print FILE $self->serialize or return undef;
+	close FILE                  or return undef;
+	return 1;
 }
 
 =pod

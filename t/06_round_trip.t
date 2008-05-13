@@ -60,7 +60,8 @@ foreach my $file ( @files ) {
 
 sub roundtrip_ok {
 	my $file = shift;
-	my $rv   = open( FILE, '<', $file );
+	local *FILE;
+	my $rv = open( FILE, '<', $file );
 	ok( $rv, "$file: Found file " );
 	SKIP: {
 		skip "No file to test", 7 unless $rv;

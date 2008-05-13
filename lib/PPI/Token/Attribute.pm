@@ -37,7 +37,7 @@ use base 'PPI::Token';
 
 use vars qw{$VERSION};
 BEGIN {
-	$VERSION = '1.202_02';
+	$VERSION = '1.202_03';
 }
 
 
@@ -93,8 +93,8 @@ sub parameters {
 
 sub __TOKENIZER__on_char {
 	my $class = shift;
-	my $t = shift;
-	my $char = substr( $t->{line}, $t->{line_cursor}, 1 );
+	my $t     = shift;
+	my $char  = substr( $t->{line}, $t->{line_cursor}, 1 );
 
 	# Unless this is a '(', we are finished.
 	unless ( $char eq '(' ) {
@@ -114,8 +114,7 @@ sub __TOKENIZER__on_char {
 	}
 
 	# Found the end of the attribute
-	$t->{token}->{content} .= $string;
-	$t->{token}->{_attribute} = 1;
+	$t->{token}->{content}   .= $string;
 	$t->_finalize_token->__TOKENIZER__on_char( $t );
 }
 
@@ -136,7 +135,7 @@ sub __TOKENIZER__scan_for_end {
 			: $t->{line};
 
 		# Look for a match
-		unless ( $search_area =~ /^(.*?(?:\(|\)))/ ) {
+		unless ( $search_area =~ /^((?:\\.|[^()])*?[()])/ ) {
 			# Load in the next line
 			$string .= $search_area;
 			return undef unless defined $t->_fill_line;

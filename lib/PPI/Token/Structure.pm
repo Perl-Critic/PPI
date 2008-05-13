@@ -33,7 +33,7 @@ use base 'PPI::Token';
 
 use vars qw{$VERSION};
 BEGIN {
-	$VERSION = '1.202_02';
+	$VERSION = '1.202_03';
 }
 
 # Set the matching braces, done as an array

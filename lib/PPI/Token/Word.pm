@@ -40,7 +40,7 @@ use base 'PPI::Token';
 
 use vars qw{$VERSION %QUOTELIKE %OPERATOR};
 BEGIN {
-	$VERSION = '1.202_02';
+	$VERSION = '1.202_03';
 
 	%QUOTELIKE = (
 		'q'  => 'Quote::Literal',
@@ -57,6 +57,8 @@ BEGIN {
 	# Copy in OPERATOR from PPI::Token::Operator
 	*OPERATOR = *PPI::Token::Operator::OPERATOR;
 }
+
+=pod
 
 =head2 literal
 
@@ -145,12 +147,12 @@ sub __TOKENIZER__on_char {
 		return $t->_finalize_token->__TOKENIZER__on_char( $t );
 	}
 
-	# If the NEXT non-whitespace character in the line is a colon, this
+	# If the NEXT character in the line is a colon, this
 	# is a label.
-	my $rest = substr( $t->{line}, $t->{line_cursor} );
-	if ( $rest =~ /^(\s*:)/ ) {
-		$t->{token}->{content} .= $1;
-		$t->{line_cursor} += length $1;
+	my $char = substr( $t->{line}, $t->{line_cursor}, 1 );
+	if ( $char eq ':' ) {
+		$t->{token}->{content} .= ':';
+		$t->{line_cursor}++;
 		$t->{class} = $t->{token}->set_class( 'Label' );
 
 	# If not a label, '_' on its own is the magic filehandle
@@ -267,12 +269,25 @@ sub __TOKENIZER__commit {
 		$token_class = 'Operator';
 
 	} else {
-		# Now, if the next character is a :, its a label
-		my $rest = substr( $t->{line}, $t->{line_cursor} );
-		if ( $rest =~ /^(\s*:)/ ) {
-			$word .= $1;
-			$t->{line_cursor} += length $1;
-			$token_class = 'Label';
+		# If the next character is a ':' then its a label...
+		my $char = substr( $t->{line}, $t->{line_cursor}, 1 );
+		if ( $char eq ':' ) {
+			if ( $tokens and $tokens->[0]->{content} eq 'sub' ) {
+				# ... UNLESS its after 'sub' in which
+				# case it is a sub name and an attribute
+				# operator.
+				# We COULD have checked this at the top
+				# level of checks, but this would impose
+				# an additional performance per-word
+				# penalty, and every other case where the
+				# attribute operator doesn't directly
+				# touch the object name already works.
+				$token_class = 'Word';
+			} else {
+				$word .= ':';
+				$t->{line_cursor}++;
+				$token_class = 'Label';
+			}
 		} elsif ( $word eq '_' ) {
 			$token_class = 'Magic';
 		} else {

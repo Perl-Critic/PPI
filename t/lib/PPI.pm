@@ -9,7 +9,7 @@ use PPI::Dumper;
 
 use vars qw{$VERSION};
 BEGIN {
-	$VERSION = '0.01';
+	$VERSION = '1.202_03';
 }
 
 
@@ -60,12 +60,21 @@ Test::Object->register(
 sub unknown_objects {
 	my $doc = shift;
 
-	is( $doc->find_any('Token::Unknown'), '',
-		"Contains no PPI::Token::Unknown elements" );
-	is( $doc->find_any('Structure::Unknown'), '',
-		"Contains no PPI::Structure::Unknown elements" );
-	is( $doc->find_any('Statement::Unknown'), '',
-		"Contains no PPI::Statement::Unknown elements" );
+	is(
+		$doc->find_any('Token::Unknown'),
+		'',
+		"Contains no PPI::Token::Unknown elements",
+	);
+	is(
+		$doc->find_any('Structure::Unknown'),
+		'',
+		"Contains no PPI::Structure::Unknown elements",
+	);
+	is(
+		$doc->find_any('Statement::Unknown'),
+		'',
+		"Contains no PPI::Statement::Unknown elements",
+	);
 
 	1;
 }
@@ -85,10 +94,11 @@ Test::Object->register(
 sub nested_statements {
 	my $doc = shift;
 
-	ok( ! $doc->find_any( sub {
-		_INSTANCE($_[1], 'PPI::Statement')
-		and
-		any { _INSTANCE($_, 'PPI::Statement') } $_[1]->children
+	ok(
+		! $doc->find_any( sub {
+			_INSTANCE($_[1], 'PPI::Statement')
+			and
+			any { _INSTANCE($_, 'PPI::Statement') } $_[1]->children
 		} ),
 		'Document contains no nested statements',
 	);	
@@ -103,13 +113,33 @@ Test::Object->register(
 sub nested_structures {
 	my $doc = shift;
 
-	ok( ! $doc->find_any( sub {
-		_INSTANCE($_[1], 'PPI::Structure')
-		and
-		any { _INSTANCE($_, 'PPI::Structure') } $_[1]->children
+	ok(
+		! $doc->find_any( sub {
+			_INSTANCE($_[1], 'PPI::Structure')
+			and
+			any { _INSTANCE($_, 'PPI::Structure') } $_[1]->children
 		} ),
 		'Document contains no nested structures',
-	);	
+	);
+}
+
+Test::Object->register(
+	class => 'PPI::Document',
+	tests => 1,
+	code  => \&no_attribute_in_attribute,
+);
+
+sub no_attribute_in_attribute {
+	my $doc = shift;
+
+	ok(
+		! $doc->find_any( sub {
+			_INSTANCE($_[1], 'PPI::Token::Attribute')
+			and
+			! exists $_[1]->{_attribute}
+		} ),
+		'No ->{_attribute} in PPI::Token::Attributes',
+	);
 }
 
 
@@ -151,10 +181,10 @@ sub run_testdir {
 		my $rv;
 		local *CODEFILE;
 		SKIP: {
-			skip "No Document to test", 10 unless $Document;
+			skip "No Document to test", 11 unless $Document;
 
 			# Check standard things
-			object_ok( $Document ); # 6 tests contained within
+			object_ok( $Document ); # 7 tests contained within
 
 			# Get the dump array ref for the Document object
 			my $Dumper = PPI::Dumper->new( $Document );
@@ -162,9 +192,9 @@ sub run_testdir {
 			my @dump_list = $Dumper->list;
 			ok( scalar @dump_list, "$codename: Got dump content from dumper" );
 
-			local *DUMP;
 			# Try to get the .dump file array
-			open( DUMP, $dumpfile ) or die "open: $!";
+			local *DUMP;
+			open( DUMP, '<', $dumpfile ) or die "open: $!";
 			my @content = <DUMP>;
 			close( DUMP ) or die "close: $!";
 			chomp @content;

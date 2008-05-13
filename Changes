@@ -1,5 +1,20 @@
 Revision history for Perl extension PPI
 
+1.202_03 Sun 11 May 2008
+	Summary:
+	- Initial Perl 6 support
+	- Bug fixes and 1.203 release candidate
+
+	Details:
+	- Adding initial support for "use v6-alpha;"
+	- Adding new class Perl::Statement::Include::Perl6
+	- Adding a test on the KindaPerl6::Grammar,
+	  which triggered a bug in the tokenizer during
+	  CPAN::Metrics tinderboxing.
+	- All open() calls now use three-argument form
+	- Upgrading explicit Perl dependency to 5.006,
+	  because of the previous item.
+
 1.202_02 Wed  2 Jan 2008
 	Summary:
 	- Back-compatibility and 1.203 release candidate

@@ -30,7 +30,7 @@ sub pause {
 
 # For each new item in t/data/08_regression add another 14 tests
 
-use Test::More tests => 592;
+use Test::More tests => 631;
 use t::lib::PPI;
 
 #####################################################################

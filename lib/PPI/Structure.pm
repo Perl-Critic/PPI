@@ -84,6 +84,13 @@ use strict;
 use base 'PPI::Node';
 use Scalar::Util                'refaddr';
 use Params::Util                '_INSTANCE';
+
+use vars qw{$VERSION *_PARENT};
+BEGIN {
+	$VERSION = '1.202_03';
+	*_PARENT = *PPI::Element::_PARENT;
+}
+
 use PPI::Structure::Block       ();
 use PPI::Structure::Condition   ();
 use PPI::Structure::Constructor ();
@@ -91,12 +98,6 @@ use PPI::Structure::ForLoop     ();
 use PPI::Structure::List        ();
 use PPI::Structure::Subscript   ();
 use PPI::Structure::Unknown     ();
-
-use vars qw{$VERSION *_PARENT};
-BEGIN {
-	$VERSION = '1.202_02';
-	*_PARENT = *PPI::Element::_PARENT;
-}
 
 
 

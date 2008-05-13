@@ -61,7 +61,7 @@ use PPI::Document ();
 
 use vars qw{$VERSION $errstr};
 BEGIN {
-	$VERSION = '1.202_02';
+	$VERSION = '1.202_03';
 	$errstr  = '';
 }
 
@@ -232,9 +232,9 @@ sub _lex_document {
 			my $Statement = $_class->new( $Token ) or return undef;
 
 			# Move the lexing down into the statement
-			$self->_add_delayed( $Document )    or return undef;
+			$self->_add_delayed( $Document )             or return undef;
 			$self->_add_element( $Document, $Statement ) or return undef;
-			$self->_lex_statement( $Statement ) or return undef;
+			$self->_lex_statement( $Statement )          or return undef;
 
 			next;
 		}
@@ -273,6 +273,23 @@ sub _lex_document {
 	# No error, it's just the end of file.
 	# Add any insignificant trailing tokens.
 	$self->_add_delayed( $Document );
+
+	# If the Tokenizer has any v6 blocks to attach, do so now.
+	# Checking once at the end is faster than adding a special
+	# case check for every statement parsed.
+	my $v6 = $self->{Tokenizer}->{v6};
+	if ( @$v6 ) {
+		my $includes = $Document->find( 'PPI::Statement::Include::Perl6' );
+		foreach my $include ( @$includes ) {
+			unless ( @$v6 ) {
+				my $errstr = "Failed to find a v6 section";
+				return $self->_error( $errstr );
+			}
+			$include->{perl6} = shift @$v6;
+		}
+	}
+
+	return 1;
 }
 
 
@@ -294,7 +311,7 @@ BEGIN {
 
 		# Loading and context statement
 		'package'  => 'PPI::Statement::Package',
-		'use'      => 'PPI::Statement::Include',
+		# 'use'      => 'PPI::Statement::Include',
 		'no'       => 'PPI::Statement::Include',
 		'require'  => 'PPI::Statement::Include',
 
@@ -441,6 +458,32 @@ sub _resolve_new_statement {
 		# End of file... PPI::Statement::Sub is the most likely
 		$self->_rollback( $Next );
 		return 'PPI::Statement::Sub';
+	}
+
+	if ( $Token->content eq 'use' ) {
+		# Add a special case for "use v6" lines.
+		my $Next;
+		while ( $Next = $self->_get_token ) {
+			unless ( $Next->significant ) {
+				$self->_delay_element( $Next ) or return undef;
+				next;
+			}
+
+			# Found the next significant token.
+			# Is it a v6 use?
+			if ( $Next->content eq 'v6' ) {
+				$self->_rollback( $Next );
+				return 'PPI::Statement::Include::Perl6';
+			} else {
+				$self->_rollback( $Next );
+				return 'PPI::Statement::Include';
+			}
+		}
+
+		# End of file... this means it is an incomplete use
+		# line, just treat it as a normal include.
+		$self->_rollback( $Next );
+		return 'PPI::Statement::Include';
 	}
 
 	# If our parent is a Condition, we are an Expression
@@ -1146,7 +1189,7 @@ sub _add_delayed {
 
 	# Clear the delayed elements
 	$self->{delayed} = [];
-	1;
+	return 1;
 }
 
 # Rollback the delayed tokens, plus any passed. Once all the tokens

@@ -19,7 +19,7 @@ use Test::More tests => 18;
 
 
 # Check their perl version
-ok( $] >= 5.005, "Your perl is new enough" );
+ok( $] >= 5.006, "Your perl is new enough" );
 
 # Does the module load
 use_all_ok( qw{
@@ -52,5 +52,3 @@ sub use_all_ok {
 }
 
 ok( ! $PPI::XS::VERSION, 'PPI::XS is correctly NOT loaded' );
-
-exit(0);

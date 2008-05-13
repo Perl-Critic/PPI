@@ -3,16 +3,16 @@ package PPI::Util;
 # Provides some common utility functions that can be imported
 
 use strict;
-use Exporter     ();
 use Digest::MD5  ();
-use Params::Util '_INSTANCE',
-                 '_SCALAR';
+use Params::Util qw{ _INSTANCE _SCALAR };
 
 use vars qw{$VERSION @ISA @EXPORT_OK};
 BEGIN {
-	$VERSION   = '1.202_02';
-	@ISA       = qw{Exporter};
-	@EXPORT_OK = qw{_Document _slurp};
+	$VERSION = '1.202_03';
+
+	require Exporter;
+	@ISA       = qw{ Exporter         };
+	@EXPORT_OK = qw{ _Document _slurp };
 }
 
 # Down here so we don't get into circular troubles
@@ -33,18 +33,18 @@ sub _Document {
 	return PPI::Document->new( shift ) unless ref $_[0];
 	return PPI::Document->new( shift ) if _SCALAR($_[0]);
 	return shift if _INSTANCE($_[0], 'PPI::Document');
-	undef;
+	return undef;
 }
 
 # Provide a simple _slurp implementation
 sub _slurp {
 	my $file = shift;
 	local $/ = undef;
-	local *PPIUTIL;
-	open( PPIUTIL, '<', $file ) or return "open($file) failed: $!";
-	my $source = <PPIUTIL>;
-	close( PPIUTIL ) or return "close($file) failed: $!";
-	\$source;
+	local *FILE;
+	open( FILE, '<', $file ) or return "open($file) failed: $!";
+	my $source = <FILE>;
+	close( FILE ) or return "close($file) failed: $!";
+	return \$source;
 }
 
 # Provides a version of Digest::MD5's md5hex that explicitly

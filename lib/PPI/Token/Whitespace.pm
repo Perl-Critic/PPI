@@ -47,7 +47,7 @@ use Clone ();
 
 use vars qw{$VERSION};
 BEGIN {
-	$VERSION = '1.202_02';
+	$VERSION = '1.202_03';
 }
 
 =pod
@@ -133,7 +133,7 @@ BEGIN {
 }
 
 sub __TOKENIZER__on_line_start {
-	my $t = $_[1];
+	my $t    = $_[1];
 	my $line = $t->{line};
 
 	# Can we classify the entire line in one go
@@ -143,7 +143,7 @@ sub __TOKENIZER__on_line_start {
 		return 0;
 
 	} elsif ( $line =~ /^\s*#/ ) {
-		# Add the comment token, and finalize it immediately
+		# A comment line
 		$t->_new_token( 'Comment', $line );
 		$t->_finalize_token;
 		return 0;
@@ -159,13 +159,30 @@ sub __TOKENIZER__on_line_start {
 			$t->{class} = 'PPI::Token::Pod';
 		}
 		return 0;
+
+	} elsif ( $line =~ /^use v6\-alpha\;/ ) {
+		# Indicates a Perl 6 block. Make the initial
+		# implementation just suck in the entire rest of the
+		# file.
+		my @perl6 = ();
+		while ( 1 ) {
+			my $line6 = $t->_get_line;
+			last unless defined $line6;
+			push @perl6, $line6;
+		}
+		push @{ $t->{v6} }, join '', @perl6;
+
+		# We only sucked in the block, we don't actially do
+		# anything to the "use v6..." line. So return as if
+		# we didn't find anything at all.
+		return 1;
 	}
 
 	1;
 }
 
 sub __TOKENIZER__on_char {
-	my $t = $_[1];
+	my $t    = $_[1];
 	my $char = ord substr $t->{line}, $t->{line_cursor}, 1;
 
 	# Do we definately know what something is?
@@ -382,7 +399,9 @@ sub __TOKENIZER__on_char {
 	return $t->_error("Encountered unexpected character '$char'");
 }
 
-sub __TOKENIZER__on_line_end { $_[1]->_finalize_token if $_[1]->{token} }
+sub __TOKENIZER__on_line_end {
+	$_[1]->_finalize_token if $_[1]->{token};
+}
 
 1;
 
