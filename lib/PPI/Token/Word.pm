@@ -270,8 +270,8 @@ sub __TOKENIZER__commit {
 
 	} else {
 		# If the next character is a ':' then its a label...
-		my $char = substr( $t->{line}, $t->{line_cursor}, 1 );
-		if ( $char eq ':' ) {
+		my $string = substr( $t->{line}, $t->{line_cursor} );
+		if ( $string =~ /^(\s*:)(!:)/ ) {
 			if ( $tokens and $tokens->[0]->{content} eq 'sub' ) {
 				# ... UNLESS its after 'sub' in which
 				# case it is a sub name and an attribute
@@ -284,8 +284,8 @@ sub __TOKENIZER__commit {
 				# touch the object name already works.
 				$token_class = 'Word';
 			} else {
-				$word .= ':';
-				$t->{line_cursor}++;
+				$word .= $1;
+				$t->{line_cursor} += length($1);
 				$token_class = 'Label';
 			}
 		} elsif ( $word eq '_' ) {
