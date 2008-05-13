@@ -3,7 +3,9 @@ Revision history for Perl extension PPI
 1.202_03 Sun 11 May 2008
 	Summary:
 	- Initial Perl 6 support
-	- Bug fixes and 1.203 release candidate
+	- Bug fixes and final 1.203 release candidate
+	- I finally catch up with all the failing test cases
+	  that Chris Dolan keeps commiting :)
 
 	Details:
 	- Adding initial support for "use v6-alpha;"
@@ -14,6 +16,7 @@ Revision history for Perl extension PPI
 	- All open() calls now use three-argument form
 	- Upgrading explicit Perl dependency to 5.006,
 	  because of the previous item.
+	- Better support for labels, including tricky ones like "BEGIN : { ... }"
 
 1.202_02 Wed  2 Jan 2008
 	Summary:
