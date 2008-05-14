@@ -33,7 +33,7 @@ use base 'PPI::Token::Number::Float';
 
 use vars qw{$VERSION};
 BEGIN {
-	$VERSION = '1.202_03';
+	$VERSION = '1.203';
 }
 
 

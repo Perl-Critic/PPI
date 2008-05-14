@@ -1,5 +1,9 @@
 Revision history for Perl extension PPI
 
+1.203    Wed 14 May 2008
+	Summary:
+	- No change, switching to production version
+
 1.202_03 Wed 14 May 2008
 	Summary:
 	- Initial Perl 6 support
