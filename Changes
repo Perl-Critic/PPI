@@ -1,5 +1,10 @@
 Revision history for Perl extension PPI
 
+1.2xx    xxx xx xxx xxxx
+	Details:
+	- Workaround for "RT#35917 - charsets.t eats all available VM"
+	  (unicode bug in 5.8.6, works in 5.8.8)
+
 1.203    Wed 14 May 2008
 	Summary:
 	- No change, switching to production version

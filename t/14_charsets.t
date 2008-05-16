@@ -49,7 +49,13 @@ SKIP: {
 	# Testing accented characters in UTF-8
 	good_ok( 'sub func { }',           "Parsed code without accented chars" );
 	good_ok( 'rätselhaft();',          "Function with umlaut"               );
-	good_ok( '一();',                   "Function with Chinese characters"   );
+	SKIP: {
+		eval { require 5.008007 };
+		if ( $@ ) {
+			skip( "Unicode substr support requires perl >= 5.8.7", 1 );
+		}
+		good_ok( '一();',                   "Function with Chinese characters"   );
+        }
 	good_ok( 'ätselhaft()',            "Starting with umlaut"               );
 	good_ok( '"rätselhaft"',           "In double quotes"                   );
 	good_ok( "'rätselhaft'",           "In single quotes"                   );
