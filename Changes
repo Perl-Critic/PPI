@@ -14,6 +14,8 @@ Revision history for Perl extension PPI
 	- 100% of PPI::Tokenizer is now exception-driven
 	- Workaround for "RT#35917 - charsets.t eats all available VM"
 	  (unicode bug in 5.8.6, works in 5.8.8)
+	- Temporarily disable round-trip testing of 14_charset.t
+
 
 1.203    Wed 14 May 2008
 	Summary:
