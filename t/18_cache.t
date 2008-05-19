@@ -15,7 +15,7 @@ use File::Remove  ();
 use Scalar::Util  'refaddr';
 use Test::More    tests => 42;
 
-my $this_file = catdir( 't', 'data', '03_empiric', 'test.dat' );
+my $this_file = catdir( 't', 'data', '03_document', 'test.dat' );
 my $cache_dir = catdir( 't', 'data', '18_cache' );
 
 # Define, create and clear the test cache

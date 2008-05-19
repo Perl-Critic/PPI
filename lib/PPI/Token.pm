@@ -27,7 +27,7 @@ use PPI::Exception ();
 
 use vars qw{$VERSION};
 BEGIN {
-	$VERSION = '1.203';
+	$VERSION = '1.204_01';
 }
 
 # We don't load the abstracts, they are loaded

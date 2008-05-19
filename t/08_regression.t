@@ -30,14 +30,20 @@ sub pause {
 
 # For each new item in t/data/08_regression add another 14 tests
 
-use Test::More tests => 646;
+use Test::More tests => 661;
 use t::lib::PPI;
+
+
+
+
 
 #####################################################################
 # Code/Dump Testing
 # ntests = 2 + 14 * nfiles
 
-t::lib::PPI->run_testdir( catdir( 't', 'data', '08_regression' ) );
+t::lib::PPI->run_testdir(qw{ t data 08_regression });
+
+
 
 
 
@@ -280,5 +286,3 @@ SCOPE: {
 	isa_ok( $stmt, 'PPI::Statement::Include' );
 	is( $stmt->pragma, 'utf8', 'pragma() with numbers' );
 }
-
-exit(0);

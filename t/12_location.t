@@ -230,5 +230,3 @@ foreach my $i ( 0 .. $#test_locations ) {
 
 ok( $Document->flush_locations, '->flush_locations returns true' );
 is( scalar(grep { defined $_->{_location} } $Document->tokens), 0, 'All _location attributes removed' );
-
-1;

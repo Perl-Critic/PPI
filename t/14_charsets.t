@@ -1,10 +1,10 @@
 ﻿#!/usr/bin/perl
 
 BEGIN {
-    if ($] < 5.008) {
+    if ($] < 5.008007) {
         require Test::More;
-        Test::More->import( skip_all => "Perl 5.8+ needed for Unicode support" );
-        exit;
+        Test::More->import( skip_all => "Unicode support requires perl 5.8.7" );
+        exit(0);
     }
 }
 
@@ -35,27 +35,20 @@ sub good_ok {
 
 # We cannot reliably support Unicode on anything less than 5.8.5
 SKIP: {
-	eval { require 5.008005 };
-	if ( $@ ) {
-		skip( "Unicode support requires perl >= 5.8.5", 11 );
-	}
-
 	# In some (weird) cases with custom locales, things aren't words
 	# that should be
 	unless ( "ä" =~ /\w/ ) {
-		skip( "Unicode-incompatible locale in use", 11 );
+		skip( "Unicode-incompatible locale in use (apparently)", 11 );
 	}
+
+	# Notorious test case.
+	# In 1.203 this test case causes a memory leaking infinite loop
+	# that consumes all available memory and then crashes the process.
+	good_ok( '一();',                   "Function with Chinese characters"   );
 
 	# Testing accented characters in UTF-8
 	good_ok( 'sub func { }',           "Parsed code without accented chars" );
 	good_ok( 'rätselhaft();',          "Function with umlaut"               );
-	SKIP: {
-		eval { require 5.008007 };
-		if ( $@ ) {
-			skip( "Unicode substr support requires perl >= 5.8.7", 1 );
-		}
-		good_ok( '一();',                   "Function with Chinese characters"   );
-        }
 	good_ok( 'ätselhaft()',            "Starting with umlaut"               );
 	good_ok( '"rätselhaft"',           "In double quotes"                   );
 	good_ok( "'rätselhaft'",           "In single quotes"                   );

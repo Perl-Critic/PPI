@@ -15,7 +15,7 @@ use PPI::Find;
 use PPI::Transform;
 
 # Execute the tests
-use Test::More tests => 2288;
+use Test::More tests => 2287;
 use Test::ClassAPI;
 
 # Ignore various imported or special functions
@@ -383,7 +383,6 @@ get_token=method
 all_tokens=method
 increment_cursor=method
 decrement_cursor=method
-errstr=method
 
 [PPI::Lexer]
 new=method

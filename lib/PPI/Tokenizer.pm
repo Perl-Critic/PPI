@@ -36,28 +36,37 @@ about the difference between how perl parses Perl "code" and how PPI
 parsers Perl "documents".
 
 "perl" itself (the interpreter) uses a heavily modified lex specification
-to specify it's parsing logic, maintains several types of state as it
-goes, and both tokenizes and lexes AND EXECUTES at the same time.
-In fact, it's provably impossible to use perl's parsing method without
-BEING perl.
+to specify its parsing logic, maintains several types of state as it
+goes, and incrementally tokenizes, lexes AND EXECUTES at the same time.
+
+In fact, it is provably impossible to use perl's parsing method without
+simultaneously executing code. A formal mathematical proof has been
+published demonstrating the method.
 
 This is where the truism "Only perl can parse Perl" comes from.
 
-PPI uses a completely different approach by abandoning the ability to
-provably parse perl, and instead to parse the source as a document, but
-get so close to being perfect that unless you do insanely silly things,
-it can handle it.
+PPI uses a completely different approach by abandoning the (impossible)
+ability to parse Perl the same way that the interpreter does, and instead
+parsing the source as a document, using a document structure independantly
+derived from the Perl documentation and approximating the perl interpreter
+interpretation as closely as possible.
 
 It was touch and go for a long time whether we could get it close enough,
 but in the end it turned out that it could be done.
 
-In this approach, the tokenizer C<PPI::Tokenizer> is separate from the
-lexer L<PPI::Lexer>. The job of C<PPI::Tokenizer> is to take pure source
-as a string and break it up into a stream/set of tokens.
+In this approach, the tokenizer C<PPI::Tokenizer> is implemented separately
+from the lexer L<PPI::Lexer>.
 
-The Tokenizer uses a hell of a lot of heuristics, guessing, and cruft,
-supported by a very B<VERY> flexible internal API, but fortunately there's
-not a lot that gets exposed to people using the C<PPI::Tokenizer> itself.
+The job of C<PPI::Tokenizer> is to take pure source as a string and break it
+up into a stream/set of tokens, and contains most of the "black magic" used
+in PPI. By comparison, the lexer implements a relatively straight forward
+tree structure, and has an implementation that is uncomplicated (compared
+to the insanity in the tokenizer at least).
+
+The Tokenizer uses an immense amount of heuristics, guessing and cruft,
+supported by a very B<VERY> flexible internal API, but fortunately it was
+possible to largely encapsulate the black magic, so there is not a lot that
+gets exposed to people using the C<PPI::Tokenizer> itself.
 
 =head1 METHODS
 
@@ -67,22 +76,20 @@ in private methods.
 
 =cut
 
-# Make sure everything we need is loaded, so we
-# don't have to go and load all of PPI.
+# Make sure everything we need is loaded so
+# we don't have to go and load all of PPI.
 use strict;
 use List::MoreUtils ();
-use Params::Util    '_INSTANCE',
-                    '_SCALAR',
-                    '_ARRAY';
+use Params::Util    qw{ _INSTANCE _SCALAR0 _ARRAY0 };
+use PPI::Util       ();
 use PPI::Element    ();
 use PPI::Token      ();
-use PPI::Util       ();
 use PPI::Exception  ();
+use PPI::Exception::ParserRejection ();
 
-use vars qw{$VERSION $errstr};
+use vars qw{$VERSION};
 BEGIN {
-	$VERSION = '1.203';
-	$errstr  = '';
+	$VERSION = '1.204_01';
 }
 
 
@@ -104,75 +111,84 @@ It takes as argument either a normal scalar containing source code,
 a reference to a scalar containing source code, or a reference to an
 ARRAY containing newline-terminated lines of source code.
 
-Returns a new C<PPI::Tokenizer> object on success, or C<undef> on error.
+Returns a new C<PPI::Tokenizer> object on success, or throws a
+L<PPI::Exception> exception on error.
 
 =cut
 
 sub new {
-	my $class = (ref $_[0] ? ref shift : shift)->_clear;
+	my $class = ref($_[0]) || $_[0];
 
 	# Create the empty tokenizer struct
 	my $self = bless {
 		# Source code
-		source         => undef,
-		source_bytes   => undef,
+		source       => undef,
+		source_bytes => undef,
 
 		# Line buffer
-		line           => undef,
-		line_length    => undef,
-		line_cursor    => undef,
-		line_count     => 0,
+		line         => undef,
+		line_length  => undef,
+		line_cursor  => undef,
+		line_count   => 0,
 
 		# Parse state
-		token          => undef,
-		class          => 'PPI::Token::Whitespace',
-		zone           => 'PPI::Token::Whitespace',
+		token        => undef,
+		class        => 'PPI::Token::Whitespace',
+		zone         => 'PPI::Token::Whitespace',
 
 		# Output token buffer
-		tokens         => [],
-		token_cursor   => 0,
-		token_eof      => 0,
+		tokens       => [],
+		token_cursor => 0,
+		token_eof    => 0,
 
 		# Perl 5 blocks
-		v6             => [],
+		v6           => [],
 	}, $class;
 
-	if ( ! defined $_[0] ) {
+	if ( ! defined $_[1] ) {
 		# We weren't given anything
-		return $self->_error( "No source provided to Tokenizer" );
+		PPI::Exception->throw("No source provided to Tokenizer");
 
-	} elsif ( ! ref $_[0] ) {
-		my $source = PPI::Util::_slurp($_[0]);
+	} elsif ( ! ref $_[1] ) {
+		my $source = PPI::Util::_slurp($_[1]);
 		if ( ref $source ) {
 			# Content returned by reference
 			$self->{source} = $$source;
 		} else {
 			# Errors returned as a string
-			return($source);
+			return( $source );
 		}
 
-	} elsif ( _SCALAR($_[0]) ) {
-		$self->{source} = ${shift()};
+	} elsif ( _SCALAR0($_[1]) ) {
+		$self->{source} = ${$_[1]};
 
-	} elsif ( _ARRAY($_[0]) ) {
-		$self->{source} = join "\n", @{shift()};
+	} elsif ( _ARRAY0($_[1]) ) {
+		$self->{source} = join '', map { "\n" } @{$_[1]};
 
 	} else {
 		# We don't support whatever this is
-		return $self->_error( ref($_[0]) . " is not supported as a source provider" );
+		PPI::Exception->throw(ref($_[1]) . " is not supported as a source provider");
 	}
-
-	# Localise newlines
-	$self->{source} =~ s/(?:\015{1,2}\012|\015|\012)/\n/g;
 
 	# We can't handle a null string
 	$self->{source_bytes} = length $self->{source};
-	unless ( $self->{source_bytes} ) {
-		return $self->_error( "Nothing to parse" );
-	}
+	if ( $self->{source_bytes} > 1048576 ) {
+		# Dammit! It's ALWAYS the "Perl" modules larger than a
+		# meg that seems to blow up the Tokenizer/Lexer.
+		# Nobody actually writes real programs larger than a meg
+		# Perl::Tidy (the largest) is only 800k.
+		# It is always these idiots with massive Data::Dumper
+		# structs or huge RecDescent parser.
+		PPI::Exception::ParserRejection->throw("File is too large");
 
-	# Split into the line array
-	$self->{source} = [ split /(?<=\n)/, $self->{source} ];
+	} elsif ( $self->{source_bytes} ) {
+		# Split on local newlines
+		$self->{source} =~ s/(?:\015{1,2}\012|\015|\012)/\n/g;
+		$self->{source} = [ split /(?<=\n)/, $self->{source} ];
+
+	} else {
+		$self->{source} = [ ];
+	}
 
 	### EVIL
 	# I'm explaining this earlier than I should so you can understand
@@ -193,6 +209,8 @@ sub new {
 	# manually either remove the ' ' token, or chop it off the end of
 	# a longer one in which the space would be valid.
 	if ( List::MoreUtils::any { /^__(?:DATA|END)__\s*$/ } @{$self->{source}} ) {
+		$self->{source_eof_chop} = '';
+	} elsif ( ! defined $self->{source}->[0] ) {
 		$self->{source_eof_chop} = '';
 	} elsif ( $self->{source}->[-1] =~ /\s$/ ) {
 		$self->{source_eof_chop} = '';
@@ -267,11 +285,12 @@ sub get_token {
 	};
 	if ( $@ ) {
 		if ( _INSTANCE($@, 'PPI::Exception') ) {
-			return $self->_error( $@->message );
+			PPI::Exception->throw;
+		} else {
+			my $errstr = $@;
+			$errstr =~ s/^(.*) at line .+$/$1/;
+			PPI::Exception->throw( $errstr );
 		}
-		my $errstr = $@;
-		$errstr =~ s/^(.*) at line .+$/$1/;
-		return $self->_error( $errstr );
 	} elsif ( $rv ) {
 		return $rv;
 	}
@@ -304,9 +323,8 @@ It should be noted that C<all_tokens> does B<NOT> interfere with the
 use of the Tokenizer object as an iterator (does not modify the token
 cursor) and use of the two different mechanisms can be mixed safely.
 
-Returns a reference to an ARRAY of L<PPI::Token> objects on success,
-C<0> in the special case that the file/string contains NO tokens at
-all, or C<undef> on error.
+Returns a reference to an ARRAY of L<PPI::Token> objects on success
+or throws an exception on error.
 
 =cut
 
@@ -320,7 +338,9 @@ sub all_tokens {
 		unless ( $self->{token_eof} ) {
 			my $rv;
 			while ( $rv = $self->_process_next_line ) {}
-			return $self->_error( "Error while processing source" ) unless defined $rv;
+			unless ( defined $rv ) {
+				PPI::Exception->throw("Error while processing source");
+			}
 
 			# Clean up the end of the tokenizer
 			$self->_clean_eof;
@@ -329,11 +349,11 @@ sub all_tokens {
 	if ( $@ ) {
 		my $errstr = $@;
 		$errstr =~ s/^(.*) at line .+$/$1/;
-		return $self->_error( $errstr );
+		PPI::Exception->throw( $errstr );
 	}
 
 	# End of file, return a copy of the token array.
-	@{ $self->{tokens} } ? [ @{$self->{tokens}} ] : 0;
+	return [ @{$self->{tokens}} ];
 }
 
 =pod
@@ -414,7 +434,6 @@ sub _get_line {
 # Fetches the next line, ready to process
 # Returns 1 on success
 # Returns 0 on EOF
-# Returns undef on error
 sub _fill_line {
 	my $self   = shift;
 	my $inscan = shift;
@@ -485,13 +504,13 @@ sub _process_next_line {
 
 		# Defined but false means next line
 		return 1 if defined $rv;
-		throw PPI::Exception("Error at line $self->{line_count}");
+		PPI::Exception->throw("Error at line $self->{line_count}");
 	}
 
 	# If we can't deal with the entire line, process char by char
 	while ( $rv = $self->_process_next_char ) {}
 	unless ( defined $rv ) {
-		throw PPI::Exception("Error at line $self->{line_count}, character $self->{line_cursor}");
+		PPI::Exception->throw("Error at line $self->{line_count}, character $self->{line_cursor}");
 	}
 
 	# Trigger any action that needs to happen at the end of a line
@@ -502,108 +521,9 @@ sub _process_next_line {
 		return $self->_clean_eof;
 	}
 
-	# If we have any entries in the rawinput queue process it.
-	# This should happen at the END of this line, not the beginning of
-	# the next one, because Tokenizer->get_token, may retrieve the RawInput
-	# terminator and process it before we get a chance to rebless it from
-	# a bareword or a string that it was originally. Note also that
-	# _handle_raw_input has the same return conditions as this method.
-	$self->{rawinput_queue} ? $self->_handle_raw_input : 1;
+	return 1;
 }
 
-# Read in raw input from the source
-# Returns 1 on success
-# Returns 0 on EOF
-# Returns undef on error
-sub _handle_raw_input {
-	my $self = shift;
-
-	# Is there a half finished token?
-	if ( defined $self->{token} ) {
-		if ( ref($self->{token}) eq 'PPI::Token::Whitespace' ) {
-			# Finish the whitespace token
-			$self->_finalize_token;
-		} else {
-			# This is just a little too complicated to tokenize.
-			# The Perl interpretor has the luxury of being able to
-			# destructively consume the input. We don't... so having
-			# a token that SPANS OVER a raw input is just silly, and
-			# too complicated for this little parser to turn back
-			# into something useful.
-			return $self->_error( "The code is too crufty for the tokenizer.\n"
-				. "Cannot have tokens that span across rawinput lines." );
-		}
-	}
-
-	while ( scalar @{$self->{rawinput_queue}} ) {
-		# Find the rawinput operator and terminator
-		my $position = shift @{$self->{rawinput_queue}};
-		my $operator = $self->{tokens}->[ $position ];
-		my $terminator = $self->{tokens}->[ $position + 1 ];
-
-		# Handle a whitespace gap between the operator and terminator
-		if ( ref($terminator) eq 'PPI::Token::Whitespace' ) {
-			$terminator = $self->{tokens}->[ $position + 2 ];
-		}
-
-		# Check the terminator, and get the termination string
-		my $tString;
-		if ( ref($terminator) eq 'PPI::Token::Word' ) {
-			$tString = $terminator->{content};
-		} elsif ( ref($terminator) =~ /^PPI::Token::Quote::(Single|Double)$/ ) {
-			$tString = $terminator->string;
-			return undef unless defined $tString;
-		} else {
-			return $self->_error( "Syntax error. The raw input << operator must be followed by a bare word, or a single or double quoted string" );
-		}
-		$tString .= "\n";
-
-		# Change the class of the terminator token to the appropriate one
-		$terminator->set_class( 'RawInput::Terminator' );
-
-		# Create the token
-		my $rawinput = PPI::Token::RawInput::String->new( '' ) or return undef;
-		$rawinput->{endString} = $tString;
-
-		# Add some extra links, so these will know where its other parts are
-		$rawinput->{_operator} = $operator;
-		$operator->{_string}   = $rawinput;
-
-		# Start looking at lines, and pull new ones until we find the
-		# termination string.
-		my $rv;
-		while ( $rv = $self->_fill_line ) {
-			# Add to the token
-			$rawinput->{content} .= $self->{line};
-
-			# Does the line match the termination string
-			if ( $self->{line} eq $tString ) {
-				# Done
-				push @{ $self->{tokens} }, $rawinput;
-				last;
-			}
-		}
-
-		# End of this rawinput
-		next if $rv;
-
-		# Pass on any error
-		return undef unless defined $rv;
-
-		# End of file. We are a bit more lenient on errors, so
-		# we will let this slip by without mention. In fact, it may
-		# well actually be legal.
-
-		# Finish the token
-		push @{ $self->{tokens} }, $rawinput if $rawinput->{content} ne '';
-		return 0;
-	}
-
-	# Clean up and return true
-	delete $self->{rawinput_queue};
-
-	1;
-}
 
 
 
@@ -820,41 +740,6 @@ sub _opcontext {
 
 	# Otherwise, we don't know
 	return ''
-}
-
-
-
-
-
-#####################################################################
-# Error Handling
-
-# Set the error message
-sub _error {
-	$errstr = $_[1];
-	undef;
-}
-
-# Clear the error message.
-# Returns the object as a convenience.
-sub _clear {
-	$errstr = '';
-	$_[0];
-}
-
-=pod
-
-=head2 errstr
-
-For any error that occurs, you can use the C<errstr>, as either
-a static or object method, to access the error message.
-
-If no error occurs for any particular action, C<errstr> will return false.
-
-=cut
-
-sub errstr {
-	$errstr;
 }
 
 1;

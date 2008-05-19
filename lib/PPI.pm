@@ -8,12 +8,13 @@ use strict;
 # Set the version for CPAN
 use vars qw{$VERSION $XS_COMPATIBLE @XS_EXCLUDE};
 BEGIN {
-	$VERSION       = '1.203';
+	$VERSION       = '1.204_01';
 	$XS_COMPATIBLE = '0.845';
 	@XS_EXCLUDE    = ();
 }
 
 # Load everything
+use PPI::Util                 ();
 use PPI::Exception            ();
 use PPI::Element              ();
 use PPI::Token                ();

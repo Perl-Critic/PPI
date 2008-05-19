@@ -70,5 +70,3 @@ SCOPE: {
 	isa_ok( $doc->child(0), 'PPI::Statement::Include' );
 	is( $doc->child(0)->pragma, 'utf8', 'use utf8 is a pragma' );
 }
-
-1;

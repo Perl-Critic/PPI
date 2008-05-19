@@ -3,7 +3,7 @@
 # Load ALL of the PPI files, and look for a collection
 # of known problems, implemented using PPI itself.
 
-# Using PPI to analyse it's own code at install-time? Fuck yeah! :)
+# Using PPI to analyse its own code at install-time? Fuck yeah! :)
 
 use strict;
 use File::Spec::Functions ':ALL';
@@ -15,7 +15,7 @@ BEGIN {
 use PPI;
 use Class::Inspector;
 use constant CI => 'Class::Inspector';
-use Params::Util '_CLASS', '_ARRAY', '_INSTANCE';
+use Params::Util qw{ _CLASS _ARRAY _INSTANCE _IDENTIFIER };
 use Test::More; # Plan comes later
 use Test::Object;
 use t::lib::PPI;
@@ -43,7 +43,7 @@ foreach my $dir ( '05_lexer_practical', '08_regression', '11_util', '13_data', '
 }
 
 # Declare our plan
-Test::More::plan( tests => scalar(@files) * 9 + 3 );
+Test::More::plan( tests => scalar(@files) * 10 + 3 );
 
 
 
@@ -83,15 +83,31 @@ foreach my $file ( @files ) {
 
 	# By this point, everything should have parsed properly at least
 	# once, so no need to skip.
-	my $rv = $Document->find( \&bug_bad_isa_class_name );
-	if ( $rv ) {
-		foreach ( @$rv ) {
-			print "# $file: Found bad class "
-				. $_->string
-				. "\n";
+	SCOPE: {
+		my $rv = $Document->find( \&bug_bad_isa_class_name );
+		if ( $rv ) {
+			$Document->index_locations;
+			foreach ( @$rv ) {
+				print "# $file: Found bad class "
+					. $_->content
+					. "\n";
+			}
 		}
+		is_deeply( $rv, '', "$file: All class names in ->isa calls exist" );
 	}
-	is_deeply( $rv, '', "$file: All class names in ->isa calls exist" );
+	SCOPE: {
+		my $rv = $Document->find( \&bad_static_method );
+		if ( $rv ) {
+			$Document->index_locations;
+			foreach ( @$rv ) {
+				my $c = $_->sprevious_sibling->content;
+				my $m = $_->snext_sibling->content;
+				my $l = $_->location;
+				print "# $file: Found bad call ${c}->${m} at line $l->[0], col $l->[1]\n";
+			}
+		}
+		is_deeply( $rv, '', "$file: All class names in static method calls" );
+	}
 
 	# Test with Test::Object stuff
 	object_ok( $Document );
@@ -151,6 +167,35 @@ sub bug_bad_isa_class_name {
 
 	# Looks like we found a class that doesn't exist in
 	# an isa call.
+	return 1;
+}
+
+# Check for the use of a method that doesn't exist
+sub bad_static_method {
+	my ($document, $element) = @_;
+
+	# Find a quote containing a class name
+	$element->isa('PPI::Token::Operator')   or return '';
+	$element->content eq '->'               or return '';
+
+	# Check the method
+	my $method = $element->snext_sibling    or return '';
+	$method->isa('PPI::Token::Word')        or return '';
+	_IDENTIFIER($method->content)           or return '';
+
+	# Check the class
+	my $class = $element->sprevious_sibling or return '';
+	$class->isa('PPI::Token::Word')         or return '';
+	_CLASS($class->content)                 or return '';
+
+	# It's usually a deep class
+	$class  = $class->content;
+	$method = $method->content;
+	$class =~ /::/                          or return '';
+
+	# Check the method exists
+	$class->can($method)                   and return '';
+
 	return 1;
 }
 

@@ -37,7 +37,7 @@ use base 'PPI::Token';
 
 use vars qw{$VERSION};
 BEGIN {
-	$VERSION = '1.203';
+	$VERSION = '1.204_01';
 }
 
 
@@ -110,11 +110,11 @@ sub __TOKENIZER__on_char {
 		# EOF
 		$t->{token}->{content} .= $$string;
 		$t->_finalize_token;
-		return '';
+		return 0;
 	}
 
 	# Found the end of the attribute
-	$t->{token}->{content}   .= $string;
+	$t->{token}->{content} .= $string;
 	$t->_finalize_token->__TOKENIZER__on_char( $t );
 }
 
@@ -129,17 +129,15 @@ sub __TOKENIZER__scan_for_end {
 	my $depth = 0;
 	while ( exists $t->{line} ) {
 		# Get the search area
-		my $search_area
-			= $t->{line_cursor}
+		my $search = $t->{line_cursor}
 			? substr( $t->{line}, $t->{line_cursor} )
 			: $t->{line};
 
 		# Look for a match
-		unless ( $search_area =~ /^((?:\\.|[^()])*?[()])/ ) {
+		unless ( $search =~ /^((?:\\.|[^()])*?[()])/ ) {
 			# Load in the next line
-			$string .= $search_area;
-			return undef unless defined $t->_fill_line;
-			$t->{line_cursor} = 0;
+			$string .= $search;
+			$t->_fill_line(1) or return \$string;
 			next;
 		}
 

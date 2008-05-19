@@ -1,0 +1,5 @@
+#!/usr/bin/perl
+
+# A simple test script
+
+print "Hello World!\n";

@@ -9,7 +9,7 @@ use PPI::Dumper;
 
 use vars qw{$VERSION};
 BEGIN {
-	$VERSION = '1.203';
+	$VERSION = '1.204';
 }
 
 
@@ -151,8 +151,8 @@ sub no_attribute_in_attribute {
 # plan: 2 + 14 * npairs
 
 sub run_testdir {
-	my $pkg = shift;
-	my $testdir = shift;
+	my $pkg     = shift;
+	my $testdir = catdir(@_);
 
 	# Does the test directory exist?
 	ok( (-e $testdir and -d $testdir and -r $testdir), "Test directory $testdir found" );
@@ -164,7 +164,6 @@ sub run_testdir {
 	closedir( TESTDIR ) or die "closedir: $!";
 	ok( scalar @code, 'Found at least one code file' );
 
-	my $Lexer = PPI::Lexer->new;
 	foreach my $codefile ( @code ) {
 		# Does the .code file have a matching .dump file
 		my $dumpfile = $codefile;
@@ -174,7 +173,7 @@ sub run_testdir {
 		ok( (-f $dumpfile and -r $dumpfile), "$codename: Found matching .dump file" );
 
 		# Create the lexer and get the Document object
-		my $Document = $Lexer->lex_file( $codefile );
+		my $Document = PPI::Document->new( $codefile );
 		ok( $Document, "$codename: Lexer->Document returns true" );
 		ok( _INSTANCE($Document, 'PPI::Document'), "$codename: Object isa PPI::Document" );
 
@@ -219,5 +218,62 @@ sub run_testdir {
 	}
 }
 
+
+
+
+
+
+#####################################################################
+# Process a .code/.dump file pair
+# plan: 2 + 14 * npairs
+
+sub increment_testdir {
+	my $pkg     = shift;
+	my $testdir = catdir(@_);
+
+	# Does the test directory exist?
+	ok( (-e $testdir and -d $testdir and -r $testdir), "Test directory $testdir found" );
+
+	# Find the .code test files
+        local *TESTDIR;
+	opendir( TESTDIR, $testdir ) or die "opendir: $!";
+	my @code = map { catfile( $testdir, $_ ) } sort grep { /\.code$/ } readdir(TESTDIR);
+	closedir( TESTDIR ) or die "closedir: $!";
+	ok( scalar @code, 'Found at least one code file' );
+
+	foreach my $codefile ( @code ) {
+		# Does the .code file have a matching .dump file
+		my $codename = $codefile;
+		$codename =~ s/\.code$//;
+
+		# Load the file
+		local *CODEFILE;
+		local $/ = undef;
+		open( CODEFILE, $codefile ) or die "open: $!";
+		my $buffer = <CODEFILE>;
+		close( CODEFILE ) or die "close: $!";
+
+		# Cover every possible transitional state in
+		# the regression test code fragments.
+		foreach my $chars ( 1 .. length($buffer) ) {
+			my $string   = substr( $buffer, 0, $chars );
+			my $Document = eval {
+				PPI::Document->new( \$string );
+			};
+			is(
+				$@ => '',
+				"$codename: $chars chars ok",
+			);
+			is(
+				ref($Document) => 'PPI::Document',
+				"$codename: $chars chars document",
+			);
+			is(
+				$Document->serialize => $string,
+				"$codename: $chars char roundtrip",
+			);
+		}
+	}
+}
 
 1;

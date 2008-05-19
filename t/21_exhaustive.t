@@ -152,13 +152,6 @@ sub test_code {
 
 	# Version of the code for use in error messages
 	my $quotable = quotable($code);
-	if ( $PPI::Tokenizer::errstr ) {
-		$failures++;
-		diag( "\"$quotable\": Tokenizer returned an error" );
-		my $short = quotable(quickcheck($code));
-		diag( "Shortest failing substring: \"$short\"" );
-		return;
-	}
 	unless ( _INSTANCE($Document, 'PPI::Document') ) {
 		$failures++;
 		diag( "\"$quotable\": Parser did not return a Document" );

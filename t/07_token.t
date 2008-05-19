@@ -172,5 +172,3 @@ foreach my $code ( '0xg', '0x0g' ) {
 	ok(!$token->{_error}, 'invalid hexadecimal digit triggers end of token');
 	is($token->literal, 0, "literal('$code') is 0");
 }
-
-1;

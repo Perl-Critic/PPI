@@ -36,5 +36,3 @@ is( $line, "This is data\n", "Reading off a handle works as expected" );
 ok( $handle->print("Foo bar\n"), "handle->print returns ok" );
 is( $Token->content, "This is data\nFoo bar\nis\n",
 	"handle->print modifies the content as expected" );
-
-1;

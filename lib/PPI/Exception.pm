@@ -5,7 +5,7 @@ use Params::Util '_INSTANCE';
 
 use vars qw{$VERSION};
 BEGIN {
-	$VERSION = '1.203';
+	$VERSION = '1.204_01';
 }
 
 
@@ -17,17 +17,17 @@ BEGIN {
 
 sub new {
 	my $class = shift;
-	my $self  = bless { }, $class;
-	if ( @_ ) {
-		$self->{message} = shift;
-	} else {
-		$self->{message} = 'Unknown Reason';
-	}
-	$self;
+	return bless { @_ }, $class if @_ > 1;
+	return bless { message => $_[0] }, $class if @_;
+	return bless { message => 'Unknown Reason' }, $class;
 }
 
 sub message {
 	$_[0]->{message};
+}
+
+sub callers {
+	@{ $_[0]->{callers} || [] };
 }
 
 
@@ -39,8 +39,20 @@ sub message {
 
 sub throw {
 	my $it = shift;
-	unless ( _INSTANCE($it, 'PPI::Exception') ) {
-		$it = $it->new( @_ );
+	if ( _INSTANCE($it, 'PPI::Exception') ) {
+		if ( $it->{callers} ) {
+			push @{ $it->{callers} }, [ caller(0) ];
+		} else {
+			$it->{callers} ||= [];
+		}
+	} else {
+		my $message = $_[0] || 'Unknown Reason';
+		$it = $it->new(
+			message => $message,
+			callers => [
+				[ caller(0) ],
+			],
+		);
 	}
 	die $it;
 }

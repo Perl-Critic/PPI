@@ -27,6 +27,4 @@ use t::lib::PPI;
 # Code/Dump Testing
 # ntests = 2 + 11 * nfiles
 
-t::lib::PPI->run_testdir( catdir( 't', 'data', '05_lexer_practical' ) );
-
-exit();
+t::lib::PPI->run_testdir( catdir( 't', 'data', '05_lexer' ) );

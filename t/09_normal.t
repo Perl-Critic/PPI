@@ -54,7 +54,3 @@ use Test::More tests => 13;
 	is( $Normal1->equal( $Normal2 ), 1, '->equal returns true for equivalent code' );
 	is( $Normal1->equal( $Normal3 ), '', '->equal returns false for different code' );
 }
-
-
-1;
-

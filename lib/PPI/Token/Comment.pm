@@ -63,7 +63,7 @@ use base 'PPI::Token';
 
 use vars qw{$VERSION};
 BEGIN {
-	$VERSION = '1.203';
+	$VERSION = '1.204_01';
 }
 
 ### XS -> PPI/XS.xs:_PPI_Token_Comment__significant 0.900+
@@ -86,14 +86,14 @@ sub __TOKENIZER__commit {
 	my $t = $_[1];
 
 	# Get the rest of the line
-	my $rest_of_line = substr( $t->{line}, $t->{line_cursor} );
-	if ( chomp $rest_of_line) { # Include the newline separately
+	my $rest = substr( $t->{line}, $t->{line_cursor} );
+	if ( chomp $rest ) { # Include the newline separately
 		# Add the current token, and the newline
-		$t->_new_token('Comment', $rest_of_line);
+		$t->_new_token('Comment', $rest);
 		$t->_new_token('Whitespace', "\n");
 	} else {
 		# Add this token only
-		$t->_new_token('Comment', $rest_of_line);
+		$t->_new_token('Comment', $rest);
 	}
 
 	# Advance the line cursor to the end

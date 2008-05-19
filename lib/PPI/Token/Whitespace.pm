@@ -47,7 +47,7 @@ use Clone ();
 
 use vars qw{$VERSION};
 BEGIN {
-	$VERSION = '1.203';
+	$VERSION = '1.204_01';
 }
 
 =pod
@@ -396,7 +396,7 @@ sub __TOKENIZER__on_char {
 
 	# All the whitespaces are covered, so what to do
 	### For now, die
-	return $t->_error("Encountered unexpected character '$char'");
+	PPI::Exception->throw("Encountered unexpected character '$char'");
 }
 
 sub __TOKENIZER__on_line_end {

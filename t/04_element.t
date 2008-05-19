@@ -556,5 +556,3 @@ END_PERL
    ok($Document == $Document, 'overload ==');
    ok($Document != $Document->schild(0), 'overload !=');
 }
-
-1;

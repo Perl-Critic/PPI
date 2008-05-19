@@ -15,7 +15,7 @@ use PPI::Util '_Document',
               '_slurp';
 
 # Execute the tests
-use Test::More tests => 8;
+use Test::More tests => 12;
 
 my $testfile   = catfile( 't', 'data', '11_util', 'test.pm' );
 my $testsource = 'print "Hello World!\n"';
@@ -42,7 +42,7 @@ my $Document = PPI::Document->new( \$testsource );
 isa_ok( $Document, 'PPI::Document' );
 
 # Good things
-foreach my $thing ( $testfile, \$testsource, $Document ) {
+foreach my $thing ( $testfile, \$testsource, $Document, [] ) {
 	isa_ok( _Document( $thing ), 'PPI::Document' );
 }
 
@@ -50,7 +50,7 @@ foreach my $thing ( $testfile, \$testsource, $Document ) {
 ### erm...
 
 # Evil things
-foreach my $thing ( [], {}, sub () { 1 } ) {
+foreach my $thing ( {}, sub () { 1 } ) {
 	is( _Document( $thing ), undef, '_Document(evil) returns undef' );
 }
 
@@ -63,4 +63,16 @@ foreach my $thing ( [], {}, sub () { 1 } ) {
 my $source = _slurp( $slurpfile );
 is_deeply( $source, \$slurpcode, '_slurp loads file as expected' );
 
-1;
+
+
+
+
+#####################################################################
+# Check the capability flags
+
+my $have_alarm   = PPI::Util::HAVE_ALARM();
+my $have_unicode = PPI::Util::HAVE_UNICODE();
+ok( defined $have_alarm,   'HAVE_ALARM defined'   );
+ok( defined $have_unicode, 'HAVE_UNICODE defined' );
+is( $have_alarm,   !! $have_alarm,   'HAVE_ALARM is a boolean'   );
+is( $have_unicode, !! $have_unicode, 'HAVE_UNICODE is a boolean' );

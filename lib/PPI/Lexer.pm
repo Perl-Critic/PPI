@@ -55,13 +55,11 @@ For more unusual tasks, by all means forge onwards.
 
 use strict;
 use Params::Util  '_INSTANCE';
-use PPI           ();
-use PPI::Token    ();
-use PPI::Document ();
+use PPI ();
 
 use vars qw{$VERSION $errstr};
 BEGIN {
-	$VERSION = '1.203';
+	$VERSION = '1.204_01';
 	$errstr  = '';
 }
 
@@ -121,12 +119,12 @@ sub lex_file {
 		);
 
 	# Create the Tokenizer and hand off
-	my $Tokenizer = PPI::Tokenizer->new( $file );
-	unless ( $Tokenizer ) {
-		# Import the tokenizer error
-		my $errstr = PPI::Tokenizer->errstr
-			|| "Unknown error creating PPI::Tokenizer";
-		PPI::Tokenizer->_clear;
+	my $Tokenizer = eval {
+		PPI::Tokenizer->new( $file );
+	};
+	if ( _INSTANCE($@, 'PPI::Exception') ) {
+		return $self->_error( $@->message );
+	} elsif ( $@ ) {
 		return $self->_error( $errstr );
 	}
 
@@ -153,12 +151,12 @@ sub lex_source {
 		);
 
 	# Create the Tokenizer and hand off to the next method
-	my $Tokenizer = PPI::Tokenizer->new( \$source );
-	unless ( $Tokenizer ) {
-		# Import the tokenizer error
-		my $errstr = PPI::Tokenizer->errstr
-			|| "Unknown error creating PPI::Tokenizer";
-		PPI::Tokenizer->_clear;
+	my $Tokenizer = eval {
+		PPI::Tokenizer->new( \$source );
+	};
+	if ( _INSTANCE($@, 'PPI::Exception') ) {
+		return $self->_error( $@->message );
+	} elsif ( $@ ) {
 		return $self->_error( $errstr );
 	}
 

@@ -1,7 +1,17 @@
 Revision history for Perl extension PPI
 
-1.2xx    xxx xx xxx xxxx
+1.204_01
+        Summary:
+        - Unicode cleanup and bug fixing
+	- Taking the opportunity to do some house cleaning while the
+	  code base is relatively stable, before things get crazy again.
+
 	Details:
+        - For completeness sake, add support for empty documents
+        - Moved capability detection into PPI::Util
+	- POD test script now skips on install properly
+	- Removed 200 lines of old dead "rawinput" code from PPI::Tokenizer
+	- 100% of PPI::Tokenizer is now exception-driven
 	- Workaround for "RT#35917 - charsets.t eats all available VM"
 	  (unicode bug in 5.8.6, works in 5.8.8)
 

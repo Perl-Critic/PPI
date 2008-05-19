@@ -30,12 +30,21 @@ unless ( @files ) {
 	exit();
 }
 
-# Find all the testable perl files in t.data
-foreach my $dir ( '05_lexer_practical', '07_token', '08_regression',
-                  '11_util', '13_data', '15_transform' ) {
-	my @perl = find_files( $dir );
+# Find all the testable perl files in t/data
+foreach my $dir (
+	'05_lexer_practical',
+	'07_token',
+	'08_regression',
+	'11_util',
+	'13_data',
+	'15_transform'
+) {
+	my @perl = find_files( catdir( 't', 'data', $dir ) );
 	push @files, @perl;
 }
+
+# Add the test scripts themselves
+push @files, find_files( 't' );
 
 # Declare our plan
 Test::More::plan( tests => scalar(@files) * 8 );
@@ -91,17 +100,14 @@ sub roundtrip_ok {
 
 # Find file names in named t/data dirs
 sub find_files {
-	my $dir  = shift;
-	my $testdir = catdir( 't', 'data', $dir );
+	my $testdir  = shift;
 	
 	# Does the test directory exist?
 	-e $testdir and -d $testdir and -r $testdir or die "Failed to find test directory $testdir";
 	
 	# Find the .code test files
 	opendir( TESTDIR, $testdir ) or die "opendir: $!";
-	my @perl = map { catfile( $testdir, $_ ) } sort grep { /\.(?:code|pm)$/ } readdir(TESTDIR);
+	my @perl = map { catfile( $testdir, $_ ) } sort grep { /\.(?:code|pm|t)$/ } readdir(TESTDIR);
 	closedir( TESTDIR ) or die "closedir: $!";
 	return @perl;
 }
-
-1;

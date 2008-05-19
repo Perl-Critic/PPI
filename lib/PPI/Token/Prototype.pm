@@ -51,7 +51,7 @@ use base 'PPI::Token';
 
 use vars qw{$VERSION};
 BEGIN {
-	$VERSION = '1.203';
+	$VERSION = '1.204_01';
 }
 
 sub __TOKENIZER__on_char {
@@ -65,7 +65,10 @@ sub __TOKENIZER__on_char {
 		$t->{line_cursor} += length $1;
 	}
 
-	# Finish off the token and process the next char
+	# Shortcut if end of line
+	return 0 unless $1 =~ /\)$/;
+
+	# Found the closing bracket
 	$t->_finalize_token->__TOKENIZER__on_char( $t );
 }
 

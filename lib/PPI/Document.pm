@@ -65,23 +65,20 @@ Document-specific.
 
 use strict;
 use base 'PPI::Node';
-use Carp                          ();
-use List::MoreUtils               ();
-use Params::Util                  '_INSTANCE',
-                                  '_SCALAR';
-use Digest::MD5                   ();
-use PPI                           ();
-use PPI::Util                     ();
+use Carp            ();
+use List::MoreUtils ();
+use Params::Util    qw{ _SCALAR0 _ARRAY0 _INSTANCE };
+use Digest::MD5     ();
+use PPI             ();
+use PPI::Util       ();
 use PPI::Exception::ParserTimeout ();
-use overload 'bool'               => sub () { 1 };
-use overload '""'                 => 'content';
-use constant HAS_ALARM            => (
-	$^O eq 'MSWin32' or $^O eq 'cygwin'
-	) ? 0 : 1;
+
+use overload 'bool'    => sub () { 1 };
+use overload '""'      => 'content';
 
 use vars qw{$VERSION $errstr};
 BEGIN {
-	$VERSION = '1.203';
+	$VERSION = '1.204_01';
 	$errstr  = '';
 }
 
@@ -108,7 +105,7 @@ my $CACHE = undef;
   # With the readonly attribute set
   $doc = PPI::Document->new( $filename,
           readonly => 1,
-          );
+  );
 
 The C<new> constructor takes as argument a variety of different sources of
 Perl code, and creates a single cohesive Perl C<PPI::Document>
@@ -155,7 +152,7 @@ sub new {
 	my $source  = shift;
 	my %attr    = @_;
 	my $timeout = delete $attr{timeout};
-	if ( $timeout and ! HAS_ALARM ) {
+	if ( $timeout and ! PPI::Util::HAVE_ALARM() ) {
 		Carp::croak("This platform does not support PPI parser timeouts");
 	}
 
@@ -212,7 +209,7 @@ sub new {
 			}
 		}
 
-	} elsif ( _SCALAR($source) ) {
+	} elsif ( _SCALAR0($source) ) {
 		if ( $timeout ) {
 			eval {
 				local $SIG{ALRM} = sub { die "alarm\n" };
@@ -220,14 +217,29 @@ sub new {
 				my $document = PPI::Lexer->lex_source( $$source );
 				return $class->_setattr( $document, %attr ) if $document;
 				alarm( 0 );
-			}
+			};
 		} else {
 			my $document = PPI::Lexer->lex_source( $$source );
 			return $class->_setattr( $document, %attr ) if $document;
 		}
 
+	} elsif ( _ARRAY0($source) ) {
+		$source = join '', map { "$_\n" } @$source;
+		if ( $timeout ) {
+			eval {
+				local $SIG{ALRM} = sub { die "alarm\n" };
+				alarm( $timeout );
+				my $document = PPI::Lexer->lex_source( $source );
+				return $class->_setattr( $document, %attr ) if $document;
+				alarm( 0 );
+			};
+		} else {
+			my $document = PPI::Lexer->lex_source( $source );
+			return $class->_setattr( $document, %attr ) if $document;
+		}
+
 	} else {
-		$class->_error("An unknown object or reference was passed to PPI::Document::new");
+		$class->_error("Unknown object or reference was passed to PPI::Document::new");
 	}
 
 	# Pull and store the error from the lexer
