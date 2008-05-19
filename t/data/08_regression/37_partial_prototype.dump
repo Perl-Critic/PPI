@@ -1,0 +1,5 @@
+PPI::Document
+  PPI::Statement
+    PPI::Token::Word  	'sub'
+    PPI::Token::Whitespace  	' '
+    PPI::Token::Prototype  	'('
