@@ -635,7 +635,7 @@ sub _clean_eof {
 	# Find the last token, and if it has no content, kill it.
 	# There appears to be some evidence that such "null tokens" are
 	# somehow getting created accidentally.
-	my $last_token = $self->{tokens}->[ $#{$self->{tokens}} ];
+	my $last_token = $self->{tokens}->[ -1 ];
 	unless ( length $last_token->{content} ) {
 		pop @{$self->{tokens}};
 	}
@@ -643,7 +643,7 @@ sub _clean_eof {
 	# Now, if the last character of the last token is a space we added,
 	# chop it off, deleting the token if there's nothing else left.
 	if ( $self->{source_eof_chop} ) {
-		$last_token = $self->{tokens}->[ $#{$self->{tokens}} ];
+		$last_token = $self->{tokens}->[ -1 ];
 		$last_token->{content} =~ s/ $//;
 		unless ( length $last_token->{content} ) {
 			# Popping token
