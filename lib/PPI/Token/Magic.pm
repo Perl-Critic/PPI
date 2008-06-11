@@ -114,7 +114,7 @@ sub __TOKENIZER__on_char {
 
 		if ( $c =~ /^(\$\#)\w/ ) {
 			# This is really an array index thingy ( $#array )
-			$t->{token} = PPI::Token::ArrayIndex->new( $1 );
+			$t->{token} = PPI::Token::ArrayIndex->new( "$1" );
 			return PPI::Token::ArrayIndex->__TOKENIZER__on_char( $t );
 		}
 
