@@ -133,7 +133,7 @@ sub new {
 
 		# Parse state
 		token        => undef,
-		class        => 'PPI::Token::Whitespace',
+		class        => 'PPI::Token::BOM',
 		zone         => 'PPI::Token::Whitespace',
 
 		# Output token buffer

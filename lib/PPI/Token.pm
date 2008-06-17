@@ -34,6 +34,7 @@ BEGIN {
 # as part of the 'use base' statements.
 
 # Load the token classes
+use PPI::Token::BOM                   ();
 use PPI::Token::Whitespace            ();
 use PPI::Token::Comment               ();
 use PPI::Token::Pod                   ();
