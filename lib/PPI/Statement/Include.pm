@@ -106,6 +106,51 @@ sub module {
 
 =pod
 
+=head2 module_version
+
+The C<module_version> method returns the minimum version of the module
+required by the statement.
+
+=begin testing module_version 9
+
+my $document = PPI::Document->new(\<<'END_PERL');
+use Integer::Version 1;
+use Float::Version 1.5;
+use Version::With::Argument 1 2;
+use No::Version;
+use No::Version::With::Argument 'x';
+use No::Version::With::Arguments 1, 2;
+use 5.005;
+END_PERL
+
+isa_ok( $document, 'PPI::Document' );
+my $statements = $document->find('PPI::Statement::Include');
+is( scalar @{$statements}, 7, 'Found expeced include statements.' );
+is( $statements->[0]->module_version(), 1, 'Integer version' );
+is( $statements->[1]->module_version(), 1.5, 'Float version' );
+is( $statements->[2]->module_version(), 1, 'Version and argument' );
+is( $statements->[3]->module_version(), undef, 'No version, no arguments' );
+is( $statements->[4]->module_version(), undef, 'No version, with argument' );
+is( $statements->[5]->module_version(), undef, 'No version, with arguments' );
+is( $statements->[6]->module_version(), undef, 'Version include, no module' );
+
+=end testing
+
+=cut
+
+sub module_version {
+	my $self = shift;
+	my $argument = $self->schild(3);
+	return undef if $argument and $argument->isa('PPI::Token::Operator');
+
+	my $version = $self->schild(2) or return undef;
+	return undef if not $version->isa('PPI::Token::Number');
+
+	return $version;
+}
+
+=pod
+
 =head2 pragma
 
 The C<pragma> method checks for an include statement's use as a

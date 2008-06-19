@@ -1,5 +1,9 @@
 Revision history for Perl extension PPI
 
+1.xxx
+	Details:
+	- Statement::Include::module_version() implemented.
+
 1.204_01
         Summary:
         - Unicode cleanup and bug fixing

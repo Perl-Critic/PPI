@@ -15,7 +15,7 @@ use PPI::Find;
 use PPI::Transform;
 
 # Execute the tests
-use Test::More tests => 2287;
+use Test::More tests => 2289;
 use Test::ClassAPI;
 
 # Ignore various imported or special functions
@@ -274,6 +274,7 @@ file_scoped=method
 PPI::Statement=isa
 type=method
 module=method
+module_version=method
 pragma=method
 version=method
 
