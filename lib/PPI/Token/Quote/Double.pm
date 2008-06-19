@@ -131,7 +131,7 @@ is( $strings->[5]->simplify, q<''>,                      'String 6: Empty string
 
 sub simplify {
 	# This only works on EXACTLY this class
-	my $self = _INSTANCE(shift, 'PPI::Token::Quote::Double') or return $self;
+	my $self = _INSTANCE(shift, 'PPI::Token::Quote::Double') or return undef;
 
 	# Don't bother if there are characters that could complicate things
 	my $content = $self->content;
