@@ -13,7 +13,7 @@ BEGIN {
 use PPI;
 
 # Execute the tests
-use Test::More tests => 11;
+use Test::More tests => 19;
 
 # =begin testing interpolations 8
 {
@@ -28,13 +28,36 @@ my $Document = PPI::Document->new(\<<'END_PERL');
 END_PERL
 isa_ok( $Document, 'PPI::Document' );
 my $strings = $Document->find('Token::Quote::Double');
-is( scalar(@$strings), 6, 'Found the 5 test strings' );
+is( scalar(@$strings), 6, 'Found the 6 test strings' );
 is( $strings->[0]->interpolations, '', 'String 1: No interpolations'  );
 is( $strings->[1]->interpolations, '', 'String 2: No interpolations'  );
 is( $strings->[2]->interpolations, 1,  'String 3: Has interpolations' );
 is( $strings->[3]->interpolations, 1,  'String 4: Has interpolations' );
 is( $strings->[4]->interpolations, 1,  'String 5: Has interpolations' );
 is( $strings->[5]->interpolations, '', 'String 6: No interpolations'  );
+}
+
+
+
+# =begin testing simplify 8
+{
+my $Document = PPI::Document->new(\<<'END_PERL');
+"no special characters"
+"has \"double\" quotes"
+"has 'single' quotes"
+"has $interpolation"
+"has @interpolation"
+""
+END_PERL
+isa_ok( $Document, 'PPI::Document' );
+my $strings = $Document->find('Token::Quote::Double');
+is( scalar(@$strings), 6, 'Found the 6 test strings' );
+is( $strings->[0]->simplify, q<'no special characters'>, 'String 1: No special characters' );
+is( $strings->[1]->simplify, q<"has \"double\" quotes">, 'String 2: Double quotes'         );
+is( $strings->[2]->simplify, q<"has 'single' quotes">,   'String 3: Single quotes'         );
+is( $strings->[3]->simplify, q<"has $interpolation">,    'String 3: Has interpolation'     );
+is( $strings->[4]->simplify, q<"has @interpolation">,    'String 4: Has interpolation'     );
+is( $strings->[5]->simplify, q<''>,                      'String 6: Empty string'          );
 }
 
 

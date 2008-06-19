@@ -70,7 +70,7 @@ my $Document = PPI::Document->new(\<<'END_PERL');
 END_PERL
 isa_ok( $Document, 'PPI::Document' );
 my $strings = $Document->find('Token::Quote::Double');
-is( scalar(@$strings), 6, 'Found the 5 test strings' );
+is( scalar(@$strings), 6, 'Found the 6 test strings' );
 is( $strings->[0]->interpolations, '', 'String 1: No interpolations'  );
 is( $strings->[1]->interpolations, '', 'String 2: No interpolations'  );
 is( $strings->[2]->interpolations, 1,  'String 3: Has interpolations' );
@@ -103,21 +103,43 @@ equivalent single-quoted string.
 
 If the double can be simplified, it will be modified in place and
 returned as a convenience, or returns false if the string cannot be
-simplified.  
+simplified.
+
+=begin testing simplify 8
+
+my $Document = PPI::Document->new(\<<'END_PERL');
+"no special characters"
+"has \"double\" quotes"
+"has 'single' quotes"
+"has $interpolation"
+"has @interpolation"
+""
+END_PERL
+isa_ok( $Document, 'PPI::Document' );
+my $strings = $Document->find('Token::Quote::Double');
+is( scalar(@$strings), 6, 'Found the 6 test strings' );
+is( $strings->[0]->simplify, q<'no special characters'>, 'String 1: No special characters' );
+is( $strings->[1]->simplify, q<"has \"double\" quotes">, 'String 2: Double quotes'         );
+is( $strings->[2]->simplify, q<"has 'single' quotes">,   'String 3: Single quotes'         );
+is( $strings->[3]->simplify, q<"has $interpolation">,    'String 3: Has interpolation'     );
+is( $strings->[4]->simplify, q<"has @interpolation">,    'String 4: Has interpolation'     );
+is( $strings->[5]->simplify, q<''>,                      'String 6: Empty string'          );
+
+=end testing
 
 =cut
 
 sub simplify {
 	# This only works on EXACTLY this class
-	my $self = _INSTANCE(shift, 'PPI::Token::Quote::Double') or return undef;
+	my $self = _INSTANCE(shift, 'PPI::Token::Quote::Double') or return $self;
 
 	# Don't bother if there are characters that could complicate things
 	my $content = $self->content;
-	my $value   = substr($content, 1, length($content) - 1);
-	return '' if $value =~ /[\\\$\'\"]/;
+	my $value   = substr($content, 1, length($content) - 2);
+	return $self if $value =~ /[\\\$@\'\"]/;
 
 	# Change the token to a single string
-	$self->{content} = '"' . $value . '"';
+	$self->{content} = q<'> . $value . q<'>;
 	bless $self, 'PPI::Token::Quote::Single';
 }
 
