@@ -7,6 +7,7 @@ Revision history for Perl extension PPI
 	- Token::Quote::Double::simplify() fixed.
 	- Element line_number(), column_number(), and visual_column_number()
 	  implmented.
+	- Support for Unicode byte order marks (PPI::Token::BOM) added.
 
 1.204_01
         Summary:
