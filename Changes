@@ -5,6 +5,8 @@ Revision history for Perl extension PPI
 	- Statement::Include::module_version() implemented.
 	- Token::QuoteLike::Words::literal() implemented.
 	- Token::Quote::Double::simplify() fixed.
+	- Element line_number(), column_number(), and visual_column_number()
+	  implmented.
 
 1.204_01
         Summary:

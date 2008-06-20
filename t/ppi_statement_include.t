@@ -29,7 +29,7 @@ END_PERL
 
 isa_ok( $document, 'PPI::Document' );
 my $statements = $document->find('PPI::Statement::Include');
-is( scalar @{$statements}, 7, 'Found expeced include statements.' );
+is( scalar @{$statements}, 7, 'Found expected include statements.' );
 is( $statements->[0]->module_version(), 1, 'Integer version' );
 is( $statements->[1]->module_version(), 1.5, 'Float version' );
 is( $statements->[2]->module_version(), 1, 'Version and argument' );
