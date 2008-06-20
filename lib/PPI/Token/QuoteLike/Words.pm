@@ -91,6 +91,12 @@ foreach my $token ( @{$non_empty_list_tokens} ) {
 =cut
 
 sub literal {
+	my $self = shift;
+
+	my $content = $self->content();
+	my $content = substr $self->content(), 3, length($content) - 4;
+
+	return split q< >, $content;
 }
 
 1;
