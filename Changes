@@ -3,6 +3,8 @@ Revision history for Perl extension PPI
 1.xxx
 	Details:
 	- Statement::Include::module_version() implemented.
+	- Token::QuoteLike::Words::literal() implemented.
+	- Token::Quote::Double::simplify() fixed.
 
 1.204_01
         Summary:

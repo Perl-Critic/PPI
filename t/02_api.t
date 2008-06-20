@@ -15,7 +15,7 @@ use PPI::Find;
 use PPI::Transform;
 
 # Execute the tests
-use Test::More tests => 2289;
+use Test::More tests => 2290;
 use Test::ClassAPI;
 
 # Ignore various imported or special functions
@@ -236,6 +236,7 @@ PPI::Token::_QuoteEngine::Full=isa
 [PPI::Token::QuoteLike::Words]
 PPI::Token=isa
 PPI::Token::_QuoteEngine::Full=isa
+literal=method
 
 [PPI::Token::QuoteLike::Regexp]
 PPI::Token=isa

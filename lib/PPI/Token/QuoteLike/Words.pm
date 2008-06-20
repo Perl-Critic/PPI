@@ -94,7 +94,7 @@ sub literal {
 	my $self = shift;
 
 	my $content = $self->content();
-	my $content = substr $self->content(), 3, length($content) - 4;
+	$content = substr $self->content(), 3, length($content) - 4;
 
 	return split q< >, $content;
 }
