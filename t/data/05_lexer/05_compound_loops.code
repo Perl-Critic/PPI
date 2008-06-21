@@ -4,7 +4,9 @@ foreach () {}
 LABEL: foreach $foo ( 1 .. 20 ) {
 }
 foreach my $foo () {}
+foreach state $foo () {}
 for my $foo () {}
+for state $foo () {}
 foreach $foo () {}
 for $foo () {}
 for (my $a = 0; $a < 10; $a++) {

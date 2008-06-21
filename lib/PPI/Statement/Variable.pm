@@ -52,7 +52,7 @@ BEGIN {
 =head2 type
 
 The C<type> method checks and returns the declaration type of the statement,
-which will be one of either 'my', 'local' or 'our'.
+which will be one of 'my', 'local', 'our', or 'state'.
 
 Returns a string of the type, or C<undef> if the type cannot be detected
 (which is probably a bug).
@@ -69,7 +69,7 @@ sub type {
 	shift @schild if _INSTANCE($schild[0], 'PPI::Token::Label');
 
 	# Get the type
-	(_INSTANCE($schild[0], 'PPI::Token::Word') and $schild[0]->content =~ /^(my|local|our)$/)
+	(_INSTANCE($schild[0], 'PPI::Token::Word') and $schild[0]->content =~ /^(my|local|our|state)$/)
 		? $schild[0]->content
 		: undef;
 }
@@ -140,7 +140,11 @@ sub variables {
 		$Expression->isa('PPI::Statement::Expression') or return ();
 
 		# my and our are simpler than local
-		if ( $self->type eq 'my' or $self->type eq 'our' ) {
+		if (
+				$self->type eq 'my'
+			or	$self->type eq 'our'
+			or	$self->type eq 'state'
+		) {
 			return map { $_->canonical }
 				grep { $_->isa('PPI::Token::Symbol') }
 				$Expression->schildren;

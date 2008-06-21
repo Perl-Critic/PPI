@@ -9,3 +9,13 @@ PPI::Document
     PPI::Token::Number  	'1'
     PPI::Token::Structure  	';'
   PPI::Token::Whitespace  	'\n'
+  PPI::Statement::Variable
+    PPI::Token::Word  	'state'
+    PPI::Token::Whitespace  	' '
+    PPI::Token::Symbol  	'$b'
+    PPI::Token::Whitespace  	' '
+    PPI::Token::Operator  	'='
+    PPI::Token::Whitespace  	' '
+    PPI::Token::Number  	'1'
+    PPI::Token::Structure  	';'
+  PPI::Token::Whitespace  	'\n'

@@ -317,6 +317,7 @@ BEGIN {
 		'my'       => 'PPI::Statement::Variable',
 		'local'    => 'PPI::Statement::Variable',
 		'our'      => 'PPI::Statement::Variable',
+		'state'    => 'PPI::Statement::Variable',
 		# Statements starting with 'sub' could be any one of...
 		# 'sub'    => 'PPI::Statement::Sub',
 		# 'sub'    => 'PPI::Statement::Scheduled',
@@ -784,7 +785,13 @@ sub _statement_continues {
 
 		if ( $LastChild->content eq 'foreach' or $LastChild->content eq 'for' ) {
 			# There are three possibilities here
-			if ( $Token->isa('PPI::Token::Word') and $Token->content eq 'my' ) {
+			if (
+					$Token->isa('PPI::Token::Word')
+				and	(
+						$Token->content eq 'my'
+					or	$Token->content eq 'state'
+				)
+			) {
 				# VAR == 'my ...'
 				return 1;
 			} elsif ( $Token->content =~ /^\$/ ) {
@@ -797,7 +804,7 @@ sub _statement_continues {
 			}
 		}
 
-		if ( $LastChild->content eq 'my' ) {
+		if ( $LastChild->content eq 'my' or $LastChild->content eq 'state' ) {
 			# LABEL foreach my ...
 			# Only a scalar will do
 			return $Token->content =~ /^\$/;

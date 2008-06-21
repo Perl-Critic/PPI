@@ -90,12 +90,16 @@ including any C<'elsif'> or C<'else'> parts of the compound statement.
 The C<'while'> type describes the standard while statement, but again does
 B<not> describes simple statements with a trailing while.
 
-The C<'for'> type covers both of C<'for'> and C<'foreach'> statements.
+The C<'for'> type covers the C-style for loops, regardless of whether they
+were declared using C<'for'> or C<'foreach'>.
+
+The C<'foreach'> type covers loops that iterate over collections,
+regardless of whether they were declared using C<'for'> or C<'foreach'>.
 
 All of the compounds are a variation on one of these three.
 
-Returns the simple string C<'if'>, C<'for'> or C<'while'>, or C<undef> if the type
-cannot be determined.
+Returns the simple string C<'if'>, C<'for'>, C<'foreach'> or C<'while'>,
+or C<undef> if the type cannot be determined.
 
 =cut
 
@@ -113,6 +117,7 @@ sub type {
 	if ( $Element->content eq 'for' ) {
 		$Element = $self->schild(++$p) or return 'for';
 		return 'foreach' if $Element->content eq 'my';
+		return 'foreach' if $Element->content eq 'state';
 		return 'foreach' if $Element->isa('PPI::Token::Symbol');
 		return 'for';
 	}
