@@ -6,10 +6,11 @@ Revision history for Perl extension PPI
 	- Token::QuoteLike::Words::literal() implemented.
 	- Token::Quote::Double::simplify() fixed.
 	- Element line_number(), column_number(), and visual_column_number()
-	  implmented.
+	  implemented.
 	- Support for Unicode byte order marks (PPI::Token::BOM) added.
 	- Now supports the 5.10 "state" keyword.  As far as PPI is concerned,
 	  it's a synonym for "my".
+	- Token::Word::method_call() implemented.
 
 1.204_01
         Summary:

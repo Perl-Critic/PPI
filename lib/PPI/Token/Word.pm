@@ -84,7 +84,7 @@ while ( @pairs ) {
 	is( $word->literal, $to, "The source $from becomes $to ok" );
 }
 
-=end testing 
+=end testing
 
 =cut
 
@@ -96,6 +96,92 @@ sub literal {
 	$word =~ s/\'/::/g;
 
 	return $word;
+}
+
+=pod
+
+=head2 method_call
+
+Answers whether this is the name of a method in a method call. Returns true if
+yes, false if no, and nothing if unknown.
+
+=begin testing method_call 10
+
+my $Document = PPI::Document->new(\<<'END_PERL');
+indirect $foo;
+$bar->method_with_parentheses();
+print SomeClass->method_without_parentheses + 1;
+sub_call();
+$baz->chained_from->chained_to;
+END_PERL
+
+isa_ok( $Document, 'PPI::Document' );
+my $words = $Document->find('Token::Word');
+is( scalar @{$words}, 8, 'Found the 8 test words' );
+my %words = map { $_ => $_ } @{$words};
+is(
+	scalar $words{indirect}->method_call(),
+	undef,
+	'Indirect notation is unknown.',
+);
+is(
+	scalar $words{method_with_parentheses}->method_call(),
+	1,
+	'Method with parentheses is true.',
+);
+is(
+	scalar $words{method_without_parentheses}->method_call(),
+	1,
+	'Method without parentheses is true.',
+);
+is(
+	scalar $words{print}->method_call(),
+	undef,
+	'Plain print is unknown.',
+);
+is(
+	scalar $words{SomeClass}->method_call(),
+	undef,
+	'Class in class method call is unknown.',
+);
+is(
+	scalar $words{sub_call}->method_call(),
+	0,
+	'Subroutine call is false.',
+);
+is(
+	scalar $words{chained_from}->method_call(),
+	1,
+	'Method that is chained from is true.',
+);
+is(
+	scalar $words{chained_to}->method_call(),
+	1,
+	'Method that is chained to is true.',
+);
+
+=end testing
+
+=cut
+
+sub method_call {
+	my $self = shift;
+
+	my $previous = $self->sprevious_sibling();
+	if (
+			$previous
+		and $previous->isa('PPI::Token::Operator')
+		and $previous eq '->'
+	) {
+		return 1;
+	}
+
+	my $next = $self->snext_sibling();
+	if ( $next and $next->isa('PPI::Structure::List') ) {
+		return 0;
+	}
+
+	return;
 }
 
 sub __TOKENIZER__on_char {
@@ -164,6 +250,8 @@ sub __TOKENIZER__on_char {
 	# Finalise and process the character again
 	$t->_finalize_token->__TOKENIZER__on_char( $t );
 }
+
+
 
 # We are committed to being a bareword.
 # Or so we would like to believe.
