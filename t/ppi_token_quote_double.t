@@ -28,7 +28,7 @@ my $Document = PPI::Document->new(\<<'END_PERL');
 END_PERL
 isa_ok( $Document, 'PPI::Document' );
 my $strings = $Document->find('Token::Quote::Double');
-is( scalar(@$strings), 6, 'Found the 6 test strings' );
+is( scalar @{$strings}, 6, 'Found the 6 test strings' );
 is( $strings->[0]->interpolations, '', 'String 1: No interpolations'  );
 is( $strings->[1]->interpolations, '', 'String 2: No interpolations'  );
 is( $strings->[2]->interpolations, 1,  'String 3: Has interpolations' );
@@ -51,7 +51,7 @@ my $Document = PPI::Document->new(\<<'END_PERL');
 END_PERL
 isa_ok( $Document, 'PPI::Document' );
 my $strings = $Document->find('Token::Quote::Double');
-is( scalar(@$strings), 6, 'Found the 6 test strings' );
+is( scalar @{$strings}, 6, 'Found the 6 test strings' );
 is( $strings->[0]->simplify, q<'no special characters'>, 'String 1: No special characters' );
 is( $strings->[1]->simplify, q<"has \"double\" quotes">, 'String 2: Double quotes'         );
 is( $strings->[2]->simplify, q<"has 'single' quotes">,   'String 3: Single quotes'         );
