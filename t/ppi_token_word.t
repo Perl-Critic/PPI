@@ -13,7 +13,7 @@ BEGIN {
 use PPI;
 
 # Execute the tests
-use Test::More tests => 19;
+use Test::More tests => 32;
 
 # =begin testing literal 9
 {
@@ -35,7 +35,7 @@ while ( @pairs ) {
 
 
 
-# =begin testing method_call 10
+# =begin testing method_call 23
 {
 my $Document = PPI::Document->new(\<<'END_PERL');
 indirect $foo;
@@ -43,11 +43,18 @@ $bar->method_with_parentheses();
 print SomeClass->method_without_parentheses + 1;
 sub_call();
 $baz->chained_from->chained_to;
+a_first_thing a_middle_thing a_last_thing;
+(first_list_element, second_list_element, third_list_element);
+first_comma_separated_word, second_comma_separated_word, third_comma_separated_word;
+single_bareword_statement;
+{ bareword_no_semicolon_end_of_block }
+$buz{hash_key};
+fat_comma_left_side => $thingy;
 END_PERL
 
 isa_ok( $Document, 'PPI::Document' );
 my $words = $Document->find('Token::Word');
-is( scalar @{$words}, 8, 'Found the 8 test words' );
+is( scalar @{$words}, 21, 'Found the 21 test words' );
 my %words = map { $_ => $_ } @{$words};
 is(
 	scalar $words{indirect}->method_call(),
@@ -89,6 +96,37 @@ is(
 	1,
 	'Method that is chained to is true.',
 );
+is(
+	scalar $words{a_first_thing}->method_call(),
+	undef,
+	'First bareword is unknown.',
+);
+is(
+	scalar $words{a_middle_thing}->method_call(),
+	undef,
+	'Bareword in the middle is unknown.',
+);
+is(
+	scalar $words{a_last_thing}->method_call(),
+	0,
+	'Bareword at the end is false.',
+);
+foreach my $false_word (
+	qw<
+		first_list_element second_list_element third_list_element
+		first_comma_separated_word second_comma_separated_word third_comma_separated_word
+		single_bareword_statement
+		bareword_no_semicolon_end_of_block
+		hash_key
+		fat_comma_left_side
+	>
+) {
+	is(
+		scalar $words{$false_word}->method_call(),
+		0,
+		"$false_word is false.",
+	);
+}
 }
 
 
