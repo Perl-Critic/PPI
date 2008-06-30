@@ -15,7 +15,7 @@ use PPI::Find;
 use PPI::Transform;
 
 # Execute the tests
-use Test::More tests => 2451;
+use Test::More tests => 2557;
 use Test::ClassAPI;
 
 # Ignore various imported or special functions
@@ -68,6 +68,8 @@ PPI::Statement=abstract
 new=method
 clone=method
 parent=method
+descendant_of=method
+ancestor_of=method
 top=method
 document=method
 statement=method

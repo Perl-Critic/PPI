@@ -147,6 +147,124 @@ sub parent { $_PARENT{refaddr $_[0]} }
 
 =pod
 
+=head2 descendant_of $element
+
+Answers whether a C<PPI::Element> is contained within another one.
+
+C<PPI::Element>s are considered to be descendants of themselves.
+
+=begin testing descendant_of 9
+
+my $Document = PPI::Document->new( \'( [ thingy ] ); $blarg = 1' );
+isa_ok( $Document, 'PPI::Document' );
+ok(
+	$Document->descendant_of($Document),
+	'Document is a descendant of itself.',
+);
+
+my $words = $Document->find('Token::Word');
+is(scalar @{$words}, 1, 'Document contains 1 Word.');
+my $word = $words->[0];
+ok(
+	$word->descendant_of($word),
+	'Word is a descendant of itself.',
+);
+ok(
+	$word->descendant_of($Document),
+	'Word is a descendant of the Document.',
+);
+ok(
+	! $Document->descendant_of($word),
+	'Document is not a descendant of the Word.',
+);
+
+my $symbols = $Document->find('Token::Symbol');
+is(scalar @{$symbols}, 1, 'Document contains 1 Symbol.');
+my $symbol = $symbols->[0];
+ok(
+	! $word->descendant_of($symbol),
+	'Word is not a descendant the Symbol.',
+);
+ok(
+	! $symbol->descendant_of($word),
+	'Symbol is not a descendant the Word.',
+);
+
+=end testing
+
+=cut
+
+sub descendant_of {
+	my ($cursor, $potential_ancestor) = @_;
+
+	return '' if not $potential_ancestor;
+
+	while ( refaddr $cursor != refaddr $potential_ancestor ) {
+		$cursor = $_PARENT{refaddr $cursor} or return '';
+	}
+
+	return 1;
+}
+
+=pod
+
+=head2 ancestor_of $element
+
+Answers whether a C<PPI::Element> is contains another one.
+
+C<PPI::Element>s are considered to be ancestors of themselves.
+
+=begin testing ancestor_of 9
+
+my $Document = PPI::Document->new( \'( [ thingy ] ); $blarg = 1' );
+isa_ok( $Document, 'PPI::Document' );
+ok(
+	$Document->ancestor_of($Document),
+	'Document is an ancestor of itself.',
+);
+
+my $words = $Document->find('Token::Word');
+is(scalar @{$words}, 1, 'Document contains 1 Word.');
+my $word = $words->[0];
+ok(
+	$word->ancestor_of($word),
+	'Word is an ancestor of itself.',
+);
+ok(
+	! $word->ancestor_of($Document),
+	'Word is not an ancestor of the Document.',
+);
+ok(
+	$Document->ancestor_of($word),
+	'Document is an ancestor of the Word.',
+);
+
+my $symbols = $Document->find('Token::Symbol');
+is(scalar @{$symbols}, 1, 'Document contains 1 Symbol.');
+my $symbol = $symbols->[0];
+ok(
+	! $word->ancestor_of($symbol),
+	'Word is not an ancestor the Symbol.',
+);
+ok(
+	! $symbol->ancestor_of($word),
+	'Symbol is not an ancestor the Word.',
+);
+
+=end testing
+
+=cut
+
+sub ancestor_of {
+	my ($self, $potential_descendant) = @_;
+
+	return '' if not $potential_descendant;
+
+	return $potential_descendant->descendant_of($self);
+}
+
+=pod
+
 =head2 statement
 
 For a C<PPI::Element> that is contained (at some depth) within a

@@ -11,6 +11,9 @@ Revision history for Perl extension PPI
 	- Now supports the 5.10 "state" keyword.  As far as PPI is concerned,
 	  it's a synonym for "my".
 	- Token::Word::method_call() implemented.
+	- Element::descendant_of() and Element::ancestor_of implemented.
+	- Now can handle files named "0".  Perl::Critic got a complaint about
+	  this.
 
 1.204_01
         Summary:
