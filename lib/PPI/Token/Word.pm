@@ -105,10 +105,11 @@ sub literal {
 Answers whether this is the name of a method in a method call. Returns true if
 yes, false if no, and nothing if unknown.
 
-=begin testing method_call 23
+=begin testing method_call 24
 
 my $Document = PPI::Document->new(\<<'END_PERL');
 indirect $foo;
+indirect_class_with_colon Foo::;
 $bar->method_with_parentheses();
 print SomeClass->method_without_parentheses + 1;
 sub_call();
@@ -124,12 +125,17 @@ END_PERL
 
 isa_ok( $Document, 'PPI::Document' );
 my $words = $Document->find('Token::Word');
-is( scalar @{$words}, 21, 'Found the 21 test words' );
+is( scalar @{$words}, 23, 'Found the 23 test words' );
 my %words = map { $_ => $_ } @{$words};
 is(
 	scalar $words{indirect}->method_call(),
 	undef,
 	'Indirect notation is unknown.',
+);
+is(
+	scalar $words{indirect_class_with_colon}->method_call(),
+	1,
+	'Indirect notation with following word ending with colons is true.',
 );
 is(
 	scalar $words{method_with_parentheses}->method_call(),
@@ -215,9 +221,10 @@ sub method_call {
 	}
 
 	my $next = $self->snext_sibling();
+	return 0 if not $next;
+
 	if (
-			not $next
-		or	$next->isa('PPI::Structure::List')
+			$next->isa('PPI::Structure::List')
 		or	$next->isa('PPI::Token::Structure')
 		or	$next->isa('PPI::Token::Operator')
 		and (
@@ -226,6 +233,14 @@ sub method_call {
 		)
 	) {
 		return 0;
+	}
+
+	if (
+			$next
+		and $next->isa('PPI::Token::Word')
+		and $next->content() =~ m< \w :: \z >xms
+	) {
+		return 1;
 	}
 
 	return;

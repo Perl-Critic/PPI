@@ -13,7 +13,7 @@ BEGIN {
 use PPI;
 
 # Execute the tests
-use Test::More tests => 32;
+use Test::More tests => 33;
 
 # =begin testing literal 9
 {
@@ -35,10 +35,11 @@ while ( @pairs ) {
 
 
 
-# =begin testing method_call 23
+# =begin testing method_call 24
 {
 my $Document = PPI::Document->new(\<<'END_PERL');
 indirect $foo;
+indirect_class_with_colon Foo::;
 $bar->method_with_parentheses();
 print SomeClass->method_without_parentheses + 1;
 sub_call();
@@ -54,12 +55,17 @@ END_PERL
 
 isa_ok( $Document, 'PPI::Document' );
 my $words = $Document->find('Token::Word');
-is( scalar @{$words}, 21, 'Found the 21 test words' );
+is( scalar @{$words}, 23, 'Found the 23 test words' );
 my %words = map { $_ => $_ } @{$words};
 is(
 	scalar $words{indirect}->method_call(),
 	undef,
 	'Indirect notation is unknown.',
+);
+is(
+	scalar $words{indirect_class_with_colon}->method_call(),
+	1,
+	'Indirect notation with following word ending with colons is true.',
 );
 is(
 	scalar $words{method_with_parentheses}->method_call(),
