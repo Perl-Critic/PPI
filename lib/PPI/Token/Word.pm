@@ -227,7 +227,7 @@ sub method_call {
 			$next->isa('PPI::Structure::List')
 		or	$next->isa('PPI::Token::Structure')
 		or	$next->isa('PPI::Token::Operator')
-		and (
+		and	(
 				$next->content() eq q<,>
 			or	$next->content() eq q[=>]
 		)
@@ -236,9 +236,8 @@ sub method_call {
 	}
 
 	if (
-			$next
-		and $next->isa('PPI::Token::Word')
-		and $next->content() =~ m< \w :: \z >xms
+			$next->isa('PPI::Token::Word')
+		and	$next->content() =~ m< \w :: \z >xms
 	) {
 		return 1;
 	}
