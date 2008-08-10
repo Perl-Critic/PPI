@@ -190,7 +190,9 @@ sub finish { $_[0]->{finish} }
 
 =head2 braces
 
-The C<braces> method is a utility method which returns the brace type.
+The C<braces> method is a utility method which returns the brace type,
+regardless of whether has both braces defined, or just the starting
+brace, or just the ending brace.
 
 Returns on of the three strings C<'[]'>, C<'{}'>, or C<'()'>, or C<undef>
 on error (primarily not having a start brace, as mentioned above).
@@ -199,7 +201,29 @@ on error (primarily not having a start brace, as mentioned above).
 
 sub braces {
 	my $self = $_[0]->{start} ? shift : return undef;
-	return { '[' => '[]', '(' => '()', '{' => '{}' }->{ $self->{start}->{content} };
+	return {
+		'[' => '[]',
+		'(' => '()',
+		'{' => '{}',
+	}->{ $self->{start}->{content} };
+}
+
+=pod
+
+=head1 complete
+
+The C<complete> method is a convenience method that returns true if
+the both braces are defined for the structure, or false if only one
+brace is defined.
+
+Unlike the top level C<complete> method which checks for completeness
+in depth, the structure complete method ONLY confirms completeness
+for the braces, and does not recurse downwards.
+
+=cut
+
+sub complete {
+	!! ($_[0]->{start} and $_[0]->{finish});
 }
 
 

@@ -51,9 +51,13 @@ sub __TOKENIZER__on_char {
 	# Now, we split on the different values of the current content
 	if ( $c eq '*' ) {
 		if ( $char =~ /(?:(?!\d)\w|\:)/ ) {
-			# Symbol
-			$t->{class} = $t->{token}->set_class( 'Symbol' );
-			return 1;
+			# Symbol (unless the thing before it is a number
+			my $tokens = $t->_previous_significant_tokens(1);
+			my $p0     = $tokens->[0];
+			if ( $p0 and ! $p0->isa('PPI::Token::Number') ) {
+				$t->{class} = $t->{token}->set_class( 'Symbol' );
+				return 1;
+			}
 		}
 
 		if ( $char eq '{' ) {

@@ -25,7 +25,7 @@ PPI::Document - Object representation of a Perl document
   # Find all the named subroutines
   my $sub_nodes = $Document->find( 
   	sub { $_[1]->isa('PPI::Statement::Sub') and $_[1]->name }
-  	);
+  );
   my @sub_names = map { $_->name } @$sub_nodes;
   
   # Save the file
@@ -720,6 +720,38 @@ sub normalized {
 	PPI::Normal->process( $Document );
 }
 
+=pod
+
+=head1 complete
+
+The C<complete> method is used to determine if a document is cleanly
+structured, all braces are closed, the final statement is
+fully terminated and all heredocs are fully entered.
+
+Returns true if the document is complete or false if not.
+
+=cut
+
+sub complete {
+	my $self = shift;
+
+	# Do a shortcutting negated check of all
+	# structures in the document.
+	$self->find_any( sub {
+		$_[0]->isa('PPI::Structure')
+		and
+		! $_[0]->complete
+	} )
+	and return '';
+
+
+
+
+
+	return 1;
+}
+
+
 
 
 
@@ -737,18 +769,6 @@ sub scope { 1 }
 
 #####################################################################
 # PPI::Element Methods
-
-# Is the document complete.
-# Cascase to the last significant child
-sub complete {
-	my $self  = shift;
-	my $child = $self->schild(-1);
-	return !! (
-		$child
-		and
-		$child->complete
-	);
-}
 
 sub insert_before {
 	return undef;
