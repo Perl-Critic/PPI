@@ -483,6 +483,8 @@ the C<remove_element> method will remove the C<Element> intact, along
 with any of its children. As such, this method acts essentially as a
 'cut' function.
 
+If successful, returns the removed element.  Otherwise, returns C<undef>.
+
 =cut
 
 sub remove_child {
