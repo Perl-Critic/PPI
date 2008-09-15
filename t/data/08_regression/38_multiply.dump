@@ -1,0 +1,5 @@
+PPI::Document
+  PPI::Statement
+    PPI::Token::Number  	'2'
+    PPI::Token::Operator  	'*'
+    PPI::Token::Word  	'foo'
