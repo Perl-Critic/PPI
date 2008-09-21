@@ -9,6 +9,28 @@ PPI::Document
     PPI::Structure::Block  	{ ... }
   PPI::Token::Whitespace  	'\n'
   PPI::Statement::Compound
+    PPI::Token::Label  	'LABEL:'
+    PPI::Token::Whitespace  	' '
+    PPI::Token::Word  	'while'
+    PPI::Token::Whitespace  	' '
+    PPI::Structure::Condition  	( ... )
+      PPI::Statement::Expression
+        PPI::Token::Number  	'1'
+    PPI::Token::Whitespace  	' '
+    PPI::Structure::Block  	{ ... }
+  PPI::Token::Whitespace  	'\n'
+  PPI::Statement::Compound
+    PPI::Token::Word  	'until'
+    PPI::Token::Whitespace  	' '
+    PPI::Structure::Condition  	( ... )
+      PPI::Statement::Expression
+        PPI::Token::Number  	'1'
+    PPI::Token::Whitespace  	' '
+    PPI::Structure::Block  	{ ... }
+  PPI::Token::Whitespace  	'\n'
+  PPI::Statement::Compound
+    PPI::Token::Label  	'LABEL:'
+    PPI::Token::Whitespace  	' '
     PPI::Token::Word  	'until'
     PPI::Token::Whitespace  	' '
     PPI::Structure::Condition  	( ... )
@@ -103,6 +125,17 @@ PPI::Document
     PPI::Token::Symbol  	'$foo'
     PPI::Token::Whitespace  	' '
     PPI::Structure::ForLoop  	( ... )
+    PPI::Token::Whitespace  	' '
+    PPI::Structure::Block  	{ ... }
+  PPI::Token::Whitespace  	'\n'
+  PPI::Statement::Compound
+    PPI::Token::Word  	'for'
+    PPI::Token::Whitespace  	' '
+    PPI::Token::Symbol  	'$foo'
+    PPI::Token::Whitespace  	' '
+    PPI::Structure::ForLoop  	...
+      PPI::Statement
+        PPI::Token::QuoteLike::Words  	'qw<blah>'
     PPI::Token::Whitespace  	' '
     PPI::Structure::Block  	{ ... }
   PPI::Token::Whitespace  	'\n'

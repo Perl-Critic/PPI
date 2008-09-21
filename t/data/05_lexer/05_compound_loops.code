@@ -1,5 +1,7 @@
 while (1) {}
+LABEL: while (1) {}
 until (1) {}
+LABEL: until (1) {}
 foreach () {}
 LABEL: foreach $foo ( 1 .. 20 ) {
 }
@@ -9,5 +11,6 @@ for my $foo () {}
 for state $foo () {}
 foreach $foo () {}
 for $foo () {}
+for $foo qw<blah> {}
 for (my $a = 0; $a < 10; $a++) {
 }
