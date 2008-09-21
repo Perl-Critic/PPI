@@ -2,14 +2,15 @@ Revision history for Perl extension PPI
 
 1.xxx
 	Details:
+	- Now supports the 5.10 "state" keyword.  As far as PPI is concerned,
+	  it's a synonym for "my".
+	- Now supports the smart match operator (~~).
 	- Statement::Include::module_version() implemented.
 	- Token::QuoteLike::Words::literal() implemented.
 	- Token::Quote::Double::simplify() fixed.
 	- Element line_number(), column_number(), and visual_column_number()
 	  implemented.
 	- Support for Unicode byte order marks (PPI::Token::BOM) added.
-	- Now supports the 5.10 "state" keyword.  As far as PPI is concerned,
-	  it's a synonym for "my".
 	- Token::Word::method_call() implemented.
 	- Element::descendant_of() and Element::ancestor_of() implemented.
 	- Statement::specialized() implemented.

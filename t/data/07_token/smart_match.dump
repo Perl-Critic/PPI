@@ -1,0 +1,6 @@
+PPI::Document
+  PPI::Statement
+    PPI::Token::Symbol  	'@foo'
+    PPI::Token::Operator  	'~~'
+    PPI::Token::Symbol  	'@bar'
+  PPI::Token::Whitespace  	'\n'

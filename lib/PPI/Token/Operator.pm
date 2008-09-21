@@ -18,7 +18,7 @@ PPI::Token::Operator - Token class for operators
   # This is the list of valid operators
   ++   --   **   !    ~    +    -
   =~   !~   *    /    %    x
-  <<   >>   lt   gt   le   ge   cmp
+  <<   >>   lt   gt   le   ge   cmp  ~~
   ==   !=   <=>  .    ..   ...  ,
   &    |    ^    &&   ||   //
   ?    :    =    +=   -=   *=   .=   //=
@@ -56,7 +56,7 @@ BEGIN {
 		-> ++ -- ** ! ~ + -
 		=~ !~ * / % x + - . << >>
 		< > <= >= lt gt le ge
-		== != <=> eq ne cmp
+		== != <=> eq ne cmp ~~
 		& | ^ && || // .. ...
 		? : = += -= *= .= /= //=
 		=> <>
