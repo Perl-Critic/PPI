@@ -24,7 +24,7 @@ use Params::Util '_INSTANCE';
 
 # For each new item in t/data/08_regression add another 14 tests
 
-use Test::More tests => 3302;
+use Test::More tests => 3317;
 use t::lib::PPI;
 
 

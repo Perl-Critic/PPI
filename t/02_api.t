@@ -15,7 +15,7 @@ use PPI::Find;
 use PPI::Transform;
 
 # Execute the tests
-use Test::More tests => 2557;
+use Test::More tests => 2577;
 use Test::ClassAPI;
 
 # Ignore various imported or special functions
@@ -332,6 +332,7 @@ PPI::Statement=isa
 [PPI::Structure]
 PPI::Node=isa
 braces=method
+complete=method
 start=method
 finish=method
 
