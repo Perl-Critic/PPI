@@ -16,7 +16,7 @@ PPI::Statement::Break - Statements which break out of normal statement flow
 
 =head1 INHERITANCE
 
-  PPI::Statement::Compound
+  PPI::Statement::Break
   isa PPI::Statement
       isa PPI::Node
           isa PPI::Element
