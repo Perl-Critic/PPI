@@ -599,7 +599,7 @@ sub index_locations {
 		# Calculate the new location if needed.
 		$location = $_
 			? $self->_add_location( $location, $Tokens[$_ - 1], \$heredoc )
-			: [ 1, 1, 1 ];
+			: [ 1, 1, 1, 1 ];
 		$first = $_;
 		last;
 	}
@@ -625,20 +625,26 @@ sub _add_location {
 
 	# Does the content contain any newlines
 	my $newlines =()= $content =~ /\n/g;
+	my $logical_line =
+		$self->_logical_line_and_file($start, $Token, $newlines);
+
 	unless ( $newlines ) {
 		# Handle the simple case
 		return [
 			$start->[0],
 			$start->[1] + length($content),
-			$start->[2] + $self->_visual_length($content, $start->[2])
+			$start->[2] + $self->_visual_length($content, $start->[2]),
+			$logical_line,
 		];
 	}
 
 	# This is the more complex case where we hit or
 	# span a newline boundary.
-	my $location = [ $start->[0] + $newlines, 1, 1 ];
+	my $physical_line = $start->[0] + $newlines;
+	my $location = [ $physical_line, 1, 1, $logical_line ];
 	if ( $heredoc and $$heredoc ) {
 		$location->[0] += $$heredoc;
+		$location->[3] += $$heredoc;
 		$$heredoc = 0;
 	}
 
@@ -650,6 +656,31 @@ sub _add_location {
 	}
 
 	$location;
+}
+
+# The file part isn't handled yet.
+sub _logical_line_and_file {
+	my ($self, $start, $Token, $newlines) = @_;
+
+	# Regex taken from perlsyn, with the correction that there's no space
+	# required between the line number and the file name.
+	if (
+			$Token->isa('PPI::Token::Comment')
+		and $start->[1] == 1
+		and $Token->content() =~ m<
+			\A
+			\#      \s*
+			line    \s+
+			(\d+)   \s*
+			(?: ("?) ([^"]+) \2 )?
+			\s*
+			\z
+		>x
+	) {
+		return $1;
+	}
+
+	return $start->[3] + $newlines;
 }
 
 sub _visual_length {
