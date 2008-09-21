@@ -267,6 +267,7 @@ PPI::Token=isa
 [PPI::Statement]
 PPI::Node=isa
 label=method
+specialized=method
 stable=method
 
 [PPI::Statement::Expression]

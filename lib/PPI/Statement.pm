@@ -213,6 +213,68 @@ sub label {
 
 =pod
 
+=head2 specialized
+
+Answer whether this is a plain statement or one that has more
+significance.
+
+Returns true if the statement is a subclass of this one, false
+otherwise.
+
+=begin testing specialized 22
+
+my $Document = PPI::Document->new(\<<'END_PERL');
+package Foo;
+use strict;
+;
+while (1) { last; }
+BEGIN { }
+sub foo { }
+state $x;
+$x = 5;
+END_PERL
+
+isa_ok( $Document, 'PPI::Document' );
+
+my $statements = $Document->find('Statement');
+is( scalar @{$statements}, 10, 'Found the 10 test statements' );
+
+isa_ok( $statements->[0], 'PPI::Statement::Package',    'String 1: isa Package'            );
+ok( $statements->[0]->specialized(),                    'String 1: is specialized'         );
+isa_ok( $statements->[1], 'PPI::Statement::Include',    'String 2: isa Include'            );
+ok( $statements->[1]->specialized(),                    'String 2: is specialized'         );
+isa_ok( $statements->[2], 'PPI::Statement::Null',       'String 3: isa Null'               );
+ok( $statements->[2]->specialized(),                    'String 3: is specialized'         );
+isa_ok( $statements->[3], 'PPI::Statement::Compound',   'String 4: isa Compound'           );
+ok( $statements->[3]->specialized(),                    'String 4: is specialized'         );
+isa_ok( $statements->[4], 'PPI::Statement::Expression', 'String 5: isa Expression'         );
+ok( $statements->[4]->specialized(),                    'String 5: is specialized'         );
+isa_ok( $statements->[5], 'PPI::Statement::Break',      'String 6: isa Break'              );
+ok( $statements->[5]->specialized(),                    'String 6: is specialized'         );
+isa_ok( $statements->[6], 'PPI::Statement::Scheduled',  'String 7: isa Scheduled'          );
+ok( $statements->[6]->specialized(),                    'String 7: is specialized'         );
+isa_ok( $statements->[7], 'PPI::Statement::Sub',        'String 8: isa Sub'                );
+ok( $statements->[7]->specialized(),                    'String 8: is specialized'         );
+isa_ok( $statements->[8], 'PPI::Statement::Variable',   'String 9: isa Variable'           );
+ok( $statements->[8]->specialized(),                    'String 9: is specialized'         );
+is( ref $statements->[9], 'PPI::Statement',             'String 10: is a simple Statement' );
+ok( ! $statements->[9]->specialized(),                  'String 10: is not specialized'    );
+
+=end testing
+
+=cut
+
+sub specialized {
+	my $self = shift;
+
+	# Yes, this is doing precisely what it's intending to prevent
+	# client code from doing.  However, since it's here, if the
+	# implementation changes, code outside PPI doesn't care.
+	return __PACKAGE__ ne ref $self;
+}
+
+=pod
+
 =head2 stable
 
 Much like the L<PPI::Document> method of the same name, the ->stable
