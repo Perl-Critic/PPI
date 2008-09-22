@@ -664,20 +664,47 @@ sub _logical_line_and_file {
 
 	# Regex taken from perlsyn, with the correction that there's no space
 	# required between the line number and the file name.
-	if (
-			$Token->isa('PPI::Token::Comment')
-		and $start->[1] == 1
-		and $Token->content() =~ m<
-			\A
-			\#      \s*
-			line    \s+
-			(\d+)   \s*
-			(?: ("?) ([^"]+) \2 )?
-			\s*
-			\z
-		>x
-	) {
-		return $1;
+	if ($start->[1] == 1) {
+		if ( $Token->isa('PPI::Token::Comment') ) {
+			if (
+				$Token->content() =~ m<
+					\A
+					\#      \s*
+					line    \s+
+					(\d+)   \s*
+					(?: ("?) ([^"]+) \2 )?
+					\s*
+					\z
+				>xms
+			) {
+				return $1;
+			}
+		}
+		elsif ( $Token->isa('PPI::Token::Pod') ) {
+			my $content = $Token->content();
+			my $line;
+			my $end_of_directive;
+			while (
+				$content =~ m<
+					^
+					\#      \s*?
+					line    \s+?
+					(\d+)   \s*?
+					(?: ("?) ([^"]+?) \2 )??
+					\s*?
+					$
+				>xmsg
+			) {
+				$line = $1;
+				$end_of_directive = pos $content;
+			}
+
+			if (defined $line) {
+				pos $content = $end_of_directive;
+				my $post_directive_newlines =()= $content =~ m< \G [^\n]* \n >xmsg;
+				return $line + $post_directive_newlines - 1;
+			}
+		}
 	}
 
 	return $start->[3] + $newlines;
