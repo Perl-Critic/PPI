@@ -109,7 +109,7 @@ sub module {
 =head2 module_version
 
 The C<module_version> method returns the minimum version of the module
-required by the statement.
+required by the statement, if there is one.
 
 =begin testing module_version 9
 
