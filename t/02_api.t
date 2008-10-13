@@ -15,7 +15,7 @@ use PPI::Find;
 use PPI::Transform;
 
 # Execute the tests
-use Test::More tests => 2577;
+use Test::More tests => 2578;
 use Test::ClassAPI;
 
 # Ignore various imported or special functions
@@ -309,6 +309,7 @@ PPI::Statement=isa
 PPI::Statement::Expression=isa
 type=method
 variables=method
+symbols=method
 
 [PPI::Statement::Compound]
 PPI::Statement=isa

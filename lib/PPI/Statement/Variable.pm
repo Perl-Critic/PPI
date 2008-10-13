@@ -124,13 +124,28 @@ is_deeply( [ $ST->[6]->variables ], [ '$foo', '$bar' ], '7: Found $foo and $bar'
 sub variables {
 	my $self = shift;
 
+	return map { $_->canonical() } $self->symbols();
+}
+
+=pod
+
+=head2 symbols
+
+Returns a list of the variables defined by the statement, as
+L<PPI::Token::Symbol>s.
+
+=cut
+
+sub symbols {
+	my $self = shift;
+
 	# Get the children we care about
 	my @schild = grep { $_->significant } $self->children;
 	shift @schild if _INSTANCE($schild[0], 'PPI::Token::Label');
 
 	# If the second child is a symbol, return its name
 	if ( _INSTANCE($schild[1], 'PPI::Token::Symbol') ) {
-		return $schild[1]->canonical;
+		return $schild[1];
 	}
 
 	# If it's a list, return as a list
@@ -145,7 +160,7 @@ sub variables {
 			or	$self->type eq 'our'
 			or	$self->type eq 'state'
 		) {
-			return map { $_->canonical }
+			return
 				grep { $_->isa('PPI::Token::Symbol') }
 				$Expression->schildren;
 		}
@@ -156,7 +171,7 @@ sub variables {
 		# for future bug reports about local() things.
 		
 		# This is a slightly better way to check.
-		return map   { $_->canonical                 }
+		return
 			grep { $self->_local_variable($_)    }
 			grep { $_->isa('PPI::Token::Symbol') }
 			$Expression->schildren;

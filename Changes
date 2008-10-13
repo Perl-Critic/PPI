@@ -8,6 +8,7 @@ Revision history for Perl extension PPI
 	- Now supports keeping track of line numbers as affected by the #line
 	  directive.
 	- Statement::Include::module_version() implemented.
+	- Statement::Variable::symbols() implemented.
 	- Token::QuoteLike::Words::literal() implemented.
 	- Token::Quote::Double::simplify() fixed.
 	- Element line_number(), column_number(), and visual_column_number()
