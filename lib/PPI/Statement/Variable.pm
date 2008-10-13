@@ -169,7 +169,7 @@ sub symbols {
 		# Not that we are actually going to deal with it now,
 		# but having this seperate is likely going to be needed
 		# for future bug reports about local() things.
-		
+
 		# This is a slightly better way to check.
 		return
 			grep { $self->_local_variable($_)    }
