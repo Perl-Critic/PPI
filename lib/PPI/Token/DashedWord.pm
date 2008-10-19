@@ -19,7 +19,7 @@ The "dashed bareword" token represents literal values like C<-foo>.
 NOTE: this class is currently unused.  All tokens that should be
 PPI::Token::DashedWords are just normal PPI::Token::Word instead.
 That actually makes sense, since there really is nothing special about
-this class except that dashed words cannot subroutine names or
+this class except that dashed words cannot be subroutine names or
 keywords.  As such, this class may be removed from PPI in the future.
 
 =head1 METHODS
