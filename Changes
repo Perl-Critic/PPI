@@ -7,6 +7,7 @@ Revision history for Perl extension PPI
 	- Now supports the smart match operator (~~).
 	- Now supports keeping track of line numbers as affected by the #line
 	  directive.
+	- Now supports UNITCHECK blocks.
 	- Statement::Include::module_version() implemented.
 	- Statement::Variable::symbols() implemented.
 	- Token::QuoteLike::Words::literal() implemented.

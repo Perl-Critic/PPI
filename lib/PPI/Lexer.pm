@@ -302,45 +302,46 @@ BEGIN {
 	# Keyword -> Statement Subclass
 	%STATEMENT_CLASSES = (
 		# Things that affect the timing of execution
-		'BEGIN'    => 'PPI::Statement::Scheduled',
-		'CHECK'    => 'PPI::Statement::Scheduled',
-		'INIT'     => 'PPI::Statement::Scheduled',
-		'END'      => 'PPI::Statement::Scheduled',
+		'BEGIN'     => 'PPI::Statement::Scheduled',
+		'CHECK'     => 'PPI::Statement::Scheduled',
+		'UNITCHECK' => 'PPI::Statement::Scheduled',
+		'INIT'      => 'PPI::Statement::Scheduled',
+		'END'       => 'PPI::Statement::Scheduled',
 
 		# Loading and context statement
-		'package'  => 'PPI::Statement::Package',
-		# 'use'      => 'PPI::Statement::Include',
-		'no'       => 'PPI::Statement::Include',
-		'require'  => 'PPI::Statement::Include',
+		'package'   => 'PPI::Statement::Package',
+		# 'use'       => 'PPI::Statement::Include',
+		'no'        => 'PPI::Statement::Include',
+		'require'   => 'PPI::Statement::Include',
 
 		# Various declarations
-		'my'       => 'PPI::Statement::Variable',
-		'local'    => 'PPI::Statement::Variable',
-		'our'      => 'PPI::Statement::Variable',
-		'state'    => 'PPI::Statement::Variable',
+		'my'        => 'PPI::Statement::Variable',
+		'local'     => 'PPI::Statement::Variable',
+		'our'       => 'PPI::Statement::Variable',
+		'state'     => 'PPI::Statement::Variable',
 		# Statements starting with 'sub' could be any one of...
-		# 'sub'    => 'PPI::Statement::Sub',
-		# 'sub'    => 'PPI::Statement::Scheduled',
-		# 'sub'    => 'PPI::Statement',
+		# 'sub'     => 'PPI::Statement::Sub',
+		# 'sub'     => 'PPI::Statement::Scheduled',
+		# 'sub'     => 'PPI::Statement',
 
 		# Compound statement
-		'if'       => 'PPI::Statement::Compound',
-		'unless'   => 'PPI::Statement::Compound',
-		'for'      => 'PPI::Statement::Compound',
-		'foreach'  => 'PPI::Statement::Compound',
-		'while'    => 'PPI::Statement::Compound',
-		'until'    => 'PPI::Statement::Compound',
+		'if'        => 'PPI::Statement::Compound',
+		'unless'    => 'PPI::Statement::Compound',
+		'for'       => 'PPI::Statement::Compound',
+		'foreach'   => 'PPI::Statement::Compound',
+		'while'     => 'PPI::Statement::Compound',
+		'until'     => 'PPI::Statement::Compound',
 
 		# Various ways of breaking out of scope
-		'redo'     => 'PPI::Statement::Break',
-		'next'     => 'PPI::Statement::Break',
-		'last'     => 'PPI::Statement::Break',
-		'return'   => 'PPI::Statement::Break',
-                'goto'     => 'PPI::Statement::Break',
+		'redo'      => 'PPI::Statement::Break',
+		'next'      => 'PPI::Statement::Break',
+		'last'      => 'PPI::Statement::Break',
+		'return'    => 'PPI::Statement::Break',
+		'goto'      => 'PPI::Statement::Break',
 
 		# Special sections of the file
-		'__DATA__' => 'PPI::Statement::Data',
-		'__END__'  => 'PPI::Statement::End',
+		'__DATA__'  => 'PPI::Statement::Data',
+		'__END__'   => 'PPI::Statement::End',
 		);
 }
 

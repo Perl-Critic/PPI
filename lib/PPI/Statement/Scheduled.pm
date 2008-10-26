@@ -19,23 +19,28 @@ PPI::Statement::Scheduled - A scheduled code block
 A scheduled code block is one that is intended to be run at a specific
 time during the loading process.
 
-There are four types of scheduled block:
+There are five types of scheduled block:
 
   BEGIN {
   	# Executes as soon as this block is fully defined
   	...
   }
-  
+
   CHECK {
-  	# Executes after compile-phase in reverse order
+  	# Executes after overall compile-phase in reverse order
   	...
   }
-  
+
+  UNITCHECK {
+  	# Executes after compile-phase of individual module in reverse order
+  	...
+  }
+
   INIT {
   	# Executes just before run-time
   	...
   }
-  
+
   END {
   	# Executes as late as possible in reverse order
   	...
@@ -63,7 +68,7 @@ sub __LEXER__normal { '' }
 =head2 type
 
 The C<type> method returns the type of scheduled block, which should always be
-one of C<'BEGIN'>, C<'CHECK'>, C<'INIT'> or C<'END'>.
+one of C<'BEGIN'>, C<'CHECK'>, C<'UNITCHECK'>, C<'INIT'> or C<'END'>.
 
 =cut
 

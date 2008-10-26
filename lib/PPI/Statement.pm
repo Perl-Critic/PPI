@@ -27,9 +27,9 @@ frozen/finalised. Names may change slightly or be added or removed.
 
 =head2 L<PPI::Statement::Scheduled>
 
-This covers all "scheduled" blocks, chunks of code that are executed
-separately from the main body of the code, at a particular time. This
-includes all C<BEGIN>, C<CHECK>, C<INIT> and C<END> blocks.
+This covers all "scheduled" blocks, chunks of code that are executed separately
+from the main body of the code, at a particular time. This includes all
+C<BEGIN>, C<CHECK>, C<UNITCHECK>, C<INIT> and C<END> blocks.
 
 =head2 L<PPI::Statement::Package>
 
