@@ -1,32 +1,32 @@
-package PPI::Statement::Switch;
+package PPI::Structure::WhenMatch;
 
 =pod
 
 =head1 NAME
 
-PPI::Statement::Switch - Describes all compound statements
+PPI::Structure::WhenMatch - Circular braces for a when statement
 
 =head1 SYNOPSIS
 
-  given ( foo ) {
-      say $_;
+  when ( something ) {
+      ...
   }
 
 =head1 INHERITANCE
 
-  PPI::Statement::Switch
-  isa PPI::Statement
+  PPI::Structure::WhenMatch
+  isa PPI::Structure
       isa PPI::Node
           isa PPI::Element
 
 =head1 DESCRIPTION
 
-C<PPI::Statement::Switch> objects are used to describe switch statements, as
-described in L<perlsyn>.
+C<PPI::Structure::WhenMatch> is the class used for circular braces that
+contain the thing to be matched in a when statement.
 
 =head1 METHODS
 
-C<PPI::Structure::Switch> has no methods beyond those provided by the
+C<PPI::Structure::WhenMatch> has no methods beyond those provided by the
 standard L<PPI::Structure>, L<PPI::Node> and L<PPI::Element> methods.
 
 Got any ideas for methods? Submit a report to rt.cpan.org!
@@ -34,31 +34,16 @@ Got any ideas for methods? Submit a report to rt.cpan.org!
 =cut
 
 use strict;
-use base 'PPI::Statement';
+use base 'PPI::Structure';
 
 use vars qw{$VERSION};
 BEGIN {
 	$VERSION = '1.204_01';
 }
 
-# Lexer clues
-sub __LEXER__normal { '' }
-
-
-#####################################################################
-# PPI::Node Methods
-
-sub scope {
-	1;
-}
-
 1;
 
 =pod
-
-=head1 TO DO
-
-- Write unit tests for this package
 
 =head1 SUPPORT
 

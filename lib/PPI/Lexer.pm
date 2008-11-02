@@ -334,6 +334,7 @@ BEGIN {
 
 		# Switch statement
 		'given'     => 'PPI::Statement::Switch',
+		'when'      => 'PPI::Statement::When',
 
 		# Various ways of breaking out of scope
 		'redo'      => 'PPI::Statement::Break',
@@ -500,7 +501,10 @@ sub _resolve_new_statement {
 	}
 
 	# Switch statements use expressions, as well.
-	if ( $Parent->isa('PPI::Structure::Given') ) {
+	if (
+			$Parent->isa('PPI::Structure::Given')
+		or  $Parent->isa('PPI::Structure::WhenMatch')
+	) {
 		return 'PPI::Statement::Expression';
 	}
 
@@ -615,13 +619,14 @@ sub _statement_continues {
 	}
 
 	# Alrighty then, there are only five implied end statement types,
-	# ::Scheduled blocks, ::Sub declarations, ::Compound, and Switch statements.
-	unless ( ref($Statement) =~ /\b(?:Scheduled|Sub|Compound|Switch)$/ ) {
+	# ::Scheduled blocks, ::Sub declarations, ::Compound, ::Switch, and ::When
+	# statements.
+	unless ( ref($Statement) =~ /\b(?:Scheduled|Sub|Compound|Switch|When)$/ ) {
 		return 1;
 	}
 
-	# Of these five, ::Scheduled, ::Sub, and ::Switch follow the same simple
-	# rule and can be handled first.
+	# Of these five, ::Scheduled, ::Sub, ::Switch, and ::When follow the same
+	# simple rule and can be handled first.
 	my @part      = $Statement->schildren;
 	my $LastChild = $part[-1] or return undef;
 	unless ( $Statement->isa('PPI::Statement::Compound') ) {
@@ -886,6 +891,8 @@ sub _resolve_new_structure_round {
 		}
 	} elsif ( $Parent->isa('PPI::Statement::Switch') ) {
 		return 'PPI::Structure::Given';
+	} elsif ( $Parent->isa('PPI::Statement::When') ) {
+		return 'PPI::Structure::WhenMatch';
 	}
 
 	# Otherwise, it must be a list

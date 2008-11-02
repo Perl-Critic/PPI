@@ -401,6 +401,8 @@ based on inheritance.
                PPI::Statement::Scheduled
             PPI::Statement::Compound
             PPI::Statement::Break
+            PPI::Statement::Switch
+            PPI::Statement::When
             PPI::Statement::Data
             PPI::Statement::End
             PPI::Statement::Expression
@@ -415,6 +417,8 @@ based on inheritance.
             PPI::Structure::Condition
             PPI::Structure::List
             PPI::Structure::ForLoop
+            PPI::Structure::Given
+            PPI::Structure::WhenMatch
             PPI::Structure::Unknown
       PPI::Token
          PPI::Token::Whitespace

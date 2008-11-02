@@ -1,32 +1,37 @@
-package PPI::Statement::Switch;
+package PPI::Statement::When;
 
 =pod
 
 =head1 NAME
 
-PPI::Statement::Switch - Describes all compound statements
+PPI::Statement::When - Describes all compound statements
 
 =head1 SYNOPSIS
 
-  given ( foo ) {
-      say $_;
+  foreach ( qw/ foo bar baz / ) {
+      when ( m/b/ ) {
+          boing($_);
+      }
+      when ( m/f/ ) {
+          boom($_);
+      }
   }
 
 =head1 INHERITANCE
 
-  PPI::Statement::Switch
+  PPI::Statement::When
   isa PPI::Statement
       isa PPI::Node
           isa PPI::Element
 
 =head1 DESCRIPTION
 
-C<PPI::Statement::Switch> objects are used to describe switch statements, as
+C<PPI::Statement::When> objects are used to describe when statements, as
 described in L<perlsyn>.
 
 =head1 METHODS
 
-C<PPI::Structure::Switch> has no methods beyond those provided by the
+C<PPI::Structure::When> has no methods beyond those provided by the
 standard L<PPI::Structure>, L<PPI::Node> and L<PPI::Element> methods.
 
 Got any ideas for methods? Submit a report to rt.cpan.org!

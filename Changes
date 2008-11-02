@@ -1,9 +1,13 @@
 Revision history for Perl extension PPI
 
 1.xxx
+	Summary:
+	- It's a perl 5.10 extravaganza!
+
 	Details:
 	- Now supports the 5.10 "state" keyword.  As far as PPI is concerned,
 	  it's a synonym for "my".
+	- Now supports switch statements.
 	- Now supports the smart match operator (~~).
 	- Now supports keeping track of line numbers as affected by the #line
 	  directive.

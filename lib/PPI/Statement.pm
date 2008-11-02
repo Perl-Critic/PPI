@@ -50,7 +50,7 @@ A named subroutine declaration, or forward declaration
 A variable declaration statement. This could be either a straight
 declaration or also be an expression.
 
-This includes all 'my', 'local' and 'out' statements.
+This includes all 'my', 'state', 'local' and 'out' statements.
 
 =head2 L<PPI::Statement::Compound>
 
@@ -69,6 +69,16 @@ a ';' statement terminator.
 A statement that breaks out of a structure.
 
 This includes all of 'redo', 'next', 'last' and 'return' statements.
+
+=head2 L<PPI::Statement::Switch>
+
+The kind of statement introduced in Perl 5.10 that starts with 'given'.  This
+has an implicit end.
+
+=head2 L<PPI::Statement::When>
+
+The kind of statement introduced in Perl 5.10 that starts with 'when'.  This
+also has an implicit end.
 
 =head2 L<PPI::Statement::Data>
 
@@ -159,6 +169,7 @@ use PPI::Statement::Switch         ();
 use PPI::Statement::UnmatchedBrace ();
 use PPI::Statement::Unknown        ();
 use PPI::Statement::Variable       ();
+use PPI::Statement::When           ();
 
 # "Normal" statements end at a statement terminator ;
 # Some are not, and need the more rigorous _statement_continues to see

@@ -15,7 +15,7 @@ use PPI::Find;
 use PPI::Transform;
 
 # Execute the tests
-use Test::More tests => 2685;
+use Test::More tests => 2792;
 use Test::ClassAPI;
 
 # Ignore various imported or special functions
@@ -318,6 +318,9 @@ type=method
 [PPI::Statement::Switch]
 PPI::Statement=isa
 
+[PPI::Statement::When]
+PPI::Statement=isa
+
 [PPI::Statement::Break]
 PPI::Statement=isa
 
@@ -359,6 +362,9 @@ PPI::Structure=isa
 PPI::Structure=isa
 
 [PPI::Structure::Given]
+PPI::Structure=isa
+
+[PPI::Structure::WhenMatch]
 PPI::Structure=isa
 
 [PPI::Structure::Unknown]

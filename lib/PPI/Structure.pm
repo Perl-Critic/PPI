@@ -37,7 +37,7 @@ end, the -E<gt>children method explicitly will B<not> return the brace.
 =head1 STRUCTURE CLASSES
 
 Excluding the transient L<PPI::Structure::Unknown> that exists briefly
-inside the parser, there are six types of structure.
+inside the parser, there are eight types of structure.
 
 =head2 L<PPI::Structure::List>
 
@@ -49,6 +49,14 @@ loops, literal lists, and braces used for precedence-ordering purposes.
 Although B<not> used for the C<foreach> loop list, this B<is> used for
 the special case of the round-brace three-part semicolon-seperated C<for>
 loop expression (the traditional C style for loop).
+
+=head2 L<PPI::Structure::Given>
+
+This is for the expression being matched in switch statements.
+
+=head2 L<PPI::Structure::WhenMatch>
+
+This is for the matching expression in "when" statements.
 
 =head2 L<PPI::Structure::Condition>
 
@@ -99,6 +107,7 @@ use PPI::Structure::Given       ();
 use PPI::Structure::List        ();
 use PPI::Structure::Subscript   ();
 use PPI::Structure::Unknown     ();
+use PPI::Structure::WhenMatch   ();
 
 
 
