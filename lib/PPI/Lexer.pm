@@ -499,6 +499,11 @@ sub _resolve_new_statement {
 		return 'PPI::Statement::Expression';
 	}
 
+	# Switch statements use expressions, as well.
+	if ( $Parent->isa('PPI::Structure::Given') ) {
+		return 'PPI::Statement::Expression';
+	}
+
 	if ( _INSTANCE($Token, 'PPI::Token::Label') ) {
 		return 'PPI::Statement::Compound';
 	}
