@@ -335,6 +335,7 @@ BEGIN {
 		# Switch statement
 		'given'     => 'PPI::Statement::Switch',
 		'when'      => 'PPI::Statement::When',
+		'default'   => 'PPI::Statement::When',
 
 		# Various ways of breaking out of scope
 		'redo'      => 'PPI::Statement::Break',
