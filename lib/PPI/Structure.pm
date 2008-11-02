@@ -95,6 +95,7 @@ use PPI::Structure::Block       ();
 use PPI::Structure::Condition   ();
 use PPI::Structure::Constructor ();
 use PPI::Structure::ForLoop     ();
+use PPI::Structure::Given       ();
 use PPI::Structure::List        ();
 use PPI::Structure::Subscript   ();
 use PPI::Structure::Unknown     ();

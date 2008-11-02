@@ -332,6 +332,9 @@ BEGIN {
 		'while'     => 'PPI::Statement::Compound',
 		'until'     => 'PPI::Statement::Compound',
 
+		# Switch statement
+		'given'     => 'PPI::Statement::Switch',
+
 		# Various ways of breaking out of scope
 		'redo'      => 'PPI::Statement::Break',
 		'next'      => 'PPI::Statement::Break',
@@ -606,13 +609,13 @@ sub _statement_continues {
 		return '';
 	}
 
-	# Alrighty then, there are only three implied end statement types,
-	# ::Scheduled blocks, ::Sub declarations, and ::Compound statements.
-	unless ( ref($Statement) =~ /\b(?:Scheduled|Sub|Compound)$/ ) {
+	# Alrighty then, there are only five implied end statement types,
+	# ::Scheduled blocks, ::Sub declarations, ::Compound, and Switch statements.
+	unless ( ref($Statement) =~ /\b(?:Scheduled|Sub|Compound|Switch)$/ ) {
 		return 1;
 	}
 
-	# Of these three, ::Scheduled and ::Sub both follow the same simple
+	# Of these five, ::Scheduled, ::Sub, and ::Switch follow the same simple
 	# rule and can be handled first.
 	my @part      = $Statement->schildren;
 	my $LastChild = $part[-1] or return undef;
@@ -838,7 +841,7 @@ BEGIN {
 		# For(each)
 		'for'     => 'PPI::Structure::ForLoop',
 		'foreach' => 'PPI::Structure::ForLoop',
-		);
+	);
 }
 
 # Given a parent element, and a token which will open a structure, determine
@@ -872,8 +875,12 @@ sub _resolve_new_structure_round {
 	}
 
 	# If we are part of a for or foreach statement, we are a ForLoop
-	if ( $Parent->isa('PPI::Statement::Compound') and $Parent->type =~ /^for(?:each)?$/ ) {
-		return 'PPI::Structure::ForLoop';
+	if ( $Parent->isa('PPI::Statement::Compound') ) {
+		if ( $Parent->type =~ /^for(?:each)?$/ ) {
+			return 'PPI::Structure::ForLoop';
+		}
+	} elsif ( $Parent->isa('PPI::Statement::Switch') ) {
+		return 'PPI::Structure::Given';
 	}
 
 	# Otherwise, it must be a list

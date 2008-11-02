@@ -155,6 +155,7 @@ use PPI::Statement::Null           ();
 use PPI::Statement::Package        ();
 use PPI::Statement::Scheduled      ();
 use PPI::Statement::Sub            ();
+use PPI::Statement::Switch         ();
 use PPI::Statement::UnmatchedBrace ();
 use PPI::Statement::Unknown        ();
 use PPI::Statement::Variable       ();
