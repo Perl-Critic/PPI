@@ -891,6 +891,86 @@ sub visual_column_number {
 	return $self->{_location}[2];
 }
 
+=pod
+
+=head2 logical_line_number
+
+If the Element exists within a L<PPI::Document> that has indexed the Element
+locations using C<PPI::Document::index_locations>, the C<logical_line_number>
+method will return the line number of the first character of the Element within
+the Document, taking into account any C<#line> directives.
+
+Returns C<undef> on error, or if the L<PPI::Document> object has not been
+indexed.
+
+=begin testing logical_line_number 3
+
+my $document = PPI::Document->new(\<<'END_PERL');
+
+
+#line 1 test-file
+   foo
+END_PERL
+
+isa_ok( $document, 'PPI::Document' );
+my $words = $document->find('PPI::Token::Word');
+is( scalar @{$words}, 1, 'Found expected word token.' );
+is( $words->[0]->logical_line_number, 1, 'Got correct logical line number.' );
+
+=end testing
+
+=cut
+
+sub logical_line_number {
+	my $self = shift;
+
+	$self->_ensure_location_present() or return undef;
+
+	return $self->{_location}[3];
+}
+
+=pod
+
+=head2 logical_filename
+
+If the Element exists within a L<PPI::Document> that has indexed the Element
+locations using C<PPI::Document::index_locations>, the C<logical_filename>
+method will return the logical file name containing the first character of the
+Element within the Document, taking into account any C<#line> directives.
+
+Returns C<undef> on error, or if the L<PPI::Document> object has not been
+indexed.
+
+=begin testing logical_filename 3
+
+my $document = PPI::Document->new(\<<'END_PERL');
+
+
+#line 1 test-file
+   foo
+END_PERL
+
+isa_ok( $document, 'PPI::Document' );
+my $words = $document->find('PPI::Token::Word');
+is( scalar @{$words}, 1, 'Found expected word token.' );
+is(
+	$words->[0]->logical_filename,
+	'test-file',
+	'Got correct logical line number.',
+);
+
+=end testing
+
+=cut
+
+sub logical_filename {
+	my $self = shift;
+
+	$self->_ensure_location_present() or return undef;
+
+	return $self->{_location}[4];
+}
+
 sub _ensure_location_present {
 	my $self = shift;
 

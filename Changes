@@ -16,8 +16,8 @@ Revision history for Perl extension PPI
 	- Statement::Variable::symbols() implemented.
 	- Token::QuoteLike::Words::literal() implemented.
 	- Token::Quote::Double::simplify() fixed.
-	- Element line_number(), column_number(), and visual_column_number()
-	  implemented.
+	- Element line_number(), column_number(), visual_column_number(),
+	  logical_line_number(), and logical_filename() implemented.
 	- Support for Unicode byte order marks (PPI::Token::BOM) added.
 	- Token::Word::method_call() implemented.
 	- Element::descendant_of() and Element::ancestor_of() implemented.

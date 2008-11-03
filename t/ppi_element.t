@@ -13,7 +13,7 @@ BEGIN {
 use PPI;
 
 # Execute the tests
-use Test::More tests => 51;
+use Test::More tests => 57;
 
 # =begin testing __insert_after 6
 {
@@ -191,6 +191,44 @@ isa_ok( $document, 'PPI::Document' );
 my $words = $document->find('PPI::Token::Word');
 is( scalar @{$words}, 1, 'Found expected word token.' );
 is( $words->[0]->line_number, 3, 'Got correct line number.' );
+}
+
+
+
+# =begin testing logical_filename 3
+{
+my $document = PPI::Document->new(\<<'END_PERL');
+
+
+#line 1 test-file
+   foo
+END_PERL
+
+isa_ok( $document, 'PPI::Document' );
+my $words = $document->find('PPI::Token::Word');
+is( scalar @{$words}, 1, 'Found expected word token.' );
+is(
+	$words->[0]->logical_filename,
+	'test-file',
+	'Got correct logical line number.',
+);
+}
+
+
+
+# =begin testing logical_line_number 3
+{
+my $document = PPI::Document->new(\<<'END_PERL');
+
+
+#line 1 test-file
+   foo
+END_PERL
+
+isa_ok( $document, 'PPI::Document' );
+my $words = $document->find('PPI::Token::Word');
+is( scalar @{$words}, 1, 'Found expected word token.' );
+is( $words->[0]->logical_line_number, 1, 'Got correct logical line number.' );
 }
 
 
