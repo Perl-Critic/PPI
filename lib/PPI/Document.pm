@@ -597,9 +597,14 @@ sub index_locations {
 
 		# Found the first Token without a location
 		# Calculate the new location if needed.
-		$location = $_
-			? $self->_add_location( $location, $Tokens[$_ - 1], \$heredoc )
-			: [ 1, 1, 1, 1 ];
+		if ($_) {
+			$location =
+				$self->_add_location( $location, $Tokens[$_ - 1], \$heredoc );
+		} else {
+			my $logical_file =
+				$self->can('filename') ? $self->filename() : undef;
+			$location = [ 1, 1, 1, 1, $logical_file ];
+		}
 		$first = $_;
 		last;
 	}
@@ -619,52 +624,65 @@ sub index_locations {
 	1;
 }
 
+use constant LOCATION_REAL_LINE_NUMBER      => 0;
+use constant LOCATION_COLUMN_NUMBER         => 1;
+use constant LOCATION_VISUAL_COLUMN_NUMBER  => 2;
+use constant LOCATION_LOGICAL_LINE_NUMBER   => 3;
+use constant LOCATION_LOGICAL_FILE_NAME     => 4;
+
 sub _add_location {
 	my ($self, $start, $Token, $heredoc) = @_;
 	my $content = $Token->{content};
 
 	# Does the content contain any newlines
 	my $newlines =()= $content =~ /\n/g;
-	my $logical_line =
+	my ($logical_line, $logical_file) =
 		$self->_logical_line_and_file($start, $Token, $newlines);
 
 	unless ( $newlines ) {
 		# Handle the simple case
 		return [
-			$start->[0],
-			$start->[1] + length($content),
-			$start->[2] + $self->_visual_length($content, $start->[2]),
+			$start->[LOCATION_REAL_LINE_NUMBER],
+			$start->[LOCATION_COLUMN_NUMBER] + length($content),
+			$start->[LOCATION_VISUAL_COLUMN_NUMBER]
+				+ $self->_visual_length(
+					$content,
+					$start->[LOCATION_VISUAL_COLUMN_NUMBER]
+				),
 			$logical_line,
+			$logical_file,
 		];
 	}
 
 	# This is the more complex case where we hit or
 	# span a newline boundary.
-	my $physical_line = $start->[0] + $newlines;
-	my $location = [ $physical_line, 1, 1, $logical_line ];
+	my $physical_line = $start->[LOCATION_REAL_LINE_NUMBER] + $newlines;
+	my $location = [ $physical_line, 1, 1, $logical_line, $logical_file ];
 	if ( $heredoc and $$heredoc ) {
-		$location->[0] += $$heredoc;
-		$location->[3] += $$heredoc;
+		$location->[LOCATION_REAL_LINE_NUMBER] += $$heredoc;
+		$location->[LOCATION_LOGICAL_LINE_NUMBER] += $$heredoc;
 		$$heredoc = 0;
 	}
 
 	# Does the token have additional characters
 	# after their last newline.
 	if ( $content =~ /\n([^\n]+?)\z/ ) {
-		$location->[1] += length($1);
-		$location->[2] += $self->_visual_length($1, $location->[2]);
+		$location->[LOCATION_COLUMN_NUMBER] += length($1);
+		$location->[LOCATION_VISUAL_COLUMN_NUMBER] +=
+			$self->_visual_length(
+				$1, $location->[LOCATION_VISUAL_COLUMN_NUMBER],
+			);
 	}
 
 	$location;
 }
 
-# The file part isn't handled yet.
 sub _logical_line_and_file {
 	my ($self, $start, $Token, $newlines) = @_;
 
 	# Regex taken from perlsyn, with the correction that there's no space
 	# required between the line number and the file name.
-	if ($start->[1] == 1) {
+	if ($start->[LOCATION_COLUMN_NUMBER] == 1) {
 		if ( $Token->isa('PPI::Token::Comment') ) {
 			if (
 				$Token->content() =~ m<
@@ -672,42 +690,45 @@ sub _logical_line_and_file {
 					\#      \s*
 					line    \s+
 					(\d+)   \s*
-					(?: ("?) ([^"]+) \2 )?
+					(?: ("?) ([^"]* [^\s"]) \2 )?
 					\s*
 					\z
 				>xms
 			) {
-				return $1;
+				return $1, ($3 || $start->[LOCATION_LOGICAL_FILE_NAME]);
 			}
 		}
 		elsif ( $Token->isa('PPI::Token::Pod') ) {
 			my $content = $Token->content();
 			my $line;
+			my $file = $start->[LOCATION_LOGICAL_FILE_NAME];
 			my $end_of_directive;
 			while (
 				$content =~ m<
 					^
 					\#      \s*?
 					line    \s+?
-					(\d+)   \s*?
-					(?: ("?) ([^"]+?) \2 )??
+					(\d+)   (?: (?! \n) \s)*
+					(?: ("?) ([^"]*? [^\s"]) \2 )??
 					\s*?
 					$
 				>xmsg
 			) {
-				$line = $1;
+				($line, $file) = ($1, ( $3 || $file ) );
 				$end_of_directive = pos $content;
 			}
 
 			if (defined $line) {
 				pos $content = $end_of_directive;
 				my $post_directive_newlines =()= $content =~ m< \G [^\n]* \n >xmsg;
-				return $line + $post_directive_newlines - 1;
+				return $line + $post_directive_newlines - 1, $file;
 			}
 		}
 	}
 
-	return $start->[3] + $newlines;
+	return
+		$start->[LOCATION_LOGICAL_LINE_NUMBER] + $newlines,
+		$start->[LOCATION_LOGICAL_FILE_NAME];
 }
 
 sub _visual_length {

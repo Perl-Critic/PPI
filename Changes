@@ -9,8 +9,8 @@ Revision history for Perl extension PPI
 	  it's a synonym for "my".
 	- Now supports switch statements.
 	- Now supports the smart match operator (~~).
-	- Now supports keeping track of line numbers as affected by the #line
-	  directive.
+	- Now supports keeping track of line numbers and file names as
+	  affected by the #line directive.
 	- Now supports UNITCHECK blocks.
 	- Statement::Include::module_version() implemented.
 	- Statement::Variable::symbols() implemented.
