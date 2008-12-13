@@ -50,7 +50,7 @@ A named subroutine declaration, or forward declaration
 A variable declaration statement. This could be either a straight
 declaration or also be an expression.
 
-This includes all 'my', 'state', 'local' and 'out' statements.
+This includes all 'my', 'state', 'local' and 'our' statements.
 
 =head2 L<PPI::Statement::Compound>
 
