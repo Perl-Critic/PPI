@@ -803,8 +803,8 @@ sub _statement_continues {
 			if (
 					$Token->isa('PPI::Token::Word')
 				and	(
-						$Token->content eq 'my'
-					or	$Token->content eq 'state'
+						$STATEMENT_CLASSES{ $Token->content() }
+					eq	'PPI::Statement::Variable'
 				)
 			) {
 				# VAR == 'my ...'
@@ -819,7 +819,10 @@ sub _statement_continues {
 			}
 		}
 
-		if ( $LastChild->content eq 'my' or $LastChild->content eq 'state' ) {
+		if (
+				$STATEMENT_CLASSES{ $LastChild->content() }
+			eq	'PPI::Statement::Variable'
+		) {
 			# LABEL foreach my ...
 			# Only a scalar will do
 			return $Token->content =~ /^\$/;
