@@ -9,9 +9,8 @@ PPI::Token::Operator - Token class for operators
 =head1 INHERITANCE
 
   PPI::Token::Operator
-  isa PPI::Token::Symbol
-      isa PPI::Token
-          isa PPI::Element
+  isa PPI::Token
+      isa PPI::Element
 
 =head1 SYNOPSIS
 

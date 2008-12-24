@@ -8,10 +8,10 @@ PPI::Token::QuoteLike::Regexp - Regexp constructor quote-like operator
 
 =head1 INHERITANCE
 
-PPI::Token::QuoteLike::Regexp
-isa PPI::Token::QuoteLike
-    isa PPI::Token
-        isa PPI::Element
+  PPI::Token::QuoteLike::Regexp
+  isa PPI::Token::QuoteLike
+      isa PPI::Token
+          isa PPI::Element
 
 =head1 DESCRIPTION
 

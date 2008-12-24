@@ -8,10 +8,10 @@ PPI::Token::QuoteLike::Words - Word list constructor quote-like operator
 
 =head1 INHERITANCE
 
-PPI::Token::QuoteLike::Words
-isa PPI::Token::QuoteLike
-    isa PPI::Token
-        isa PPI::Element
+  PPI::Token::QuoteLike::Words
+  isa PPI::Token::QuoteLike
+      isa PPI::Token
+          isa PPI::Element
 
 =head1 DESCRIPTION
 
