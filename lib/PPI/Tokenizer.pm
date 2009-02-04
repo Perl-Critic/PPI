@@ -706,12 +706,21 @@ sub _previous_significant_tokens {
 }
 
 my %OBVIOUS_CLASS = (
-	'PPI::Token::Symbol'     => 'operator',
-	'PPI::Token::Magic'      => 'operator',
-	'PPI::Token::Number'     => 'operator',
-	'PPI::Token::ArrayIndex' => 'operator',
-	'PPI::Token::Quote'      => 'operator',
+	'PPI::Token::Symbol'             => 'operator',
+	'PPI::Token::Magic'              => 'operator',
+	'PPI::Token::Number'             => 'operator',
+	'PPI::Token::ArrayIndex'         => 'operator',
+	'PPI::Token::Quote::Double'      => 'operator',
+	'PPI::Token::Quote::Interpolate' => 'operator',
+	'PPI::Token::Quote::Literal'     => 'operator',
+	'PPI::Token::Quote::Single'      => 'operator',
+	'PPI::Token::Quote::Backtick'    => 'operator',
+	'PPI::Token::Quote::Command'     => 'operator',
+	'PPI::Token::Quote::Readline'    => 'operator',
+	'PPI::Token::Quote::Regexp'      => 'operator',
+	'PPI::Token::Quote::Words'       => 'operator',
 );
+
 my %OBVIOUS_CONTENT = (
 	'(' => 'operand',
 	'{' => 'operand',
