@@ -250,8 +250,8 @@ sub __TOKENIZER__on_char {
 	my $t     = shift;
 
 	# Suck in till the end of the bareword
-	my $line = substr( $t->{line}, $t->{line_cursor} );
-	if ( $line =~ /^(\w+(?:(?:\'|::)(?!\d)\w+)*(?:::)?)/ ) {
+	my $rest = substr( $t->{line}, $t->{line_cursor} );
+	if ( $rest =~ /^(\w+(?:(?:\'|::)(?!\d)\w+)*(?:::)?)/ ) {
 		$t->{token}->{content} .= $1;
 		$t->{line_cursor} += length $1;
 
@@ -321,10 +321,10 @@ sub __TOKENIZER__commit {
 
 	# Our current position is the first character of the bareword.
 	# Capture the bareword.
-	my $line = substr( $t->{line}, $t->{line_cursor} );
-	unless ( $line =~ /^((?!\d)\w+(?:(?:\'|::)(?!\d)\w+)*(?:::)?)/ ) {
+	my $rest = substr( $t->{line}, $t->{line_cursor} );
+	unless ( $rest =~ /^((?!\d)\w+(?:(?:\'|::)(?!\d)\w+)*(?:::)?)/ ) {
 		# Programmer error
-		die "Fatal error... regex failed to match in '$line' when expected";
+		die "Fatal error... regex failed to match in '$rest' when expected";
 	}
 
 	# Special Case: If we accidentally treat eq'foo' like the word "eq'foo",
@@ -361,14 +361,14 @@ sub __TOKENIZER__commit {
 		# Add the rest of the line as a comment, and a whitespace newline
 		# Anything after the __END__ on the line is "ignored". So we must
 		# also ignore it, by turning it into a comment.
-		$line = substr( $t->{line}, $t->{line_cursor} );
+		$rest = substr( $t->{line}, $t->{line_cursor} );
 		$t->{line_cursor} = length $t->{line};
-		if ( $line =~ /\n$/ ) {
-			chomp $line;
-			$t->_new_token( 'Comment', $line ) if length $line;
+		if ( $rest =~ /\n$/ ) {
+			chomp $rest;
+			$t->_new_token( 'Comment', $rest ) if length $rest;
 			$t->_new_token( 'Whitespace', "\n" );
 		} else {
-			$t->_new_token( 'Comment', $line ) if length $line;
+			$t->_new_token( 'Comment', $rest ) if length $rest;
 		}
 		$t->_finalize_token;
 
@@ -385,14 +385,14 @@ sub __TOKENIZER__commit {
 		$t->{zone} = 'PPI::Token::Data';
 
 		# Add the rest of the line as the Data token
-		$line = substr( $t->{line}, $t->{line_cursor} );
+		$rest = substr( $t->{line}, $t->{line_cursor} );
 		$t->{line_cursor} = length $t->{line};
-		if ( $line =~ /\n$/ ) {
-			chomp $line;
-			$t->_new_token( 'Comment', $line ) if length $line;
+		if ( $rest =~ /\n$/ ) {
+			chomp $rest;
+			$t->_new_token( 'Comment', $rest ) if length $rest;
 			$t->_new_token( 'Whitespace', "\n" );
 		} else {
-			$t->_new_token( 'Comment', $line ) if length $line;
+			$t->_new_token( 'Comment', $rest ) if length $rest;
 		}
 		$t->_finalize_token;
 
@@ -467,7 +467,7 @@ sub __TOKENIZER__literal {
 	}
 
 	# Check the cases when we have previous tokens
-	my $line = substr( $t->{line}, $t->{line_cursor} );
+	my $rest = substr( $t->{line}, $t->{line_cursor} );
 	if ( $tokens ) {
 		my $token = $tokens->[0] or return '';
 
@@ -479,14 +479,14 @@ sub __TOKENIZER__literal {
 
 		# If we are contained in a pair of curly braces,
 		# we are probably a bareword hash key
-		if ( $token->{content} eq '{' and $line =~ /^\s*\}/ ) {
+		if ( $token->{content} eq '{' and $rest =~ /^\s*\}/ ) {
 			return 1;
 		}
 	}
 
 	# In addition, if the word is followed by => it is probably
 	# also actually a word and not a regex.
-	if ( $line =~ /^\s*=>/ ) {
+	if ( $rest =~ /^\s*=>/ ) {
 		return 1;
 	}
 

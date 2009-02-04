@@ -3,16 +3,22 @@
 # Testing for the PPI::Document ->complete method
 
 use strict;
-use File::Spec::Functions ':ALL';
 BEGIN {
 	$| = 1;
 	$PPI::XS_DISABLE = 1;
 	$PPI::XS_DISABLE = 1; # Prevent warning
 }
+
+use Test::More;
+use File::Spec::Functions ':ALL';
 use PPI;
 
-# Execute the tests
-use Test::More tests => 13;
+# This test uses a series of ordered files, containing test code.
+# The letter after the number acts as a boolean yes/no answer to
+# "Is this code complete"
+my @files = find_files( catdir( 't', 'data', '27_complete' ) );
+my $tests = (scalar(@files) * 2) + 1;
+plan( tests => $tests );
 
 
 
@@ -21,13 +27,7 @@ use Test::More tests => 13;
 #####################################################################
 # Resource Location
 
-# This test uses a series of ordered files, containing test code.
-# The letter after the number acts as a boolean yes/no answer to
-# "Is this code complete"
-
-my @files = find_files( catdir( 't', 'data', '27_complete' ) );
-ok( scalar(@files), 'Found ->complete test files' );
-
+ok( scalar(@files), 'Found at least one ->complete test file' );
 foreach my $file ( @files ) {
 	# Load the document
 	my $document = PPI::Document->new( $file );
@@ -35,7 +35,7 @@ foreach my $file ( @files ) {
 
 	# Test if complete or not
 	my $got      = !! ($document->complete);
-	my $expected = !! ($file =~ /\d+y\w+\.t$/);
+	my $expected = !! ($file =~ /\d+y\w+\.code$/);
 	my $isnot    = ($got == $expected) ? 'is' : 'is NOT';
 	is( $got, $expected, "File $file $isnot complete" );
 }

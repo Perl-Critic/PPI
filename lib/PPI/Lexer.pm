@@ -694,8 +694,11 @@ sub _statement_continues {
 		# LABEL BLOCK continue BLOCK
 
 		# Handle cases with a word after the label
-		if ( $Token->isa('PPI::Token::Word')
-		and $Token->content =~ /^(?:while|for|foreach)$/ ) {
+		if (
+			$Token->isa('PPI::Token::Word')
+			and
+			$Token->content =~ /^(?:while|until|for|foreach)$/
+		) {
 			return 1;
 		}
 
@@ -712,7 +715,7 @@ sub _statement_continues {
 		# LABEL while (EXPR) ...
 		# LABEL while (EXPR) ...
 		# LABEL for (EXPR; EXPR; EXPR) ...
-		# LABEL foreach VAR (LIST) ...
+		# LABEL for VAR (LIST) ...
 		# LABEL foreach VAR (LIST) ...
 		# Only a block will do
 		return $Token->isa('PPI::Token::Structure') && $Token->content eq '{';
@@ -722,8 +725,23 @@ sub _statement_continues {
 		# LABEL for (EXPR; EXPR; EXPR) BLOCK
 		if ( $LastChild->isa('PPI::Token::Word') and $LastChild->content eq 'for' ) {
 			# LABEL for ...
-			if ( $Token->isa('PPI::Token::Structure') && $Token->content eq '(' ) {
+			if (
+				(
+					$Token->isa('PPI::Token::Structure')
+					and
+					$Token->content eq '('
+				)
+				or
+				$Token->isa('PPI::Token::QuoteLike::Words')
+			) {
 				return 1;
+			}
+
+			if ( $LastChild->isa('PPI::Token::QuoteLike::Words') ) {
+				# LABEL for VAR QW{} ...
+				# LABEL foreach VAR QW{} ...
+				# Only a block will do
+				return $Token->isa('PPI::Token::Structure') && $Token->content eq '{';
 			}
 
 			# In this case, we can also behave like a foreach
@@ -733,6 +751,12 @@ sub _statement_continues {
 			# LABEL for (EXPR; EXPR; EXPR) BLOCK
 			# That's it, nothing can continue
 			return '';
+
+		} elsif ( $LastChild->isa('PPI::Token::QuoteLike::Words') ) {
+			# LABEL for VAR QW{} ...
+			# LABEL foreach VAR QW{} ...
+			# Only a block will do
+			return $Token->isa('PPI::Token::Structure') && $Token->content eq '{';
 		}
 	}
 
@@ -777,7 +801,14 @@ sub _statement_continues {
 		# LABEL until (EXPR) BLOCK
 		# LABEL until (EXPR) BLOCK continue BLOCK
 		# The only case not covered is the while ...
-		if ( $LastChild->isa('PPI::Token::Word') and $LastChild->content eq 'while' or $LastChild->content eq 'until' ) {
+		if (
+			$LastChild->isa('PPI::Token::Word')
+			and (
+				$LastChild->content eq 'while'
+				or
+				$LastChild->content eq 'until'
+			)
+		) {
 			# LABEL while ...
 			# LABEL until ...
 			# Only a condition structure will do
@@ -794,17 +825,20 @@ sub _statement_continues {
 
 		if ( $LastChild->isa('PPI::Token::Symbol') ) {
 			# LABEL foreach my $scalar ...
-			# Only an open round brace will do
-			return $Token->isa('PPI::Token::Structure') && $Token->content eq '(';
+			# Open round brace, or a quotewords
+			return 1 if $Token->isa('PPI::Token::Structure') && $Token->content eq '(';
+			return 1 if $Token->isa('PPI::Token::QuoteLike::Words');
+			return '';
 		}
 
 		if ( $LastChild->content eq 'foreach' or $LastChild->content eq 'for' ) {
 			# There are three possibilities here
 			if (
-					$Token->isa('PPI::Token::Word')
-				and	(
-						$STATEMENT_CLASSES{ $Token->content() }
-					eq	'PPI::Statement::Variable'
+				$Token->isa('PPI::Token::Word')
+				and (
+					$STATEMENT_CLASSES{ $Token->content }
+					eq
+					'PPI::Statement::Variable'
 				)
 			) {
 				# VAR == 'my ...'
@@ -820,8 +854,9 @@ sub _statement_continues {
 		}
 
 		if (
-				$STATEMENT_CLASSES{ $LastChild->content() }
-			eq	'PPI::Statement::Variable'
+			$STATEMENT_CLASSES{ $LastChild->content() }
+			eq
+			'PPI::Statement::Variable'
 		) {
 			# LABEL foreach my ...
 			# Only a scalar will do

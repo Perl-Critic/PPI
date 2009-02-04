@@ -814,22 +814,26 @@ Returns true if the document is complete or false if not.
 sub complete {
 	my $self = shift;
 
-	# Do a shortcutting negated check of all
-	# structures in the document.
+	# Every structure has to be complete
 	$self->find_any( sub {
-		$_[0]->isa('PPI::Structure')
+		$_[1]->isa('PPI::Structure')
 		and
-		! $_[0]->complete
+		! $_[1]->complete
 	} )
 	and return '';
 
+	# Strip anything that isn't a statement off the end
+	my @child = $self->children;
+	while ( @child and not $child[-1]->isa('PPI::Statement') ) {
+		pop @child;
+	}
 
+	# We must have at least one statement
+	return '' unless @child;
 
-
-
-	return 1;
+	# Check the completeness of the last statement
+	return $child[-1]->_complete;
 }
-
 
 
 

@@ -52,6 +52,9 @@ BEGIN {
 	$VERSION = '1.204_01';
 }
 
+# Once we have an __END__ we're done
+sub _complete () { 1 }
+
 1;
 
 =pod

@@ -11,6 +11,7 @@ PPI::Token::Number::Version - Token class for a byte-packed number
   $n = 1.1.0;
   $n = 127.0.0.1;
   $n = 10_000.10_000.10_000;
+  $n = v1.2.3.4
 
 =head1 INHERITANCE
 
@@ -30,12 +31,15 @@ at all by Perl, but they look like numbers to a parser.
 =cut
 
 use strict;
-use base 'PPI::Token::Number';
+use PPI::Token::Number ();
 
-use vars qw{$VERSION};
+use vars qw{$VERSION @ISA};
 BEGIN {
 	$VERSION = '1.204_01';
+	@ISA     = 'PPI::Token::Number';
 }
+
+=pod
 
 =head2 base
 
@@ -47,6 +51,8 @@ sub base {
 	return 256;
 }
 
+=pod
+
 =head2 literal
 
 Return the numeric value of this token.
@@ -54,13 +60,39 @@ Return the numeric value of this token.
 =cut
 
 sub literal {
-	my $self = shift;
-	return; # not yet implemented
+	my $self    = shift;
+	my $content = $self->{content};
+	$content =~ s/^v//;
+	return join '', map { chr $_ } ( split /\./, $content );
 }
+
+
+
 
 
 #####################################################################
 # Tokenizer Methods
+
+=pod
+
+=begin testing 9
+
+my $doc1 = new_ok( 'PPI::Document' => [ \'1.2.3.4'  ] );
+my $doc2 = new_ok( 'PPI::Document' => [ \'v1.2.3.4' ] );
+isa_ok( $doc1->child(0), 'PPI::Statement' );
+isa_ok( $doc2->child(0), 'PPI::Statement' );
+isa_ok( $doc1->child(0)->child(0), 'PPI::Token::Number::Version' );
+isa_ok( $doc2->child(0)->child(0), 'PPI::Token::Number::Version' );
+
+my $literal1 = $doc1->child(0)->child(0)->literal;
+my $literal2 = $doc2->child(0)->child(0)->literal;
+is( length($literal1), 4, 'The literal length of doc1 is 4' );
+is( length($literal2), 4, 'The literal length of doc1 is 4' );
+is( $literal1, $literal2, 'Literals match for 1.2.3.4 vs v1.2.3.4' );
+
+=end testing
+
+=cut
 
 sub __TOKENIZER__on_char {
 	my $class = shift;
@@ -87,6 +119,23 @@ sub __TOKENIZER__on_char {
 	# Doesn't fit a special case, or is after the end of the token
 	# End of token.
 	$t->_finalize_token->__TOKENIZER__on_char( $t );
+}
+
+sub __TOKENIZER__commit {
+	my $t = $_[1];
+
+	# Get the rest of the line
+	my $rest = substr( $t->{line}, $t->{line_cursor} );
+	unless ( $rest =~ /^(v\d+(?:\.\d+)*)/ ) {
+		# This was not a v-string after all (it's a word)
+		return PPI::Token::Word->__TOKENIZER__commit($t);
+	}
+
+	# This is a v-string
+	my $vstring = $1;
+	$t->{line_cursor} += length($vstring);
+	$t->_new_token('Number::Version', $vstring);
+	$t->_finalize_token->__TOKENIZER__on_char($t);
 }
 
 1;

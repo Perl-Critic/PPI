@@ -62,11 +62,11 @@ sub pause {
 # Confirm that C< weaken( $hash{scalar} = $object ) > works as expected,
 # adding a weak reference to the has index.
 use Scalar::Util ();
-{
+SCOPE: {
 	my %hash = ();
 	my $counter = 0;
 
-	{
+	SCOPE: {
 		my $object1 = bless { }, 'My::WeakenTest';
 		my $object2 = bless { }, 'My::WeakenTest';
 		my $object3 = bless { }, 'My::WeakenTest';
@@ -115,7 +115,7 @@ use Scalar::Util ();
 
 
 # Test interaction between weaken and Clone
-{
+SCOPE: {
 	my $object = { a => undef };
 	# my $object = bless { a => undef }, 'Foo';
 	my $object2 = $object;
@@ -245,7 +245,7 @@ is_object( $Braces->next_sibling, $Token7, "Braces sees seventh token as next_si
 is( $Token7->next_sibling, '', 'Last token returns false for next_sibling' );
 
 # More extensive test for next_sibling
-{
+SCOPE: {
 	my $doc = PPI::Document->new( \"sub foo { bar(); }" );
 	my $end = $doc->last_token;
 	isa_ok( $end, 'PPI::Token::Structure' );
@@ -268,7 +268,7 @@ is_object( $Token3->previous_sibling, $Token2, "Third token sees second token as
 is_object( $Token7->previous_sibling, $Braces, "Last token sees braces as previous_sibling" );
 
 # More extensive test for next_sibling
-{
+SCOPE: {
 	my $doc = PPI::Document->new( \"{ no strict; bar(); }" );
 	my $start = $doc->first_token;
 	isa_ok( $start, 'PPI::Token::Structure' );
@@ -300,7 +300,7 @@ is_object( $Token3->sprevious_sibling, $Token2, "Third token sees second token a
 is_object( $Token7->sprevious_sibling, $Braces, "Last token sees braces as sprevious_sibling" );
 
 # Test snext_sibling and sprevious_sibling cases when inside a parent block
-{
+SCOPE: {
 	my $cpan13454 = PPI::Document->new( \'{ 1 }' );
 	isa_ok( $cpan13454, 'PPI::Document' );
 	my $num = $cpan13454->find_first('Token::Number');
@@ -319,7 +319,7 @@ is_object( $Token7->sprevious_sibling, $Braces, "Last token sees braces as sprev
 # Test the PPI::Element and PPI::Node analysis methods
 
 # Test the find method
-{
+SCOPE: {
 	is( $Document->find('PPI::Token::End'), '', '->find returns false if nothing found' );
 	isa_ok( $Document->find('PPI::Structure')->[0], 'PPI::Structure' );
 	my $found = $Document->find('PPI::Token::Number');
@@ -337,14 +337,14 @@ is_object( $Token7->sprevious_sibling, $Braces, "Last token sees braces as sprev
 # Test for CPAN #7799 - Unsupported element types are accepted by find
 #
 # The correct behaviour for a bad string is a warning, and return C<undef>
-{ local $^W = '';
+SCOPE: { local $^W = '';
 	is( $Document->find(undef), undef, '->find(undef) failed' );
 	is( $Document->find([]),    undef, '->find([]) failed'    );
 	is( $Document->find('Foo'), undef, '->find(BAD) failed'   );
 }
 
 # Test the find_first method
-{
+SCOPE: {
 	is( $Document->find_first('PPI::Token::End'), '', '->find_first returns false if nothing found' );
 	isa_ok( $Document->find_first('PPI::Structure'), 'PPI::Structure' );
 	my $found = $Document->find_first('PPI::Token::Number');
@@ -358,7 +358,7 @@ is_object( $Token7->sprevious_sibling, $Braces, "Last token sees braces as sprev
 }
 
 # Test the find_any method
-{
+SCOPE: {
 	is( $Document->find_any('PPI::Token::End'), '', '->find_any returns false if nothing found' );
 	is( $Document->find_any('PPI::Structure'), 1, '->find_any returns true is something found' );
 	is( $Document->find_any('PPI::Token::Number'), 1, '->find_any returns true for multiple find' );
@@ -366,7 +366,7 @@ is_object( $Token7->sprevious_sibling, $Braces, "Last token sees braces as sprev
 }
 
 # Test the contains method
-{
+SCOPE: {
 	omethod_fails( $Document, 'contains', [ undef, '', 1, [], bless( {}, 'Foo') ] );
 	my $found = $Document->find('PPI::Element');
 	is( ref $found, 'ARRAY', '(preparing for contains tests) ->find returned an array' );
@@ -388,7 +388,7 @@ is_object( $Token7->sprevious_sibling, $Braces, "Last token sees braces as sprev
 # Test the PPI::Element manipulation methods
 
 # Cloning an Element/Node
-{
+SCOPE: {
 	my $Doc2 = $Document->clone;
 	isa_ok( $Doc2, 'PPI::Document' );
 	isa_ok( $Doc2->schild(0), 'PPI::Statement' );
@@ -421,7 +421,7 @@ ok( ! defined $Braces->parent, "Braces are detached from parent" );
 # Test DESTROY
 
 # Start with DESTROY for an element that never has a parent
-{
+SCOPE: {
 	my $Token = PPI::Token::Whitespace->new( ' ' );
 	my $k1 = scalar keys %PPI::Element::_PARENT;
 	$Token->DESTROY;
@@ -430,11 +430,11 @@ ok( ! defined $Braces->parent, "Braces are detached from parent" );
 }
 
 # Next, a single element within a parent
-{
+SCOPE: {
 	my $k1 = scalar keys %PPI::Element::_PARENT;
 	my $k2;
 	my $k3;
-	{
+	SCOPE: {
 		my $Token     = PPI::Token::Number->new( '1' );
 		my $Statement = PPI::Statement->new;
 		$Statement->add_element( $Token );
@@ -448,11 +448,11 @@ ok( ! defined $Braces->parent, "Braces are detached from parent" );
 }
 
 # Repeat for an entire (large) file
-{
+SCOPE: {
 	my $k1 = scalar keys %PPI::Element::_PARENT;
 	my $k2;
 	my $k3;
-	{
+	SCOPE: {
 		my $NodeDocument = PPI::Document->new( $INC{"PPI/Node.pm"} );
 		isa_ok( $NodeDocument, 'PPI::Document' );
 		$k2 = scalar keys %PPI::Element::_PARENT;
@@ -465,11 +465,11 @@ ok( ! defined $Braces->parent, "Braces are detached from parent" );
 }
 
 # Repeat again, but with an implicit DESTROY
-{
+SCOPE: {
 	my $k1 = scalar keys %PPI::Element::_PARENT;
 	my $k2;
 	my $k3;
-	{
+	SCOPE: {
 		my $NodeDocument = PPI::Document->new( $INC{"PPI/Node.pm"} );
 		isa_ok( $NodeDocument, 'PPI::Document' );
 		$k2 = scalar keys %PPI::Element::_PARENT;
@@ -488,7 +488,7 @@ ok( ! defined $Braces->parent, "Braces are detached from parent" );
 # Token-related methods
 
 # Test first_token, last_token, next_token and previous_token
-{
+SCOPE: {
 my $code = <<'END_PERL';
 my $foo = bar();
 
@@ -547,7 +547,7 @@ END_PERL
 
 # Make sure the 'use overload' is working on Element subclasses
 
-{
+SCOPE: {
    my $source   = '1;';
    my $Document = PPI::Lexer->lex_source( $source );
    isa_ok( $Document, 'PPI::Document' );

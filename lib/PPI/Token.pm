@@ -21,13 +21,14 @@ a L<PPI::Element> that directly represents bytes of source code.
 =cut
 
 use strict;
-use base 'PPI::Element';
-use Params::Util '_INSTANCE';
+use Params::Util   '_INSTANCE';
+use PPI::Element   ();
 use PPI::Exception ();
 
-use vars qw{$VERSION};
+use vars qw{$VERSION @ISA};
 BEGIN {
 	$VERSION = '1.204_01';
+	@ISA     = 'PPI::Element';
 }
 
 # We don't load the abstracts, they are loaded

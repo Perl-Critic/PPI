@@ -1,22 +1,14 @@
 #!/usr/bin/perl
 
 use strict;
-use File::Spec::Functions ':ALL';
 BEGIN {
 	$| = 1;
 	$PPI::XS_DISABLE = 1;
 	$PPI::XS_DISABLE = 1; # Prevent warning
 }
+use Test::More 0.86 tests => 16;
+use File::Spec::Functions ':ALL';
 use PPI;
-
-use Test::More tests => 16;
-
-sub new_ok {
-	my $class = shift;
-	my $object = $class->new( @_ );
-	isa_ok( $object, $class );
-	$object;
-}
 
 
 
@@ -26,9 +18,9 @@ sub new_ok {
 # Begin Tests
 
 my $code = 'print "Hello World";';
-my $Document = new_ok( 'PPI::Document', \$code );
+my $document = new_ok( 'PPI::Document' => [ \$code ] );
 
-my @elements = $Document->elements;
+my @elements = $document->elements;
 push @elements, $elements[0]->elements;
 
 my @expected = (
@@ -40,10 +32,20 @@ my @expected = (
 	);
 my $i = 0;
 foreach my $expect ( @expected ) {
-	is( $elements[$i]->_xml_name, $expect->[0], "Got _xml_name '$expect->[0]' as expected" );
-	is_deeply( $elements[$i]->_xml_attr, $expect->[1], "Got _xml_attr as expected" );
-	is( $elements[$i]->_xml_content, $expect->[2], "Got _xml_content '$expect->[2]' as expected" );
+	is(
+		$elements[$i]->_xml_name,
+		$expect->[0],
+		"Got _xml_name '$expect->[0]' as expected",
+	);
+	is_deeply(
+		$elements[$i]->_xml_attr,
+		$expect->[1],
+		"Got _xml_attr as expected",
+	);
+	is(
+		$elements[$i]->_xml_content,
+		$expect->[2],
+		"Got _xml_content '$expect->[2]' as expected",
+	);
 	$i++;
 }
-
-1;

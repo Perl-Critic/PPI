@@ -2,6 +2,7 @@ while (1) {}
 LABEL: while (1) {}
 until (1) {}
 LABEL: until (1) {}
+foreach qw{} {}
 foreach () {}
 LABEL: foreach $foo ( 1 .. 20 ) {
 }

@@ -317,7 +317,7 @@ sub _complete {
 	my $self = shift;
 	my $semi = $self->schild(-1);
 	return !! (
-		$semi
+		defined $semi
 		and
 		$semi->isa('PPI::Token::Structure')
 		and
@@ -325,7 +325,7 @@ sub _complete {
 	);
 }
 
-# You can insert either a statement, or a non-significant token.
+# You can insert either a statement or a non-significant token.
 sub insert_before {
 	my $self    = shift;
 	my $Element = _INSTANCE(shift, 'PPI::Element') or return undef;

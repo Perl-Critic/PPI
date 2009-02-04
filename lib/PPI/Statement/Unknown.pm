@@ -40,6 +40,10 @@ BEGIN {
 	$VERSION = '1.204_01';
 }
 
+# If one of these ends up in the final document,
+# we're pretty much screwed. Just call it a day.
+sub _complete () { 1 }
+
 1;
 
 =pod

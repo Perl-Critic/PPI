@@ -49,6 +49,20 @@ BEGIN {
 # Lexer clues
 sub __LEXER__normal { '' }
 
+sub _complete {
+	my $child = $_[0]->schild(-1);
+	return !! (
+		defined $child
+		and
+		$child->isa('PPI::Structure::Block')
+		and
+		$child->complete
+	);
+}
+
+
+
+
 
 #####################################################################
 # PPI::Node Methods

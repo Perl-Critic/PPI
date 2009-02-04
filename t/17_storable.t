@@ -28,7 +28,7 @@ Test::More::plan( tests => 9 );
 #####################################################################
 # Test freeze/thaw of PPI::Document objects
 
-{
+SCOPE: {
 	# Create a document with various example package statements
 	my $Document = PPI::Lexer->lex_source( <<'END_PERL' );
 package Foo;
@@ -54,5 +54,3 @@ END_PERL
 	}
 
 }
-
-1;

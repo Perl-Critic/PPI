@@ -42,19 +42,20 @@ provided by the parent L<PPI::Token> and L<PPI::Element> classes.
 =cut
 
 use strict;
-use base 'PPI::Token';
-use Clone ();
+use Clone      ();
+use PPI::Token ();
 
-use vars qw{$VERSION};
+use vars qw{$VERSION @ISA};
 BEGIN {
 	$VERSION = '1.204_01';
+	@ISA     = 'PPI::Token';
 }
 
 =pod
 
 =head2 null
 
-Because PPI sees documents as sitting on a sort of substrate made of
+Because L<PPI> sees documents as sitting on a sort of substrate made of
 whitespace, there are a couple of corner cases that get particularly
 nasty if they don't find whitespace in certain places.
 
@@ -111,15 +112,21 @@ sub tidy {
 # Build the class and commit maps
 use vars qw{@CLASSMAP @COMMITMAP};
 BEGIN {
-	@CLASSMAP = ();
-	foreach ( 'a' .. 'w', 'y', 'z', 'A' .. 'Z', '_' ) { $COMMITMAP[ord $_] = 'PPI::Token::Word'  }
-	foreach ( qw!; [ ] { } )! )                       { $COMMITMAP[ord $_] = 'PPI::Token::Structure' }
-	foreach ( 0 .. 9 )                                { $CLASSMAP[ord $_]  = 'Number'   }
-	foreach ( qw{= ? | + > . ! ~ ^} )                 { $CLASSMAP[ord $_]  = 'Operator' }
-	foreach ( qw{* $ @ & : %} )                       { $CLASSMAP[ord $_]  = 'Unknown'  }
+	@CLASSMAP  = ();
+	@COMMITMAP = ();
+	foreach (
+		'a' .. 'u', 'w', 'y', 'z', 'A' .. 'Z', '_'
+	) {
+		$COMMITMAP[ord $_] = 'PPI::Token::Word';
+	}
+	foreach ( qw!; [ ] { } )! )       { $COMMITMAP[ord $_] = 'PPI::Token::Structure' }
+	foreach ( 0 .. 9 )                { $CLASSMAP[ord $_]  = 'Number'   }
+	foreach ( qw{= ? | + > . ! ~ ^} ) { $CLASSMAP[ord $_]  = 'Operator' }
+	foreach ( qw{* $ @ & : %} )       { $CLASSMAP[ord $_]  = 'Unknown'  }
 
 	# Miscellaneous remainder
 	$COMMITMAP[ord '#'] = 'PPI::Token::Comment';
+	$COMMITMAP[ord 'v'] = 'PPI::Token::Number::Version';
 	$CLASSMAP[ord ',']  = 'PPI::Token::Operator';
 	$CLASSMAP[ord "'"]  = 'Quote::Single';
 	$CLASSMAP[ord '"']  = 'Quote::Double';

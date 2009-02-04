@@ -1,16 +1,16 @@
 #!/usr/bin/perl
 
 use strict;
-use File::Spec::Functions ':ALL';
 BEGIN {
 	$| = 1;
 	$PPI::XS_DISABLE = 1;
 	$PPI::XS_DISABLE = 1; # Prevent warning
 }
+
+use Test::More 0.86 tests => 23;
+use File::Spec::Functions ':ALL';
 use PPI;
 use PPI::Transform;
-
-use Test::More tests => 23;
 
 # Files to clean up
 my @cleanup = ();
@@ -20,12 +20,6 @@ END {
 	}
 }
 
-sub new_ok {
-	my $class = shift;
-	my $object = $class->new( @_ );
-	isa_ok( $object, $class );
-	$object;
-}
 
 
 
@@ -39,8 +33,10 @@ my $rv = MyCleaner->apply( \$code );
 ok( $rv, 'MyCleaner->apply( \$code ) returns true' );
 is( $code, 'my$foo="bar";', 'MyCleaner->apply( \$code ) modifies code as expected' );
 
-ok( PPI::Transform->register_apply_handler( 'Foo', \&Foo::get, \&Foo::set ),
-	"register_apply_handler worked" );
+ok(
+	PPI::Transform->register_apply_handler( 'Foo', \&Foo::get, \&Foo::set ),
+	"register_apply_handler worked",
+);
 $Foo::VALUE = 'my $foo = "bar";';
 my $Foo = Foo->new;
 isa_ok( $Foo, 'Foo' );
@@ -84,9 +80,9 @@ foreach my $input ( @files ) {
 	push @cleanup, $copy2;
 	ok( copy( $input, $copy ), "Copied $input to $copy" );
 
-	my $Original = new_ok( 'PPI::Document' => $input  );
-	my $Input    = new_ok( 'PPI::Document' => $input  );
-	my $Output   = new_ok( 'PPI::Document' => $output );
+	my $Original = new_ok( 'PPI::Document' => [ $input  ] );
+	my $Input    = new_ok( 'PPI::Document' => [ $input  ] );
+	my $Output   = new_ok( 'PPI::Document' => [ $output ] );
 
 	# Process the file
 	my $rv = MyCleaner->document( $Input );
@@ -96,15 +92,14 @@ foreach my $input ( @files ) {
 
 	# Squish to another location
 	ok( MyCleaner->file( $copy, $copy2 ), '->file returned true' );
-	my $Copy  = new_ok( 'PPI::Document' => $copy  );
+	my $Copy  = new_ok( 'PPI::Document' => [ $copy ] );
 	is_deeply( $Copy, $Original, 'targeted transform leaves original unchanged' );
-	my $Copy2 = new_ok( 'PPI::Document' => $copy2 );
+	my $Copy2 = new_ok( 'PPI::Document' => [ $copy2 ] );
 	is_deeply( $Copy2, $Output, 'targeted transform works as expected' );
 
 	# Copy the file and process in-place
-	ok( MyCleaner->file( $copy ),
-		'->file returned true' );
-	$Copy = new_ok( 'PPI::Document' => $copy );
+	ok( MyCleaner->file( $copy ), '->file returned true' );
+	$Copy = new_ok( 'PPI::Document' => [ $copy ] );
 	is_deeply( $Copy, $Output, 'In-place transform works as expected' );
 }
 
@@ -147,5 +142,3 @@ sub set {
 	my $string = $_[1]->serialize;
 	$VALUE = $string;
 }
-
-1;

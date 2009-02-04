@@ -22,11 +22,11 @@ use Scalar::Util 'refaddr';
 #####################################################################
 # Tests for PPI::Statement::Package
 
-{
+SCOPE: {
 	# Create a document with various example package statements
 	my $Document = PPI::Lexer->lex_source( <<'END_PERL' );
 package Foo;
-{
+SCOPE: {
 	package # comment
 	Bar::Baz;
 	1;

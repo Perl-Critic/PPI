@@ -1,16 +1,16 @@
 #!/usr/bin/perl
 
 use strict;
-use PPI;
-
-
-#####################################################################
-# Prepare
+BEGIN {
+	$| = 1;
+	$PPI::XS_DISABLE = 1;
+	$PPI::XS_DISABLE = 1; # Prevent warning
+}
 
 # For each new item in t/data/08_regression add another 14 tests
-
 use Test::More tests => 17;
 use t::lib::PPI;
+use PPI;
 
 
 

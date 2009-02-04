@@ -48,6 +48,9 @@ BEGIN {
 	$VERSION = '1.204_01';
 }
 
+# Data is never complete
+sub _complete () { '' }
+
 1;
 
 =pod

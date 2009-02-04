@@ -52,6 +52,10 @@ BEGIN {
 	$VERSION = '1.204_01';
 }
 
+# Once we've hit a naked unmatched brace we can never truly be complete.
+# So instead we always just call it a day...
+sub _complete () { 1 }
+
 1;
 
 =pod

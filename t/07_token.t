@@ -30,7 +30,7 @@ t::lib::PPI->run_testdir( catdir( 't', 'data', '07_token' ) );
 # PPI::Token::Symbol Unit Tests
 # Note: braces and the symbol() method are tested in regression.t
 
-{
+SCOPE: {
 	# Test both creation methods
 	my $Token = PPI::Token::Symbol->new( '$foo' );
 	isa_ok( $Token, 'PPI::Token::Symbol' );
