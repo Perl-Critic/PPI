@@ -38,11 +38,12 @@ to, or the structure to break out of.
 =cut
 
 use strict;
-use base 'PPI::Statement';
+use PPI::Statement ();
 
-use vars qw{$VERSION};
+use vars qw{$VERSION @ISA};
 BEGIN {
 	$VERSION = '1.204_01';
+	@ISA     = 'PPI::Statement';
 }
 
 1;

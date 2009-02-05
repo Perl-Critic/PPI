@@ -54,7 +54,7 @@ For more unusual tasks, by all means forge onwards.
 =cut
 
 use strict;
-use Params::Util  '_INSTANCE';
+use Params::Util '_INSTANCE';
 use PPI ();
 
 use vars qw{$VERSION $errstr};
@@ -836,7 +836,7 @@ sub _statement_continues {
 			if (
 				$Token->isa('PPI::Token::Word')
 				and (
-					$STATEMENT_CLASSES{ $Token->content }
+					($STATEMENT_CLASSES{ $Token->content } || '')
 					eq
 					'PPI::Statement::Variable'
 				)
@@ -848,19 +848,29 @@ sub _statement_continues {
 				return 1;
 			} elsif ( $Token->isa('PPI::Token::Structure') and $Token->content eq '(' ) {
 				return 1;
+			} elsif ( $Token->isa('PPI::Token::QuoteLike::Words') ) {
+				return 1;
 			} else {
 				return '';
 			}
 		}
 
 		if (
-			$STATEMENT_CLASSES{ $LastChild->content() }
+			($STATEMENT_CLASSES{ $LastChild->content } || '')
 			eq
 			'PPI::Statement::Variable'
 		) {
 			# LABEL foreach my ...
 			# Only a scalar will do
 			return $Token->content =~ /^\$/;
+		}
+
+		# Handle the rare for my $foo qw{bar} ... case
+		if ( $LastChild->isa('PPI::Token::QuoteLike::Words') ) {
+			# LABEL for VAR QW ...
+			# LABEL foreach VAR QW ...
+			# Only a block will do
+			return $Token->isa('PPI::Token::Structure') && $Token->content eq '{';
 		}
 	}
 

@@ -3,16 +3,16 @@
 # Tests functionality relating to __DATA__ sections of files
 
 use strict;
-use File::Spec::Functions ':ALL';
 BEGIN {
 	$| = 1;
 	$PPI::XS_DISABLE = 1;
 	$PPI::XS_DISABLE = 1; # Prevent warning
 }
-use PPI;
 
-# Execute the tests
-use Test::More tests => 7;
+use Test::More tests => 8;
+use Test::NoWarnings;
+use File::Spec::Functions ':ALL';
+use PPI;
 
 my $module = catfile('t', 'data', '13_data', 'Foo.pm');
 ok( -f $module, 'Test file exists' );

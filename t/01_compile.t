@@ -12,7 +12,8 @@ BEGIN {
 	$PPI::XS_DISABLE = 1; # Prevent warning
 }
 
-use Test::More tests => 18;
+use Test::More tests => 19;
+use Test::NoWarnings;
 
 
 

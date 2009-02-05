@@ -5,33 +5,26 @@
 # Some other regressions tests are included here for simplicity.
 
 use strict;
-use File::Spec::Functions ':ALL';
 BEGIN {
 	$| = 1;
 	$PPI::XS_DISABLE = 1;
 	$PPI::XS_DISABLE = 1; # Prevent warning
 }
+
+# For each new item in t/data/08_regression add another 15 tests
+use Test::More tests => 677;
+use Test::NoWarnings;
+use File::Spec::Functions ':ALL';
+use Params::Util '_INSTANCE';
+use t::lib::PPI;
 use PPI::Lexer;
 use PPI::Dumper;
-use Params::Util '_INSTANCE';
 
 sub pause {
 	local $@;
 	eval { require Time::HiRes; };
 	$@ ? sleep(1) : Time::HiRes::sleep(0.1);
 }
-
-
-
-
-
-#####################################################################
-# Prepare
-
-# For each new item in t/data/08_regression add another 15 tests
-
-use Test::More tests => 676;
-use t::lib::PPI;
 
 
 

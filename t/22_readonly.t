@@ -3,14 +3,16 @@
 # Testing of readonly functionality
 
 use strict;
-use File::Spec::Functions ':ALL';
 BEGIN {
 	$| = 1;
 	$PPI::XS_DISABLE = 1;
 	$PPI::XS_DISABLE = 1; # Prevent warning
 }
+
+use Test::More tests => 9;
+use Test::NoWarnings;
+use File::Spec::Functions ':ALL';
 use PPI::Document;
-use Test::More tests => 8;
 
 
 
@@ -45,5 +47,3 @@ SCOPE: {
 	isa_ok( $doc3, 'PPI::Document' );
 	is( $doc3->readonly, 1, '->readonly is true for explicit true' );
 }
-
-exit(0);

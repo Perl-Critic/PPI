@@ -3,25 +3,24 @@
 # Test the PPI::Util package
 
 use strict;
-use File::Spec::Functions ':ALL';
 BEGIN {
 	$| = 1;
 	$PPI::XS_DISABLE = 1;
 	$PPI::XS_DISABLE = 1; # Prevent warning
 }
+
+use Test::More tests => 13;
+use Test::NoWarnings;
+use File::Spec::Functions ':ALL';
 use PPI::Lexer ();
 use PPI;
-use PPI::Util '_Document',
-              '_slurp';
+use PPI::Util qw{ _Document _slurp };
 
 # Execute the tests
-use Test::More tests => 12;
-
 my $testfile   = catfile( 't', 'data', '11_util', 'test.pm' );
 my $testsource = 'print "Hello World!\n"';
-
-my $slurpfile = catfile( 't', 'data', 'basic.pl' );
-my $slurpcode = <<'END_FILE';
+my $slurpfile  = catfile( 't', 'data', 'basic.pl' );
+my $slurpcode  = <<'END_FILE';
 #!/usr/bin/perl
 
 if ( 1 ) {

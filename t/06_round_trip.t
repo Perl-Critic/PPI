@@ -4,15 +4,15 @@
 # out, and verify that the code goes in and out cleanly.
 
 use strict;
-use File::Spec::Functions ':ALL';
 BEGIN {
 	$| = 1;
 	$PPI::XS_DISABLE = 1;
 	$PPI::XS_DISABLE = 1; # Prevent warning
 }
-use PPI;
 use Test::More; # Plan comes later
-
+use Test::NoWarnings;
+use File::Spec::Functions ':ALL';
+use PPI;
 
 
 
@@ -25,7 +25,7 @@ use Test::More; # Plan comes later
 my %tests = map { $_ => $INC{$_} } grep { ! /\bXS\.pm/ } grep { /^PPI\b/ } keys %INC;
 my @files = sort values %tests;
 unless ( @files ) {
-	Test::More::plan( tests => 1 );
+	Test::More::plan( tests => 2 );
 	ok( undef, "Failed to find any files to test" );
 	exit();
 }
@@ -47,7 +47,7 @@ foreach my $dir (
 push @files, find_files( 't' );
 
 # Declare our plan
-Test::More::plan( tests => scalar(@files) * 8 );
+Test::More::plan( tests => 1 + scalar(@files) * 8 );
 
 
 

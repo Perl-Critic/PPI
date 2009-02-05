@@ -4,14 +4,16 @@
 # with a "98 subroutine recursion" error in 1.201
 
 use strict;
-use File::Spec::Functions ':ALL';
 BEGIN {
 	$| = 1;
 	$PPI::XS_DISABLE = 1;
 	$PPI::XS_DISABLE = 1; # Prevent warning
 }
+
+use Test::More tests => 9;
+use Test::NoWarnings;
+use File::Spec::Functions ':ALL';
 use PPI;
-use Test::More tests => 8;
 
 foreach my $file ( qw{
 	Simple.pm

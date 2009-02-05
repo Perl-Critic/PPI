@@ -51,11 +51,12 @@ standard L<PPI::Statement>, L<PPI::Node> and L<PPI::Element> methods.
 =cut
 
 use strict;
-use base 'PPI::Statement';
+use PPI::Statement ();
 
-use vars qw{$VERSION %TYPES};
+use vars qw{$VERSION @ISA %TYPES};
 BEGIN {
 	$VERSION = '1.204_01';
+	@ISA     = 'PPI::Statement';
 
 	# Keyword type map
 	%TYPES = (
@@ -203,6 +204,7 @@ sub type {
 		return 'foreach' if $Element->content eq 'my';
 		return 'foreach' if $Element->content eq 'state';
 		return 'foreach' if $Element->isa('PPI::Token::Symbol');
+		return 'foreach' if $Element->isa('PPI::Token::QuoteLike::Words');
 		return 'for';
 	}
 	return $TYPES{$Element->content} if $Element->isa('PPI::Token::Word');
@@ -219,9 +221,7 @@ sub type {
 #####################################################################
 # PPI::Node Methods
 
-sub scope {
-	1;
-}
+sub scope () { 1 }
 
 
 

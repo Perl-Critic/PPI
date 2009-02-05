@@ -41,11 +41,12 @@ Perl code itself.
 =cut
 
 use strict;
-use base 'PPI::Statement';
+use PPI::Statement ();
 
-use vars qw{$VERSION};
+use vars qw{$VERSION @ISA};
 BEGIN {
 	$VERSION = '1.204_01';
+	@ISA     = 'PPI::Statement';
 }
 
 # Data is never complete

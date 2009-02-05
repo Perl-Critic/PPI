@@ -2,10 +2,11 @@ Revision history for Perl extension PPI
 
 1.xxx
 	Summary:
-	- Various bug fixing
+	- Various bug fixing and stabilisation work
 	- It's a perl 5.10 extravaganza!
 
 	Details:
+	- Added Test::NoWarnings to the test suite
 	- Added support for qw{foo} in addition to for ('foo')
 	- Added support for vstrings again
 	- Now supports the 5.10 "state" keyword.  As far as PPI is concerned,

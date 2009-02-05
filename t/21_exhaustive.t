@@ -3,15 +3,12 @@
 # Exhaustively test all possible Perl programs to a particular length
 
 use strict;
-use File::Spec::Functions ':ALL';
+use Carp 'croak';
 BEGIN {
 	$| = 1;
 	$PPI::XS_DISABLE = 1;
 	$PPI::XS_DISABLE = 1; # Prevent warning
 }
-use PPI;
-use Carp 'croak';
-use Params::Util '_INSTANCE';
 
 use vars qw{$MAX_CHARS $ITERATIONS $LENGTH @ALL_CHARS};
 BEGIN {
@@ -44,7 +41,11 @@ BEGIN {
 #####################################################################
 # Prepare
 
-use Test::More tests => ($MAX_CHARS + $ITERATIONS + 2);
+use Test::More tests => ($MAX_CHARS + $ITERATIONS + 3);
+use Test::NoWarnings;
+use File::Spec::Functions ':ALL';
+use Params::Util '_INSTANCE';
+use PPI;
 
 
 

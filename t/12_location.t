@@ -3,16 +3,16 @@
 # Tests the accuracy and features for location functionality
 
 use strict;
-use File::Spec::Functions ':ALL';
 BEGIN {
 	$| = 1;
 	$PPI::XS_DISABLE = 1;
 	$PPI::XS_DISABLE = 1; # Prevent warning
 }
-use PPI;
 
-# Execute the tests
-use Test::More tests => 682;
+use Test::More tests => 683;
+use Test::NoWarnings;
+use File::Spec::Functions ':ALL';
+use PPI;
 
 my $test_source = <<'END_PERL';
 my $foo = 'bar';

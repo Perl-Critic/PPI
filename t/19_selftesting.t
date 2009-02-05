@@ -6,19 +6,22 @@
 # Using PPI to analyse its own code at install-time? Fuck yeah! :)
 
 use strict;
-use File::Spec::Functions ':ALL';
 BEGIN {
 	$| = 1;
 	$PPI::XS_DISABLE = 1;
 	$PPI::XS_DISABLE = 1; # Prevent warning
 }
-use PPI;
-use Class::Inspector;
-use constant CI => 'Class::Inspector';
-use Params::Util qw{ _CLASS _ARRAY _INSTANCE _IDENTIFIER };
+
 use Test::More; # Plan comes later
+use Test::NoWarnings;
 use Test::Object;
+use File::Spec::Functions ':ALL';
+use Params::Util qw{ _CLASS _ARRAY _INSTANCE _IDENTIFIER };
+use Class::Inspector;
+use PPI;
 use t::lib::PPI;
+
+use constant CI => 'Class::Inspector';
 
 
 
@@ -30,7 +33,7 @@ use t::lib::PPI;
 # Find all of the files to be checked
 my %tests = map { $_ => $INC{$_} } grep { ! /\bXS\.pm/ } grep { /^PPI\b/ } keys %INC;
 unless ( %tests ) {
-	Test::More::plan( tests => 1 );
+	Test::More::plan( tests => 2 );
 	ok( undef, "Failed to find any files to test" );
 	exit();
 }
@@ -43,7 +46,7 @@ foreach my $dir ( '05_lexer', '08_regression', '11_util', '13_data', '15_transfo
 }
 
 # Declare our plan
-Test::More::plan( tests => scalar(@files) * 10 + 3 );
+Test::More::plan( tests => scalar(@files) * 10 + 4 );
 
 
 

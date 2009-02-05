@@ -15,7 +15,8 @@ BEGIN {
 use PPI::Lexer ();
 
 # Execute the tests
-use Test::More tests => 220;
+use Test::More tests => 221;
+use Test::NoWarnings;
 use Scalar::Util 'refaddr';
 
 sub is_object {

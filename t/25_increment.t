@@ -5,26 +5,19 @@
 # Some other regressions tests are included here for simplicity.
 
 use strict;
-use File::Spec::Functions ':ALL';
 BEGIN {
 	$| = 1;
 	$PPI::XS_DISABLE = 1;
 	$PPI::XS_DISABLE = 1; # Prevent warning
 }
-use PPI::Lexer;
-use PPI::Dumper;
-use Params::Util '_INSTANCE';
-
-
-
-
-
-#####################################################################
-# Prepare
 
 # For each new item in t/data/08_regression add another 14 tests
-
-use Test::More tests => 3317;
+use Test::More tests => 3318;
+use Test::NoWarnings;
+use File::Spec::Functions ':ALL';
+use Params::Util '_INSTANCE';
+use PPI::Lexer;
+use PPI::Dumper;
 use t::lib::PPI;
 
 
@@ -36,4 +29,3 @@ use t::lib::PPI;
 # ntests = 2 + 14 * nfiles
 
 t::lib::PPI->increment_testdir(qw{ t data 08_regression });
-

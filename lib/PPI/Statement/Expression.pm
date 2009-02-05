@@ -36,11 +36,12 @@ provided by L<PPI::Statement>, L<PPI::Node> and L<PPI::Element>.
 =cut
 
 use strict;
-use base 'PPI::Statement';
+use PPI::Statement ();
 
-use vars qw{$VERSION};
+use vars qw{$VERSION @ISA};
 BEGIN {
 	$VERSION = '1.204_01';
+	@ISA     = 'PPI::Statement';
 }
 
 1;

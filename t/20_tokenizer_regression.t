@@ -5,12 +5,14 @@
 # Some other regressions tests are included here for simplicity.
 
 use strict;
-use File::Spec::Functions ':ALL';
 BEGIN {
 	$| = 1;
 	$PPI::XS_DISABLE = 1;
 	$PPI::XS_DISABLE = 1; # Prevent warning
 }
+
+use File::Spec::Functions ':ALL';
+
 use PPI::Lexer;
 use PPI::Dumper;
 use Carp 'croak';
@@ -59,8 +61,8 @@ BEGIN {
 		);
 }
 
-use Test::More tests => scalar(@FAILURES) * 3;
-
+use Test::More tests => 1 + scalar(@FAILURES) * 3;
+use Test::NoWarnings;
 
 
 

@@ -3,18 +3,23 @@
 # Formal unit tests for specific PPI::Token classes
 
 use strict;
-use File::Spec::Functions ':ALL';
-use List::MoreUtils qw();
 BEGIN {
 	$| = 1;
 	$PPI::XS_DISABLE = 1;
 	$PPI::XS_DISABLE = 1; # Prevent warning
 }
-use PPI;
 
 # Execute the tests
-use Test::More tests => 294;
+use Test::More tests => 295;
+use Test::NoWarnings;
+use File::Spec::Functions ':ALL';
+use List::MoreUtils ();
 use t::lib::PPI;
+use PPI;
+
+
+
+
 
 #####################################################################
 # Code/Dump Testing

@@ -12,7 +12,8 @@ BEGIN {
 use PPI;
 
 # Execute the tests
-use Test::More tests => 13;
+use Test::More tests => 14;
+use Test::NoWarnings;
 
 # Test file
 my $file  = catfile(qw{ t data 03_document test.dat  });

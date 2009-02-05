@@ -3,17 +3,19 @@
 # Test compatibility with Storable
 
 use strict;
-use File::Spec::Functions ':ALL';
 BEGIN {
 	$| = 1;
 	$PPI::XS_DISABLE = 1;
 	$PPI::XS_DISABLE = 1; # Prevent warning
 }
-use PPI::Cache    ();
-use PPI::Document ();
-use File::Remove  ();
+
+use Test::More tests => 43;
+use Test::NoWarnings;
+use File::Spec::Functions ':ALL';
 use Scalar::Util  'refaddr';
-use Test::More    tests => 42;
+use File::Remove  ();
+use PPI::Document ();
+use PPI::Cache    ();
 
 my $this_file = catdir( 't', 'data', '03_document', 'test.dat' );
 my $cache_dir = catdir( 't', 'data', '18_cache' );

@@ -3,24 +3,29 @@
 # Test compatibility with Storable
 
 use strict;
-use File::Spec::Functions ':ALL';
 BEGIN {
 	$| = 1;
 	$PPI::XS_DISABLE = 1;
 	$PPI::XS_DISABLE = 1; # Prevent warning
 }
-use PPI;
-use PPI::Document ();
-use Test::More    ();
-use Scalar::Util  'refaddr';
 
-# Is Storable installed?
-eval { require Storable; };
-if ( $@ ) {
-	Test::More::plan( 'skip_all' );
-	exit(0);
+use Test::More;
+BEGIN {
+	# Is Storable installed?
+	eval { require Storable; };
+	if ( $@ ) {
+		plan( 'skip_all' );
+		exit(0);
+	} else {
+		plan( tests => 10 );
+	}
 }
-Test::More::plan( tests => 9 );
+
+use Test::NoWarnings;
+use File::Spec::Functions ':ALL';
+use Scalar::Util  'refaddr';
+use PPI;
+
 
 
 

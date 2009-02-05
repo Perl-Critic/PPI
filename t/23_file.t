@@ -3,14 +3,16 @@
 # Testing of PPI::Document::File
 
 use strict;
-use File::Spec::Functions ':ALL';
 BEGIN {
 	$| = 1;
 	$PPI::XS_DISABLE = 1;
 	$PPI::XS_DISABLE = 1; # Prevent warning
 }
+
+use Test::More tests => 5;
+use Test::NoWarnings;
+use File::Spec::Functions ':ALL';
 use PPI::Document::File;
-use Test::More tests => 4;
 
 
 
@@ -30,5 +32,3 @@ SCOPE: {
 	isa_ok( $doc, 'PPI::Document'       );
 	is( $doc->filename, $file, '->filename ok' );
 }
-
-exit(0);

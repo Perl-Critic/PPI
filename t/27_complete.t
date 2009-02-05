@@ -10,6 +10,7 @@ BEGIN {
 }
 
 use Test::More;
+use Test::NoWarnings;
 use File::Spec::Functions ':ALL';
 use PPI;
 
@@ -17,7 +18,7 @@ use PPI;
 # The letter after the number acts as a boolean yes/no answer to
 # "Is this code complete"
 my @files = find_files( catdir( 't', 'data', '27_complete' ) );
-my $tests = (scalar(@files) * 2) + 1;
+my $tests = (scalar(@files) * 2) + 2;
 plan( tests => $tests );
 
 

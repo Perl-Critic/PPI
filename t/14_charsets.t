@@ -1,24 +1,26 @@
 ﻿#!/usr/bin/perl
 
-BEGIN {
-    if ($] < 5.008007) {
-        require Test::More;
-        Test::More->import( skip_all => "Unicode support requires perl 5.8.7" );
-        exit(0);
-    }
-}
-
 use strict;
-use File::Spec::Functions ':ALL';
 BEGIN {
 	$| = 1;
 	$PPI::XS_DISABLE = 1;
 	$PPI::XS_DISABLE = 1; # Prevent warning
 }
-use PPI;
-use Params::Util '_INSTANCE';
-use Test::More tests => 11;
+use Test::More;
+
+BEGIN {
+	if ($] < 5.008007) {
+		Test::More->import( skip_all => "Unicode support requires perl 5.8.7" );
+		exit(0);
+	}
+	plan( tests => 12 );
+}
+
+use Test::NoWarnings;
 use utf8;
+use File::Spec::Functions ':ALL';
+use Params::Util '_INSTANCE';
+use PPI;
 
 sub good_ok {
 	my $source  = shift;
@@ -29,6 +31,10 @@ sub good_ok {
 		diag($PPI::Document::errstr);
 	}
 }
+
+
+
+
 
 #####################################################################
 # Begin Tests

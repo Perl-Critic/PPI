@@ -7,7 +7,8 @@ BEGIN {
 	$PPI::XS_DISABLE = 1; # Prevent warning
 }
 
-use Test::More 0.86 tests => 23;
+use Test::More 0.86 tests => 24;
+use Test::NoWarnings;
 use File::Spec::Functions ':ALL';
 use PPI;
 use PPI::Transform;
