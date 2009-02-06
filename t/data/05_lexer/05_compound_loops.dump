@@ -42,6 +42,13 @@ PPI::Document
   PPI::Statement::Compound
     PPI::Token::Word  	'foreach'
     PPI::Token::Whitespace  	' '
+    PPI::Token::QuoteLike::Words  	'qw{}'
+    PPI::Token::Whitespace  	' '
+    PPI::Structure::Block  	{ ... }
+  PPI::Token::Whitespace  	'\n'
+  PPI::Statement::Compound
+    PPI::Token::Word  	'foreach'
+    PPI::Token::Whitespace  	' '
     PPI::Structure::ForLoop  	( ... )
     PPI::Token::Whitespace  	' '
     PPI::Structure::Block  	{ ... }
@@ -133,9 +140,7 @@ PPI::Document
     PPI::Token::Whitespace  	' '
     PPI::Token::Symbol  	'$foo'
     PPI::Token::Whitespace  	' '
-    PPI::Structure::ForLoop  	...
-      PPI::Statement
-        PPI::Token::QuoteLike::Words  	'qw<blah>'
+    PPI::Token::QuoteLike::Words  	'qw<blah>'
     PPI::Token::Whitespace  	' '
     PPI::Structure::Block  	{ ... }
   PPI::Token::Whitespace  	'\n'
