@@ -714,11 +714,11 @@ my %OBVIOUS_CLASS = (
 	'PPI::Token::Quote::Interpolate' => 'operator',
 	'PPI::Token::Quote::Literal'     => 'operator',
 	'PPI::Token::Quote::Single'      => 'operator',
-	'PPI::Token::Quote::Backtick'    => 'operator',
-	'PPI::Token::Quote::Command'     => 'operator',
-	'PPI::Token::Quote::Readline'    => 'operator',
-	'PPI::Token::Quote::Regexp'      => 'operator',
-	'PPI::Token::Quote::Words'       => 'operator',
+	'PPI::Token::QuoteLike::Backtick'    => 'operator',
+	'PPI::Token::QuoteLike::Command'     => 'operator',
+	'PPI::Token::QuoteLike::Readline'    => 'operator',
+	'PPI::Token::QuoteLike::Regexp'      => 'operator',
+	'PPI::Token::QuoteLike::Words'       => 'operator',
 );
 
 my %OBVIOUS_CONTENT = (
