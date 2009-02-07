@@ -13,7 +13,7 @@ BEGIN {
 use PPI;
 
 # Execute the tests
-use Test::More tests => 22;
+use Test::More tests => 41;
 
 # =begin testing module_version 9
 {
@@ -77,6 +77,109 @@ is( $statements->[8]->version(), '5.006', 'require back-compatible version, foll
 is( $statements->[9]->version(), '5.6.1', '... require v-string, no leading "v"' );
 
 is( $statements->[10]->version(), '', 'use module version' );
+}
+
+
+
+# =begin testing arguments 19
+{
+my $document = PPI::Document->new(\<<'END_PERL');
+use 5.006;       # Don't expect anything.
+use Foo;         # Don't expect anything.
+use Foo 5;       # Don't expect anything.
+use Foo 'bar';   # One thing.
+use Foo 5 'bar'; # One thing.
+use Foo qw< bar >, "baz";
+use Test::More tests => 5 * 9   # Don't get tripped up by the lack of the ";"
+END_PERL
+
+isa_ok( $document, 'PPI::Document' );
+my $statements = $document->find('PPI::Statement::Include');
+is( scalar @{$statements}, 7, 'Found expected include statements.' );
+
+is(
+	scalar $statements->[0]->arguments(), undef, 'arguments for perl version',
+);
+is(
+	scalar $statements->[1]->arguments(),
+	undef,
+	'arguments with no arguments',
+);
+is(
+	scalar $statements->[2]->arguments(),
+	undef,
+	'arguments with no arguments but module version',
+);
+
+my @arguments = $statements->[3]->arguments();
+is( scalar @arguments, 1, 'arguments with single argument' );
+is( $arguments[0]->content(), q<'bar'>, 'arguments with single argument' );
+
+@arguments = $statements->[4]->arguments();
+is(
+	scalar @arguments,
+	1,
+	'arguments with single argument and module version',
+);
+is(
+	$arguments[0]->content(),
+	q<'bar'>,
+	'arguments with single argument and module version',
+);
+
+@arguments = $statements->[5]->arguments();
+is(
+	scalar @arguments,
+	3,
+	'arguments with multiple arguments',
+);
+is(
+	$arguments[0]->content(),
+	q/qw< bar >/,
+	'arguments with multiple arguments',
+);
+is(
+	$arguments[1]->content(),
+	q<,>,
+	'arguments with multiple arguments',
+);
+is(
+	$arguments[2]->content(),
+	q<"baz">,
+	'arguments with multiple arguments',
+);
+
+@arguments = $statements->[6]->arguments();
+is(
+	scalar @arguments,
+	5,
+	'arguments with Test::More',
+);
+is(
+	$arguments[0]->content(),
+	'tests',
+	'arguments with Test::More',
+);
+is(
+	$arguments[1]->content(),
+	q[=>],
+	'arguments with Test::More',
+);
+is(
+	$arguments[2]->content(),
+	5,
+	'arguments with Test::More',
+);
+is(
+	$arguments[3]->content(),
+	'*',
+	'arguments with Test::More',
+);
+is(
+	$arguments[4]->content(),
+	9,
+	'arguments with Test::More',
+);
 }
 
 

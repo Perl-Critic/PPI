@@ -17,6 +17,7 @@ Revision history for Perl extension PPI
 	  affected by the #line directive.
 	- Now supports UNITCHECK blocks.
 	- Statement::Include::module_version() implemented.
+	- Statement::Include::arguments() implemented.
 	- Statement::Variable::symbols() implemented.
 	- Token::QuoteLike::Words::literal() implemented.
 	- Token::Quote::Double::simplify() fixed.
