@@ -165,7 +165,7 @@ END_PERL
 isa_ok( $Document, 'PPI::Document' );
 
 my $statements = $Document->find('Statement::Compound');
-is( scalar @{$statements}, 38, 'Found the 38 test statements' );
+is( scalar @{$statements}, 50, 'Found the 50 test statements' );
 
 is( $statements->[0]->type(), 'while', q<Type of while is "while"> );
 is( $statements->[1]->type(), 'while', q<Type of until is "while"> );
@@ -205,6 +205,7 @@ sub type {
 		return 'foreach' if $Element->content eq 'state';
 		return 'foreach' if $Element->isa('PPI::Token::Symbol');
 		return 'foreach' if $Element->isa('PPI::Token::QuoteLike::Words');
+		# if ( $Element->isa('PPI::
 		return 'for';
 	}
 	return $TYPES{$Element->content} if $Element->isa('PPI::Token::Word');

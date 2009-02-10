@@ -60,7 +60,7 @@ PPI::Document
     PPI::Token::Whitespace  	' '
     PPI::Token::Symbol  	'$foo'
     PPI::Token::Whitespace  	' '
-    PPI::Structure::ForLoop  	( ... )
+    PPI::Structure::List  	( ... )
       PPI::Token::Whitespace  	' '
       PPI::Statement
         PPI::Token::Number  	'1'
@@ -80,7 +80,7 @@ PPI::Document
     PPI::Token::Whitespace  	' '
     PPI::Token::Symbol  	'$foo'
     PPI::Token::Whitespace  	' '
-    PPI::Structure::ForLoop  	( ... )
+    PPI::Structure::List  	( ... )
     PPI::Token::Whitespace  	' '
     PPI::Structure::Block  	{ ... }
   PPI::Token::Whitespace  	'\n'
@@ -91,7 +91,7 @@ PPI::Document
     PPI::Token::Whitespace  	' '
     PPI::Token::Symbol  	'$foo'
     PPI::Token::Whitespace  	' '
-    PPI::Structure::ForLoop  	( ... )
+    PPI::Structure::List  	( ... )
     PPI::Token::Whitespace  	' '
     PPI::Structure::Block  	{ ... }
   PPI::Token::Whitespace  	'\n'
@@ -102,7 +102,7 @@ PPI::Document
     PPI::Token::Whitespace  	' '
     PPI::Token::Symbol  	'$foo'
     PPI::Token::Whitespace  	' '
-    PPI::Structure::ForLoop  	( ... )
+    PPI::Structure::List  	( ... )
     PPI::Token::Whitespace  	' '
     PPI::Structure::Block  	{ ... }
   PPI::Token::Whitespace  	'\n'
@@ -113,7 +113,7 @@ PPI::Document
     PPI::Token::Whitespace  	' '
     PPI::Token::Symbol  	'$foo'
     PPI::Token::Whitespace  	' '
-    PPI::Structure::ForLoop  	( ... )
+    PPI::Structure::List  	( ... )
     PPI::Token::Whitespace  	' '
     PPI::Structure::Block  	{ ... }
   PPI::Token::Whitespace  	'\n'
@@ -122,7 +122,7 @@ PPI::Document
     PPI::Token::Whitespace  	' '
     PPI::Token::Symbol  	'$foo'
     PPI::Token::Whitespace  	' '
-    PPI::Structure::ForLoop  	( ... )
+    PPI::Structure::List  	( ... )
     PPI::Token::Whitespace  	' '
     PPI::Structure::Block  	{ ... }
   PPI::Token::Whitespace  	'\n'
@@ -131,7 +131,7 @@ PPI::Document
     PPI::Token::Whitespace  	' '
     PPI::Token::Symbol  	'$foo'
     PPI::Token::Whitespace  	' '
-    PPI::Structure::ForLoop  	( ... )
+    PPI::Structure::List  	( ... )
     PPI::Token::Whitespace  	' '
     PPI::Structure::Block  	{ ... }
   PPI::Token::Whitespace  	'\n'

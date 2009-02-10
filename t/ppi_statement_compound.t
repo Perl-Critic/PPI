@@ -76,7 +76,7 @@ END_PERL
 isa_ok( $Document, 'PPI::Document' );
 
 my $statements = $Document->find('Statement::Compound');
-is( scalar @{$statements}, 38, 'Found the 38 test statements' );
+is( scalar @{$statements}, 50, 'Found the 38 test statements' );
 
 is( $statements->[0]->type(), 'while', q<Type of while is "while"> );
 is( $statements->[1]->type(), 'while', q<Type of until is "while"> );
