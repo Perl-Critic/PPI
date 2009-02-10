@@ -53,13 +53,13 @@ BEGIN {
 	%OPERATOR = map { $_ => 1 } (
 		qw{
 		-> ++ -- ** ! ~ + -
-		=~ !~ * / % x + - . << >>
+		=~ !~ * / % x . << >>
 		< > <= >= lt gt le ge
 		== != <=> eq ne cmp ~~
 		& | ^ && || // .. ...
 		? : = += -= *= .= /= //=
 		=> <>
-		and or dor not
+		and or xor not
 		}, ',' 	# Avoids "comma in qw{}" warning
 		);
 }
