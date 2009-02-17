@@ -163,7 +163,7 @@ sub bug_bad_isa_class_name {
 	# The list should be the params list for an isa call
 	my $Word = $List->sprevious_sibling            or return '';
 	$Word->isa('PPI::Token::Word')                 or return '';
-	$Word->content =~ /^(?:UNIVERSAL::)?isa$/s     or return '';
+	$Word->content =~ /^(?:UNIVERSAL::)?isa\z/s    or return '';
 
 	# Is the class real and loaded?
 	CI->loaded($Element->string)                  and return '';
