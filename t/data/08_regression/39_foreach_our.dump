@@ -1,0 +1,14 @@
+PPI::Document
+  PPI::Statement::Compound
+    PPI::Token::Word  	'for'
+    PPI::Token::Whitespace  	' '
+    PPI::Token::Word  	'our'
+    PPI::Token::Whitespace  	' '
+    PPI::Token::Symbol  	'$k'
+    PPI::Token::Whitespace  	' '
+    PPI::Structure::ForLoop  	( ... )
+      PPI::Statement
+        PPI::Token::Symbol  	'@foo'
+    PPI::Token::Whitespace  	' '
+    PPI::Structure::Block  	{ ... }
+  PPI::Token::Whitespace  	'\n'
