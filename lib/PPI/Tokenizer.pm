@@ -101,7 +101,7 @@ BEGIN {
 
 =pod
 
-=head2 new $source | \@lines | \$source
+=head2 new $file | \@lines | \$source
 
 The main C<new> constructor creates a new Tokenizer object. These
 objects have no configuration parameters, and can only be used once,
