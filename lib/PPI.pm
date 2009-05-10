@@ -833,7 +833,7 @@ So for my schooling in the Deep Magiks, you have my deepest gratitude Randal.
 
 =head1 COPYRIGHT
 
-Copyright 2001 - 2008 Adam Kennedy.
+Copyright 2001 - 2009 Adam Kennedy.
 
 This program is free software; you can redistribute
 it and/or modify it under the same terms as Perl itself.

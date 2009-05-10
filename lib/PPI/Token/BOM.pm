@@ -97,13 +97,11 @@ See the L<support section|PPI/SUPPORT> in the main module
 
 =head1 AUTHOR
 
-Chris Dolan, L<http://www.chrisdolan.ney/>, cdolan@cpan.org
-
-Copyright is hereby granted to Adam Kennedy or his designees.
+Chris Dolan E<lt>cdolan@cpan.orgE<gt>
 
 =head1 COPYRIGHT
 
-Copyright (c) 2001 - 2005 Adam Kennedy. All rights reserved.
+Copyright 2001 - 2009 Adam Kennedy.
 
 This program is free software; you can redistribute
 it and/or modify it under the same terms as Perl itself.
