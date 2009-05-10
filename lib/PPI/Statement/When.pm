@@ -15,6 +15,9 @@ PPI::Statement::When - Describes all compound statements
       when ( m/f/ ) {
           boom($_);
       }
+      default {
+          tchak($_);
+      }
   }
 
 =head1 INHERITANCE
@@ -26,8 +29,8 @@ PPI::Statement::When - Describes all compound statements
 
 =head1 DESCRIPTION
 
-C<PPI::Statement::When> objects are used to describe when statements, as
-described in L<perlsyn>.
+C<PPI::Statement::When> objects are used to describe when and default
+statements, as described in L<perlsyn>.
 
 =head1 METHODS
 
