@@ -8,7 +8,7 @@ use Params::Util qw{ _INSTANCE _SCALAR0 _ARRAY0 };
 
 use vars qw{$VERSION @ISA @EXPORT_OK};
 BEGIN {
-	$VERSION = '1.204_01';
+	$VERSION = '1.204_02';
 
 	require Exporter;
 	@ISA       = qw{ Exporter         };

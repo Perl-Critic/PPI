@@ -1,16 +1,17 @@
 Revision history for Perl extension PPI
 
-1.xxx
+1.204_02 Sun 10 May 2009
 	Summary:
 	- Various bug fixing and stabilisation work
 	- It's a perl 5.10 extravaganza!
 
 	Details:
+	- Updated Module::Install to 0.87
 	- Added Test::NoWarnings to the test suite
 	- Added support for qw{foo} in addition to for ('foo')
 	- Added support for vstrings again
-	- Now supports the 5.10 "state" keyword.  As far as PPI is concerned,
-	  it's a synonym for "my".
+	- Now supports the 5.10 "state" keyword.
+	  (As far as PPI is concerned it's a synonym for "my")
 	- Now supports switch statements.
 	- Now supports the smart match operator (~~).
 	- Now supports keeping track of line numbers and file names as
@@ -27,9 +28,9 @@ Revision history for Perl extension PPI
 	- Token::Word::method_call() implemented.
 	- Element::descendant_of() and Element::ancestor_of() implemented.
 	- Statement::specialized() implemented.
-	- Now can handle files named "0".  Perl::Critic got a complaint about
-	  this.
-	- foreach loop variables can be declared using "our" and "local".
+	- Now can handle files named "0".
+	  (Perl::Critic got a complaint about this)
+	- foreach loop variables can be declared using "our".
 	- Much more comprehensive testing of compound statement detection.
 
 1.204_01 Sun 18 May 2008

@@ -46,7 +46,7 @@ foreach my $dir ( '05_lexer', '08_regression', '11_util', '13_data', '15_transfo
 }
 
 # Declare our plan
-Test::More::plan( tests => scalar(@files) * 10 + 4 );
+Test::More::plan( tests => scalar(@files) * 12 + 4 );
 
 
 
@@ -81,8 +81,17 @@ is_deeply( $bad, [ 'Bad::Class1', 'Bad::Class2', 'Bad::Class3', 'Bad::Class4' ],
 # Run the Tests
 
 foreach my $file ( @files ) {
+	# MD5 the raw file
+	my $md5a = PPI::Util::md5hex_file($file);
+	like( $md5a, qr/^[0-9a-f]{32}\z/, 'md5hex_file ok' );
+
+	# Load the file
 	my $Document = PPI::Document->new($file);
 	ok( _INSTANCE($Document, 'PPI::Document'), "$file: Parsed ok" );
+
+	# Compare the preload signature to the post-load value
+	my $md5b = $Document->hex_id;
+	is( $md5b, $md5a, '->hex_id matches md5hex' );
 
 	# By this point, everything should have parsed properly at least
 	# once, so no need to skip.

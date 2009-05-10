@@ -49,7 +49,7 @@ use base 'PPI::Statement';
 
 use vars qw{$VERSION};
 BEGIN {
-	$VERSION = '1.204_01';
+	$VERSION = '1.204_02';
 }
 
 # Once we've hit a naked unmatched brace we can never truly be complete.
