@@ -49,7 +49,7 @@ PPI::Document
   PPI::Statement::Compound
     PPI::Token::Word  	'foreach'
     PPI::Token::Whitespace  	' '
-    PPI::Structure::ForLoop  	( ... )
+    PPI::Structure::List  	( ... )
     PPI::Token::Whitespace  	' '
     PPI::Structure::Block  	{ ... }
   PPI::Token::Whitespace  	'\n'

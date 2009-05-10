@@ -51,7 +51,8 @@ standard L<PPI::Statement>, L<PPI::Node> and L<PPI::Element> methods.
 =cut
 
 use strict;
-use PPI::Statement ();
+use List::MoreUtils ();
+use PPI::Statement  ();
 
 use vars qw{$VERSION @ISA %TYPES};
 BEGIN {
@@ -104,7 +105,7 @@ All of the compounds are a variation on one of these three.
 Returns the simple string C<'if'>, C<'for'>, C<'foreach'> or C<'while'>,
 or C<undef> if the type cannot be determined.
 
-=begin testing type 40
+=begin testing type 52
 
 my $Document = PPI::Document->new(\<<'END_PERL');
        while (1) { }
@@ -179,7 +180,7 @@ foreach my $index (6..37) {
 	is( $statement->type(), 'foreach', qq<Type is "foreach": $statement> );
 }
 
-foreach my $index (38..53) {
+foreach my $index (38..49) {
 	my $statement = $statements->[$index];
 	is( $statement->type(), 'for', qq<Type is "for": $statement> );
 }
@@ -199,17 +200,21 @@ sub type {
 	}
 
 	# Most simple cases
-	if ( $Element->content eq 'for' ) {
-		$Element = $self->schild(++$p) or return 'for';
-		return 'foreach' if $Element->content eq 'my';
-		return 'foreach' if $Element->content eq 'state';
-		return 'foreach' if $Element->isa('PPI::Token::Symbol');
-		return 'foreach' if $Element->isa('PPI::Token::QuoteLike::Words');
-		# if ( $Element->isa('PPI::
+	my $content = $Element->content;
+	if ( $content =~ /^?for(?:each)?\z/ ) {
+		$Element = $self->schild(++$p) or return $content;
+		if ( $Element->isa('PPI::Token') ) {
+			return 'foreach' if $Element->content =~ /^my|our|state\z/;
+			return 'foreach' if $Element->isa('PPI::Token::Symbol');
+			return 'foreach' if $Element->isa('PPI::Token::QuoteLike::Words');
+		}
+		if ( $Element->isa('PPI::Structure::List') ) {
+			return 'foreach';
+		}
 		return 'for';
 	}
-	return $TYPES{$Element->content} if $Element->isa('PPI::Token::Word');
-	return 'continue'                if $Element->isa('PPI::Structure::Block');
+	return $TYPES{$content} if $Element->isa('PPI::Token::Word');
+	return 'continue'       if $Element->isa('PPI::Structure::Block');
 
 	# Unknown (shouldn't exist?)
 	undef;

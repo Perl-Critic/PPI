@@ -30,6 +30,7 @@ Revision history for Perl extension PPI
 	- Now can handle files named "0".  Perl::Critic got a complaint about
 	  this.
 	- foreach loop variables can be declared using "our" and "local".
+	- Much more comprehensive testing of compound statement detection.
 
 1.204_01 Sun 18 May 2008
         Summary:

@@ -13,9 +13,9 @@ BEGIN {
 use PPI;
 
 # Execute the tests
-use Test::More tests => 40;
+use Test::More tests => 52;
 
-# =begin testing type 40
+# =begin testing type 52
 {
 my $Document = PPI::Document->new(\<<'END_PERL');
        while (1) { }
@@ -90,7 +90,7 @@ foreach my $index (6..37) {
 	is( $statement->type(), 'foreach', qq<Type is "foreach": $statement> );
 }
 
-foreach my $index (38..53) {
+foreach my $index (38..49) {
 	my $statement = $statements->[$index];
 	is( $statement->type(), 'for', qq<Type is "for": $statement> );
 }

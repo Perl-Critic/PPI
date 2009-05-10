@@ -6,7 +6,7 @@ PPI::Document
     PPI::Token::Whitespace  	' '
     PPI::Token::Symbol  	'$k'
     PPI::Token::Whitespace  	' '
-    PPI::Structure::ForLoop  	( ... )
+    PPI::Structure::List  	( ... )
       PPI::Statement
         PPI::Token::Symbol  	'@foo'
     PPI::Token::Whitespace  	' '

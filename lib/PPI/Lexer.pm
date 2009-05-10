@@ -54,7 +54,8 @@ For more unusual tasks, by all means forge onwards.
 =cut
 
 use strict;
-use Params::Util '_INSTANCE';
+use List::MoreUtils ();
+use Params::Util    '_INSTANCE';
 use PPI ();
 
 use vars qw{$VERSION $errstr};
@@ -723,7 +724,7 @@ sub _statement_continues {
 
 	if ( $type eq 'for' ) {
 		# LABEL for (EXPR; EXPR; EXPR) BLOCK
-		if ( $LastChild->isa('PPI::Token::Word') and $LastChild->content eq 'for' ) {
+		if ( $LastChild->isa('PPI::Token::Word') and $LastChild->content =~ /^for(?:each)?\z/ ) {
 			# LABEL for ...
 			if (
 				(
@@ -1161,6 +1162,16 @@ sub _lex_structure {
 				# Add any delayed tokens, and the finishing token
 				$self->_add_delayed( $Structure ) or return undef;
 				$Structure->_set_finish( $Token ) or return undef;
+
+				# Confirm that ForLoop structures are actually so, and
+				# aren't really a list.
+				if ( $Structure->isa('PPI::Structure::ForLoop') ) {
+					if ( 2 > scalar grep {
+						$_->isa('PPI::Statement')
+					} $Structure->children ) {
+						bless($Structure, 'PPI::Structure::List');
+					}
+				}
 				return 1;
 			}
 
