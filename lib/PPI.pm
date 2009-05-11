@@ -418,7 +418,7 @@ based on inheritance.
             PPI::Structure::List
             PPI::Structure::ForLoop
             PPI::Structure::Given
-            PPI::Structure::WhenMatch
+            PPI::Structure::When
             PPI::Structure::Unknown
       PPI::Token
          PPI::Token::Whitespace

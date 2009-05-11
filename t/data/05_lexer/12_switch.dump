@@ -12,7 +12,7 @@ PPI::Document
       PPI::Statement::When
         PPI::Token::Word  	'when'
         PPI::Token::Whitespace  	' '
-        PPI::Structure::WhenMatch  	( ... )
+        PPI::Structure::When  	( ... )
           PPI::Statement::Expression
             PPI::Token::Symbol  	'@blah'
         PPI::Token::Whitespace  	' '

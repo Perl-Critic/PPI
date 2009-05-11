@@ -27,7 +27,7 @@ my $empty_list_tokens =
 	$empty_list_document->find('PPI::Token::QuoteLike::Words');
 is( scalar @{$empty_list_tokens}, 2, 'Found expected empty word lists.' );
 foreach my $token ( @{$empty_list_tokens} ) {
-	my @literal = $token->literal();
+	my @literal = $token->literal;
 	is( scalar @literal, 0, qq<No elements for "$token"> );
 }
 
@@ -46,13 +46,13 @@ is(
 	'Found expected non-empty word lists.',
 );
 foreach my $token ( @{$non_empty_list_tokens} ) {
-	my $literal = $token->literal();
+	my $literal = $token->literal;
 	is(
 		$literal,
 		scalar @expected,
 		qq<Scalar context literal() returns the list for "$token">,
 	);
-	my @literal = $token->literal();
+	my @literal = $token->literal;
 	is( scalar @literal, scalar @expected, qq<Element count for "$token"> );
 	for (my $x = 0; $x < @expected; $x++) {
 		is( $literal[$x], $expected[$x], qq<Element $x of "$token"> );

@@ -38,22 +38,21 @@ a code security process, and false positives could be highly dangerous.
 
 =cut
 
+# For convenience (and since this isn't really a public class), import
+# the methods we will need from Scalar::Util.
 use strict;
-use overload 'bool' => sub () { 1 },
-             '=='   => 'equal';
-use Params::Util '_INSTANCE',
-                 '_ARRAY';
+use Scalar::Util qw{refaddr reftype blessed};
+use Params::Util qw{_INSTANCE _ARRAY};
+use PPI::Util    ();
 
 use vars qw{$VERSION};
 BEGIN {
 	$VERSION = '1.204_02';
 }
 
-# For convenience (and since this isn't really a public class), import
-# the methods we will need from Scalar::Util.
-use Scalar::Util 'refaddr',
-                 'reftype',
-                 'blessed';
+use overload 'bool' => \&PPI::Util::TRUE;
+use overload '=='   => 'equal';
+
 
 
 

@@ -30,13 +30,13 @@ END_PERL
 isa_ok( $document, 'PPI::Document' );
 my $statements = $document->find('PPI::Statement::Include');
 is( scalar @{$statements}, 7, 'Found expected include statements.' );
-is( $statements->[0]->module_version(), 1, 'Integer version' );
-is( $statements->[1]->module_version(), 1.5, 'Float version' );
-is( $statements->[2]->module_version(), 1, 'Version and argument' );
-is( $statements->[3]->module_version(), undef, 'No version, no arguments' );
-is( $statements->[4]->module_version(), undef, 'No version, with argument' );
-is( $statements->[5]->module_version(), undef, 'No version, with arguments' );
-is( $statements->[6]->module_version(), undef, 'Version include, no module' );
+is( $statements->[0]->module_version, 1, 'Integer version' );
+is( $statements->[1]->module_version, 1.5, 'Float version' );
+is( $statements->[2]->module_version, 1, 'Version and argument' );
+is( $statements->[3]->module_version, undef, 'No version, no arguments' );
+is( $statements->[4]->module_version, undef, 'No version, with argument' );
+is( $statements->[5]->module_version, undef, 'No version, with arguments' );
+is( $statements->[6]->module_version, undef, 'Version include, no module' );
 }
 
 
@@ -64,19 +64,19 @@ isa_ok( $document, 'PPI::Document' );
 my $statements = $document->find('PPI::Statement::Include');
 is( scalar @{$statements}, 11, 'Found expected include statements.' );
 
-is( $statements->[0]->version(), 'v5.6.1', 'use v-string' );
-is( $statements->[1]->version(), '5.6.1', 'use v-string, no leading "v"' );
-is( $statements->[2]->version(), '5.006_001', 'use developer release' );
-is( $statements->[3]->version(), '5.006', 'use back-compatible version, followed by...' );
-is( $statements->[4]->version(), '5.6.1', '... use v-string, no leading "v"' );
+is( $statements->[0]->version, 'v5.6.1', 'use v-string' );
+is( $statements->[1]->version, '5.6.1', 'use v-string, no leading "v"' );
+is( $statements->[2]->version, '5.006_001', 'use developer release' );
+is( $statements->[3]->version, '5.006', 'use back-compatible version, followed by...' );
+is( $statements->[4]->version, '5.6.1', '... use v-string, no leading "v"' );
 
-is( $statements->[5]->version(), 'v5.6.1', 'require v-string' );
-is( $statements->[6]->version(), '5.6.1', 'require v-string, no leading "v"' );
-is( $statements->[7]->version(), '5.006_001', 'require developer release' );
-is( $statements->[8]->version(), '5.006', 'require back-compatible version, followed by...' );
-is( $statements->[9]->version(), '5.6.1', '... require v-string, no leading "v"' );
+is( $statements->[5]->version, 'v5.6.1', 'require v-string' );
+is( $statements->[6]->version, '5.6.1', 'require v-string, no leading "v"' );
+is( $statements->[7]->version, '5.006_001', 'require developer release' );
+is( $statements->[8]->version, '5.006', 'require back-compatible version, followed by...' );
+is( $statements->[9]->version, '5.6.1', '... require v-string, no leading "v"' );
 
-is( $statements->[10]->version(), '', 'use module version' );
+is( $statements->[10]->version, '', 'use module version' );
 }
 
 
@@ -98,85 +98,85 @@ my $statements = $document->find('PPI::Statement::Include');
 is( scalar @{$statements}, 7, 'Found expected include statements.' );
 
 is(
-	scalar $statements->[0]->arguments(), undef, 'arguments for perl version',
+	scalar $statements->[0]->arguments, undef, 'arguments for perl version',
 );
 is(
-	scalar $statements->[1]->arguments(),
+	scalar $statements->[1]->arguments,
 	undef,
 	'arguments with no arguments',
 );
 is(
-	scalar $statements->[2]->arguments(),
+	scalar $statements->[2]->arguments,
 	undef,
 	'arguments with no arguments but module version',
 );
 
-my @arguments = $statements->[3]->arguments();
+my @arguments = $statements->[3]->arguments;
 is( scalar @arguments, 1, 'arguments with single argument' );
-is( $arguments[0]->content(), q<'bar'>, 'arguments with single argument' );
+is( $arguments[0]->content, q<'bar'>, 'arguments with single argument' );
 
-@arguments = $statements->[4]->arguments();
+@arguments = $statements->[4]->arguments;
 is(
 	scalar @arguments,
 	1,
 	'arguments with single argument and module version',
 );
 is(
-	$arguments[0]->content(),
+	$arguments[0]->content,
 	q<'bar'>,
 	'arguments with single argument and module version',
 );
 
-@arguments = $statements->[5]->arguments();
+@arguments = $statements->[5]->arguments;
 is(
 	scalar @arguments,
 	3,
 	'arguments with multiple arguments',
 );
 is(
-	$arguments[0]->content(),
+	$arguments[0]->content,
 	q/qw< bar >/,
 	'arguments with multiple arguments',
 );
 is(
-	$arguments[1]->content(),
+	$arguments[1]->content,
 	q<,>,
 	'arguments with multiple arguments',
 );
 is(
-	$arguments[2]->content(),
+	$arguments[2]->content,
 	q<"baz">,
 	'arguments with multiple arguments',
 );
 
-@arguments = $statements->[6]->arguments();
+@arguments = $statements->[6]->arguments;
 is(
 	scalar @arguments,
 	5,
 	'arguments with Test::More',
 );
 is(
-	$arguments[0]->content(),
+	$arguments[0]->content,
 	'tests',
 	'arguments with Test::More',
 );
 is(
-	$arguments[1]->content(),
+	$arguments[1]->content,
 	q[=>],
 	'arguments with Test::More',
 );
 is(
-	$arguments[2]->content(),
+	$arguments[2]->content,
 	5,
 	'arguments with Test::More',
 );
 is(
-	$arguments[3]->content(),
+	$arguments[3]->content,
 	'*',
 	'arguments with Test::More',
 );
 is(
-	$arguments[4]->content(),
+	$arguments[4]->content,
 	9,
 	'arguments with Test::More',
 );

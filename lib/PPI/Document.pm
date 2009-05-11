@@ -64,21 +64,22 @@ Document-specific.
 =cut
 
 use strict;
-use base 'PPI::Node';
 use Carp            ();
 use List::MoreUtils ();
 use Params::Util    qw{ _SCALAR0 _ARRAY0 _INSTANCE };
 use Digest::MD5     ();
 use PPI             ();
 use PPI::Util       ();
+use PPI::Node       ();
 use PPI::Exception::ParserTimeout ();
 
-use overload 'bool'    => sub () { 1 };
-use overload '""'      => 'content';
+use overload 'bool' => \&PPI::Util::TRUE;
+use overload '""'   => 'content';
 
-use vars qw{$VERSION $errstr};
+use vars qw{$VERSION @ISA $errstr};
 BEGIN {
 	$VERSION = '1.204_02';
+	@ISA     = 'PPI::Node';
 	$errstr  = '';
 }
 
@@ -86,6 +87,13 @@ use PPI::Document::Fragment ();
 
 # Document cache
 my $CACHE = undef;
+
+# Convenience constants related to constants
+use constant LOCATION_LINE         => 0;
+use constant LOCATION_CHARACTER    => 1;
+use constant LOCATION_COLUMN       => 2;
+use constant LOCATION_LOGICAL_LINE => 3;
+use constant LOCATION_LOGICAL_FILE => 4;
 
 
 
@@ -412,15 +420,15 @@ Returns the serialized document as a string.
 
 sub serialize {
 	my $self   = shift;
-	my @Tokens = $self->tokens;
+	my @tokens = $self->tokens;
 
 	# The here-doc content buffer
 	my $heredoc = '';
 
 	# Start the main loop
 	my $output = '';
-	foreach my $i ( 0 .. $#Tokens ) {
-		my $Token = $Tokens[$i];
+	foreach my $i ( 0 .. $#tokens ) {
+		my $Token = $tokens[$i];
 
 		# Handle normal tokens
 		unless ( $Token->isa('PPI::Token::HereDoc') ) {
@@ -469,8 +477,8 @@ sub serialize {
 
 			# When calculating $last_line, ignore the final token if
 			# and only if it has a single newline at the end.
-			my $last_index = $#Tokens;
-			if ( $Tokens[$last_index]->{content} =~ /^[^\n]*\n$/ ) {
+			my $last_index = $#tokens;
+			if ( $tokens[$last_index]->{content} =~ /^[^\n]*\n$/ ) {
 				$last_index--;
 			}
 
@@ -478,7 +486,7 @@ sub serialize {
 			# First, are we on the last line of the
 			# content part of the file
 			my $last_line = List::MoreUtils::none {
-				$Tokens[$_] and $Tokens[$_]->{content} =~ /\n/
+				$tokens[$_] and $tokens[$_]->{content} =~ /\n/
 				} (($i + 1) .. $last_index);
 			if ( ! defined $last_line ) {
 				# Handles the null list case
@@ -488,13 +496,13 @@ sub serialize {
 			# Secondly, are their any more here-docs after us,
 			# (with content or a terminator)
 			my $any_after = List::MoreUtils::any {
-				$Tokens[$_]->isa('PPI::Token::HereDoc')
+				$tokens[$_]->isa('PPI::Token::HereDoc')
 				and (
-					scalar(@{$Tokens[$_]->{_heredoc}})
+					scalar(@{$tokens[$_]->{_heredoc}})
 					or
-					defined $Tokens[$_]->{_terminator_line}
+					defined $tokens[$_]->{_terminator_line}
 					)
-				} (($i + 1) .. $#Tokens);
+				} (($i + 1) .. $#tokens);
 			if ( ! defined $any_after ) {
 				# Handles the null list case
 				$any_after = '';
@@ -557,8 +565,7 @@ Returns a 32 character hexadecimal string.
 =cut
 
 sub hex_id {
-	my $self = shift;
-	PPI::Util::md5hex($self->serialize);
+	PPI::Util::md5hex($_[0]->serialize);
 }
 
 =pod
@@ -574,15 +581,15 @@ and very slow if you need to do it a lot. So the C<index_locations> method
 will index and save the locations of every Element within the Document in
 advance, making future calls to <PPI::Element::location> virtually free.
 
-Please note that this is index should always be cleared using
-C<flush_locations> once you are finished with the locations. If content is
-added to or removed from the file, these indexed locations will be B<wrong>.
+Please note that this index should always be cleared using C<flush_locations>
+once you are finished with the locations. If content is added to or removed
+from the file, these indexed locations will be B<wrong>.
 
 =cut
 
 sub index_locations {
 	my $self   = shift;
-	my @Tokens = $self->tokens;
+	my @tokens = $self->tokens;
 
 	# Whenever we hit a heredoc we will need to increment by
 	# the number of lines in it's content section when when we
@@ -591,18 +598,18 @@ sub index_locations {
 
 	# Find the first Token without a location
 	my ($first, $location) = ();
-	foreach ( 0 .. $#Tokens ) {
-		my $Token = $Tokens[$_];
+	foreach ( 0 .. $#tokens ) {
+		my $Token = $tokens[$_];
 		next if $Token->{_location};
 
 		# Found the first Token without a location
 		# Calculate the new location if needed.
 		if ($_) {
 			$location =
-				$self->_add_location( $location, $Tokens[$_ - 1], \$heredoc );
+				$self->_add_location( $location, $tokens[$_ - 1], \$heredoc );
 		} else {
 			my $logical_file =
-				$self->can('filename') ? $self->filename() : undef;
+				$self->can('filename') ? $self->filename : undef;
 			$location = [ 1, 1, 1, 1, $logical_file ];
 		}
 		$first = $_;
@@ -610,8 +617,8 @@ sub index_locations {
 	}
 
 	# Calculate locations for the rest
-	foreach ( $first .. $#Tokens ) {
-		my $Token = $Tokens[$_];
+	foreach ( $first .. $#tokens ) {
+		my $Token = $tokens[$_];
 		$Token->{_location} = $location;
 		$location = $self->_add_location( $location, $Token, \$heredoc );
 
@@ -623,12 +630,6 @@ sub index_locations {
 
 	1;
 }
-
-use constant LOCATION_REAL_LINE_NUMBER      => 0;
-use constant LOCATION_COLUMN_NUMBER         => 1;
-use constant LOCATION_VISUAL_COLUMN_NUMBER  => 2;
-use constant LOCATION_LOGICAL_LINE_NUMBER   => 3;
-use constant LOCATION_LOGICAL_FILE_NAME     => 4;
 
 sub _add_location {
 	my ($self, $start, $Token, $heredoc) = @_;
@@ -642,12 +643,12 @@ sub _add_location {
 	unless ( $newlines ) {
 		# Handle the simple case
 		return [
-			$start->[LOCATION_REAL_LINE_NUMBER],
-			$start->[LOCATION_COLUMN_NUMBER] + length($content),
-			$start->[LOCATION_VISUAL_COLUMN_NUMBER]
+			$start->[LOCATION_LINE],
+			$start->[LOCATION_CHARACTER] + length($content),
+			$start->[LOCATION_COLUMN]
 				+ $self->_visual_length(
 					$content,
-					$start->[LOCATION_VISUAL_COLUMN_NUMBER]
+					$start->[LOCATION_COLUMN]
 				),
 			$logical_line,
 			$logical_file,
@@ -656,21 +657,21 @@ sub _add_location {
 
 	# This is the more complex case where we hit or
 	# span a newline boundary.
-	my $physical_line = $start->[LOCATION_REAL_LINE_NUMBER] + $newlines;
+	my $physical_line = $start->[LOCATION_LINE] + $newlines;
 	my $location = [ $physical_line, 1, 1, $logical_line, $logical_file ];
 	if ( $heredoc and $$heredoc ) {
-		$location->[LOCATION_REAL_LINE_NUMBER] += $$heredoc;
-		$location->[LOCATION_LOGICAL_LINE_NUMBER] += $$heredoc;
+		$location->[LOCATION_LINE]         += $$heredoc;
+		$location->[LOCATION_LOGICAL_LINE] += $$heredoc;
 		$$heredoc = 0;
 	}
 
 	# Does the token have additional characters
 	# after their last newline.
 	if ( $content =~ /\n([^\n]+?)\z/ ) {
-		$location->[LOCATION_COLUMN_NUMBER] += length($1);
-		$location->[LOCATION_VISUAL_COLUMN_NUMBER] +=
+		$location->[LOCATION_CHARACTER] += length($1);
+		$location->[LOCATION_COLUMN] +=
 			$self->_visual_length(
-				$1, $location->[LOCATION_VISUAL_COLUMN_NUMBER],
+				$1, $location->[LOCATION_COLUMN],
 			);
 	}
 
@@ -682,26 +683,26 @@ sub _logical_line_and_file {
 
 	# Regex taken from perlsyn, with the correction that there's no space
 	# required between the line number and the file name.
-	if ($start->[LOCATION_COLUMN_NUMBER] == 1) {
+	if ($start->[LOCATION_CHARACTER] == 1) {
 		if ( $Token->isa('PPI::Token::Comment') ) {
 			if (
-				$Token->content() =~ m<
+				$Token->content =~ m<
 					\A
 					\#      \s*
 					line    \s+
 					(\d+)   \s*
-					(?: ("?) ([^"]* [^\s"]) \2 )?
+					(?: (\"?) ([^\"]* [^\s\"]) \2 )?
 					\s*
 					\z
 				>xms
 			) {
-				return $1, ($3 || $start->[LOCATION_LOGICAL_FILE_NAME]);
+				return $1, ($3 || $start->[LOCATION_LOGICAL_FILE]);
 			}
 		}
 		elsif ( $Token->isa('PPI::Token::Pod') ) {
-			my $content = $Token->content();
+			my $content = $Token->content;
 			my $line;
-			my $file = $start->[LOCATION_LOGICAL_FILE_NAME];
+			my $file = $start->[LOCATION_LOGICAL_FILE];
 			my $end_of_directive;
 			while (
 				$content =~ m<
@@ -709,7 +710,7 @@ sub _logical_line_and_file {
 					\#      \s*?
 					line    \s+?
 					(\d+)   (?: (?! \n) \s)*
-					(?: ("?) ([^"]*? [^\s"]) \2 )??
+					(?: (\"?) ([^\"]*? [^\s\"]) \2 )??
 					\s*?
 					$
 				>xmsg
@@ -727,8 +728,8 @@ sub _logical_line_and_file {
 	}
 
 	return
-		$start->[LOCATION_LOGICAL_LINE_NUMBER] + $newlines,
-		$start->[LOCATION_LOGICAL_FILE_NAME];
+		$start->[LOCATION_LOGICAL_LINE] + $newlines,
+		$start->[LOCATION_LOGICAL_FILE];
 }
 
 sub _visual_length {
@@ -788,15 +789,10 @@ Returns a L<PPI::Document::Normalized> object, or C<undef> on error.
 =cut
 
 sub normalized {
-	my $self = shift;
-
 	# The normalization process will utterly destroy and mangle
 	# anything passed to it, so we are going to only give it a
 	# clone of ourself.
-	my $Document = $self->clone or return undef;
-
-	# Create the normalization object and execute it
-	PPI::Normal->process( $Document );
+	PPI::Normal->process( $_[0]->clone );
 }
 
 =pod

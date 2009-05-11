@@ -19,11 +19,12 @@ within it, and it does not represent a scope.
 =cut
 
 use strict;
-use base 'PPI::Document';
+use PPI::Document ();
 
-use vars qw{$VERSION};
+use vars qw{$VERSION @ISA};
 BEGIN {
 	$VERSION = '1.204_02';
+	@ISA     = 'PPI::Document';
 }
 
 

@@ -261,7 +261,7 @@ sub __TOKENIZER__on_char {
 		return 'Operator' if $prev->isa('PPI::Token::ArrayIndex');
 
 		# If it is <<... it's a here-doc instead
-		my $next_char = substr $t->{line}, $t->{line_cursor} + 1, 1;
+		my $next_char = substr( $t->{line}, $t->{line_cursor} + 1, 1 );
 		if ( $next_char eq '<' ) {
 			return 'Operator';
 		}
@@ -337,8 +337,14 @@ sub __TOKENIZER__on_char {
 			return 'Regexp::Match';
 		}
 
-		# Functions that we know use commonly use regexs as an argument
-		return 'Regexp::Match' if $prev->isa('PPI::Token::Word') && $prec eq 'split';
+		# Functions that we know commonly use regexs as an argument
+		if (
+			$prev->isa('PPI::Token::Word')
+			and
+			$prec eq 'split'
+		) {
+			return 'Regexp::Match';
+		}
 
 		# After a keyword
 		if (
@@ -396,8 +402,8 @@ sub __TOKENIZER__on_char {
 		}
 
 	} elsif ( $char >= 128 ) { # Outside ASCII
-            return 'PPI::Token::Word'->__TOKENIZER__commit($t) if $t =~ /\w/;
-            return 'Whitespace' if $t =~ /\s/;
+		return 'PPI::Token::Word'->__TOKENIZER__commit($t) if $t =~ /\w/;
+		return 'Whitespace' if $t =~ /\s/;
         }
 
 

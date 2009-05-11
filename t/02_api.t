@@ -368,7 +368,7 @@ PPI::Structure=isa
 [PPI::Structure::Given]
 PPI::Structure=isa
 
-[PPI::Structure::WhenMatch]
+[PPI::Structure::When]
 PPI::Structure=isa
 
 [PPI::Structure::Unknown]

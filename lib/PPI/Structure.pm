@@ -54,7 +54,7 @@ loop expression (the traditional C style for loop).
 
 This is for the expression being matched in switch statements.
 
-=head2 L<PPI::Structure::WhenMatch>
+=head2 L<PPI::Structure::When>
 
 This is for the matching expression in "when" statements.
 
@@ -89,13 +89,14 @@ of the methods that are subclass-specific.
 =cut
 
 use strict;
-use base 'PPI::Node';
-use Scalar::Util                'refaddr';
-use Params::Util                '_INSTANCE';
+use Scalar::Util 'refaddr';
+use Params::Util '_INSTANCE';
+use PPI::Node    ();
 
-use vars qw{$VERSION *_PARENT};
+use vars qw{$VERSION @ISA *_PARENT};
 BEGIN {
 	$VERSION = '1.204_02';
+	@ISA     = 'PPI::Node';
 	*_PARENT = *PPI::Element::_PARENT;
 }
 
@@ -107,7 +108,7 @@ use PPI::Structure::Given       ();
 use PPI::Structure::List        ();
 use PPI::Structure::Subscript   ();
 use PPI::Structure::Unknown     ();
-use PPI::Structure::WhenMatch   ();
+use PPI::Structure::When        ();
 
 
 

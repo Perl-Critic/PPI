@@ -140,7 +140,7 @@ sub new {
 	if ( $self->{display}->{locations} ) {
 		my $Document = $Element->isa('PPI::Document') ? $Element : $Element->top;
 		if ( $Document->isa('PPI::Document') ) {
-			$Document->index_locations();
+			$Document->index_locations;
 		} else {
 			$self->{display}->{locations} = 0;
 		}

@@ -78,21 +78,21 @@ isa_ok( $Document, 'PPI::Document' );
 my $statements = $Document->find('Statement::Compound');
 is( scalar @{$statements}, 50, 'Found the 50 test statements' );
 
-is( $statements->[0]->type(), 'while', q<Type of while is "while"> );
-is( $statements->[1]->type(), 'while', q<Type of until is "while"> );
-is( $statements->[2]->type(), 'while', q<Type of while with label is "while"> );
-is( $statements->[3]->type(), 'while', q<Type of until with label is "while"> );
-is( $statements->[4]->type(), 'if',    q<Type of if is "if"> );
-is( $statements->[5]->type(), 'if',    q<Type of unless is "if"> );
+is( $statements->[0]->type, 'while', q<Type of while is "while"> );
+is( $statements->[1]->type, 'while', q<Type of until is "while"> );
+is( $statements->[2]->type, 'while', q<Type of while with label is "while"> );
+is( $statements->[3]->type, 'while', q<Type of until with label is "while"> );
+is( $statements->[4]->type, 'if',    q<Type of if is "if"> );
+is( $statements->[5]->type, 'if',    q<Type of unless is "if"> );
 
 foreach my $index (6..37) {
 	my $statement = $statements->[$index];
-	is( $statement->type(), 'foreach', qq<Type is "foreach": $statement> );
+	is( $statement->type, 'foreach', qq<Type is "foreach": $statement> );
 }
 
 foreach my $index (38..49) {
 	my $statement = $statements->[$index];
-	is( $statement->type(), 'for', qq<Type is "for": $statement> );
+	is( $statement->type, 'for', qq<Type is "for": $statement> );
 }
 }
 

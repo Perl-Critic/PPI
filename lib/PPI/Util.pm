@@ -3,15 +3,14 @@ package PPI::Util;
 # Provides some common utility functions that can be imported
 
 use strict;
+use Exporter     ();
 use Digest::MD5  ();
 use Params::Util qw{ _INSTANCE _SCALAR0 _ARRAY0 };
 
 use vars qw{$VERSION @ISA @EXPORT_OK};
 BEGIN {
-	$VERSION = '1.204_02';
-
-	require Exporter;
-	@ISA       = qw{ Exporter         };
+	$VERSION   = '1.204_02';
+	@ISA       = 'Exporter';
 	@EXPORT_OK = qw{ _Document _slurp };
 }
 
@@ -24,6 +23,11 @@ use constant HAVE_UNICODE => !! ( $] >= 5.008007 );
 
 # Down here so we don't get into circular troubles
 use PPI::Document ();
+
+# Common reusable true and false functions
+# This makes it easy to upgrade many places in PPI::XS
+sub TRUE  () { 1  }
+sub FALSE () { '' }
 
 
 

@@ -116,9 +116,9 @@ SCOPE: {
 		my $exp   = $base =~ s/e//;
 		my $float = $exp || $base =~ s/f//;
 		my $T     = PPI::Tokenizer->new( \$code );
-		my $token = $T->get_token();
+		my $token = $T->get_token;
 		is("$token", $code, "'$code' is a single token");
-		is($token->base(), $base, "base of '$code' is $base");
+		is($token->base, $base, "base of '$code' is $base");
 		if ($float) {
 			ok($token->isa('PPI::Token::Number::Float'), "'$code' is ::Float");
 		} else {
@@ -144,14 +144,14 @@ SCOPE: {
 
 foreach my $code ( '1.0._0', '1.0.0.0_0' ) {
 	my $T = PPI::Tokenizer->new( \$code );
-	my $token = $T->get_token();
+	my $token = $T->get_token;
 	isnt("$token", $code, 'tokenize bad version');
 }
 
 
 foreach my $code ( '08', '09', '0778', '0779' ) {
 	my $T = PPI::Tokenizer->new( \$code );
-	my $token = $T->get_token();
+	my $token = $T->get_token;
 	isa_ok($token, 'PPI::Token::Number::Octal');
 	is("$token", $code, "tokenize bad octal '$code'");
 	ok($token->{_error} && $token->{_error} =~ m/octal/i,
@@ -161,7 +161,7 @@ foreach my $code ( '08', '09', '0778', '0779' ) {
 
 foreach my $code ( '0b2', '0b012' ) {
 	my $T = PPI::Tokenizer->new( \$code );
-	my $token = $T->get_token();
+	my $token = $T->get_token;
 	isa_ok($token, 'PPI::Token::Number::Binary');
 	is("$token", $code, "tokenize bad binary '$code'");
 	ok($token->{_error} && $token->{_error} =~ m/binary/i,
@@ -171,7 +171,7 @@ foreach my $code ( '0b2', '0b012' ) {
 
 foreach my $code ( '0xg', '0x0g' ) {
 	my $T = PPI::Tokenizer->new( \$code );
-	my $token = $T->get_token();
+	my $token = $T->get_token;
 	isa_ok($token, 'PPI::Token::Number::Hex');
 	isnt("$token", $code, "tokenize bad hex '$code'");
 	ok(!$token->{_error}, 'invalid hexadecimal digit triggers end of token');

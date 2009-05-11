@@ -33,11 +33,12 @@ L<PPI::Element>.
 =cut
 
 use strict;
-use base 'PPI::Statement';
+use PPI::Statement ();
 
-use vars qw{$VERSION};
+use vars qw{$VERSION @ISA};
 BEGIN {
 	$VERSION = '1.204_02';
+	@ISA     = 'PPI::Statement';
 }
 
 # If one of these ends up in the final document,

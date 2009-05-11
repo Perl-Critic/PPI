@@ -40,7 +40,7 @@ while ( @pairs ) {
 my $Document = PPI::Document->new(\<<'END_PERL');
 indirect $foo;
 indirect_class_with_colon Foo::;
-$bar->method_with_parentheses();
+$bar->method_with_parentheses;
 print SomeClass->method_without_parentheses + 1;
 sub_call();
 $baz->chained_from->chained_to;
@@ -58,62 +58,62 @@ my $words = $Document->find('Token::Word');
 is( scalar @{$words}, 23, 'Found the 23 test words' );
 my %words = map { $_ => $_ } @{$words};
 is(
-	scalar $words{indirect}->method_call(),
+	scalar $words{indirect}->method_call,
 	undef,
 	'Indirect notation is unknown.',
 );
 is(
-	scalar $words{indirect_class_with_colon}->method_call(),
+	scalar $words{indirect_class_with_colon}->method_call,
 	1,
 	'Indirect notation with following word ending with colons is true.',
 );
 is(
-	scalar $words{method_with_parentheses}->method_call(),
+	scalar $words{method_with_parentheses}->method_call,
 	1,
 	'Method with parentheses is true.',
 );
 is(
-	scalar $words{method_without_parentheses}->method_call(),
+	scalar $words{method_without_parentheses}->method_call,
 	1,
 	'Method without parentheses is true.',
 );
 is(
-	scalar $words{print}->method_call(),
+	scalar $words{print}->method_call,
 	undef,
 	'Plain print is unknown.',
 );
 is(
-	scalar $words{SomeClass}->method_call(),
+	scalar $words{SomeClass}->method_call,
 	undef,
 	'Class in class method call is unknown.',
 );
 is(
-	scalar $words{sub_call}->method_call(),
+	scalar $words{sub_call}->method_call,
 	0,
 	'Subroutine call is false.',
 );
 is(
-	scalar $words{chained_from}->method_call(),
+	scalar $words{chained_from}->method_call,
 	1,
 	'Method that is chained from is true.',
 );
 is(
-	scalar $words{chained_to}->method_call(),
+	scalar $words{chained_to}->method_call,
 	1,
 	'Method that is chained to is true.',
 );
 is(
-	scalar $words{a_first_thing}->method_call(),
+	scalar $words{a_first_thing}->method_call,
 	undef,
 	'First bareword is unknown.',
 );
 is(
-	scalar $words{a_middle_thing}->method_call(),
+	scalar $words{a_middle_thing}->method_call,
 	undef,
 	'Bareword in the middle is unknown.',
 );
 is(
-	scalar $words{a_last_thing}->method_call(),
+	scalar $words{a_last_thing}->method_call,
 	0,
 	'Bareword at the end is false.',
 );
@@ -128,7 +128,7 @@ foreach my $false_word (
 	>
 ) {
 	is(
-		scalar $words{$false_word}->method_call(),
+		scalar $words{$false_word}->method_call,
 		0,
 		"$false_word is false.",
 	);

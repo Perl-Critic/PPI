@@ -32,7 +32,7 @@ BEGIN {
 }
 
 # We don't load the abstracts, they are loaded
-# as part of the 'use base' statements.
+# as part of the inheritance process.
 
 # Load the token classes
 use PPI::Token::BOM                   ();

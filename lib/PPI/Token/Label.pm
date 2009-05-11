@@ -29,11 +29,12 @@ Got any ideas for methods? Submit a report to rt.cpan.org!
 =cut
 
 use strict;
-use base 'PPI::Token';
+use PPI::Token ();
 
-use vars qw{$VERSION};
+use vars qw{$VERSION @ISA};
 BEGIN {
 	$VERSION = '1.204_02';
+	@ISA     = 'PPI::Token';
 }
 
 1;

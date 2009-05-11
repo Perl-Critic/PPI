@@ -28,12 +28,13 @@ object as a bug.
 =cut
 
 use strict;
-use base 'PPI::Token';
+use PPI::Token     ();
 use PPI::Exception ();
 
-use vars qw{$VERSION};
+use vars qw{$VERSION @ISA};
 BEGIN {
 	$VERSION = '1.204_02';
+	@ISA     = 'PPI::Token';
 }
 
 
@@ -256,7 +257,7 @@ sub __TOKENIZER__on_char {
 	}
 
 	# erm...
-	throw PPI::Exception('Unknown value in PPI::Token::Unknown token');
+	PPI::Exception->throw('Unknown value in PPI::Token::Unknown token');
 }
 
 # Are we at a location where a ':' would indicate a subroutine attribute

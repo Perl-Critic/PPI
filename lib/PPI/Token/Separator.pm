@@ -33,11 +33,12 @@ parent classes.
 =cut
 
 use strict;
-use base 'PPI::Token::Word';
+use PPI::Token::Word ();
 
-use vars qw{$VERSION};
+use vars qw{$VERSION @ISA};
 BEGIN {
 	$VERSION = '1.204_02';
+	@ISA     = 'PPI::Token::Word';
 }
 
 1;

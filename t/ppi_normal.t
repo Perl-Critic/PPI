@@ -18,9 +18,9 @@ use Test::More tests => 27;
 # =begin testing new after PPI::Document 12
 {
 # Check we actually set the layer at creation
-my $layer_1 = PPI::Normal->new();
+my $layer_1 = PPI::Normal->new;
 isa_ok( $layer_1, 'PPI::Normal' );
-is( $layer_1->layer, 1, '->new() creates a layer 1' );
+is( $layer_1->layer, 1, '->new creates a layer 1' );
 my $layer_1a = PPI::Normal->new(1);
 isa_ok( $layer_1a, 'PPI::Normal' );
 is( $layer_1a->layer, 1, '->new(1) creates a layer 1' );

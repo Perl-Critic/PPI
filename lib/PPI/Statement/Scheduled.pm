@@ -54,11 +54,12 @@ may have 'sub' in front of them.
 =cut
 
 use strict;
-use base 'PPI::Statement::Sub';
+use PPI::Statement::Sub ();
 
-use vars qw{$VERSION};
+use vars qw{$VERSION @ISA};
 BEGIN {
 	$VERSION = '1.204_02';
+	@ISA     = 'PPI::Statement::Sub';
 }
 
 sub __LEXER__normal { '' }

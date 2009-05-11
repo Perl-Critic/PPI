@@ -3,16 +3,13 @@ package PPI::Token::_QuoteEngine::Simple;
 # Simple quote engine
 
 use strict;
-use base 'PPI::Token::_QuoteEngine';
+use PPI::Token::_QuoteEngine ();
 
-use vars qw{$VERSION};
+use vars qw{$VERSION @ISA};
 BEGIN {
 	$VERSION = '1.204_02';
+	@ISA     = 'PPI::Token::_QuoteEngine';
 }
-
-
-
-
 
 sub new {
 	my $class     = shift;

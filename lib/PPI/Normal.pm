@@ -117,7 +117,7 @@ use PPI::Normal::Standard;
 
 =head2 new
 
-  my $level_1 = PPI::Normal->new();
+  my $level_1 = PPI::Normal->new;
   my $level_2 = PPI::Normal->new(2);
 
 Creates a new normalization object, to which Document objects
@@ -134,9 +134,9 @@ Returns a new C<PPI::Normal> object, or C<undef> on error.
 =begin testing new after PPI::Document 12
 
 # Check we actually set the layer at creation
-my $layer_1 = PPI::Normal->new();
+my $layer_1 = PPI::Normal->new;
 isa_ok( $layer_1, 'PPI::Normal' );
-is( $layer_1->layer, 1, '->new() creates a layer 1' );
+is( $layer_1->layer, 1, '->new creates a layer 1' );
 my $layer_1a = PPI::Normal->new(1);
 isa_ok( $layer_1a, 'PPI::Normal' );
 is( $layer_1a->layer, 1, '->new(1) creates a layer 1' );
@@ -241,7 +241,7 @@ is_deeply( { %$nor21 }, { %$nor24 }, 'Layer 2: 1 and 4 match' );
 =cut
 
 sub process {
-	my $self     = ref $_[0] ? shift : shift->new;
+	my $self = ref $_[0] ? shift : shift->new;
 
 	# PPI::Normal objects are reusable, but not re-entrant
 	return undef if $self->{Document};
@@ -266,11 +266,11 @@ sub process {
 		Document  => $self->{Document},
 		version   => $VERSION,
 		functions => \@functions,
-		) or return undef;
+	) or return undef;
 
 	# Done, clean up
 	delete $self->{Document};
-	$Normalized;
+	return $Normalized;
 }
 
 1;

@@ -1,5 +1,15 @@
 Revision history for Perl extension PPI
 
+1.204_03 Mon 11 May 2009
+	Summary:
+	- More bug fixing, clean up, and optimisation
+	- Cleaning up contributed APIs
+
+	Details:
+	- Removed the use of 'use base'
+	- Various minor simplifications
+	- Changed PPI::Structure::WhenMatch to ::When
+
 1.204_02 Sun 10 May 2009
 	Summary:
 	- Various bug fixing and stabilisation work

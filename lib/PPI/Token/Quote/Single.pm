@@ -35,12 +35,16 @@ Got any ideas for methods? Submit a report to rt.cpan.org!
 =cut
 
 use strict;
-use base 'PPI::Token::_QuoteEngine::Simple',
-         'PPI::Token::Quote';
+use PPI::Token::Quote ();
+use PPI::Token::_QuoteEngine::Simple ();
 
-use vars qw{$VERSION};
+use vars qw{$VERSION @ISA};
 BEGIN {
 	$VERSION = '1.204_02';
+	@ISA     = qw{
+		PPI::Token::_QuoteEngine::Simple
+		PPI::Token::Quote
+	};
 }
 
 
@@ -96,17 +100,15 @@ while ( @pairs ) {
 
 =cut
 
-my %literal_unescape = (
+my %UNESCAPE = (
 	"\\'"  => "'",
 	"\\\\" => "\\",
 );
+
 sub literal {
-	my $self = shift;
-	my $str  = $self->string;
-
 	# Unescape \\ and \' ONLY
-	$str =~ s/(\\.)/$literal_unescape{$1} || $1/ge;
-
+	my $str = $_[0]->string;
+	$str =~ s/(\\.)/$UNESCAPE{$1} || $1/ge;
 	return $str;
 }
 

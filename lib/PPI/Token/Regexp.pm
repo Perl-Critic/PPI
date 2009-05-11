@@ -39,11 +39,12 @@ operator that acts as a constructor for compiled L<Regexp> objects.
 =cut
 
 use strict;
-use base 'PPI::Token';
+use PPI::Token ();
 
-use vars qw{$VERSION};
+use vars qw{$VERSION @ISA};
 BEGIN {
 	$VERSION = '1.204_02';
+	@ISA     = 'PPI::Token';
 }
 
 1;

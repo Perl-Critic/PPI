@@ -27,12 +27,15 @@ represent base-8 numbers.
 =cut
 
 use strict;
-use base 'PPI::Token::Number';
+use PPI::Token::Number ();
 
-use vars qw{$VERSION};
+use vars qw{$VERSION @ISA};
 BEGIN {
 	$VERSION = '1.204_02';
+	@ISA     = 'PPI::Token::Number';
 }
+
+=pod
 
 =head2 base
 
@@ -40,10 +43,9 @@ Returns the base for the number: 8.
 
 =cut
 
-sub base {
-	return 8;
-}
+sub base () { 8 }
 
+=pod
 
 =head2 literal
 
@@ -59,6 +61,9 @@ sub literal {
 	my $val = oct $str;
 	return $neg ? -$val : $val;
 }
+
+
+
 
 
 #####################################################################

@@ -36,11 +36,15 @@ now, look at L<Perl::Critic::Utils>.
 =cut
 
 use strict;
-use base 'PPI::Token';
+use PPI::Token ();
 
-use vars qw{$VERSION %QUOTELIKE %OPERATOR};
+use vars qw{$VERSION @ISA %OPERATOR %QUOTELIKE};
 BEGIN {
 	$VERSION = '1.204_02';
+	@ISA     = 'PPI::Token';
+
+	# Copy in OPERATOR from PPI::Token::Operator
+	*OPERATOR  = *PPI::Token::Operator::OPERATOR;
 
 	%QUOTELIKE = (
 		'q'  => 'Quote::Literal',
@@ -52,10 +56,7 @@ BEGIN {
 		's'  => 'Regexp::Substitute',
 		'tr' => 'Regexp::Transliterate',
 		'y'  => 'Regexp::Transliterate',
-		);
-
-	# Copy in OPERATOR from PPI::Token::Operator
-	*OPERATOR = *PPI::Token::Operator::OPERATOR;
+	);
 }
 
 =pod
@@ -90,7 +91,7 @@ while ( @pairs ) {
 
 sub literal {
 	my $self = shift;
-	my $word  = $self->content;
+	my $word = $self->content;
 
 	# Expand Foo'Bar to Foo::Bar
 	$word =~ s/\'/::/g;
@@ -110,7 +111,7 @@ yes, false if no, and nothing if unknown.
 my $Document = PPI::Document->new(\<<'END_PERL');
 indirect $foo;
 indirect_class_with_colon Foo::;
-$bar->method_with_parentheses();
+$bar->method_with_parentheses;
 print SomeClass->method_without_parentheses + 1;
 sub_call();
 $baz->chained_from->chained_to;
@@ -128,62 +129,62 @@ my $words = $Document->find('Token::Word');
 is( scalar @{$words}, 23, 'Found the 23 test words' );
 my %words = map { $_ => $_ } @{$words};
 is(
-	scalar $words{indirect}->method_call(),
+	scalar $words{indirect}->method_call,
 	undef,
 	'Indirect notation is unknown.',
 );
 is(
-	scalar $words{indirect_class_with_colon}->method_call(),
+	scalar $words{indirect_class_with_colon}->method_call,
 	1,
 	'Indirect notation with following word ending with colons is true.',
 );
 is(
-	scalar $words{method_with_parentheses}->method_call(),
+	scalar $words{method_with_parentheses}->method_call,
 	1,
 	'Method with parentheses is true.',
 );
 is(
-	scalar $words{method_without_parentheses}->method_call(),
+	scalar $words{method_without_parentheses}->method_call,
 	1,
 	'Method without parentheses is true.',
 );
 is(
-	scalar $words{print}->method_call(),
+	scalar $words{print}->method_call,
 	undef,
 	'Plain print is unknown.',
 );
 is(
-	scalar $words{SomeClass}->method_call(),
+	scalar $words{SomeClass}->method_call,
 	undef,
 	'Class in class method call is unknown.',
 );
 is(
-	scalar $words{sub_call}->method_call(),
+	scalar $words{sub_call}->method_call,
 	0,
 	'Subroutine call is false.',
 );
 is(
-	scalar $words{chained_from}->method_call(),
+	scalar $words{chained_from}->method_call,
 	1,
 	'Method that is chained from is true.',
 );
 is(
-	scalar $words{chained_to}->method_call(),
+	scalar $words{chained_to}->method_call,
 	1,
 	'Method that is chained to is true.',
 );
 is(
-	scalar $words{a_first_thing}->method_call(),
+	scalar $words{a_first_thing}->method_call,
 	undef,
 	'First bareword is unknown.',
 );
 is(
-	scalar $words{a_middle_thing}->method_call(),
+	scalar $words{a_middle_thing}->method_call,
 	undef,
 	'Bareword in the middle is unknown.',
 );
 is(
-	scalar $words{a_last_thing}->method_call(),
+	scalar $words{a_last_thing}->method_call,
 	0,
 	'Bareword at the end is false.',
 );
@@ -198,7 +199,7 @@ foreach my $false_word (
 	>
 ) {
 	is(
-		scalar $words{$false_word}->method_call(),
+		scalar $words{$false_word}->method_call,
 		0,
 		"$false_word is false.",
 	);
@@ -211,33 +212,39 @@ foreach my $false_word (
 sub method_call {
 	my $self = shift;
 
-	my $previous = $self->sprevious_sibling();
+	my $previous = $self->sprevious_sibling;
 	if (
-			$previous
-		and $previous->isa('PPI::Token::Operator')
-		and $previous->content() eq '->'
+		$previous
+		and
+		$previous->isa('PPI::Token::Operator')
+		and
+		$previous->content eq '->'
 	) {
 		return 1;
 	}
 
-	my $next = $self->snext_sibling();
-	return 0 if not $next;
+	my $snext = $self->snext_sibling;
+	return 0 unless $snext;
 
 	if (
-			$next->isa('PPI::Structure::List')
-		or	$next->isa('PPI::Token::Structure')
-		or	$next->isa('PPI::Token::Operator')
-		and	(
-				$next->content() eq q<,>
-			or	$next->content() eq q[=>]
+		$snext->isa('PPI::Structure::List')
+		or
+		$snext->isa('PPI::Token::Structure')
+		or
+		$snext->isa('PPI::Token::Operator')
+		and (
+			$snext->content eq ','
+			or
+			$snext->content eq '=>'
 		)
 	) {
 		return 0;
 	}
 
 	if (
-			$next->isa('PPI::Token::Word')
-		and	$next->content() =~ m< \w :: \z >xms
+		$snext->isa('PPI::Token::Word')
+		and
+		$snext->content =~ m< \w :: \z >xms
 	) {
 		return 1;
 	}

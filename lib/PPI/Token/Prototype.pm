@@ -47,16 +47,17 @@ L<PPI::Token> and L<PPI::Element> parent classes.
 =cut
 
 use strict;
-use base 'PPI::Token';
+use PPI::Token ();
 
-use vars qw{$VERSION};
+use vars qw{$VERSION @ISA};
 BEGIN {
 	$VERSION = '1.204_02';
+	@ISA     = 'PPI::Token';
 }
 
 sub __TOKENIZER__on_char {
 	my $class = shift;
-	my $t = shift;
+	my $t     = shift;
 
 	# Suck in until we find the closing bracket (or the end of line)
 	my $line = substr( $t->{line}, $t->{line_cursor} );
@@ -82,10 +83,10 @@ of braces and any whitespace inside the pattern.
 =cut
 
 sub prototype {
-	my $self = shift;
-	my $prototype = $self->content;
-	$prototype =~ s/\(\)\s//g; # Strip brackets and whitespace
-	$prototype;
+	my $self  = shift;
+	my $proto = $self->content;
+	$proto =~ s/\(\)\s//g; # Strip brackets and whitespace
+	$proto;
 }
 
 1;

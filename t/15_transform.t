@@ -114,8 +114,13 @@ foreach my $input ( @files ) {
 # Test Transform class
 package MyCleaner;
 
-use Params::Util '_INSTANCE';
-use base 'PPI::Transform';
+use Params::Util   '_INSTANCE';
+use PPI::Transform ();
+
+use vars qw{@ISA};
+BEGIN {
+	@ISA = 'PPI::Transform';
+}
 
 sub document {
 	my $self     = shift;
@@ -140,6 +145,5 @@ sub get {
 }
 
 sub set {
-	my $string = $_[1]->serialize;
-	$VALUE = $string;
+	$VALUE = $_[1]->serialize;
 }

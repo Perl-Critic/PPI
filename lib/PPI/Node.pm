@@ -49,16 +49,16 @@ L<PPI::Element> objects also apply to C<PPI::Node> objects.
 =cut
 
 use strict;
-use base 'PPI::Element';
 use Carp            ();
-use Scalar::Util    'refaddr';
+use Scalar::Util    qw{refaddr};
 use List::MoreUtils ();
-use Params::Util    '_INSTANCE',
-                    '_CLASS';
+use Params::Util    qw{_INSTANCE _CLASS _CODELIKE};
+use PPI::Element    ();
 
-use vars qw{$VERSION *_PARENT};
+use vars qw{$VERSION @ISA *_PARENT};
 BEGIN {
 	$VERSION = '1.204_02';
+	@ISA     = 'PPI::Element';
 	*_PARENT = *PPI::Element::_PARENT;
 }
 
@@ -118,7 +118,7 @@ sub add_element {
 	push @{$self->{children}}, $Element;
 	Scalar::Util::weaken(
 		$_PARENT{refaddr $Element} = $self
-		);
+	);
 
 	1;
 }
@@ -128,7 +128,7 @@ sub add_element {
 sub __add_element {
 	Scalar::Util::weaken(
 		$_PARENT{refaddr $_[1]} = $_[0]
-		);
+	);
 	push @{$_[0]->{children}}, $_[1];
 }
 
@@ -418,7 +418,7 @@ or an error occurs.
 =cut
 
 sub find_first {
-	my $self      = shift;
+	my $self   = shift;
 	my $wanted = $self->_wanted(shift) or return undef;
 
 	# Use the same queue-based search as for ->find
@@ -495,7 +495,7 @@ sub remove_child {
 	my $key = refaddr $child;
 	my $p   = List::MoreUtils::firstidx {
 		refaddr $_ == $key
-		} @{$self->{children}};
+	} @{$self->{children}};
 	return undef unless defined $p;
 
 	# Splice it out, and remove the child's parent entry
@@ -590,13 +590,13 @@ sub prune {
 ###       break File::Find::Rule::PPI
 sub _wanted {
 	my $either = shift;
-	my $it     = defined $_[0] ? shift : do {
+	my $it     = defined($_[0]) ? shift : do {
 		Carp::carp('Undefined value passed as search condition') if $^W;
 		return undef;
-		};
+	};
 
 	# Has the caller provided a wanted function directly
-	return $it if ref $it eq 'CODE';
+	return $it if _CODELIKE($it);
 	if ( ref $it ) {
 		# No other ref types are supported
 		Carp::carp('Illegal non-CODE reference passed as search condition') if $^W;

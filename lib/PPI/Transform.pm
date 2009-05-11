@@ -19,10 +19,7 @@ use strict;
 use Carp          ();
 use List::Util    ();
 use PPI::Document ();
-use Params::Util '_INSTANCE',
-                 '_CLASS',
-                 '_CODE',
-                 '_SCALAR0';
+use Params::Util  qw{_INSTANCE _CLASS _CODE _SCALAR0};
 
 use vars qw{$VERSION};
 BEGIN {
@@ -137,7 +134,8 @@ sub apply {
 	my $class = _SCALAR0($it) ? 'SCALAR'
 		: List::Util::first { _INSTANCE($it, $_) } @ORDER
 		or return undef;
-	my $handler = $HANDLER{$class} or die "->apply handler for $class missing! Panic";
+	my $handler = $HANDLER{$class}
+		or die("->apply handler for $class missing! Panic");
 
 	# Get, change, set
 	my $Document = _INSTANCE($handler->[0]->($it), 'PPI::Document')
@@ -164,8 +162,8 @@ sub file {
 	my $self = _SELF(shift);
 
 	# Where do we read from and write to
-	my $input    = defined $_[0] ? shift : return undef;
-	my $output   = @_ ? defined $_[0] ? "$_[0]" : undef : $input or return undef;
+	my $input  = defined $_[0] ? shift : return undef;
+	my $output = @_ ? defined $_[0] ? "$_[0]" : undef : $input or return undef;
 	
 	# Process the file
 	my $Document = PPI::Document->new( "$input" ) or return undef;
@@ -181,13 +179,12 @@ sub file {
 # Apply Hander Methods
 
 sub _SCALAR_get {
-	my $it = shift;
-	PPI::Document->new( $it );
+	PPI::Document->new( $_[0] );
 }
 
 sub _SCALAR_set {
-	my ($it, $Document) = @_;
-	$$it = $Document->serialize;
+	my $it = shift;
+	$$it = $_[0]->serialize;
 	1;
 }
 

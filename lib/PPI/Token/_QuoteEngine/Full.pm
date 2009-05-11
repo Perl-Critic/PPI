@@ -3,13 +3,14 @@ package PPI::Token::_QuoteEngine::Full;
 # Full quote engine
 
 use strict;
-use base 'PPI::Token::_QuoteEngine';
-use Clone ();
-use Carp  ();
+use Clone                    ();
+use Carp                     ();
+use PPI::Token::_QuoteEngine ();
 
-use vars qw{$VERSION %quotes %sections};
+use vars qw{$VERSION @ISA %quotes %sections};
 BEGIN {
 	$VERSION = '1.204_02';
+	@ISA     = 'PPI::Token::_QuoteEngine';
 
 	# Prototypes for the different braced sections
 	%sections = (
@@ -17,7 +18,7 @@ BEGIN {
 		'<' => { type => '<>', _close => '>' },
 		'[' => { type => '[]', _close => ']' },
 		'{' => { type => '{}', _close => '}' },
-		);
+	);
 
 	# For each quote type, the extra fields that should be set.
 	# This should give us faster initialization.
@@ -43,7 +44,7 @@ BEGIN {
 		# used yet, since I'm not sure on the context differences between
 		# this and the trinary operator, but its here for completeness.
 		'?'   => { operator => undef, braced => 0,     separator => '?',   _sections => 1, modifiers => 1 },
-		);
+	);
 }
 
 =pod
@@ -130,7 +131,7 @@ sub new {
 	# Do we have a prototype for the intializer? If so, add the extra fields
 	my $options = $quotes{$init} or return $self->_error(
 		"Unknown quote type '$init'"
-		);
+	);
 	foreach ( keys %$options ) {
 		$self->{$_} = $options->{$_};
 	}
@@ -235,7 +236,7 @@ sub _fill_normal {
 		position => length $self->{content},
 		size     => length($string) - 1,
 		type     => "$self->{separator}$self->{separator}"
-		};
+	};
 	$self->{content} .= $string;
 
 	# We are done if there is only one section
@@ -259,7 +260,7 @@ sub _fill_normal {
 	$self->{sections}->[1] = {
 		position => length($self->{content}),
 		size     => length($string) - 1
-		};
+	};
 	$self->{content} .= $string;
 
 	1;
@@ -271,7 +272,7 @@ sub _fill_braced {
 	my $t    = shift;
 
 	# Get the content up to the close character
-	my $section = $self->{sections}->[0];
+	my $section   = $self->{sections}->[0];
 	my $brace_str = $self->_scan_for_brace_character( $t, $section->{_close} );
 	return undef unless defined $brace_str;
 	if ( ref $brace_str ) {
@@ -317,7 +318,7 @@ sub _fill_braced {
 			position => length($self->{content}),
 			size     => 0,
 			type     => '',
-			};
+		};
 
 		# Attach an error to the token and move on
 		$self->{_error} = "No second section of regexp, or does not start with a balanced character";

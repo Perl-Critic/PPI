@@ -28,12 +28,13 @@ pointing at, rather than what it might appear to be pointing at.
 =cut
  
 use strict;
-use base 'PPI::Token';
 use Params::Util '_INSTANCE';
+use PPI::Token   ();
 
-use vars qw{$VERSION};
+use vars qw{$VERSION @ISA};
 BEGIN {
 	$VERSION = '1.204_02';
+	@ISA     = 'PPI::Token';
 }
 
 
@@ -121,8 +122,7 @@ Returns the sigil as a string.
 =cut
 
 sub raw_type {
-	my $self = shift;
-	substr( $self->content, 0, 1 );
+	substr( $_[0]->content, 0, 1 );
 }
 
 =pod
@@ -137,8 +137,7 @@ Returns the sigil as a string.
 =cut
 
 sub symbol_type {
-	my $self = shift;
-	substr( $self->symbol, 0, 1 );
+	substr( $_[0]->symbol, 0, 1 );
 }
 
 
@@ -153,7 +152,7 @@ sub __TOKENIZER__on_char {
 
 	# Suck in till the end of the symbol
 	my $line = substr( $t->{line}, $t->{line_cursor} );
-	if ( $line =~ /^([\w:']+)/ ) {
+	if ( $line =~ /^([\w:\']+)/ ) {
 		$t->{token}->{content} .= $1;
 		$t->{line_cursor}      += length $1;
 	}

@@ -43,12 +43,16 @@ Got any ideas for methods? Submit a report to rt.cpan.org!
 =cut
 
 use strict;
-use base 'PPI::Token::_QuoteEngine::Full',
-         'PPI::Token::Regexp';
+use PPI::Token::Regexp             ();
+use PPI::Token::_QuoteEngine::Full ();
 
-use vars qw{$VERSION};
+use vars qw{$VERSION @ISA};
 BEGIN {
 	$VERSION = '1.204_02';
+	@ISA     = qw{
+		PPI::Token::_QuoteEngine::Full
+		PPI::Token::Regexp
+	};
 }
 
 1;

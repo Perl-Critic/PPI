@@ -22,18 +22,12 @@ implementations.
 =cut
 
 use strict;
-use Scalar::Util 'refaddr';
-use Params::Util '_INSTANCE',
-                 '_ARRAY';
-use PPI::Node       ();
 use Clone           ();
+use Scalar::Util    qw{refaddr};
+use Params::Util    qw{_INSTANCE _ARRAY};
 use List::MoreUtils ();
-use overload 'bool' => sub () { 1 },
-             '""'   => 'content',
-             '=='   => '__equals',
-             '!='   => '__nequals',
-             'eq'   => '__eq',
-             'ne'   => '__ne';
+use PPI::Util       ();
+use PPI::Node       ();
 
 use vars qw{$VERSION $errstr %_PARENT};
 BEGIN {
@@ -43,6 +37,13 @@ BEGIN {
 	# Master Child -> Parent index
 	%_PARENT = ();
 }
+
+use overload 'bool' => \&PPI::Util::TRUE;
+use overload '""'   => 'content';
+use overload '=='   => '__equals';
+use overload '!='   => '__nequals';
+use overload 'eq'   => '__eq';
+use overload 'ne'   => '__ne';
 
 
 
@@ -195,14 +196,11 @@ ok(
 =cut
 
 sub descendant_of {
-	my ($cursor, $potential_ancestor) = @_;
-
-	return '' if not $potential_ancestor;
-
-	while ( refaddr $cursor != refaddr $potential_ancestor ) {
+	my $cursor = shift;
+	my $parent = shift or return undef;
+	while ( refaddr $cursor != refaddr $parent ) {
 		$cursor = $_PARENT{refaddr $cursor} or return '';
 	}
-
 	return 1;
 }
 
@@ -256,11 +254,12 @@ ok(
 =cut
 
 sub ancestor_of {
-	my ($self, $potential_descendant) = @_;
-
-	return '' if not $potential_descendant;
-
-	return $potential_descendant->descendant_of($self);
+	my $self   = shift;
+	my $cursor = shift or return undef;
+	while ( refaddr $cursor != refaddr $self ) {
+		$cursor = $_PARENT{refaddr $cursor} or return '';
+	}
+	return 1;
 }
 
 =pod
@@ -767,7 +766,7 @@ indexed.
 sub location {
 	my $self = shift;
 
-	$self->_ensure_location_present() or return undef;
+	$self->_ensure_location_present or return undef;
 
 	# Return a copy, not the original
 	return [ @{$self->{_location}} ];
@@ -805,7 +804,7 @@ is( $words->[0]->line_number, 3, 'Got correct line number.' );
 sub line_number {
 	my $self = shift;
 
-	$self->_ensure_location_present() or return undef;
+	$self->_ensure_location_present or return undef;
 
 	return $self->{_location}[0];
 }
@@ -842,7 +841,7 @@ is( $words->[0]->column_number, 4, 'Got correct column number.' );
 sub column_number {
 	my $self = shift;
 
-	$self->_ensure_location_present() or return undef;
+	$self->_ensure_location_present or return undef;
 
 	return $self->{_location}[1];
 }
@@ -886,7 +885,7 @@ is(
 sub visual_column_number {
 	my $self = shift;
 
-	$self->_ensure_location_present() or return undef;
+	$self->_ensure_location_present or return undef;
 
 	return $self->{_location}[2];
 }
@@ -924,7 +923,7 @@ is( $words->[0]->logical_line_number, 1, 'Got correct logical line number.' );
 sub logical_line_number {
 	my $self = shift;
 
-	$self->_ensure_location_present() or return undef;
+	$self->_ensure_location_present or return undef;
 
 	return $self->{_location}[3];
 }
@@ -966,7 +965,7 @@ is(
 sub logical_filename {
 	my $self = shift;
 
-	$self->_ensure_location_present() or return undef;
+	$self->_ensure_location_present or return undef;
 
 	return $self->{_location}[4];
 }

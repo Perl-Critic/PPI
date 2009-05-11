@@ -46,11 +46,12 @@ honor of its own token class (L<PPI::Token::HereDoc>).
 =cut
 
 use strict;
-use base 'PPI::Token';
+use PPI::Token ();
 
-use vars qw{$VERSION};
+use vars qw{$VERSION @ISA};
 BEGIN {
 	$VERSION = '1.204_02';
+	@ISA     = 'PPI::Token';
 }
 
 
@@ -103,6 +104,8 @@ foreach my $Quote ( @$quotes ) {
 #	my $class = ref $_[0] || $_[0];
 #	die "$class does not implement method ->string";
 #}
+
+=pod
 
 =head2 literal
 

@@ -32,13 +32,17 @@ Got any ideas for methods? Submit a report to rt.cpan.org!
 =cut
 
 use strict;
-use base 'PPI::Token::_QuoteEngine::Simple',
-         'PPI::Token::Quote';
-use Params::Util '_INSTANCE';
+use Params::Util                     '_INSTANCE';
+use PPI::Token::Quote                ();
+use PPI::Token::_QuoteEngine::Simple ();
 
-use vars qw{$VERSION};
+use vars qw{$VERSION @ISA};
 BEGIN {
 	$VERSION = '1.204_02';
+	@ISA     = qw{
+		PPI::Token::_QuoteEngine::Simple
+		PPI::Token::Quote
+	};
 }
 
 
@@ -85,10 +89,8 @@ is( $strings->[5]->interpolations, '', 'String 6: No interpolations'  );
 # Upgrade: Return the interpolated substrings.
 # Upgrade: Returns parsed expressions.
 sub interpolations {
-	my $self = shift;
-
 	# Are there any unescaped $things in the string
-	!! ($self->content =~ /(?<!\\)(?:\\\\)*[\$\@]/);
+	!! ($_[0]->content =~ /(?<!\\)(?:\\\\)*[\$\@]/);
 }
 
 =pod
@@ -139,7 +141,7 @@ sub simplify {
 	return $self if $value =~ /[\\\$@\'\"]/;
 
 	# Change the token to a single string
-	$self->{content} = q<'> . $value . q<'>;
+	$self->{content} = "'$value'";
 	bless $self, 'PPI::Token::Quote::Single';
 }
 

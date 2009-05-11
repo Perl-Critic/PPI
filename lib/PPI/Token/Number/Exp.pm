@@ -29,13 +29,15 @@ represent floating point numbers with exponential notation.
 =cut
 
 use strict;
-use base 'PPI::Token::Number::Float';
+use PPI::Token::Number::Float ();
 
-use vars qw{$VERSION};
+use vars qw{$VERSION @ISA};
 BEGIN {
 	$VERSION = '1.204_02';
+	@ISA     = 'PPI::Token::Number::Float';
 }
 
+=pod
 
 =head2 literal
 
@@ -53,6 +55,10 @@ sub literal {
 	my $val = $mantissa * 10 ** $exponent;
 	return $neg ? -$val : $val;
 }
+
+
+
+
 
 #####################################################################
 # Tokenizer Methods

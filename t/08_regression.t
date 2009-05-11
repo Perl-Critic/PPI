@@ -267,7 +267,7 @@ SCOPE: {
 	my $doc = PPI::Document->new( \'$h={};' );
 	my $hash = $doc->find('PPI::Structure::Constructor')->[0];
 	ok($hash, 'location for empty constructor - fetched a constructor');
-	is_deeply( $hash->location(), [1,4,4,1,undef], 'location for empty constructor');
+	is_deeply( $hash->location, [1,4,4,1,undef], 'location for empty constructor');
 }
 
 #####################################################################

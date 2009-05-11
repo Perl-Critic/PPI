@@ -39,12 +39,13 @@ L<PPI::Node> to recognise this fact, but for now it stays here.
 =cut
 
 use strict;
-use base 'PPI::Statement::Expression';
-use Params::Util '_INSTANCE';
+use Params::Util               '_INSTANCE';
+use PPI::Statement::Expression ();
 
-use vars qw{$VERSION};
+use vars qw{$VERSION @ISA};
 BEGIN {
 	$VERSION = '1.204_02';
+	@ISA     = 'PPI::Statement::Expression';
 }
 
 =pod
@@ -122,9 +123,7 @@ is_deeply( [ $ST->[6]->variables ], [ '$foo', '$bar' ], '7: Found $foo and $bar'
 =cut
 
 sub variables {
-	my $self = shift;
-
-	return map { $_->canonical() } $self->symbols();
+	map { $_->canonical } $_[0]->symbols;
 }
 
 =pod

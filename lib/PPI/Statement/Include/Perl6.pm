@@ -39,11 +39,12 @@ string and will not be parsed by PPI.
 =cut
 
 use strict;
-use base 'PPI::Statement::Include';
+use PPI::Statement::Include ();
 
-use vars qw{$VERSION};
+use vars qw{$VERSION @ISA};
 BEGIN {
 	$VERSION = '1.204_02';
+	@ISA     = 'PPI::Statement::Include';
 }
 
 =pod

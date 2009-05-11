@@ -1,10 +1,10 @@
-package PPI::Structure::WhenMatch;
+package PPI::Structure::When;
 
 =pod
 
 =head1 NAME
 
-PPI::Structure::WhenMatch - Circular braces for a when statement
+PPI::Structure::When - Circular braces for a when statement
 
 =head1 SYNOPSIS
 
@@ -14,19 +14,19 @@ PPI::Structure::WhenMatch - Circular braces for a when statement
 
 =head1 INHERITANCE
 
-  PPI::Structure::WhenMatch
+  PPI::Structure::When
   isa PPI::Structure
       isa PPI::Node
           isa PPI::Element
 
 =head1 DESCRIPTION
 
-C<PPI::Structure::WhenMatch> is the class used for circular braces that
+C<PPI::Structure::When> is the class used for circular braces that
 contain the thing to be matched in a when statement.
 
 =head1 METHODS
 
-C<PPI::Structure::WhenMatch> has no methods beyond those provided by the
+C<PPI::Structure::When> has no methods beyond those provided by the
 standard L<PPI::Structure>, L<PPI::Node> and L<PPI::Element> methods.
 
 Got any ideas for methods? Submit a report to rt.cpan.org!
@@ -34,11 +34,12 @@ Got any ideas for methods? Submit a report to rt.cpan.org!
 =cut
 
 use strict;
-use base 'PPI::Structure';
+use PPI::Structure ();
 
-use vars qw{$VERSION};
+use vars qw{$VERSION @ISA};
 BEGIN {
 	$VERSION = '1.204_02';
+	@ISA     = 'PPI::Structure';
 }
 
 1;

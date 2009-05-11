@@ -28,12 +28,13 @@ our parent L<PPI::Token> and L<PPI::Element> classes.
 =cut
 
 use strict;
-use base 'PPI::Token';
 use IO::String ();
+use PPI::Token ();
 
-use vars qw{$VERSION};
+use vars qw{$VERSION @ISA};
 BEGIN {
 	$VERSION = '1.204_02';
+	@ISA     = 'PPI::Token';
 }
 
 

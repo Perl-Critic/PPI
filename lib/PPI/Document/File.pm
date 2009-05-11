@@ -18,13 +18,14 @@ a Perl document stored in a specific named file.
 =cut
 
 use strict;
-use Carp         ();
-use Params::Util '_STRING';
-use base 'PPI::Document';
+use Carp          ();
+use Params::Util  '_STRING';
+use PPI::Document ();
 
-use vars qw{$VERSION};
+use vars qw{$VERSION @ISA};
 BEGIN {
 	$VERSION = '1.204_02';
+	@ISA     = 'PPI::Document';
 }
 
 

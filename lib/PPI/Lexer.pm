@@ -55,8 +55,9 @@ For more unusual tasks, by all means forge onwards.
 
 use strict;
 use List::MoreUtils ();
-use Params::Util    '_INSTANCE';
-use PPI ();
+use Params::Util    qw{_STRING _INSTANCE};
+use PPI             ();
+use PPI::Exception  ();
 
 use vars qw{$VERSION $errstr};
 BEGIN {
@@ -89,7 +90,7 @@ sub new {
 		Tokenizer => undef, # Where we store the tokenizer for a run
 		buffer    => [],    # The input token buffer
 		delayed   => [],    # The "delayed insignificant tokens" buffer
-		}, $class;
+	}, $class;
 }
 
 
@@ -114,12 +115,12 @@ Returns a L<PPI::Document> object, or C<undef> on error.
 
 sub lex_file {
 	my $self = ref $_[0] ? shift : shift->new;
-	my $file = (defined $_[0] and ! ref $_[0]) ? shift
-		: return $self->_error(
-		"Did not pass a filename to PPI::Lexer::lex_file"
-		);
+	my $file = _STRING(shift);
+	unless ( defined $file ) {
+		return $self->_error("Did not pass a filename to PPI::Lexer::lex_file");
+	}
 
-	# Create the Tokenizer and hand off
+	# Create the Tokenizer
 	my $Tokenizer = eval {
 		PPI::Tokenizer->new( $file );
 	};
@@ -146,10 +147,10 @@ Returns a L<PPI::Document> object, or C<undef> on error.
 
 sub lex_source {
 	my $self   = ref $_[0] ? shift : shift->new;
-	my $source = (defined $_[0] and ! ref $_[0]) ? shift
-		: return $self->_error(
-		"Did not pass a string to PPI::Lexer::lex_source"
-		);
+	my $source = shift;
+	unless ( defined $source and not ref $source ) {
+		return $self->_error("Did not pass a string to PPI::Lexer::lex_source");
+	}
 
 	# Create the Tokenizer and hand off to the next method
 	my $Tokenizer = eval {
@@ -177,23 +178,30 @@ Returns a L<PPI::Document> object, or C<undef> on error.
 
 sub lex_tokenizer {
 	my $self      = ref $_[0] ? shift : shift->new;
-	my $Tokenizer = _INSTANCE(shift, 'PPI::Tokenizer')
-		or return $self->_error(
+	my $Tokenizer = _INSTANCE(shift, 'PPI::Tokenizer');
+	return $self->_error(
 		"Did not pass a PPI::Tokenizer object to PPI::Lexer::lex_tokenizer"
-		);
+	) unless $Tokenizer;
 
 	# Create the empty document
 	my $Document = PPI::Document->new;
 
 	# Lex the token stream into the document
 	$self->{Tokenizer} = $Tokenizer;
-	my $rv = $self->_lex_document( $Document );
-	$self->{Tokenizer} = undef;
-	return $Document if $rv;
+	eval {
+		$self->_lex_document($Document);
+	};
+	if ( $@ ) {
+		# If an error occurs DESTROY the partially built document.
+		undef $Document;
+		if ( _INSTANCE($@, 'PPI::Exception') ) {
+			return $self->_error( $@->message );
+		} else {
+			return $self->_error( $errstr );
+		}
+	}
 
-	# If an error occurs, DESTROY the partially built document.
-	$Document->DESTROY;
-	undef;
+	return $Document;
 }
 
 
@@ -259,7 +267,7 @@ sub _lex_document {
 		}
 
 		# Shouldn't be able to get here
-		return undef;
+		PPI::Exception->throw('Lexer reached an illegal state');
 	}
 
 	# Did we leave the main loop because of a Tokenizer error?
@@ -504,8 +512,9 @@ sub _resolve_new_statement {
 
 	# Switch statements use expressions, as well.
 	if (
-			$Parent->isa('PPI::Structure::Given')
-		or  $Parent->isa('PPI::Structure::WhenMatch')
+		$Parent->isa('PPI::Structure::Given')
+		or
+		$Parent->isa('PPI::Structure::When')
 	) {
 		return 'PPI::Statement::Expression';
 	}
@@ -942,7 +951,7 @@ sub _resolve_new_structure_round {
 	} elsif ( $Parent->isa('PPI::Statement::Switch') ) {
 		return 'PPI::Structure::Given';
 	} elsif ( $Parent->isa('PPI::Statement::When') ) {
-		return 'PPI::Structure::WhenMatch';
+		return 'PPI::Structure::When';
 	}
 
 	# Otherwise, it must be a list
@@ -1004,8 +1013,7 @@ BEGIN {
 		'||='  => 'PPI::Structure::Constructor',
 		','    => 'PPI::Structure::Constructor',
 		'=>'   => 'PPI::Structure::Constructor',
-		
-		);
+	);
 }
 
 # Given a parent element, and a { token to open a structure, determine

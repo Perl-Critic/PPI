@@ -29,11 +29,12 @@ L<PPI::Token> and L<PPI::Element> parent classes.
 =cut
 
 use strict;
-use base 'PPI::Token';
+use PPI::Token ();
 
-use vars qw{$VERSION};
+use vars qw{$VERSION @ISA};
 BEGIN {
 	$VERSION = '1.204_02';
+	@ISA     = 'PPI::Token';
 }
 
 # Set the matching braces, done as an array

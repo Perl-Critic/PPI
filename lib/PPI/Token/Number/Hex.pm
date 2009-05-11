@@ -27,12 +27,15 @@ represent base-16 numbers.
 =cut
 
 use strict;
-use base 'PPI::Token::Number';
+use PPI::Token::Number ();
 
-use vars qw{$VERSION};
+use vars qw{$VERSION @ISA};
 BEGIN {
 	$VERSION = '1.204_02';
+	@ISA     = 'PPI::Token::Number';
 }
+
+=pod
 
 =head2 base
 
@@ -40,9 +43,9 @@ Returns the base for the number: 16.
 
 =cut
 
-sub base {
-	return 16;
-}
+sub base () { 16 }
+
+=pod
 
 =head2 literal
 
@@ -57,6 +60,9 @@ sub literal {
 	my $val = hex $str;
 	return $neg ? -$val : $val;
 }
+
+
+
 
 
 #####################################################################
