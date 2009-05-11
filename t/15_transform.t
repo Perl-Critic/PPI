@@ -114,7 +114,7 @@ foreach my $input ( @files ) {
 # Test Transform class
 package MyCleaner;
 
-use Params::Util   '_INSTANCE';
+use Params::Util   qw{_INSTANCE};
 use PPI::Transform ();
 
 use vars qw{@ISA};

@@ -5,13 +5,13 @@ package PPI::Util;
 use strict;
 use Exporter     ();
 use Digest::MD5  ();
-use Params::Util qw{ _INSTANCE _SCALAR0 _ARRAY0 };
+use Params::Util qw{_INSTANCE _SCALAR0 _ARRAY0};
 
 use vars qw{$VERSION @ISA @EXPORT_OK};
 BEGIN {
 	$VERSION   = '1.204_02';
 	@ISA       = 'Exporter';
-	@EXPORT_OK = qw{ _Document _slurp };
+	@EXPORT_OK = qw{_Document _slurp};
 }
 
 # Alarms are used to catch unexpectedly slow and complex documents

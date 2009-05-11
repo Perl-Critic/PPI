@@ -72,7 +72,7 @@ caught by the Find object and returned as an error.
 =cut
 
 use strict;
-use Params::Util '_INSTANCE';
+use Params::Util qw{_INSTANCE};
 
 use vars qw{$VERSION};
 BEGIN {

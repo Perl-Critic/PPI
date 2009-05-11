@@ -15,7 +15,7 @@ BEGIN {
 use Test::More tests => 3381;
 use Test::NoWarnings;
 use File::Spec::Functions ':ALL';
-use Params::Util '_INSTANCE';
+use Params::Util qw{_INSTANCE};
 use PPI::Lexer;
 use PPI::Dumper;
 use t::lib::PPI;

@@ -12,10 +12,10 @@ BEGIN {
 }
 
 # For each new item in t/data/08_regression add another 15 tests
-use Test::More tests => 692;
+use Test::More tests => 735;
 use Test::NoWarnings;
 use File::Spec::Functions ':ALL';
-use Params::Util '_INSTANCE';
+use Params::Util qw{_INSTANCE};
 use t::lib::PPI;
 use PPI::Lexer;
 use PPI::Dumper;

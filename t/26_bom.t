@@ -8,7 +8,7 @@ BEGIN {
 }
 
 # For each new item in t/data/08_regression add another 14 tests
-use Test::More tests => 18;
+use Test::More tests => 19;
 use Test::NoWarnings;
 use t::lib::PPI;
 use PPI;

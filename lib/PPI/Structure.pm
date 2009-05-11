@@ -89,9 +89,10 @@ of the methods that are subclass-specific.
 =cut
 
 use strict;
-use Scalar::Util 'refaddr';
-use Params::Util '_INSTANCE';
-use PPI::Node    ();
+use Scalar::Util   ();
+use Params::Util   qw{_INSTANCE};
+use PPI::Node      ();
+use PPI::Exception ();
 
 use vars qw{$VERSION @ISA *_PARENT};
 BEGIN {
@@ -129,27 +130,10 @@ sub new {
 
 	# Set the start braces parent link
 	Scalar::Util::weaken(
-		$_PARENT{refaddr $Token} = $self
-		);
+		$_PARENT{Scalar::Util::refaddr $Token} = $self
+	);
 
 	$self;
-}
-
-# Hacky method to let the Lexer set the finish token, so it doesn't
-# have to import %PPI::Element::_PARENT itself.
-sub _set_finish {
-	my $self  = shift;
-
-	# Check the Token
-	my $Token = ($_[0] and $_[0]->isa('PPI::Token::Structure')) ? shift : return undef;
-	$Token->parent and return undef; # Must be a detached token
-	($self->start->__LEXER__opposite eq $Token->content) or return undef; # ... that matches the opening token
-
-	# Set the token
-	$self->{finish} = $Token;
-	$_PARENT{refaddr $Token} = $self;
-
-	1;
 }
 
 
@@ -274,13 +258,14 @@ sub last_element {
 	$_[0]->{finish} or $_[0]->{children}->[-1] or $_[0]->{start};
 }
 
-
 # Location is same as the start token, if any
 sub location {
 	my $self  = shift;
 	my $first = $self->first_element or return undef;
 	$first->location;
 }
+
+
 
 
 

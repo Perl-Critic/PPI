@@ -51,8 +51,7 @@ use File::Spec    ();
 use File::Path    ();
 use Storable      ();
 use Digest::MD5   ();
-use Params::Util  '_INSTANCE',
-                  '_SCALAR';
+use Params::Util  qw{_INSTANCE _SCALAR};
 use PPI::Document ();
 
 use vars qw{$VERSION};

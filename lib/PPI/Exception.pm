@@ -1,7 +1,7 @@
 package PPI::Exception;
 
 use strict;
-use Params::Util '_INSTANCE';
+use Params::Util qw{_INSTANCE};
 
 use vars qw{$VERSION};
 BEGIN {

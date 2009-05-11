@@ -19,7 +19,7 @@ BEGIN {
 use Test::NoWarnings;
 use utf8;
 use File::Spec::Functions ':ALL';
-use Params::Util '_INSTANCE';
+use Params::Util qw{_INSTANCE};
 use PPI;
 
 sub good_ok {

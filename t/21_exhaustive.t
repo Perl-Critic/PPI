@@ -44,7 +44,7 @@ BEGIN {
 use Test::More tests => ($MAX_CHARS + $ITERATIONS + 3);
 use Test::NoWarnings;
 use File::Spec::Functions ':ALL';
-use Params::Util '_INSTANCE';
+use Params::Util qw{_INSTANCE};
 use PPI;
 
 

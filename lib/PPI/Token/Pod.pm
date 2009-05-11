@@ -27,7 +27,7 @@ Got any ideas for more methods? Submit a report to rt.cpan.org!
 =cut
 
 use strict;
-use Params::Util '_INSTANCE';
+use Params::Util qw{_INSTANCE};
 use PPI::Token   ();
 
 use vars qw{$VERSION @ISA};

@@ -3,7 +3,7 @@ package t::lib::PPI;
 use File::Spec::Functions ':ALL';
 use Test::More;
 use Test::Object;
-use Params::Util    '_INSTANCE';
+use Params::Util qw{_STRING _INSTANCE};
 use List::MoreUtils 'any';
 use PPI::Dumper;
 
@@ -139,6 +139,28 @@ sub no_attribute_in_attribute {
 			! exists $_[1]->{_attribute}
 		} ),
 		'No ->{_attribute} in PPI::Token::Attributes',
+	);
+}
+
+
+
+
+
+#####################################################################
+# PPI::Statement Tests
+
+Test::Object->register(
+	class => 'PPI::Document',
+	tests => 1,
+	code  => \&valid_compound_type,
+);
+
+sub valid_compound_type {
+	my $document = shift;
+	my $compound = $document->find('PPI::Statement::Compound');
+	is(
+		scalar( grep { not defined $_->type } @$compound ),
+		0, 'All compound statements have defined ->type',
 	);
 }
 

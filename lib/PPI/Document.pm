@@ -66,7 +66,7 @@ Document-specific.
 use strict;
 use Carp            ();
 use List::MoreUtils ();
-use Params::Util    qw{ _SCALAR0 _ARRAY0 _INSTANCE };
+use Params::Util    qw{_SCALAR0 _ARRAY0 _INSTANCE};
 use Digest::MD5     ();
 use PPI             ();
 use PPI::Util       ();

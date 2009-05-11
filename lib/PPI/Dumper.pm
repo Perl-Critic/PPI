@@ -33,7 +33,7 @@ generate the dump content itself.
 =cut
 
 use strict;
-use Params::Util '_INSTANCE';
+use Params::Util qw{_INSTANCE};
 
 use vars qw{$VERSION};
 BEGIN {

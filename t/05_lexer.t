@@ -19,7 +19,7 @@ use PPI::Dumper;
 #####################################################################
 # Prepare
 
-use Test::More tests => (3 + 15 * 12);
+use Test::More tests => 195;
 use Test::NoWarnings;
 use File::Spec::Functions ':ALL';
 use t::lib::PPI;

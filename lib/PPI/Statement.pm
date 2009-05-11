@@ -147,13 +147,16 @@ of the methods that are subclass-specific.
 =cut
 
 use strict;
-use Params::Util '_INSTANCE';
-use PPI::Node ();
+use Scalar::Util   ();
+use Params::Util   qw{_INSTANCE};
+use PPI::Node      ();
+use PPI::Exception ();
 
-use vars qw{$VERSION @ISA};
+use vars qw{$VERSION @ISA *_PARENT};
 BEGIN {
 	$VERSION = '1.204_02';
 	@ISA     = 'PPI::Node';
+	*_PARENT = *PPI::Element::_PARENT;
 }
 
 use PPI::Statement::Break          ();
@@ -173,7 +176,7 @@ use PPI::Statement::Variable       ();
 use PPI::Statement::When           ();
 
 # "Normal" statements end at a statement terminator ;
-# Some are not, and need the more rigorous _statement_continues to see
+# Some are not, and need the more rigorous _continues to see
 # if we are at an implicit statement boundary.
 sub __LEXER__normal { 1 }
 
@@ -185,16 +188,24 @@ sub __LEXER__normal { 1 }
 # Constructor
 
 sub new {
-	my $class = ref $_[0] ? ref shift : shift;
-	
+	my $class = shift;
+	if ( ref $class ) {
+		PPI::Exception->throw;
+	}
+
 	# Create the object
 	my $self = bless { 
 		children => [],
 	}, $class;
 
 	# If we have been passed what should be an initial token, add it
-	if ( _INSTANCE($_[0], 'PPI::Token') ) {
-		$self->__add_element(shift);
+	my $token = shift;
+	if ( _INSTANCE($token, 'PPI::Token') ) {
+		# Inlined $self->__add_element(shift);
+		Scalar::Util::weaken(
+			$_PARENT{Scalar::Util::refaddr $token} = $self
+		);
+		push @{$self->{children}}, $token;
 	}
 
 	$self;
@@ -277,13 +288,11 @@ ok( ! $statements->[9]->specialized,                    'Statement 10: is not sp
 
 =cut
 
+# Yes, this is doing precisely what it's intending to prevent
+# client code from doing.  However, since it's here, if the
+# implementation changes, code outside PPI doesn't care.
 sub specialized {
-	my $self = shift;
-
-	# Yes, this is doing precisely what it's intending to prevent
-	# client code from doing.  However, since it's here, if the
-	# implementation changes, code outside PPI doesn't care.
-	return __PACKAGE__ ne ref $self;
+	__PACKAGE__ ne ref $_[0];
 }
 
 =pod
@@ -301,7 +310,6 @@ error.
 =cut
 
 sub stable {
-	my $self = shift;
 	die "The ->stable method has not yet been implemented";	
 }
 
@@ -348,25 +356,6 @@ sub insert_after {
 		return $self->__insert_after($Element);
 	}
 	'';
-}
-
-
-
-
-
-#####################################################################
-# Support Methods
-
-sub _Fragment {
-	my $self = shift;
-
-	# Because we are potentially part of a larger structure,
-	# we need to clone ourselves first.
-	my $clone = $self->clone or return undef;
-
-	# Create the empty Fragment
-	my $Fragment = PPI::Document::Fragment->new;
-	$Fragment->add_element( $self ) or return undef;
 }
 
 1;

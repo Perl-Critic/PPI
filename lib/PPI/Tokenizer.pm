@@ -79,8 +79,8 @@ in private methods.
 # Make sure everything we need is loaded so
 # we don't have to go and load all of PPI.
 use strict;
+use Params::Util    qw{_INSTANCE _SCALAR0 _ARRAY0};
 use List::MoreUtils ();
-use Params::Util    qw{ _INSTANCE _SCALAR0 _ARRAY0 };
 use PPI::Util       ();
 use PPI::Element    ();
 use PPI::Token      ();

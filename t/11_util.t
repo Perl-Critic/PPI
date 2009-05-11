@@ -14,7 +14,7 @@ use Test::NoWarnings;
 use File::Spec::Functions ':ALL';
 use PPI::Lexer ();
 use PPI;
-use PPI::Util qw{ _Document _slurp };
+use PPI::Util qw{_Document _slurp};
 
 # Execute the tests
 my $testfile   = catfile( 't', 'data', '11_util', 'test.pm' );

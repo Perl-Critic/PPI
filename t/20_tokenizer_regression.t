@@ -16,7 +16,7 @@ use File::Spec::Functions ':ALL';
 use PPI::Lexer;
 use PPI::Dumper;
 use Carp 'croak';
-use Params::Util '_INSTANCE';
+use Params::Util qw{_INSTANCE};
 
 sub pause {
 	local $@;

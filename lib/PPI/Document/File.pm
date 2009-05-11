@@ -19,7 +19,7 @@ a Perl document stored in a specific named file.
 
 use strict;
 use Carp          ();
-use Params::Util  '_STRING';
+use Params::Util  qw{_STRING _INSTANCE};
 use PPI::Document ();
 
 use vars qw{$VERSION @ISA};
@@ -52,7 +52,7 @@ Returns a new PPI::Document::File object, or C<undef> on error.
 sub new {
 	my $class    = shift;
 	my $filename = _STRING(shift);
-	if (not defined $filename) {
+	unless ( defined $filename ) {
 		# Perl::Critic got a complaint about not handling a file
 		# named "0".
 		return $class->_error("Did not provide a file name to load");
@@ -64,7 +64,7 @@ sub new {
 	# Unlike a normal inheritance situation, due to our need to stay
 	# compatible with caching magic, this actually returns a regular
 	# anonymous document. We need to rebless if
-	if ( ref($self) eq 'PPI::Document' ) {
+	if ( _INSTANCE($self, 'PPI::Document') ) {
 		bless $self, 'PPI::Document::File';
 	} else {
 		die "PPI::Document::File SUPER call returned an object of the wrong type";

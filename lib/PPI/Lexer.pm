@@ -14,19 +14,19 @@ PPI::Lexer - The PPI Lexer
   my $Lexer = PPI::Lexer->new;
   
   # Build a PPI::Document object from a Token stream
-  my $Tokenizer = PPI::Tokenizer->load( 'My/Module.pm' );
-  my $Document = $Lexer->lex_tokenizer( $Tokenizer );
+  my $Tokenizer = PPI::Tokenizer->load('My/Module.pm');
+  my $Document = $Lexer->lex_tokenizer($Tokenizer);
   
   # Build a PPI::Document object for some raw source
   my $source = "print 'Hello World!'; kill(Humans->all);";
-  $Document = $Lexer->lex_source( $source );
+  $Document = $Lexer->lex_source($source);
   
   # Build a PPI::Document object for a particular file name
-  $Document = $Lexer->lex_file( 'My/Module.pm' );
+  $Document = $Lexer->lex_file('My/Module.pm');
 
 =head1 DESCRIPTION
 
-The is the PPI Lexer. In the larger scheme of things, its job is to take
+The is the L<PPI> Lexer. In the larger scheme of things, its job is to take
 token streams, in a variety of forms, and "lex" them into nested structures.
 
 Pretty much everything in this module happens behind the scenes at this
@@ -54,15 +54,41 @@ For more unusual tasks, by all means forge onwards.
 =cut
 
 use strict;
-use List::MoreUtils ();
+use Scalar::Util    ();
 use Params::Util    qw{_STRING _INSTANCE};
+use List::MoreUtils ();
 use PPI             ();
 use PPI::Exception  ();
 
-use vars qw{$VERSION $errstr};
+use vars qw{$VERSION $errstr *_PARENT %ROUND %RESOLVE};
 BEGIN {
 	$VERSION = '1.204_02';
 	$errstr  = '';
+
+	# Faster than having another method call just
+	# to set the structure finish token.
+	*_PARENT = *PPI::Element::_PARENT;
+
+	# Keyword -> Structure class maps
+	%ROUND = (
+		# Conditions
+		'if'     => 'PPI::Structure::Condition',
+		'elsif'  => 'PPI::Structure::Condition',
+		'unless' => 'PPI::Structure::Condition',
+		'while'  => 'PPI::Structure::Condition',
+		'until'  => 'PPI::Structure::Condition',
+
+		# For(each)
+		'for'     => 'PPI::Structure::ForLoop',
+		'foreach' => 'PPI::Structure::ForLoop',
+	);
+
+	# Opening brace to refining method
+	%RESOLVE = (
+		'(' => '_round',
+		'[' => '_square',
+		'{' => '_curly',
+	);
 }
 
 
@@ -211,37 +237,54 @@ sub lex_tokenizer {
 #####################################################################
 # Lex Methods - Document Object
 
+=pod
+
+=begin testing _lex_structure 3
+
+# Validate the creation of a null statement
+SCOPE: {
+	my $token = new_ok( 'PPI::Token::Structure' => [ ')'    ] );
+	my $brace = new_ok( 'PPI::Statement::UnmatchedBrace' => [ $token ] );
+	is( $null->content, ')', '->content ok' );
+}
+
+=end testing
+
+=cut
+
 sub _lex_document {
-	my $self     = shift;
-	my $Document = _INSTANCE(shift, 'PPI::Document') or return undef;
+	my ($self, $Document) = @_;
+	# my $self     = shift;
+	# my $Document = _INSTANCE(shift, 'PPI::Document') or return undef;
 
 	# Start the processing loop
 	my $Token;
 	while ( $Token = $self->_get_token ) {
 		# Add insignificant tokens directly beneath us
 		unless ( $Token->significant ) {
-			$self->_add_element( $Document, $Token ) or return undef;
+			$self->_add_element( $Document, $Token );
 			next;
 		}
 
 		if ( $Token->content eq ';' ) {
 			# It's a semi-colon on it's own.
 			# We call this a null statement.
-			my $Statement = PPI::Statement::Null->new( $Token ) or return undef;
-			$self->_add_element( $Document, $Statement )        or return undef;
+			$self->_add_element(
+				$Document,
+				PPI::Statement::Null->new($Token),
+			);
 			next;
 		}
 
 		# Handle anything other than a structural element
 		unless ( ref $Token eq 'PPI::Token::Structure' ) {
 			# Determine the class for the Statement, and create it
-			my $_class = $self->_resolve_new_statement($Document, $Token) or return undef;
-			my $Statement = $_class->new( $Token ) or return undef;
+			my $Statement = $self->_statement($Document, $Token)->new($Token);
 
 			# Move the lexing down into the statement
-			$self->_add_delayed( $Document )             or return undef;
-			$self->_add_element( $Document, $Statement ) or return undef;
-			$self->_lex_statement( $Statement )          or return undef;
+			$self->_add_delayed( $Document );
+			$self->_add_element( $Document, $Statement );
+			$self->_lex_statement( $Statement );
 
 			next;
 		}
@@ -250,9 +293,9 @@ sub _lex_document {
 		if ( $Token->__LEXER__opens ) {
 			# This should actually have a Statement instead
 			$self->_rollback( $Token );
-			my $Statement = PPI::Statement->new          or return undef;
-			$self->_add_element( $Document, $Statement ) or return undef;
-			$self->_lex_statement( $Statement )          or return undef;
+			my $Statement = PPI::Statement->new;
+			$self->_add_element( $Document, $Statement );
+			$self->_lex_statement( $Statement );
 			next;
 		}
 
@@ -261,8 +304,9 @@ sub _lex_document {
 			# Because we are at the top of the tree, this is an error.
 			# This means either a mis-parsing, or an mistake in the code.
 			# To handle this, we create a "Naked Close" statement
-			my $UnmatchedBrace = PPI::Statement::UnmatchedBrace->new( $Token ) or return undef;
-			$self->_add_element( $Document, $UnmatchedBrace ) or return undef;
+			$self->_add_element( $Document,
+				PPI::Statement::UnmatchedBrace->new($Token)
+			);
 			next;
 		}
 
@@ -273,8 +317,8 @@ sub _lex_document {
 	# Did we leave the main loop because of a Tokenizer error?
 	unless ( defined $Token ) {
 		my $errstr = $self->{Tokenizer} ? $self->{Tokenizer}->errstr : '';
-		$errstr ||= 'Unknown Tokenizer error';
-		return $self->_error( $errstr );
+		$errstr ||= 'Unknown Tokenizer Error';
+		PPI::Exception->throw($errstr);
 	}
 
 	# No error, it's just the end of file.
@@ -284,13 +328,12 @@ sub _lex_document {
 	# If the Tokenizer has any v6 blocks to attach, do so now.
 	# Checking once at the end is faster than adding a special
 	# case check for every statement parsed.
-	my $v6 = $self->{Tokenizer}->{v6};
+	my $v6 = $self->{Tokenizer}->{'v6'};
 	if ( @$v6 ) {
 		my $includes = $Document->find( 'PPI::Statement::Include::Perl6' );
 		foreach my $include ( @$includes ) {
 			unless ( @$v6 ) {
-				my $errstr = "Failed to find a v6 section";
-				return $self->_error( $errstr );
+				PPI::Exception->throw('Failed to find a v6 section');
 			}
 			$include->{perl6} = shift @$v6;
 		}
@@ -359,7 +402,7 @@ BEGIN {
 		);
 }
 
-sub _resolve_new_statement {
+sub _statement {
 	my ($self, $Parent, $Token) = @_;
 	# my $self   = shift;
 	# my $Parent = _INSTANCE(shift, 'PPI::Node')  or die "Bad param 1";
@@ -373,12 +416,17 @@ sub _resolve_new_statement {
 			my $Next;
 			while ( $Next = $self->_get_token ) {
 				unless ( $Next->significant ) {
-					$self->_delay_element( $Next ) or return undef;
+					push @{$self->{delayed}}, $Next;
+					# $self->_delay_element( $Next );
 					next;
 				}
 
 				# Got the next token
-				if ( $Next->isa('PPI::Token::Operator') and $Next->content eq '=>' ) {
+				if (
+					$Next->isa('PPI::Token::Operator')
+					and
+					$Next->content eq '=>'
+				) {
 					# Is an ordinary expression
 					$self->_rollback( $Next );
 					return 'PPI::Statement::Expression';
@@ -408,7 +456,8 @@ sub _resolve_new_statement {
 		my $Next;
 		while ( $Next = $self->_get_token ) {
 			unless ( $Next->significant ) {
-				$self->_delay_element( $Next ) or return undef;
+				push @{$self->{delayed}}, $Next;
+				# $self->_delay_element( $Next );
 				next;
 			}
 
@@ -438,13 +487,14 @@ sub _resolve_new_statement {
 		my $Next;
 		while ( $Next = $self->_get_token ) {
 			unless ( $Next->significant ) {
-				$self->_delay_element( $Next ) or return undef;
+				push @{$self->{delayed}}, $Next;
+				# $self->_delay_element( $Next );
 				next;
 			}
 
 			# Got the next significant token
-			my $_class = $STATEMENT_CLASSES{$Next->content};
-			if ( $_class and $_class eq 'PPI::Statement::Scheduled' ) {
+			my $sclass = $STATEMENT_CLASSES{$Next->content};
+			if ( $sclass and $sclass eq 'PPI::Statement::Scheduled' ) {
 				$self->_rollback( $Next );
 				return 'PPI::Statement::Scheduled';
 			}
@@ -479,7 +529,8 @@ sub _resolve_new_statement {
 		my $Next;
 		while ( $Next = $self->_get_token ) {
 			unless ( $Next->significant ) {
-				$self->_delay_element( $Next ) or return undef;
+				push @{$self->{delayed}}, $Next;
+				# $self->_delay_element( $Next );
 				next;
 			}
 
@@ -525,7 +576,7 @@ sub _resolve_new_statement {
 
 	# Beyond that, I have no idea for the moment.
 	# Just keep adding more conditions above this.
-	'PPI::Statement';
+	return 'PPI::Statement';
 }
 
 sub _lex_statement {
@@ -535,7 +586,7 @@ sub _lex_statement {
 
 	# Handle some special statements
 	if ( $Statement->isa('PPI::Statement::End') ) {
-		return $self->_lex_statement_end( $Statement );
+		return $self->_lex_end( $Statement );
 	}
 
 	# Begin processing tokens
@@ -543,13 +594,18 @@ sub _lex_statement {
 	while ( $Token = $self->_get_token ) {
 		# Delay whitespace and comment tokens
 		unless ( $Token->significant ) {
-			$self->_delay_element( $Token ) or return undef;
+			push @{$self->{delayed}}, $Token;
+			# $self->_delay_element( $Token );
 			next;
 		}
 
 		# Structual closes, and __DATA__ and __END__ tags implicitly
 		# end every type of statement
-		if ( $Token->__LEXER__closes or $Token->isa('PPI::Token::Separator') ) {
+		if (
+			$Token->__LEXER__closes
+			or
+			$Token->isa('PPI::Token::Separator')
+		) {
 			# Rollback and end the statement
 			return $self->_rollback( $Token );
 		}
@@ -557,7 +613,7 @@ sub _lex_statement {
 		# Normal statements never implicitly end
 		unless ( $Statement->__LEXER__normal ) {
 			# Have we hit an implicit end to the statement
-			unless ( $self->_statement_continues( $Statement, $Token ) ) {
+			unless ( $self->_continues( $Statement, $Token ) ) {
 				# Rollback and finish the statement
 				return $self->_rollback( $Token );
 			}
@@ -565,51 +621,60 @@ sub _lex_statement {
 
 		# Any normal character just gets added
 		unless ( $Token->isa('PPI::Token::Structure') ) {
-			$self->_add_element( $Statement, $Token ) or return undef;
+			$self->_add_element( $Statement, $Token );
 			next;
 		}
 
 		# Handle normal statement terminators
 		if ( $Token->content eq ';' ) {
-			$self->_add_element( $Statement, $Token ) or return undef;
+			$self->_add_element( $Statement, $Token );
 			return 1;
 		}
 
 		# Which leaves us with a new structure
 
 		# Determine the class for the structure and create it
-		my $sclass = $self->_resolve_new_structure($Statement, $Token) or return undef;
-		my $Structure = $sclass->new( $Token ) or return undef;
+		my $method    = $RESOLVE{$Token->content};
+		my $Structure = $self->$method($Statement)->new($Token);
 
 		# Move the lexing down into the Structure
-		$self->_add_delayed( $Statement )   or return undef;
-		$self->_add_element( $Statement, $Structure ) or return undef;
-		$self->_lex_structure( $Structure ) or return undef;
+		$self->_add_delayed( $Statement );
+		$self->_add_element( $Statement, $Structure );
+		$self->_lex_structure( $Structure );
 	}
 
 	# Was it an error in the tokenizer?
-	return undef unless defined $Token;
+	unless ( defined $Token ) {
+		PPI::Exception->throw;
+	}
 
 	# No, it's just the end of the file...
 	# Roll back any insignificant tokens, they'll get added at the Document level
 	$self->_rollback;
 }
 
-sub _lex_statement_end {
-	my $self      = shift;
-	my $Statement = _INSTANCE(shift, 'PPI::Statement::End') or die "Bad param 1";
+sub _lex_end {
+	my ($self, $Statement) = @_;
+	# my $self      = shift;
+	# my $Statement = _INSTANCE(shift, 'PPI::Statement::End') or die "Bad param 1";
 
 	# End of the file, EVERYTHING is ours
 	my $Token;
 	while ( $Token = $self->_get_token ) {
-		$Statement->__add_element( $Token );
+		# Inlined $Statement->__add_element($Token);
+		Scalar::Util::weaken(
+			$_PARENT{Scalar::Util::refaddr $Token} = $Statement
+		);
+		push @{$Statement->{children}}, $Token;
 	}
 
 	# Was it an error in the tokenizer?
-	return undef unless defined $Token;
+	unless ( defined $Token ) {
+		PPI::Exception->throw;
+	}
 
 	# No, it's just the end of the file...
-	# Roll back any insignificant tokens, they'll get added at the Document level
+	# Roll back any insignificant tokens, they get added at the Document level
 	$self->_rollback;
 }
 
@@ -617,7 +682,7 @@ sub _lex_statement_end {
 # This method takes a statement and the next significant token, and attempts
 # to determine if the there is a statement boundary between the two, or if
 # the statement can continue with the token.
-sub _statement_continues {
+sub _continues {
 	my ($self, $Statement, $Token) = @_;
 	# my $self      = shift;
 	# my $Statement = _INSTANCE(shift, 'PPI::Statement') or die "Bad param 1";
@@ -625,7 +690,11 @@ sub _statement_continues {
 
 	# Handle the simple block case
 	# { print 1; }
-	if ( $Statement->schildren == 1 and $Statement->schild(0)->isa('PPI::Structure::Block') ) {
+	if (
+		$Statement->schildren == 1
+		and
+		$Statement->schild(0)->isa('PPI::Structure::Block')
+	) {
 		return '';
 	}
 
@@ -639,7 +708,7 @@ sub _statement_continues {
 	# Of these five, ::Scheduled, ::Sub, ::Switch, and ::When follow the same
 	# simple rule and can be handled first.
 	my @part      = $Statement->schildren;
-	my $LastChild = $part[-1] or return undef;
+	my $LastChild = $part[-1];
 	unless ( $Statement->isa('PPI::Statement::Compound') ) {
 		# If the last significant element of the statement is a block,
 		# then a scheduled statement is done, no questions asked.
@@ -649,7 +718,7 @@ sub _statement_continues {
 	# Now we get to compound statements, which kind of suck (to lex).
 	# However, of them all, the 'if' type, which includes unless, are
 	# relatively easy to handle compared to the others.
-	my $type = $Statement->type or return undef;
+	my $type = $Statement->type;
 	if ( $type eq 'if' ) {
 		# This should be one of the following
 		# if (EXPR) BLOCK
@@ -733,7 +802,11 @@ sub _statement_continues {
 
 	if ( $type eq 'for' ) {
 		# LABEL for (EXPR; EXPR; EXPR) BLOCK
-		if ( $LastChild->isa('PPI::Token::Word') and $LastChild->content =~ /^for(?:each)?\z/ ) {
+		if (
+			$LastChild->isa('PPI::Token::Word')
+			and
+			$LastChild->content =~ /^for(?:each)?\z/
+		) {
 			# LABEL for ...
 			if (
 				(
@@ -831,7 +904,6 @@ sub _statement_continues {
 		# LABEL foreach VAR (LIST) BLOCK continue BLOCK
 		# The only two cases that have not been covered already are
 		# 'foreach ...' and 'foreach VAR ...'
-		return undef unless $LastChild->isa('PPI::Token');
 
 		if ( $LastChild->isa('PPI::Token::Symbol') ) {
 			# LABEL foreach my $scalar ...
@@ -885,8 +957,7 @@ sub _statement_continues {
 	}
 
 	# Something we don't know about... what could it be
-	warn("Illegal parse state in '$type' type compound statement");
-	return undef;
+	PPI::Exception->throw("Illegal state in '$type' compound statement");
 }
 
 
@@ -896,51 +967,19 @@ sub _statement_continues {
 #####################################################################
 # Lex Methods - Structure Object
 
-use vars qw{%ROUND_CLASSES};
-BEGIN {
-	# Keyword -> Structure class maps
-	%ROUND_CLASSES = (
-		# Conditions
-		'if'     => 'PPI::Structure::Condition',
-		'elsif'  => 'PPI::Structure::Condition',
-		'unless' => 'PPI::Structure::Condition',
-		'while'  => 'PPI::Structure::Condition',
-		'until'  => 'PPI::Structure::Condition',
-
-		# For(each)
-		'for'     => 'PPI::Structure::ForLoop',
-		'foreach' => 'PPI::Structure::ForLoop',
-	);
-}
-
-# Given a parent element, and a token which will open a structure, determine
-# the class that the structure should be.
-sub _resolve_new_structure {
-	# my $self   = shift;
-	# my $Parent = _INSTANCE(shift, 'PPI::Node')             or die "Bad param 1";
-	# my $Token  = _INSTANCE(shift, 'PPI::Token::Structure') or die "Bad param 2";
-	my ($self, $Parent, $Token) = @_;
-
-	return $self->_resolve_new_structure_round ($Parent) if $Token->content eq '(';
-	return $self->_resolve_new_structure_square($Parent) if $Token->content eq '[';
-	return $self->_resolve_new_structure_curly ($Parent) if $Token->content eq '{';
-	undef;
-}
-
 # Given a parent element, and a ( token to open a structure, determine
 # the class that the structure should be.
-sub _resolve_new_structure_round {
+sub _round {
+	my ($self, $Parent) = @_;
 	# my $self   = shift;
 	# my $Parent = _INSTANCE(shift, 'PPI::Node') or die "Bad param 1";
-	my ($self, $Parent) = @_;
 
 	# Get the last significant element in the parent
 	my $Element = $Parent->schild(-1);
 	if ( _INSTANCE($Element, 'PPI::Token::Word') ) {
 		# Can it be determined because it is a keyword?
-		if ( $ROUND_CLASSES{$Element->content} ) {
-			return $ROUND_CLASSES{$Element->content};
-		}
+		my $rclass = $ROUND{$Element->content};
+		return $rclass if $rclass;
 	}
 
 	# If we are part of a for or foreach statement, we are a ForLoop
@@ -966,10 +1005,10 @@ sub _resolve_new_structure_round {
 
 # Given a parent element, and a [ token to open a structure, determine
 # the class that the structure should be.
-sub _resolve_new_structure_square {
+sub _square {
+	my ($self, $Parent) = @_;
 	# my $self   = shift;
 	# my $Parent = _INSTANCE(shift, 'PPI::Node') or die "Bad param 1";
-	my ($self, $Parent) = @_;
 
 	# Get the last significant element in the parent
 	my $Element = $Parent->schild(-1);
@@ -1018,7 +1057,7 @@ BEGIN {
 
 # Given a parent element, and a { token to open a structure, determine
 # the class that the structure should be.
-sub _resolve_new_structure_curly {
+sub _curly {
 	my ($self, $Parent) = @_;
 	# my $self   = shift;
 	# my $Parent = _INSTANCE(shift, 'PPI::Node') or die "Bad param 1";
@@ -1038,7 +1077,7 @@ sub _resolve_new_structure_curly {
 			# $foo[]{}
 			return 'PPI::Structure::Subscript';
 		}
-		if ( $Element->isa('PPI::Token::Symbol') and $content =~ /^(?:\$|\@)/ ) {
+		if ( $content =~ /^(?:\$|\@)/ and $Element->isa('PPI::Token::Symbol') ) {
 			# $foo{}, @foo{}
 			return 'PPI::Structure::Subscript';
 		}
@@ -1064,9 +1103,7 @@ sub _resolve_new_structure_curly {
 
 	# Unless we are at the start of the statement, everything else should be a block
 	### FIXME This is possibly a bad choice, but will have to do for now.
-	if ( $Element ) {
-		return 'PPI::Structure::Block';
-	}
+	return 'PPI::Structure::Block' if $Element;
 
 	# Special case: Are we the param of a core function
 	# i.e. map({ $_ => 1 } @foo)
@@ -1093,20 +1130,20 @@ sub _resolve_new_structure_curly {
 
 		# If a closing curly, this is an anonymous hash-ref
 		if ( ++$position == 1 and $Next->content eq '}' ) {
-			$self->_buffer( splice( @delayed ), $Next );
+			$self->_buffer( splice(@delayed), $Next );
 			return 'PPI::Structure::Constructor';
 		}
 
 		# If it contains a => as the second thing,
 		# this is also an anonymous hash-ref.
 		if ( $position == 2 and $Next->content eq '=>' ) {
-			$self->_buffer( splice( @delayed ), $Next );
+			$self->_buffer( splice(@delayed), $Next );
 			return 'PPI::Structure::Constructor';
 		}
 
 		# We only check the first two, then default to block
 		if ( $position >= 3 ) {
-			$self->_buffer( splice( @delayed ), $Next );
+			$self->_buffer( splice(@delayed), $Next );
 			last;
 		}
 
@@ -1115,12 +1152,30 @@ sub _resolve_new_structure_curly {
 	}
 
 	# Hit the end of the document, or bailed out, go with block
-	$self->_buffer( splice @delayed );
-	if ( ref($Parent) eq 'PPI::Statement' ) {
+	$self->_buffer( splice(@delayed) );
+	if ( ref $Parent eq 'PPI::Statement' ) {
 		bless $Parent, 'PPI::Statement::Compound';
 	}
 	return 'PPI::Structure::Block';
 }
+
+=pod
+
+=begin testing _lex_structure 4
+
+# Validate the creation of a null statement
+SCOPE: {
+	my $token = new_ok( 'PPI::Token::Structure' => [ ';'    ] );
+	my $null  = new_ok( 'PPI::Statement::Null'  => [ $token ] );
+	is( $null->content, ';', '->content ok' );
+}
+
+# Validate the creation of an empty statement
+new_ok( 'PPI::Statement' => [ ] );
+
+=end testing
+
+=cut
 
 sub _lex_structure {
 	my ($self, $Structure) = @_;
@@ -1132,23 +1187,23 @@ sub _lex_structure {
 	while ( $Token = $self->_get_token ) {
 		# Is this a direct type token
 		unless ( $Token->significant ) {
-			$self->_delay_element( $Token ) or return undef;
+			push @{$self->{delayed}}, $Token;
+			# $self->_delay_element( $Token );
 			next;
 		}
 
 		# Anything other than a Structure starts a Statement
 		unless ( $Token->isa('PPI::Token::Structure') ) {
-			# Because _resolve_new_statement may well delay and
-			# rollback itself, we need to add the delayed tokens early
-			$self->_add_delayed( $Structure ) or return undef;
+			# Because _statement may well delay and rollback itself,
+			# we need to add the delayed tokens early
+			$self->_add_delayed( $Structure );
 
 			# Determine the class for the Statement and create it
-			my $_class = $self->_resolve_new_statement($Structure, $Token) or return undef;
-			my $Statement = $_class->new( $Token )        or return undef;
+			my $Statement = $self->_statement($Structure, $Token)->new($Token);
 
 			# Move the lexing down into the Statement
-			$self->_add_element( $Structure, $Statement ) or return undef;
-			$self->_lex_statement( $Statement )           or return undef;
+			$self->_add_element( $Structure, $Statement );
+			$self->_lex_statement( $Statement );
 
 			next;
 		}
@@ -1157,9 +1212,9 @@ sub _lex_structure {
 		if ( $Token->__LEXER__opens ) {
 			# Rollback the Token, and recurse into the statement
 			$self->_rollback( $Token );
-			my $Statement = PPI::Statement->new          or return undef;
-			$self->_add_element( $Structure, $Statement ) or return undef;
-			$self->_lex_statement( $Statement )          or return undef;
+			my $Statement = PPI::Statement->new;
+			$self->_add_element( $Structure, $Statement );
+			$self->_lex_statement( $Statement );
 			next;
 		}
 
@@ -1167,9 +1222,12 @@ sub _lex_structure {
 		if ( $Token->__LEXER__closes ) {
 			# Is this OUR closing structure
 			if ( $Token->content eq $Structure->start->__LEXER__opposite ) {
-				# Add any delayed tokens, and the finishing token
-				$self->_add_delayed( $Structure ) or return undef;
-				$Structure->_set_finish( $Token ) or return undef;
+				# Add any delayed tokens, and the finishing token (the ugly way)
+				$self->_add_delayed( $Structure );
+				$Structure->{finish} = $Token;
+				Scalar::Util::weaken(
+					$_PARENT{Scalar::Util::refaddr $Token} = $Structure
+				);
 
 				# Confirm that ForLoop structures are actually so, and
 				# aren't really a list.
@@ -1190,18 +1248,21 @@ sub _lex_structure {
 			# as implicitly ending the structure. This causes the
 			# least damage across the various reasons why this
 			# might have happened.
-			warn('Unexpected closing brace') if $self->{warnings};
 			return $self->_rollback( $Token );
 		}
 
 		# It's a semi-colon on it's own, just inside the block.
 		# This is a null statement.
-		my $Statement = PPI::Statement::Null->new( $Token ) or return undef;
-		$self->_add_element( $Structure, $Statement ) or return undef;
+		$self->_add_element(
+			$Structure,
+			PPI::Statement::Null->new($Token),
+		);
 	}
 
 	# Is this an error
-	return undef unless defined $Token;
+	unless ( defined $Token ) {
+		PPI::Exception->throw;
+	}
 
 	# No, it's just the end of file.
 	# Add any insignificant trailing tokens.
@@ -1217,27 +1278,27 @@ sub _lex_structure {
 
 # Get the next token for processing, handling buffering
 sub _get_token {
-	my $self = shift;
-	$self->{Tokenizer} or return undef;
-
-	# First from the buffer
-	if ( @{$self->{buffer}} ) {
-		# Take from the front, add to the end
-		return shift @{$self->{buffer}};
-	}
-
-	# Then from the Tokenizer
-	$self->{Tokenizer}->get_token;
+	shift(@{$_[0]->{buffer}}) or $_[0]->{Tokenizer}->get_token;
 }
 
-# Delay the addition of a insignificant elements
-sub _delay_element {
-	# my $self    = shift;
-	# my $Element = _INSTANCE(shift, 'PPI::Element') or die "Bad param 1";
+# Old long version of the above
+# my $self = shift;
+#     # First from the buffer
+#     if ( @{$self->{buffer}} ) {
+#         return shift @{$self->{buffer}};
+#     }
+#
+#     # Then from the Tokenizer
+#     $self->{Tokenizer}->get_token;
+# }
 
-	# Take from the front, add to the end
-	push @{ $_[0]->{delayed} }, $_[1];
-}
+# Delay the addition of a insignificant elements.
+# This ended up being inlined.
+# sub _delay_element {
+#     my $self    = shift;
+#     my $Element = _INSTANCE(shift, 'PPI::Element') or die "Bad param 1";
+#     push @{ $_[0]->{delayed} }, $_[1];
+# }
 
 # Add an Element to a Node, including any delayed Elements
 sub _add_element {
@@ -1259,14 +1320,19 @@ sub _add_element {
 	}
 
 	# Add first the delayed, from the front, then the passed element
-	foreach my $el ( @{$self->{delayed}}, $Element ) {
-		$Parent->__add_element( $el );
+	foreach my $el ( @{$self->{delayed}} ) {
+		Scalar::Util::weaken(
+			$_PARENT{Scalar::Util::refaddr $el} = $Parent
+		);
+		# Inlined $Parent->__add_element($el);
 	}
+	Scalar::Util::weaken(
+		$_PARENT{Scalar::Util::refaddr $Element} = $Parent
+	);
+	push @{$Parent->{children}}, @{$self->{delayed}}, $Element;
 
-	# Clear the delayed elements if needed
-	$self->{delayed} = [] if @{$self->{delayed}};
-
-	1;
+	# Clear the delayed elements
+	$self->{delayed} = [];
 }
 
 # Specifically just add any delayed tokens, if any.
@@ -1277,12 +1343,15 @@ sub _add_delayed {
 
 	# Add any delayed
 	foreach my $el ( @{$self->{delayed}} ) {
-		$Parent->__add_element($el);
+		Scalar::Util::weaken(
+			$_PARENT{Scalar::Util::refaddr $el} = $Parent
+		);
+		# Inlined $Parent->__add_element($el);
 	}
+	push @{$Parent->{children}}, @{$self->{delayed}};
 
 	# Clear the delayed elements
 	$self->{delayed} = [];
-	return 1;
 }
 
 # Rollback the delayed tokens, plus any passed. Once all the tokens

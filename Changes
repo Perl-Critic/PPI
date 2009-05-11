@@ -10,6 +10,12 @@ Revision history for Perl extension PPI
 	- Various minor simplifications
 	- Renamed PPI::Statement::Switch to ::Given
 	- Renamed PPI::Structure::WhenMatch to ::When
+	- Converted the Lexer internals to use exception-based error
+	  handling.
+	- Take advantage of the removal of all those "or return undef"
+	  to simplify the Lexer code, remove variable declarations, and
+	  inline calls to several hot-code-path functions. The Lexer
+	  should be significantly faster (FSDO "significant").
 
 1.204_02 Sun 10 May 2009
 	Summary:
