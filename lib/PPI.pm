@@ -401,7 +401,7 @@ based on inheritance.
                PPI::Statement::Scheduled
             PPI::Statement::Compound
             PPI::Statement::Break
-            PPI::Statement::Switch
+            PPI::Statement::Given
             PPI::Statement::When
             PPI::Statement::Data
             PPI::Statement::End

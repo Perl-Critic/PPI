@@ -342,7 +342,7 @@ BEGIN {
 		'until'     => 'PPI::Statement::Compound',
 
 		# Switch statement
-		'given'     => 'PPI::Statement::Switch',
+		'given'     => 'PPI::Statement::Given',
 		'when'      => 'PPI::Statement::When',
 		'default'   => 'PPI::Statement::When',
 
@@ -948,7 +948,7 @@ sub _resolve_new_structure_round {
 		if ( $Parent->type =~ /^for(?:each)?$/ ) {
 			return 'PPI::Structure::ForLoop';
 		}
-	} elsif ( $Parent->isa('PPI::Statement::Switch') ) {
+	} elsif ( $Parent->isa('PPI::Statement::Given') ) {
 		return 'PPI::Structure::Given';
 	} elsif ( $Parent->isa('PPI::Statement::When') ) {
 		return 'PPI::Structure::When';

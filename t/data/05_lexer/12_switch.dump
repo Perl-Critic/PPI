@@ -1,5 +1,5 @@
 PPI::Document
-  PPI::Statement::Switch
+  PPI::Statement::Given
     PPI::Token::Word  	'given'
     PPI::Token::Whitespace  	' '
     PPI::Structure::Given  	( ... )

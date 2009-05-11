@@ -319,7 +319,7 @@ symbols=method
 PPI::Statement=isa
 type=method
 
-[PPI::Statement::Switch]
+[PPI::Statement::Given]
 PPI::Statement=isa
 
 [PPI::Statement::When]

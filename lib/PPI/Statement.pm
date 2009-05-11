@@ -70,7 +70,7 @@ A statement that breaks out of a structure.
 
 This includes all of 'redo', 'next', 'last' and 'return' statements.
 
-=head2 L<PPI::Statement::Switch>
+=head2 L<PPI::Statement::Given>
 
 The kind of statement introduced in Perl 5.10 that starts with 'given'.  This
 has an implicit end.
@@ -166,7 +166,7 @@ use PPI::Statement::Null           ();
 use PPI::Statement::Package        ();
 use PPI::Statement::Scheduled      ();
 use PPI::Statement::Sub            ();
-use PPI::Statement::Switch         ();
+use PPI::Statement::Given         ();
 use PPI::Statement::UnmatchedBrace ();
 use PPI::Statement::Unknown        ();
 use PPI::Statement::Variable       ();

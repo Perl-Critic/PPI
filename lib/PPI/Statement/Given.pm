@@ -1,10 +1,10 @@
-package PPI::Statement::Switch;
+package PPI::Statement::Given;
 
 =pod
 
 =head1 NAME
 
-PPI::Statement::Switch - Describes all compound statements
+PPI::Statement::Given - Describes all compound statements
 
 =head1 SYNOPSIS
 
@@ -14,14 +14,14 @@ PPI::Statement::Switch - Describes all compound statements
 
 =head1 INHERITANCE
 
-  PPI::Statement::Switch
+  PPI::Statement::Given
   isa PPI::Statement
       isa PPI::Node
           isa PPI::Element
 
 =head1 DESCRIPTION
 
-C<PPI::Statement::Switch> objects are used to describe switch statements, as
+C<PPI::Statement::Given> objects are used to describe switch statements, as
 described in L<perlsyn>.
 
 =head1 METHODS
