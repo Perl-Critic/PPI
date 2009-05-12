@@ -65,7 +65,12 @@ __PACKAGE__->register_apply_handler( 'PPI::Document', sub { $_[0] }, sub { 1 } )
 
 =pod
 
-=head2 new [ param1 => $value, param2 => $value ]
+=head2 new
+
+  my $transform = PPI::Transform::UpdateCopyright->new(
+      param1 => 'value1',
+      param2 => 'value2',
+  );
 
 The C<new> constructor creates a new object for your C<PPI::Transform>
 subclass. A default constructor is provided for you which takes no params
@@ -74,14 +79,14 @@ and creates a basic, empty, object.
 If you wish to have your transform constructor take params, these B<must>
 be in the form of a list of key/value pairs.
 
-Returns a new C<PPI::Transform>-compatible object, or C<undef> if provided
-bad constructor params.
+Returns a new C<PPI::Transform>-compatible object, or returns
+C<undef> on error.
 
 =cut
 
 sub new {
-	my $class = ref $_[0] ? ref shift : shift;
-	bless {}, $class;
+	my $class = shift;
+	bless { @_ }, $class;
 }
 
 =pod
@@ -96,15 +101,18 @@ That's right, this method B<will not clone> and B<should not clone>
 the document object. If you do not want the original to be modified,
 you need to clone it yourself before passing it in.
 
-Returns the document anyway, as a convenience, or C<undef> if an error
-occurs. By default this error should just be that you passed in something
+Returns the numbers of changes made to the document. If the transform
+is unable to track the quantity (including the situation where it cannot
+tell B<IF> it made a change) it should return 1. Returns zero if no
+changes were made to the document, or C<undef> if an error occurs.
+
+By default this error is likely to only mean that you passed in something
 that wasn't a L<PPI::Document>, but may include additional errors
 depending on the subclass.
 
 =cut
 
 sub document {
-	my $class = ref $_[0] ? ref shift : shift;
 	die "$class does not implement the required ->document method";
 }
 
@@ -148,7 +156,13 @@ sub apply {
 
 =pod
 
-=head2 file $filename [, $output ]
+=head2 file
+
+  # Read from one file and write to another
+  $transform->file( 'Input.pm' => 'Output.pm' );
+  
+  # Change a file in place
+  $transform->file( 'Change.pm' );
 
 The C<file> method modifies a Perl document by filename. If passed a single
 parameter, it modifies the file in-place. If provided a second parameter,
@@ -164,7 +178,7 @@ sub file {
 	# Where do we read from and write to
 	my $input  = defined $_[0] ? shift : return undef;
 	my $output = @_ ? defined $_[0] ? "$_[0]" : undef : $input or return undef;
-	
+
 	# Process the file
 	my $Document = PPI::Document->new( "$input" ) or return undef;
 	$self->document( $Document )                  or return undef;
@@ -199,18 +213,13 @@ sub _SELF {
 	return shift if ref $_[0];
 	my $self = $_[0]->new or Carp::croak(
 		"Failed to auto-instantiate new $_[0] object"
-		);
+	);
 	$self;
 }
 
 1;
 
 =pod
-
-=head1 TO DO
-
-- May need to overload some methods to forcefully prevent Document
-objects becoming children of another Node.
 
 =head1 SUPPORT
 

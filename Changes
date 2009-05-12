@@ -1,11 +1,13 @@
 Revision history for Perl extension PPI
 
-1.204_03 Mon 11 May 2009
+1.204_03 to be released
 	Summary:
 	- More bug fixing, clean up, and optimisation
 	- Cleaning up contributed APIs
+	- Adding some demonstration classes
 
 	Details:
+	- Implemented PPI::Transform::UpdateCopyright
 	- Removed the use of 'use base'
 	- Various minor simplifications
 	- Renamed PPI::Statement::Switch to ::Given
