@@ -113,6 +113,7 @@ depending on the subclass.
 =cut
 
 sub document {
+	my $class = shift;
 	die "$class does not implement the required ->document method";
 }
 
