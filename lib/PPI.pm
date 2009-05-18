@@ -22,6 +22,7 @@ use PPI::Statement            ();
 use PPI::Structure            ();
 use PPI::Document             ();
 use PPI::Document::File       ();
+use PPI::Document::Fragment   ();
 use PPI::Document::Normalized ();
 use PPI::Normal               ();
 use PPI::Tokenizer            ();

@@ -62,7 +62,7 @@ sub literal {
 	my $neg = $str =~ s/^\-//;
 	$str =~ s/^0b//;
 	my $val = 0;
-	for my $bit ($str =~ m/(.)/g) {
+	for my $bit ( $str =~ m/(.)/g ) {
 		$val = $val * 2 + $bit;
 	}
 	return $neg ? -$val : $val;

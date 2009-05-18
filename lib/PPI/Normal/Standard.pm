@@ -36,12 +36,12 @@ my @METHODS = (
 	remove_useless_pragma         => 2,
 	remove_statement_separator    => 2,
 	remove_useless_return         => 2,
-	);
+);
 
 sub import {
 	PPI::Normal->register(
 		map { /\D/ ? "PPI::Normal::Standard::$_" : $_ } @METHODS
-		) or die "Failed to register PPI::Normal::Standard transforms";
+	) or die "Failed to register PPI::Normal::Standard transforms";
 }
 
 

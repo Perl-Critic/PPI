@@ -104,7 +104,7 @@ sub new {
 	# Create the object
 	my $self = bless {
 		wanted => $wanted,
-		}, $class;
+	}, $class;
 
 	$self;
 }
@@ -131,7 +131,7 @@ sub clone {
 	# Create the object
 	my $clone = bless {
 		wanted => $self->{wanted},
-		}, $class;
+	}, $class;
 
 	$clone;
 }

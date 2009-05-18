@@ -67,7 +67,7 @@ BEGIN {
 		'until'   => 'while',
 		'for'     => 'for',
 		'foreach' => 'foreach',
-		);
+	);
 }
 
 # Lexer clues
@@ -227,7 +227,7 @@ sub type {
 #####################################################################
 # PPI::Node Methods
 
-sub scope () { 1 }
+sub scope { 1 }
 
 
 

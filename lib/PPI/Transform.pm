@@ -67,7 +67,7 @@ __PACKAGE__->register_apply_handler( 'PPI::Document', sub { $_[0] }, sub { 1 } )
 
 =head2 new
 
-  my $transform = PPI::Transform::UpdateCopyright->new(
+  my $transform = PPI::Transform->new(
       param1 => 'value1',
       param2 => 'value2',
   );

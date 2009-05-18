@@ -63,6 +63,28 @@ or C<'require'>).
 
 Returns the type as a string, or C<undef> if the type cannot be detected.
 
+=begin testing type 9
+
+my $document = PPI::Document->new(\<<'END_PERL');
+require 5.6;
+require Module;
+require 'Module.pm';
+use 5.6;
+use Module;
+use Module 1.00;
+no Module;
+END_PERL
+
+isa_ok( $document, 'PPI::Document' );
+my $statements = $document->find('PPI::Statement::Include');
+is( scalar(@$statements), 7, 'Found 7 include statements' );
+my @expected = qw{ require require require use use use no };
+foreach ( 0 .. 6 ) {
+	is( $statements->[$_]->type, $expected[$_], "->type $_ ok" );
+}
+
+=end testing
+
 =cut
 
 sub type {
@@ -139,12 +161,14 @@ is( $statements->[6]->module_version, undef, 'Version include, no module' );
 =cut
 
 sub module_version {
-	my $self = shift;
+	my $self     = shift;
 	my $argument = $self->schild(3);
-	return undef if $argument and $argument->isa('PPI::Token::Operator');
+	if ( $argument and $argument->isa('PPI::Token::Operator') ) {
+		return undef;
+	}
 
 	my $version = $self->schild(2) or return undef;
-	return undef if not $version->isa('PPI::Token::Number');
+	return undef unless $version->isa('PPI::Token::Number');
 
 	return $version;
 }
@@ -174,7 +198,7 @@ pragma.
 =cut
 
 sub pragma {
-	my $self = shift;
+	my $self   = shift;
 	my $module = $self->module or return '';
 	$module =~ /^[a-z][a-z\d]*$/ ? $module : '';
 }
@@ -236,11 +260,10 @@ is( $statements->[10]->version, '', 'use module version' );
 =cut
 
 sub version {
-	my $self = shift;
+	my $self    = shift;
 	my $version = $self->schild(1) or return undef;
-	$version->isa('PPI::Token::Number') ? $version->content : '';
+	$version->isa('PPI::Token::Number') ? $version->literal : '';
 }
-
 
 =pod
 
@@ -356,34 +379,31 @@ is(
 
 sub arguments {
 	my $self = shift;
+	my @args = $self->schildren;
 
-	my @arguments = $self->schildren;
-	shift @arguments;  # Lose the "my", "no", etc.
-	shift @arguments;  # Lose the module/perl version.
+	# Remove the "use", "no" or "require"
+	shift @args;
 
-	return if not @arguments;
-
+	# Remove the statement terminator
 	if (
-		$arguments[-1]->isa('PPI::Token::Structure')
+		$args[-1]->isa('PPI::Token::Structure')
 		and
-		$arguments[-1]->content eq q<;>
+		$args[-1]->content eq ';'
 	) {
-		pop @arguments;
+		pop @args;
 	}
 
-	return if not @arguments;
+	# Remove the module or perl version.
+	shift @args;  
 
-	if ( $arguments[0]->isa('PPI::Token::Number') ) {
-		if ( my $after_number = $arguments[1] ) {
-			if ( not $after_number->isa('PPI::Token::Operator') ) {
-				shift @arguments;
-			}
-		} else {
-			return;
-		}
+	return unless @args;
+
+	if ( $args[0]->isa('PPI::Token::Number') ) {
+		my $after = $args[1] or return;
+		$after->isa('PPI::Token::Operator') or shift @args;
 	}
 
-	return @arguments;
+	return @args;
 }
 
 1;

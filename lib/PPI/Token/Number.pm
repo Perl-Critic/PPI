@@ -60,17 +60,16 @@ Return the numeric value of this token.
 =cut
 
 sub literal {
-	my $self = shift;
-	return 0+$self->_literal;
+	return 0 + $_[0]->_literal;
 }
 
 sub _literal {
 	# De-sugar the string representation
-	my $self = shift;
-	my $str = $self->content;
-	$str =~ s/^\+//;
-	$str =~ s/_//g;
-	return $str;
+	my $self   = shift;
+	my $string = $self->content;
+	$string =~ s/^\+//;
+	$string =~ s/_//g;
+	return $string;
 }
 
 

@@ -399,7 +399,7 @@ BEGIN {
 		# Special sections of the file
 		'__DATA__'  => 'PPI::Statement::Data',
 		'__END__'   => 'PPI::Statement::End',
-		);
+	);
 }
 
 sub _statement {
