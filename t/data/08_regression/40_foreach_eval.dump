@@ -1,0 +1,27 @@
+PPI::Document
+  PPI::Statement::Compound
+    PPI::Token::Word  	'foreach'
+    PPI::Token::Whitespace  	' '
+    PPI::Token::Word  	'my'
+    PPI::Token::Whitespace  	' '
+    PPI::Token::Symbol  	'$thingy'
+    PPI::Token::Whitespace  	' '
+    PPI::Structure::ForLoop  	( ... )
+      PPI::Token::Whitespace  	' '
+      PPI::Statement
+        PPI::Token::Word  	'eval'
+        PPI::Token::Whitespace  	' '
+        PPI::Structure::Block  	{ ... }
+          PPI::Token::Whitespace  	' '
+          PPI::Statement
+            PPI::Token::Word  	'bar'
+            PPI::Token::Structure  	';'
+          PPI::Token::Whitespace  	' '
+      PPI::Token::Whitespace  	' '
+    PPI::Token::Whitespace  	' '
+    PPI::Structure::Block  	{ ... }
+      PPI::Token::Whitespace  	' '
+      PPI::Statement
+        PPI::Token::Number  	'1'
+      PPI::Token::Whitespace  	' '
+  PPI::Token::Whitespace  	'\n'
