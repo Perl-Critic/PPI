@@ -177,7 +177,7 @@ sub __TOKENIZER__on_line_start {
 			last unless defined $line6;
 			push @perl6, $line6;
 		}
-		push @{ $t->{v6} }, join '', @perl6;
+		push @{ $t->{perl6} }, join '', @perl6;
 
 		# We only sucked in the block, we don't actially do
 		# anything to the "use v6..." line. So return as if

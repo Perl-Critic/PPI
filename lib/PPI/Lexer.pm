@@ -239,13 +239,13 @@ sub lex_tokenizer {
 
 =pod
 
-=begin testing _lex_structure 3
+=begin testing _lex_document 3
 
 # Validate the creation of a null statement
 SCOPE: {
 	my $token = new_ok( 'PPI::Token::Structure' => [ ')'    ] );
 	my $brace = new_ok( 'PPI::Statement::UnmatchedBrace' => [ $token ] );
-	is( $null->content, ')', '->content ok' );
+	is( $brace->content, ')', '->content ok' );
 }
 
 =end testing
@@ -328,14 +328,14 @@ sub _lex_document {
 	# If the Tokenizer has any v6 blocks to attach, do so now.
 	# Checking once at the end is faster than adding a special
 	# case check for every statement parsed.
-	my $v6 = $self->{Tokenizer}->{'v6'};
-	if ( @$v6 ) {
+	my $perl6 = $self->{Tokenizer}->{'perl6'};
+	if ( @$perl6 ) {
 		my $includes = $Document->find( 'PPI::Statement::Include::Perl6' );
 		foreach my $include ( @$includes ) {
-			unless ( @$v6 ) {
-				PPI::Exception->throw('Failed to find a v6 section');
+			unless ( @$perl6 ) {
+				PPI::Exception->throw('Failed to find a perl6 section');
 			}
-			$include->{perl6} = shift @$v6;
+			$include->{perl6} = shift @$perl6;
 		}
 	}
 

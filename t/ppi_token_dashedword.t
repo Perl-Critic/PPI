@@ -25,12 +25,14 @@ my @pairs = (
 while ( @pairs ) {
 	my $from  = shift @pairs;
 	my $to    = shift @pairs;
-	my $doc   = PPI::Document->new( \"(<$from => 1);" );
+	my $doc   = PPI::Document->new( \"( $from => 1 );" );
 	isa_ok( $doc, 'PPI::Document' );
 	my $word = $doc->find_first('Token::DashedWord');
-	local $TODO = 'PPI::Token::DashedWord is currently deactivated';
-	isa_ok( $word, 'PPI::Token::DashedWord' );
-	is( $word && $word->literal, $to, "The source $from becomes $to ok" );
+	SKIP: {
+		skip( "PPI::Token::DashedWord is deactivated", 2 );
+		isa_ok( $word, 'PPI::Token::DashedWord' );
+		is( $word && $word->literal, $to, "The source $from becomes $to ok" );
+	}
 }
 }
 

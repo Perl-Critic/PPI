@@ -141,8 +141,8 @@ sub new {
 		token_cursor => 0,
 		token_eof    => 0,
 
-		# Perl 5 blocks
-		'v6'         => [],
+		# Perl 6 blocks
+		perl6        => [],
 	}, $class;
 
 	if ( ! defined $_[1] ) {

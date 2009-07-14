@@ -13,9 +13,21 @@ BEGIN {
 use PPI;
 
 # Execute the tests
-use Test::More tests => 3;
+use Test::More tests => 7;
 
-# =begin testing _lex_structure 3
+# =begin testing _lex_document 3
+{
+# Validate the creation of a null statement
+SCOPE: {
+	my $token = new_ok( 'PPI::Token::Structure' => [ ')'    ] );
+	my $brace = new_ok( 'PPI::Statement::UnmatchedBrace' => [ $token ] );
+	is( $brace->content, ')', '->content ok' );
+}
+}
+
+
+
+# =begin testing _lex_structure 4
 {
 # Validate the creation of a null statement
 SCOPE: {
@@ -23,6 +35,9 @@ SCOPE: {
 	my $null  = new_ok( 'PPI::Statement::Null'  => [ $token ] );
 	is( $null->content, ';', '->content ok' );
 }
+
+# Validate the creation of an empty statement
+new_ok( 'PPI::Statement' => [ ] );
 }
 
 
