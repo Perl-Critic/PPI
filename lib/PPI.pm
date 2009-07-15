@@ -790,7 +790,7 @@ deep-dived into the guts to (gasp) add a feature.
   - Arjen Laarhoven : Three-element ->location support
   - Elliot Shank    : Perl 5.10 support, five-element ->location
 
-And finally, thanks to those brave ( and foolish :) ) soles willing to dive
+And finally, thanks to those brave ( and foolish :) ) souls willing to dive
 in and use, test drive and provide feedback on PPI before version 1.000,
 in some cases before it made it to beta quality, and still did extremely
 distasteful things (like eating 50 meg of RAM a second).
