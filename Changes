@@ -1,6 +1,15 @@
 Revision history for Perl extension PPI
 
-1.204_03 Wed 15 Jul 2009
+1.204_04 Thu 16 Jul 2009
+	Summary:
+	- Dependency tweaks
+
+	Details:
+	- Because we bundle Test::ClassAPI, we need to explicitly match its
+	  dependencies. Bumped Params::Util to 1.00.
+	- Bumped a couple of deps a couple of revisions to get better XS.
+
+1.204_03 Tue 14 Jul 2009
 	Summary:
 	- More bug fixing, clean up, and optimisation
 	- Cleaning up contributed APIs

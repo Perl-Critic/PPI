@@ -1,11 +1,11 @@
-use inc::Module::Install 0.87;
+use inc::Module::Install 0.91;
 
 all_from      'lib/PPI.pm';
 requires      'File::Spec'       => win32() ? '3.2701' : '0.84';
 requires      'Clone'            => '0.30';
-requires      'List::Util'       => '1.19';
+requires      'List::Util'       => '1.20';
 requires      'List::MoreUtils'  => '0.16';
-requires      'Params::Util'     => '0.36';
+requires      'Params::Util'     => '1.00';
 requires      'IO::String'       => '1.07';
 
 # Modules needed for PPI::Cache
