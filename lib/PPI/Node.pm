@@ -57,7 +57,7 @@ use PPI::Element    ();
 
 use vars qw{$VERSION @ISA *_PARENT};
 BEGIN {
-	$VERSION = '1.204_03';
+	$VERSION = '1.204_04';
 	@ISA     = 'PPI::Element';
 	*_PARENT = *PPI::Element::_PARENT;
 }

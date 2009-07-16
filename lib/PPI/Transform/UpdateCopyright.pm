@@ -33,7 +33,7 @@ use PPI::Transform ();
 
 use vars qw{$VERSION};
 BEGIN {
-	$VERSION = '1.204_03';
+	$VERSION = '1.204_04';
 }
 
 
