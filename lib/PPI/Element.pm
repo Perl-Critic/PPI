@@ -804,9 +804,7 @@ is( $words->[0]->line_number, 3, 'Got correct line number.' );
 sub line_number {
 	my $self = shift;
 
-	$self->_ensure_location_present or return undef;
-
-	return $self->{_location}[0];
+	return $self->location()->[0];
 }
 
 =pod
@@ -841,9 +839,7 @@ is( $words->[0]->column_number, 4, 'Got correct column number.' );
 sub column_number {
 	my $self = shift;
 
-	$self->_ensure_location_present or return undef;
-
-	return $self->{_location}[1];
+	return $self->location()->[1];
 }
 
 =pod
@@ -885,9 +881,7 @@ is(
 sub visual_column_number {
 	my $self = shift;
 
-	$self->_ensure_location_present or return undef;
-
-	return $self->{_location}[2];
+	return $self->location()->[2];
 }
 
 =pod
@@ -923,9 +917,7 @@ is( $words->[0]->logical_line_number, 1, 'Got correct logical line number.' );
 sub logical_line_number {
 	my $self = shift;
 
-	$self->_ensure_location_present or return undef;
-
-	return $self->{_location}[3];
+	return $self->location()->[3];
 }
 
 =pod
@@ -965,9 +957,7 @@ is(
 sub logical_filename {
 	my $self = shift;
 
-	$self->_ensure_location_present or return undef;
-
-	return $self->{_location}[4];
+	return $self->location()->[4];
 }
 
 sub _ensure_location_present {
