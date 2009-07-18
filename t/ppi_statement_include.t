@@ -87,17 +87,17 @@ isa_ok( $document, 'PPI::Document' );
 my $statements = $document->find('PPI::Statement::Include');
 is( scalar @{$statements}, 11, 'Found expected include statements.' );
 
-is( $statements->[0]->version, v5.6.1, 'use v-string' );
-is( $statements->[1]->version, 5.6.1, 'use v-string, no leading "v"' );
-is( $statements->[2]->version, 5.006_001, 'use developer release' );
-is( $statements->[3]->version, 5.006, 'use back-compatible version, followed by...' );
-is( $statements->[4]->version, 5.6.1, '... use v-string, no leading "v"' );
+is( $statements->[0]->version, 'v5.6.1', 'use v-string' );
+is( $statements->[1]->version, '5.6.1', 'use v-string, no leading "v"' );
+is( $statements->[2]->version, '5.006_001', 'use developer release' );
+is( $statements->[3]->version, '5.006', 'use back-compatible version, followed by...' );
+is( $statements->[4]->version, '5.6.1', '... use v-string, no leading "v"' );
 
-is( $statements->[5]->version, v5.6.1, 'require v-string' );
-is( $statements->[6]->version, 5.6.1, 'require v-string, no leading "v"' );
-is( $statements->[7]->version, 5.006_001, 'require developer release' );
-is( $statements->[8]->version, 5.006, 'require back-compatible version, followed by...' );
-is( $statements->[9]->version, 5.6.1, '... require v-string, no leading "v"' );
+is( $statements->[5]->version, 'v5.6.1', 'require v-string' );
+is( $statements->[6]->version, '5.6.1', 'require v-string, no leading "v"' );
+is( $statements->[7]->version, '5.006_001', 'require developer release' );
+is( $statements->[8]->version, '5.006', 'require back-compatible version, followed by...' );
+is( $statements->[9]->version, '5.6.1', '... require v-string, no leading "v"' );
 
 is( $statements->[10]->version, '', 'use module version' );
 }
