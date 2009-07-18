@@ -1,5 +1,13 @@
 Revision history for Perl extension PPI
 
+1.20xxx to be released
+
+	Summary:
+	- Bug fixes
+
+	Details:
+	- Fixed location access methods on PPI::Element
+
 1.204_04 Thu 16 Jul 2009
 	Summary:
 	- Dependency tweaks
