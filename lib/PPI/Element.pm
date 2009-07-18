@@ -750,13 +750,18 @@ indexed the Element locations using C<PPI::Document::index_locations>, the
 C<location> method will return the location of the first character of the
 Element within the Document.
 
-Returns the location as a reference to a three-element array in the form
-C<[ $line, $rowchar, $col ]>. The values are in a human format, with the
-first character of the file located at C<[ 1, 1, 1 ]>. 
+Returns the location as a reference to a five-element array in the form C<[
+$line, $rowchar, $col, $logical_line, $logical_file_name ]>. The values are in
+a human format, with the first character of the file located at C<[ 1, 1, 1, ?,
+'something' ]>.
 
 The second and third numbers are similar, except that the second is the
 literal horizontal character, and the third is the visual column, taking
 into account tabbing (see L<PPI::Document/"tab_width [ $width ]">).
+
+The fourth number is the line number, taking into account any C<#line>
+directives.  The fifth element is the name of the file that the element was
+found in, if available, taking into account any C<#line> directives.
 
 Returns C<undef> on error, or if the L<PPI::Document> object has not been
 indexed.
