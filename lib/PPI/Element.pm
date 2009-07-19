@@ -906,10 +906,12 @@ indexed.
 
 =begin testing logical_line_number 3
 
-my $document = PPI::Document->new(\<<'END_PERL');
+# Double quoted so that we don't really have a "#line" at the beginning and
+# errors in this file itself aren't affected by this.
+my $document = PPI::Document->new(\<<"END_PERL");
 
 
-#line 1 test-file
+\#line 1 test-file
    foo
 END_PERL
 
@@ -942,10 +944,12 @@ indexed.
 
 =begin testing logical_filename 3
 
-my $document = PPI::Document->new(\<<'END_PERL');
+# Double quoted so that we don't really have a "#line" at the beginning and
+# errors in this file itself aren't affected by this.
+my $document = PPI::Document->new(\<<"END_PERL");
 
 
-#line 1 test-file
+\#line 1 test-file
    foo
 END_PERL
 
