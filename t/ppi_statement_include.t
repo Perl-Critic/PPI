@@ -13,7 +13,7 @@ BEGIN {
 use PPI;
 
 # Execute the tests
-use Test::More tests => 50;
+use Test::More tests => 63;
 
 # =begin testing type 9
 {
@@ -100,6 +100,46 @@ is( $statements->[8]->version, '5.006', 'require back-compatible version, follow
 is( $statements->[9]->version, '5.6.1', '... require v-string, no leading "v"' );
 
 is( $statements->[10]->version, '', 'use module version' );
+}
+
+
+
+# =begin testing version_literal 13
+{
+my $document = PPI::Document->new(\<<'END_PERL');
+# Examples from perlfunc in 5.10.
+use v5.6.1;
+use 5.6.1;
+use 5.006_001;
+use 5.006; use 5.6.1;
+
+# Same, but using require.
+require v5.6.1;
+require 5.6.1;
+require 5.006_001;
+require 5.006; require 5.6.1;
+
+# Module.
+use Float::Version 1.5;
+END_PERL
+
+isa_ok( $document, 'PPI::Document' );
+my $statements = $document->find('PPI::Statement::Include');
+is( scalar @{$statements}, 11, 'Found expected include statements.' );
+
+is( $statements->[0]->version_literal, v5.6.1, 'use v-string' );
+is( $statements->[1]->version_literal, 5.6.1, 'use v-string, no leading "v"' );
+is( $statements->[2]->version_literal, 5.006_001, 'use developer release' );
+is( $statements->[3]->version_literal, 5.006, 'use back-compatible version, followed by...' );
+is( $statements->[4]->version_literal, 5.6.1, '... use v-string, no leading "v"' );
+
+is( $statements->[5]->version_literal, v5.6.1, 'require v-string' );
+is( $statements->[6]->version_literal, 5.6.1, 'require v-string, no leading "v"' );
+is( $statements->[7]->version_literal, 5.006_001, 'require developer release' );
+is( $statements->[8]->version_literal, 5.006, 'require back-compatible version, followed by...' );
+is( $statements->[9]->version_literal, 5.6.1, '... require v-string, no leading "v"' );
+
+is( $statements->[10]->version_literal, '', 'use module version' );
 }
 
 

@@ -15,7 +15,7 @@ use PPI::Find;
 use PPI::Transform;
 
 # Execute the tests
-use Test::More tests => 2909;
+use Test::More tests => 2911;
 use Test::NoWarnings;
 use Test::ClassAPI;
 
@@ -289,6 +289,7 @@ module=method
 module_version=method
 pragma=method
 version=method
+version_literal=method
 
 [PPI::Statement::Include::Perl6]
 PPI::Statement::Include=isa
