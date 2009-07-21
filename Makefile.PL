@@ -19,13 +19,6 @@ test_requires 'Test::Object'     => '0.07';
 test_requires 'Test::ClassAPI'   => '1.04';
 test_requires 'Test::SubCalls'   => '1.07';
 test_requires 'File::Remove'     => '1.42';
-include       'Test::Object';
-include       'Test::ClassAPI';
-include       'Test::SubCalls';
-include       'File::Remove';
-include       'Class::Inspector';
-include       'Config::Tiny';
-include       'Hook::LexWrap';
 
 # Force the existance of the weaken function
 # (which some distributions annoyingly don't have)

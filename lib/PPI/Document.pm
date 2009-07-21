@@ -64,13 +64,13 @@ Document-specific.
 =cut
 
 use strict;
-use Carp            ();
-use List::MoreUtils ();
-use Params::Util    qw{_SCALAR0 _ARRAY0 _INSTANCE};
-use Digest::MD5     ();
-use PPI             ();
-use PPI::Util       ();
-use PPI::Node       ();
+use Carp                          ();
+use List::MoreUtils               ();
+use Params::Util                  qw{_SCALAR0 _ARRAY0 _INSTANCE};
+use Digest::MD5                   ();
+use PPI::Util                     ();
+use PPI                           ();
+use PPI::Node                     ();
 use PPI::Exception::ParserTimeout ();
 
 use overload 'bool' => \&PPI::Util::TRUE;
@@ -78,7 +78,7 @@ use overload '""'   => 'content';
 
 use vars qw{$VERSION @ISA $errstr};
 BEGIN {
-	$VERSION = '1.204_04';
+	$VERSION = '1.204_05';
 	@ISA     = 'PPI::Node';
 	$errstr  = '';
 }

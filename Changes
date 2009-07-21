@@ -1,11 +1,15 @@
 Revision history for Perl extension PPI
 
-1.20xxx to be released
-
+1.204_05 Tue 21 Jul 2009
 	Summary:
-	- Bug fixes
+	- Bug fixes in preparation for production release
 
 	Details:
+	- There is no longer any real reason to bundle the testing modules
+	  except as a potential source of more bugs.
+	- Removed quantifier ? on zero-length ^ in /^?for(?:each)?\z/
+	- Run-time load PPI::Document instal of compile-time loading it
+	- Tweak a few load orders to get PPI::Util loaded earlier.
 	- Fixed location access methods on PPI::Element
 	- New PPI::Statement::Include::version_literal() method.
 

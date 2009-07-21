@@ -56,7 +56,7 @@ use PPI::Statement  ();
 
 use vars qw{$VERSION @ISA %TYPES};
 BEGIN {
-	$VERSION = '1.204_04';
+	$VERSION = '1.204_05';
 	@ISA     = 'PPI::Statement';
 
 	# Keyword type map
@@ -201,7 +201,7 @@ sub type {
 
 	# Most simple cases
 	my $content = $Element->content;
-	if ( $content =~ /^?for(?:each)?\z/ ) {
+	if ( $content =~ /^for(?:each)?\z/ ) {
 		$Element = $self->schild(++$p) or return $content;
 		if ( $Element->isa('PPI::Token') ) {
 			return 'foreach' if $Element->content =~ /^my|our|state\z/;
