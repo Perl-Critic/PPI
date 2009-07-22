@@ -147,7 +147,7 @@ PPI::Document
   PPI::Statement::Compound
     PPI::Token::Word  	'for'
     PPI::Token::Whitespace  	' '
-    PPI::Structure::ForLoop  	( ... )
+    PPI::Structure::For  	( ... )
       PPI::Statement::Variable
         PPI::Token::Word  	'my'
         PPI::Token::Whitespace  	' '

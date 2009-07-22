@@ -44,7 +44,7 @@ inside the parser, there are eight types of structure.
 This covers all round braces used for function arguments, in C<foreach>
 loops, literal lists, and braces used for precedence-ordering purposes.
 
-=head2 L<PPI::Structure::ForLoop>
+=head2 L<PPI::Structure::For>
 
 Although B<not> used for the C<foreach> loop list, this B<is> used for
 the special case of the round-brace three-part semicolon-seperated C<for>
@@ -96,7 +96,7 @@ use PPI::Exception ();
 
 use vars qw{$VERSION @ISA *_PARENT};
 BEGIN {
-	$VERSION = '1.204_05';
+	$VERSION = '1.204_06';
 	@ISA     = 'PPI::Node';
 	*_PARENT = *PPI::Element::_PARENT;
 }
@@ -104,7 +104,7 @@ BEGIN {
 use PPI::Structure::Block       ();
 use PPI::Structure::Condition   ();
 use PPI::Structure::Constructor ();
-use PPI::Structure::ForLoop     ();
+use PPI::Structure::For         ();
 use PPI::Structure::Given       ();
 use PPI::Structure::List        ();
 use PPI::Structure::Subscript   ();

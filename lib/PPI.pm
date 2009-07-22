@@ -8,7 +8,7 @@ use strict;
 # Set the version for CPAN
 use vars qw{$VERSION $XS_COMPATIBLE @XS_EXCLUDE};
 BEGIN {
-	$VERSION       = '1.204_05';
+	$VERSION       = '1.204_06';
 	$XS_COMPATIBLE = '0.845';
 	@XS_EXCLUDE    = ();
 }
@@ -417,7 +417,7 @@ based on inheritance.
             PPI::Structure::Constructor
             PPI::Structure::Condition
             PPI::Structure::List
-            PPI::Structure::ForLoop
+            PPI::Structure::For
             PPI::Structure::Given
             PPI::Structure::When
             PPI::Structure::Unknown

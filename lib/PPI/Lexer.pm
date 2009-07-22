@@ -62,7 +62,7 @@ use PPI::Exception  ();
 
 use vars qw{$VERSION $errstr *_PARENT %ROUND %RESOLVE};
 BEGIN {
-	$VERSION = '1.204_05';
+	$VERSION = '1.204_06';
 	$errstr  = '';
 
 	# Faster than having another method call just
@@ -79,8 +79,8 @@ BEGIN {
 		'until'  => 'PPI::Structure::Condition',
 
 		# For(each)
-		'for'     => 'PPI::Structure::ForLoop',
-		'foreach' => 'PPI::Structure::ForLoop',
+		'for'     => 'PPI::Structure::For',
+		'foreach' => 'PPI::Structure::For',
 	);
 
 	# Opening brace to refining method
@@ -985,7 +985,7 @@ sub _round {
 	# If we are part of a for or foreach statement, we are a ForLoop
 	if ( $Parent->isa('PPI::Statement::Compound') ) {
 		if ( $Parent->type =~ /^for(?:each)?$/ ) {
-			return 'PPI::Structure::ForLoop';
+			return 'PPI::Structure::For';
 		}
 	} elsif ( $Parent->isa('PPI::Statement::Given') ) {
 		return 'PPI::Structure::Given';
@@ -1231,7 +1231,7 @@ sub _lex_structure {
 
 				# Confirm that ForLoop structures are actually so, and
 				# aren't really a list.
-				if ( $Structure->isa('PPI::Structure::ForLoop') ) {
+				if ( $Structure->isa('PPI::Structure::For') ) {
 					if ( 2 > scalar grep {
 						$_->isa('PPI::Statement')
 					} $Structure->children ) {

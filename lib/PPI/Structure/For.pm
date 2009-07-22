@@ -1,10 +1,10 @@
-package PPI::Structure::ForLoop;
+package PPI::Structure::For;
 
 =pod
 
 =head1 NAME
 
-PPI::Structure::ForLoop - Circular braces for a for expression
+PPI::Structure::For - Circular braces for a for expression
 
 =head1 SYNOPSIS
 
@@ -14,19 +14,19 @@ PPI::Structure::ForLoop - Circular braces for a for expression
 
 =head1 INHERITANCE
 
-  PPI::Structure::ForLoop
+  PPI::Structure::For
   isa PPI::Structure
       isa PPI::Node
           isa PPI::Element
 
 =head1 DESCRIPTION
 
-C<PPI::Structure::ForLoop> is the class used for circular braces that
+C<PPI::Structure::For> is the class used for circular braces that
 contain the three part C<for> expression.
 
 =head1 METHODS
 
-C<PPI::Structure::ForLoop> has no methods beyond those provided by the
+C<PPI::Structure::For> has no methods beyond those provided by the
 standard L<PPI::Structure>, L<PPI::Node> and L<PPI::Element> methods.
 
 Got any ideas for methods? Submit a report to rt.cpan.org!
@@ -38,7 +38,7 @@ use PPI::Structure ();
 
 use vars qw{$VERSION @ISA};
 BEGIN {
-	$VERSION = '1.204_05';
+	$VERSION = '1.204_06';
 	@ISA     = 'PPI::Structure';
 }
 

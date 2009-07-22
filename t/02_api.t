@@ -363,7 +363,7 @@ PPI::Structure=isa
 [PPI::Structure::List]
 PPI::Structure=isa
 
-[PPI::Structure::ForLoop]
+[PPI::Structure::For]
 PPI::Structure=isa
 
 [PPI::Structure::Given]
