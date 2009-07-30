@@ -94,8 +94,10 @@ Returns false if the subroutine does not define a prototype
 =cut
 
 sub prototype {
-	my $self = shift;
-	my $Prototype = List::Util::first { _INSTANCE($_, 'PPI::Token::Prototype') } $self->children;
+	my $self      = shift;
+	my $Prototype = List::Util::first {
+		_INSTANCE($_, 'PPI::Token::Prototype')
+	} $self->children;
 	defined($Prototype) ? $Prototype->prototype : '';
 }
 
