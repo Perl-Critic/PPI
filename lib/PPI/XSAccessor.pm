@@ -1,5 +1,6 @@
 package PPI::XSAccessor;
 
+# This is an experimental prototype, use at your own risk.
 # Provides optional enhancement of PPI with Class::XSAccessor (if installed)
 
 use 5.006;
@@ -22,7 +23,7 @@ BEGIN {
 
 package PPI::Document;
 
-use Class::Accessor
+use Class::XSAccessor
 	replace => 1,
 	getters => {
 		readonly => 'readonly',
@@ -33,7 +34,7 @@ use Class::Accessor
 
 package PPI::Document::File;
 
-use Class::Accessor
+use Class::XSAccessor
 	replace => 1,
 	getters => {
 		filename => 'filename',
@@ -41,7 +42,7 @@ use Class::Accessor
 
 package PPI::Document::Fragment;
 
-use Class::Accessor
+use Class::XSAccessor
 	replace => 1,
 	false   => [
 		'scope',
@@ -49,7 +50,7 @@ use Class::Accessor
 
 package PPI::Document::Normalized;
 
-use Class::Accessor
+use Class::XSAccessor
 	replace => 1,
 	getters => {
 		'_Document' => 'Document',
@@ -59,7 +60,7 @@ use Class::Accessor
 
 package PPI::Element;
 
-use Class::Accessor
+use Class::XSAccessor
 	replace => 1,
 	true    => [
 		'significant',
@@ -67,7 +68,7 @@ use Class::Accessor
 
 package PPI::Exception;
 
-use Class::Accessor
+use Class::XSAccessor
 	replace => 1,
 	getters => {
 		message => 'message',
@@ -75,7 +76,7 @@ use Class::Accessor
 
 package PPI::Node;
 
-use Class::Accessor
+use Class::XSAccessor
 	replace => 1,
 	false   => [
 		'scope',
@@ -83,7 +84,7 @@ use Class::Accessor
 
 package PPI::Normal;
 
-use Class::Accessor
+use Class::XSAccessor
 	replace => 1,
 	getters => {
 		'layer' => 'layer',
@@ -91,7 +92,7 @@ use Class::Accessor
 
 package PPI::Statement;
 
-use Class::Accessor
+use Class::XSAccessor
 	replace => 1,
 	true    => [
 		'__LEXER__normal',
@@ -99,7 +100,7 @@ use Class::Accessor
 
 package PPI::Statement::Compound;
 
-use Class::Accessor
+use Class::XSAccessor
 	replace => 1,
 	true    => [
 		'scope',
@@ -110,7 +111,7 @@ use Class::Accessor
 
 package PPI::Statement::Data;
 
-use Class::Accessor
+use Class::XSAccessor
 	replace => 1,
 	false   => [
 		'_complete',
@@ -118,7 +119,7 @@ use Class::Accessor
 
 package PPI::Statement::End;
 
-use Class::Accessor
+use Class::XSAccessor
 	replace => 1,
 	true    => [
 		'_complete',
@@ -126,7 +127,7 @@ use Class::Accessor
 
 package PPI::Statement::Given;
 
-use Class::Accessor
+use Class::XSAccessor
 	replace => 1,
 	true    => [
 		'scope',
