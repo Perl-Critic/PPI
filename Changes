@@ -1,5 +1,14 @@
 Revision history for Perl extension PPI
 
+1.204_07 Fri 31 Jul 2009
+	Summary:
+	- Minor tweaks
+
+	Details:
+	- Allow ::For and ::List to return true to ->isa(::ForLoop)
+	  and do a once-per-process warning when we do.
+	- Fixed a bug in Class::XSAccessor prototype.
+
 1.204_06 Wed 22 Jul 2009
 	Summary:
 	- API Change

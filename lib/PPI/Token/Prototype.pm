@@ -35,7 +35,7 @@ the language and create things that act like keywords and core functions.
   # Create the "any" core-looking function
   sub any (&@) { ... }
   
-  if ( any { $_->sexy } @chicks ) {
+  if ( any { $_->cute } @babies ) {
   	...
   }
 
@@ -51,7 +51,7 @@ use PPI::Token ();
 
 use vars qw{$VERSION @ISA};
 BEGIN {
-	$VERSION = '1.204_06';
+	$VERSION = '1.204_07';
 	@ISA     = 'PPI::Token';
 }
 
