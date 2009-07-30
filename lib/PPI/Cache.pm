@@ -13,9 +13,9 @@ PPI::Cache - The PPI Document Caching Layer
   
   # Manually create a cache
   my $Cache = PPI::Cache->new(
-  	path     => '/var/cache/perl/class-PPI',
-  	readonly => 1,
-  	);
+      path     => '/var/cache/perl/class-PPI',
+      readonly => 1,
+  );
 
 =head1 DESCRIPTION
 
@@ -130,7 +130,7 @@ sub new {
 	my $self = bless {
 		path     => $path,
 		readonly => !! $params{readonly},
-		}, $class;
+	}, $class;
 
 	$self;
 }
@@ -174,7 +174,7 @@ cache and retrieves it if so.
 =cut
 
 sub get_document {
-	my $self   = ref $_[0]
+	my $self = ref $_[0]
 		? shift
 		: Carp::croak('PPI::Cache::get_document called as static method');
 	my $md5hex = $self->_md5hex(shift) or return undef;
