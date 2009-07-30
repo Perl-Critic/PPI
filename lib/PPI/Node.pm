@@ -149,7 +149,11 @@ returns a count of the number of elements.
 =cut
 
 sub elements {
-	wantarray ? @{$_[0]->{children}} : scalar @{$_[0]->{children}};
+	if ( wantarray ) {
+		return @{$_[0]->{children}};
+	} else {
+		return scalar @{$_[0]->{children}};
+	}
 }
 
 =pod
@@ -222,9 +226,12 @@ returns the number of significant children.
 =cut
 
 sub schildren {
-	my $self      = shift;
-	my @schildren = grep { $_->significant } $self->children;
-	wantarray ? @schildren : scalar(@schildren);
+	return grep { $_->significant } @{$_[0]->{children}} if wantarray;
+	my $count = 0;
+	foreach ( @{$_[0]->{children}} ) {
+		$count++ if $_->significant;
+	}
+	return $count;
 }
 
 =pod
