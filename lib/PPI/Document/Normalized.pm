@@ -47,7 +47,7 @@ use PPI::Util    ();
 
 use vars qw{$VERSION};
 BEGIN {
-	$VERSION = '1.204_07';
+	$VERSION = '1.205';
 }
 
 use overload 'bool' => \&PPI::Util::TRUE;
