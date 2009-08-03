@@ -1,5 +1,12 @@
 Revision history for Perl extension PPI
 
+1.205 Mon  3 Aug 2009
+	Summary:
+	- This is a production release
+
+	Details:
+	- No changes from 1.204_07
+
 1.204_07 Fri 31 Jul 2009
 	Summary:
 	- Minor tweaks
