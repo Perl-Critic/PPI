@@ -699,13 +699,13 @@ sub _continues {
 	}
 
 	# Alrighty then, there are only five implied end statement types,
-	# ::Scheduled blocks, ::Sub declarations, ::Compound, ::Switch, and ::When
+	# ::Scheduled blocks, ::Sub declarations, ::Compound, ::Given, and ::When
 	# statements.
-	unless ( ref($Statement) =~ /\b(?:Scheduled|Sub|Compound|Switch|When)$/ ) {
+	unless ( ref($Statement) =~ /\b(?:Scheduled|Sub|Compound|Given|When)$/ ) {
 		return 1;
 	}
 
-	# Of these five, ::Scheduled, ::Sub, ::Switch, and ::When follow the same
+	# Of these five, ::Scheduled, ::Sub, ::Given, and ::When follow the same
 	# simple rule and can be handled first.
 	my @part      = $Statement->schildren;
 	my $LastChild = $part[-1];
