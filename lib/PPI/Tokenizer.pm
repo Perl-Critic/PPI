@@ -286,7 +286,7 @@ sub get_token {
 	};
 	if ( $@ ) {
 		if ( _INSTANCE($@, 'PPI::Exception') ) {
-			PPI::Exception->throw;
+			$@->throw;
 		} else {
 			my $errstr = $@;
 			$errstr =~ s/^(.*) at line .+$/$1/;
@@ -623,7 +623,7 @@ sub _new_token {
 	defined($self->{token} = $class->new($_[0])) or PPI::Exception->throw;
 	$self->{class} = $class;
 
-	# 1; # $class will always be true
+	1;
 }
 
 # At the end of the file, we need to clean up the results of the erroneous

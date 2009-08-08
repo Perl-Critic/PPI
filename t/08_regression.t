@@ -12,7 +12,7 @@ BEGIN {
 }
 
 # For each new item in t/data/08_regression add another 15 tests
-use Test::More tests => 751;
+use Test::More tests => 752;
 use Test::NoWarnings;
 use File::Spec::Functions ':ALL';
 use Params::Util qw{_INSTANCE};
@@ -278,4 +278,14 @@ SCOPE: {
 	my $stmt = $doc->child(0);
 	isa_ok( $stmt, 'PPI::Statement::Include' );
 	is( $stmt->pragma, 'utf8', 'pragma() with numbers' );
+}
+
+#####################################################################
+# Proof that _new_token must return "1"
+
+SCOPE: {
+	my $doc = PPI::Document->new(\<<'END_PERL');
+$$content =~ s/(?:\015{1,2}\012|\015|\012)/\n/gs;
+END_PERL
+	isa_ok( $doc, 'PPI::Document' );
 }

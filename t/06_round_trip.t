@@ -47,7 +47,7 @@ foreach my $dir (
 push @files, find_files( 't' );
 
 # Declare our plan
-Test::More::plan( tests => 1 + scalar(@files) * 8 );
+Test::More::plan( tests => 1 + scalar(@files) * 9 );
 
 
 
@@ -81,12 +81,14 @@ sub roundtrip_ok {
 
 		# Load the file as a Document
 		SKIP: {
-			skip( 'Ignoring 14_charset.t', 6 ) if $file =~ /14_charset/;
+			skip( 'Ignoring 14_charset.t', 7 ) if $file =~ /14_charset/;
 
 			my $Document = PPI::Document->new( $file );
+			ok( $Document, "$file: ->new returned true" );
 			isa_ok( $Document, 'PPI::Document' );
 
 			# Serialize it back out, and compare with the raw version
+			skip( "Ignoring failed parse of $file", 5 ) unless defined $Document;
 			my $content = $Document->serialize;
 			ok( length($content), "$file: PPI::Document serializes" );
 			is( $content, $source, "$file: Round trip was successful" );
