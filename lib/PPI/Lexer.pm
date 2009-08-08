@@ -62,7 +62,7 @@ use PPI::Exception  ();
 
 use vars qw{$VERSION $errstr *_PARENT %ROUND %RESOLVE};
 BEGIN {
-	$VERSION = '1.205';
+	$VERSION = '1.206';
 	$errstr  = '';
 
 	# Faster than having another method call just
@@ -259,7 +259,7 @@ sub _lex_document {
 
 	# Start the processing loop
 	my $Token;
-	while ( $Token = $self->_get_token ) {
+	while ( ref($Token = $self->_get_token) ) {
 		# Add insignificant tokens directly beneath us
 		unless ( $Token->significant ) {
 			$self->_add_element( $Document, $Token );
@@ -591,7 +591,7 @@ sub _lex_statement {
 
 	# Begin processing tokens
 	my $Token;
-	while ( $Token = $self->_get_token ) {
+	while ( ref( $Token = $self->_get_token ) ) {
 		# Delay whitespace and comment tokens
 		unless ( $Token->significant ) {
 			push @{$self->{delayed}}, $Token;
@@ -1184,7 +1184,7 @@ sub _lex_structure {
 
 	# Start the processing loop
 	my $Token;
-	while ( $Token = $self->_get_token ) {
+	while ( ref($Token = $self->_get_token) ) {
 		# Is this a direct type token
 		unless ( $Token->significant ) {
 			push @{$self->{delayed}}, $Token;

@@ -9,7 +9,7 @@ use Params::Util qw{_INSTANCE _SCALAR0 _ARRAY0};
 
 use vars qw{$VERSION @ISA @EXPORT_OK};
 BEGIN {
-	$VERSION   = '1.205';
+	$VERSION   = '1.206';
 	@ISA       = 'Exporter';
 	@EXPORT_OK = qw{_Document _slurp};
 }
@@ -39,9 +39,9 @@ sub _Document {
 	shift if @_ > 1;
 	return undef unless defined $_[0];
 	require PPI::Document;
-	return PPI::Document->new( shift ) unless ref $_[0];
-	return PPI::Document->new( shift ) if _SCALAR0($_[0]);
-	return PPI::Document->new( shift ) if _ARRAY0($_[0]);
+	return PPI::Document->new(shift) unless ref $_[0];
+	return PPI::Document->new(shift) if _SCALAR0($_[0]);
+	return PPI::Document->new(shift) if _ARRAY0($_[0]);
 	return shift if _INSTANCE($_[0], 'PPI::Document');
 	return undef;
 }

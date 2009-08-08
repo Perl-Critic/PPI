@@ -89,7 +89,7 @@ use PPI::Exception::ParserRejection ();
 
 use vars qw{$VERSION};
 BEGIN {
-	$VERSION = '1.205';
+	$VERSION = '1.206';
 }
 
 
@@ -276,7 +276,8 @@ sub get_token {
 		# No token, we need to get some more
 		while ( $line_rv = $self->_process_next_line ) {
 			# If there is something in the buffer, return it
-			if ( my $token = $self->{tokens}->[ $self->{token_cursor} ] ) {
+			# The defined() prevents a ton of calls to PPI::Util::TRUE
+			if ( defined( my $token = $self->{tokens}->[ $self->{token_cursor} ] ) ) {
 				$self->{token_cursor}++;
 				return $token;
 			}
@@ -565,7 +566,7 @@ sub _process_next_char {
 		if ( defined $self->{token} ) {
 			$self->{token}->{content} .= $char;
 		} else {
-			$self->{token} = $self->{class}->new( $char ) or return undef;
+			defined($self->{token} = $self->{class}->new($char)) or return undef;
 		}
 
 		return 1;
@@ -580,7 +581,7 @@ sub _process_next_char {
 		$self->{token}->{content} .= $char;
 	} else {
 		# Same class, but no current
-		$self->{token} = $self->{class}->new( $char ) or return undef;
+		defined($self->{token} = $self->{class}->new($char)) or return undef;
 	}
 
 	1;
@@ -597,7 +598,7 @@ sub _process_next_char {
 # Returns the resulting parse class as a convenience.
 sub _finalize_token {
 	my $self = shift;
-	return $self->{class} unless $self->{token};
+	return $self->{class} unless defined $self->{token};
 
 	# Add the token to the token buffer
 	push @{ $self->{tokens} }, $self->{token};
@@ -608,6 +609,7 @@ sub _finalize_token {
 }
 
 # Creates a new token and sets it in the tokenizer
+# The defined() in here prevent a ton of calls to PPI::Util::TRUE
 sub _new_token {
 	my $self = shift;
 	# throw PPI::Exception() unless @_;
@@ -615,13 +617,13 @@ sub _new_token {
 		? shift : 'PPI::Token::' . shift;
 
 	# Finalize any existing token
-	$self->_finalize_token if $self->{token};
+	$self->_finalize_token if defined $self->{token};
 
 	# Create the new token and update the parse class
-	$self->{token} = $class->new($_[0]) or PPI::Exception->throw;
+	defined($self->{token} = $class->new($_[0])) or PPI::Exception->throw;
 	$self->{class} = $class;
 
-	1;
+	# 1; # $class will always be true
 }
 
 # At the end of the file, we need to clean up the results of the erroneous

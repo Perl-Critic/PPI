@@ -1,5 +1,15 @@
 Revision history for Perl extension PPI
 
+1.206 Sun  9 Aug 2009
+	Summary:
+	- This is an optimisation release (1-2% speed up)
+	  (Using information uncovered by a Devel::NYTProf 3 alpha)
+
+	Details:
+	- Removing som superfluous 1; returns
+	- Using defined and ref to avoid highly excessive calls
+	  to PPI::Util::TRUE
+
 1.205 Mon  3 Aug 2009
 	Summary:
 	- This is a production release

@@ -57,7 +57,7 @@ use PPI::Element    ();
 
 use vars qw{$VERSION @ISA *_PARENT};
 BEGIN {
-	$VERSION = '1.205';
+	$VERSION = '1.206';
 	@ISA     = 'PPI::Element';
 	*_PARENT = *PPI::Element::_PARENT;
 }
@@ -430,8 +430,9 @@ sub find_first {
 
 	# Use the same queue-based search as for ->find
 	my @queue = $self->children;
-	my $rv = eval {
-		while ( my $Element = shift @queue ) {
+	my $rv    = eval {
+		# The defined() here prevents a ton of calls to PPI::Util::TRUE
+		while ( defined( my $Element = shift @queue ) ) {
 			my $rv = &$wanted( $self, $Element );
 			return $Element if $rv;
 
@@ -444,9 +445,9 @@ sub find_first {
 			# Depth-first keeps the queue size down and provides a
 			# better logical order.
 			if ( $Element->isa('PPI::Structure') ) {
-				unshift @queue, $Element->finish if $Element->finish;
+				unshift @queue, $Element->finish if defined($Element->finish);
 				unshift @queue, $Element->children;
-				unshift @queue, $Element->start  if $Element->start;
+				unshift @queue, $Element->start  if defined($Element->start);
 			} else {
 				unshift @queue, $Element->children;
 			}
