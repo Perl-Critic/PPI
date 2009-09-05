@@ -1093,9 +1093,12 @@ sub _curly {
 		return 'PPI::Structure::Block';
 	}
 
-	# Are we the second argument of use
+	# Are we the second or third argument of use
 	if ( $Parent->isa('PPI::Statement::Include') ) {
-		if ( $Parent->schildren == 2 ) {
+		if ( $Parent->schildren == 2 ||
+		    $Parent->schildren == 3 &&
+			$Parent->schild(2)->isa('PPI::Token::Number')
+		) {
 			# This is something like use constant { ... };
 			return 'PPI::Structure::Constructor';
 		}
