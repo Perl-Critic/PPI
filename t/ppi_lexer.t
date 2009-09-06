@@ -13,7 +13,7 @@ BEGIN {
 use PPI;
 
 # Execute the tests
-use Test::More tests => 7;
+use Test::More tests => 11;
 
 # =begin testing _lex_document 3
 {
@@ -23,6 +23,22 @@ SCOPE: {
 	my $brace = new_ok( 'PPI::Statement::UnmatchedBrace' => [ $token ] );
 	is( $brace->content, ')', '->content ok' );
 }
+}
+
+
+
+# =begin testing _curly 4
+{
+my $document = PPI::Document->new(\<<'END_PERL');
+use constant { One => 1 };
+use constant 1 { One => 1 };
+END_PERL
+ 
+isa_ok( $document, 'PPI::Document' );
+my $statements = $document->find('PPI::Statement::Include');
+is( scalar(@$statements), 2, 'Found 2 include statements' );
+isa_ok( $statements->[0]->schild( 2 ), 'PPI::Structure::Constructor' );
+isa_ok( $statements->[1]->schild( 3 ), 'PPI::Structure::Constructor' );
 }
 
 
