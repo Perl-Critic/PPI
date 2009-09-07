@@ -31,10 +31,11 @@ use strict;
 use PPI::Token     ();
 use PPI::Exception ();
 
-use vars qw{$VERSION @ISA};
+use vars qw{$VERSION @ISA $CURLY_SYMBOL};
 BEGIN {
 	$VERSION = '1.206';
 	@ISA     = 'PPI::Token';
+	$CURLY_SYMBOL = qr{^\^[[:upper:]_]\w+\}};
 }
 
 
@@ -62,9 +63,17 @@ sub __TOKENIZER__on_char {
 		}
 
 		if ( $char eq '{' ) {
-			# Obvious GLOB cast
-			$t->{class} = $t->{token}->set_class( 'Cast' );
-			return $t->_finalize_token->__TOKENIZER__on_char( $t );
+			# Get rest of line
+			my $rest = substr( $t->{line}, $t->{line_cursor} + 1 );
+			if ( $rest =~ m/$CURLY_SYMBOL/ ) {
+				# control-character symbol (e.g. *{^_Foo})
+				$t->{class} = $t->{token}->set_class( 'Magic' );
+				return 1;
+			} else {
+				# Obvious GLOB cast
+				$t->{class} = $t->{token}->set_class( 'Cast' );
+				return $t->_finalize_token->__TOKENIZER__on_char( $t );
+			}
 		}
 
 		if ( $char eq '$' ) {
@@ -126,6 +135,16 @@ sub __TOKENIZER__on_char {
 			return 1;
 		}
 
+		if ( $char eq '{' ) {
+			# Get rest of line
+			my $rest = substr( $t->{line}, $t->{line_cursor} + 1 );
+			if ( $rest =~ m/$CURLY_SYMBOL/ ) {
+				# control-character symbol (e.g. ${^MATCH})
+				$t->{class} = $t->{token}->set_class( 'Magic' );
+				return 1;
+			}
+		}
+
 		# Must be a cast
 		$t->{class} = $t->{token}->set_class( 'Cast' );
 		return $t->_finalize_token->__TOKENIZER__on_char( $t );
@@ -143,6 +162,16 @@ sub __TOKENIZER__on_char {
 			# Magic variable
 			$t->{class} = $t->{token}->set_class( 'Magic' );
 			return 1;
+		}
+
+		if ( $char eq '{' ) {
+			# Get rest of line
+			my $rest = substr( $t->{line}, $t->{line_cursor} + 1 );
+			if ( $rest =~ m/$CURLY_SYMBOL/ ) {
+				# control-character symbol (e.g. @{^_Foo})
+				$t->{class} = $t->{token}->set_class( 'Magic' );
+				return 1;
+			}
 		}
 
 		# Must be a cast
@@ -169,6 +198,16 @@ sub __TOKENIZER__on_char {
 		if ( $char =~ /[\w:]/ ) {
 			$t->{class} = $t->{token}->set_class( 'Symbol' );
 			return 1;
+		}
+
+		if ( $char eq '{' ) {
+			# Get rest of line
+			my $rest = substr( $t->{line}, $t->{line_cursor} + 1 );
+			if ( $rest =~ m/$CURLY_SYMBOL/ ) {
+				# control-character symbol (e.g. @{^_Foo})
+				$t->{class} = $t->{token}->set_class( 'Magic' );
+				return 1;
+			}
 		}
 
 		if ( $char =~ /[\$@%*{]/ ) {
