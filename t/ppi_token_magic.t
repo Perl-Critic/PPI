@@ -13,13 +13,14 @@ BEGIN {
 use PPI;
 
 # Execute the tests
-use Test::More tests => 26;
+use Test::More tests => 27;
 
-# =begin testing __TOKENIZER_on_char 26
+# =begin testing __TOKENIZER_on_char 27
 {
 my $document = PPI::Document->new(\<<'END_PERL');
 $[;			# Magic  $[
 $$;			# Magic  $$
+%-;			# Magic  %-
 $$foo;			# Symbol $foo		Dereference of $foo
 $^W;			# Magic  $^W
 $^WIDE_SYSTEM_CALLS;	# Magic  $^WIDE_SYSTEM_CALLS
@@ -33,10 +34,14 @@ $${^MATCH};		# Magic  ${^MATCH}	Dereference of ${^MATCH}
 END_PERL
 
 isa_ok( $document, 'PPI::Document' );
+
 $document->index_locations();
+
 my $symbols = $document->find( 'PPI::Token::Symbol' );
-is( scalar(@$symbols), 12, 'Found 12 symbols' );
+
+is( scalar(@$symbols), 13, 'Found 13 symbols' );
 my $comments = $document->find( 'PPI::Token::Comment' );
+
 foreach my $token ( @$symbols ) {
 	my ($hash, $class, $name, $remk) =
 		split '\s+', $comments->[$token->line_number - 1], 4;
