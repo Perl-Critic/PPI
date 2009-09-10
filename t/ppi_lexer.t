@@ -13,7 +13,7 @@ BEGIN {
 use PPI;
 
 # Execute the tests
-use Test::More tests => 11;
+use Test::More tests => 28;
 
 # =begin testing _lex_document 3
 {
@@ -27,18 +27,78 @@ SCOPE: {
 
 
 
-# =begin testing _curly 4
+# =begin testing _curly 21
 {
 my $document = PPI::Document->new(\<<'END_PERL');
 use constant { One => 1 };
 use constant 1 { One => 1 };
+$foo->{bar};
+$foo[1]{bar};
+$foo{bar};
+sub {1};
+grep { $_ } 0 .. 2;
+map { $_ => 1 } 0 .. 2;
+sort { $b <=> $a } 0 .. 2;
+do {foo};
+$foo = { One => 1 };
+$foo ||= { One => 1 };
+1, { One => 1 };
+One => { Two => 2 };
+{foo, bar};
+{foo => bar};
+{};
++{foo, bar};
+{; => bar};
 END_PERL
  
 isa_ok( $document, 'PPI::Document' );
-my $statements = $document->find('PPI::Statement::Include');
-is( scalar(@$statements), 2, 'Found 2 include statements' );
-isa_ok( $statements->[0]->schild( 2 ), 'PPI::Structure::Constructor' );
-isa_ok( $statements->[1]->schild( 3 ), 'PPI::Structure::Constructor' );
+$document->index_locations();
+
+my @statements;
+foreach my $elem ( @{ $document->find( 'PPI::Statement' ) || [] } ) {
+	$statements[ $elem->line_number() - 1 ] ||= $elem;
+}
+
+is( scalar(@statements), 19, 'Found 19 statements' );
+
+isa_ok( $statements[0]->schild(2), 'PPI::Structure::Constructor',
+	'The curly in ' . $statements[0]);
+isa_ok( $statements[1]->schild(3), 'PPI::Structure::Constructor',
+	'The curly in ' . $statements[1]);
+isa_ok( $statements[2]->schild(2), 'PPI::Structure::Subscript',
+	'The curly in ' . $statements[2]);
+isa_ok( $statements[3]->schild(2), 'PPI::Structure::Subscript',
+	'The curly in ' . $statements[3]);
+isa_ok( $statements[4]->schild(1), 'PPI::Structure::Subscript',
+	'The curly in ' . $statements[4]);
+isa_ok( $statements[5]->schild(1), 'PPI::Structure::Block',
+	'The curly in ' . $statements[5]);
+isa_ok( $statements[6]->schild(1), 'PPI::Structure::Block',
+	'The curly in ' . $statements[6]);
+isa_ok( $statements[7]->schild(1), 'PPI::Structure::Block',
+	'The curly in ' . $statements[7]);
+isa_ok( $statements[8]->schild(1), 'PPI::Structure::Block',
+	'The curly in ' . $statements[8]);
+isa_ok( $statements[9]->schild(1), 'PPI::Structure::Block',
+	'The curly in ' . $statements[9]);
+isa_ok( $statements[10]->schild(2), 'PPI::Structure::Constructor',
+	'The curly in ' . $statements[10]);
+isa_ok( $statements[11]->schild(3), 'PPI::Structure::Constructor',
+	'The curly in ' . $statements[11]);
+isa_ok( $statements[12]->schild(2), 'PPI::Structure::Constructor',
+	'The curly in ' . $statements[12]);
+isa_ok( $statements[13]->schild(2), 'PPI::Structure::Constructor',
+	'The curly in ' . $statements[13]);
+isa_ok( $statements[14]->schild(0), 'PPI::Structure::Block',
+	'The curly in ' . $statements[14]);
+isa_ok( $statements[15]->schild(0), 'PPI::Structure::Constructor',
+	'The curly in ' . $statements[15]);
+isa_ok( $statements[16]->schild(0), 'PPI::Structure::Constructor',
+	'The curly in ' . $statements[16]);
+isa_ok( $statements[17]->schild(1), 'PPI::Structure::Constructor',
+	'The curly in ' . $statements[17]);
+isa_ok( $statements[18]->schild(0), 'PPI::Structure::Block',
+	'The curly in ' . $statements[18]);
 }
 
 
