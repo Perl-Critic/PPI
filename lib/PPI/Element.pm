@@ -311,6 +311,8 @@ sub top {
 
 =pod
 
+=head2 document
+
 For an Element that is contained within a L<PPI::Document> object,
 the C<document> method will return the top-level Document for the Element.
 
