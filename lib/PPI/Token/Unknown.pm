@@ -158,7 +158,7 @@ sub __TOKENIZER__on_char {
 			return 1;
 		}
 
-		if ( $char =~ /[\-\+\*]/ ) {
+		if ( $PPI::Token::Magic::magic{ $c . $char } ) {
 			# Magic variable
 			$t->{class} = $t->{token}->set_class( 'Magic' );
 			return 1;
@@ -189,7 +189,7 @@ sub __TOKENIZER__on_char {
 		}
 
 		# Is it a magic variable?
-		if ( $char =~ /[!^]/ ) {
+		if ( $char eq '^' || $PPI::Token::Magic::magic{ $c . $char } ) {
 			$t->{class} = $t->{token}->set_class( 'Magic' );
 			return 1;
 		}

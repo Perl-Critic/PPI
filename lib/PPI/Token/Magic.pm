@@ -71,12 +71,13 @@ BEGIN {
 
 =pod
 
-=begin testing __TOKENIZER_on_char 27
+=begin testing __TOKENIZER_on_char 30
 
 my $document = PPI::Document->new(\<<'END_PERL');
 $[;			# Magic  $[
 $$;			# Magic  $$
 %-;			# Magic  %-
+$#-;			# Magic  $#-
 $$foo;			# Symbol $foo		Dereference of $foo
 $^W;			# Magic  $^W
 $^WIDE_SYSTEM_CALLS;	# Magic  $^WIDE_SYSTEM_CALLS
@@ -95,7 +96,7 @@ $document->index_locations();
 
 my $symbols = $document->find( 'PPI::Token::Symbol' );
 
-is( scalar(@$symbols), 13, 'Found 13 symbols' );
+is( scalar(@$symbols), 14, 'Found 14 symbols' );
 my $comments = $document->find( 'PPI::Token::Comment' );
 
 foreach my $token ( @$symbols ) {
@@ -210,11 +211,17 @@ sub __TOKENIZER__on_char {
 		}
 	}
 
-	my $line = substr( $t->{line}, $t->{line_cursor} );
-	if ( $line =~ /($PPI::Token::Unknown::CURLY_SYMBOL)/ ) {
-		# control character symbol (e.g. ${^MATCH})
-		$t->{token}->{content} .= $1;
-		$t->{line_cursor}      += length $1;
+	if ( $magic{$c} ) {
+		# $#+ and $#-
+		$t->{line_cursor} += length( $c ) - length( $t->{token}->{content} );
+		$t->{token}->{content} = $c;
+	} else {
+		my $line = substr( $t->{line}, $t->{line_cursor} );
+		if ( $line =~ /($PPI::Token::Unknown::CURLY_SYMBOL)/ ) {
+			# control character symbol (e.g. ${^MATCH})
+			$t->{token}->{content} .= $1;
+			$t->{line_cursor}      += length $1;
+		}
 	}
 
 	# End the current magic token, and recheck
