@@ -1069,7 +1069,7 @@ BEGIN {
 
 =pod
 
-=begin testing _curly 21
+=begin testing _curly 24
 
 my $document = PPI::Document->new(\<<'END_PERL');
 use constant { One => 1 };
@@ -1091,6 +1091,9 @@ One => { Two => 2 };
 {};
 +{foo, bar};
 {; => bar};
+@foo{'bar', 'baz'};
+@{$foo}{'bar', 'baz'};
+${$foo}{bar};
 END_PERL
  
 isa_ok( $document, 'PPI::Document' );
@@ -1101,7 +1104,7 @@ foreach my $elem ( @{ $document->find( 'PPI::Statement' ) || [] } ) {
 	$statements[ $elem->line_number() - 1 ] ||= $elem;
 }
 
-is( scalar(@statements), 19, 'Found 19 statements' );
+is( scalar(@statements), 22, 'Found 22 statements' );
 
 isa_ok( $statements[0]->schild(2), 'PPI::Structure::Constructor',
 	'The curly in ' . $statements[0]);
@@ -1141,6 +1144,12 @@ isa_ok( $statements[17]->schild(1), 'PPI::Structure::Constructor',
 	'The curly in ' . $statements[17]);
 isa_ok( $statements[18]->schild(0), 'PPI::Structure::Block',
 	'The curly in ' . $statements[18]);
+isa_ok( $statements[19]->schild(1), 'PPI::Structure::Subscript',
+	'The curly in ' . $statements[19]);
+isa_ok( $statements[20]->schild(2), 'PPI::Structure::Subscript',
+	'The curly in ' . $statements[20]);
+isa_ok( $statements[21]->schild(2), 'PPI::Structure::Subscript',
+	'The curly in ' . $statements[21]);
 
 =end testing
 
@@ -1171,6 +1180,18 @@ sub _curly {
 		if ( $content =~ /^(?:\$|\@)/ and $Element->isa('PPI::Token::Symbol') ) {
 			# $foo{}, @foo{}
 			return 'PPI::Structure::Subscript';
+		}
+		if ( $Element->isa('PPI::Structure::Block') ) {
+			# deference - ${$hash_ref}{foo}
+			#     or even ${burfle}{foo}
+			# hash slice - @{$hash_ref}{'foo', 'bar'}
+			if ( my $prior = $Parent->schild(-2) ) {
+				my $prior_content = $prior->content();
+				$prior->isa( 'PPI::Token::Cast' )
+					and ( $prior_content eq '@' ||
+						$prior_content eq '$' )
+					and return 'PPI::Structure::Subscript';
+			}
 		}
 		if ( $CURLY_CLASSES{$content} ) {
 			# Known type

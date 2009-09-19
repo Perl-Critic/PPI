@@ -13,7 +13,7 @@ BEGIN {
 use PPI;
 
 # Execute the tests
-use Test::More tests => 28;
+use Test::More tests => 31;
 
 # =begin testing _lex_document 3
 {
@@ -27,7 +27,7 @@ SCOPE: {
 
 
 
-# =begin testing _curly 21
+# =begin testing _curly 24
 {
 my $document = PPI::Document->new(\<<'END_PERL');
 use constant { One => 1 };
@@ -49,6 +49,9 @@ One => { Two => 2 };
 {};
 +{foo, bar};
 {; => bar};
+@foo{'bar', 'baz'};
+@{$foo}{'bar', 'baz'};
+${$foo}{bar};
 END_PERL
  
 isa_ok( $document, 'PPI::Document' );
@@ -59,7 +62,7 @@ foreach my $elem ( @{ $document->find( 'PPI::Statement' ) || [] } ) {
 	$statements[ $elem->line_number() - 1 ] ||= $elem;
 }
 
-is( scalar(@statements), 19, 'Found 19 statements' );
+is( scalar(@statements), 22, 'Found 22 statements' );
 
 isa_ok( $statements[0]->schild(2), 'PPI::Structure::Constructor',
 	'The curly in ' . $statements[0]);
@@ -99,6 +102,12 @@ isa_ok( $statements[17]->schild(1), 'PPI::Structure::Constructor',
 	'The curly in ' . $statements[17]);
 isa_ok( $statements[18]->schild(0), 'PPI::Structure::Block',
 	'The curly in ' . $statements[18]);
+isa_ok( $statements[19]->schild(1), 'PPI::Structure::Subscript',
+	'The curly in ' . $statements[19]);
+isa_ok( $statements[20]->schild(2), 'PPI::Structure::Subscript',
+	'The curly in ' . $statements[20]);
+isa_ok( $statements[21]->schild(2), 'PPI::Structure::Subscript',
+	'The curly in ' . $statements[21]);
 }
 
 
