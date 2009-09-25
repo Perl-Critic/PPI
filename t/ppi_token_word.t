@@ -13,7 +13,7 @@ BEGIN {
 use PPI;
 
 # Execute the tests
-use Test::More tests => 33;
+use Test::More tests => 60;
 
 # =begin testing literal 9
 {
@@ -133,6 +133,85 @@ foreach my $false_word (
 		"$false_word is false.",
 	);
 }
+}
+
+
+
+# =begin testing __TOKENIZER__on_char 27
+{
+my $Document = PPI::Document->new(\<<'END_PERL');
+$foo eq'bar';
+$foo ne'bar';
+$foo ge'bar';
+$foo le'bar';
+$foo gt'bar';
+$foo lt'bar';
+END_PERL
+
+isa_ok( $Document, 'PPI::Document' );
+my $words = $Document->find('Token::Operator');
+is( scalar @{$words}, 6, 'Found the 6 test operators' );
+
+is( $words->[0], 'eq', q{$foo eq'bar'} );
+is( $words->[1], 'ne', q{$foo ne'bar'} );
+is( $words->[2], 'ge', q{$foo ge'bar'} );
+is( $words->[3], 'le', q{$foo le'bar'} );
+is( $words->[4], 'gt', q{$foo ht'bar'} );
+is( $words->[5], 'lt', q{$foo lt'bar'} );
+
+$Document = PPI::Document->new(\<<'END_PERL');
+q'foo';
+qq'foo';
+END_PERL
+
+isa_ok( $Document, 'PPI::Document' );
+$words = $Document->find('Token::Quote');
+is( scalar @{$words}, 2, 'Found the 2 test quotes' );
+
+is( $words->[0], q{q'foo'}, q{q'foo'} );
+is( $words->[1], q{qq'foo'}, q{qq'foo'} );
+
+$Document = PPI::Document->new(\<<'END_PERL');
+qx'foo';
+qw'foo';
+qr'foo';
+END_PERL
+
+isa_ok( $Document, 'PPI::Document' );
+$words = $Document->find('Token::QuoteLike');
+is( scalar @{$words}, 3, 'Found the 3 test quotelikes' );
+
+is( $words->[0], q{qx'foo'}, q{qx'foo'} );
+is( $words->[1], q{qw'foo'}, q{qw'foo'} );
+is( $words->[2], q{qr'foo'}, q{qr'foo'} );
+
+$Document = PPI::Document->new(\<<'END_PERL');
+m'foo';
+s'foo'bar';
+tr'fo'ba';
+y'fo'ba';
+END_PERL
+
+isa_ok( $Document, 'PPI::Document' );
+$words = $Document->find('Token::Regexp');
+is( scalar @{$words}, 4, 'Found the 4 test quotelikes' );
+
+is( $words->[0], q{m'foo'},     q{m'foo'} );
+is( $words->[1], q{s'foo'bar'}, q{s'foo'bar'} );
+is( $words->[2], q{tr'fo'ba'},  q{tr'fo'ba'} );
+is( $words->[3], q{y'fo'ba'},   q{y'fo'ba'} );
+
+$Document = PPI::Document->new(\<<'END_PERL');
+pack'H*',$data;
+unpack'H*',$data;
+END_PERL
+
+isa_ok( $Document, 'PPI::Document' );
+$words = $Document->find('Token::Word');
+is( scalar @{$words}, 2, 'Found the 2 test words' );
+
+is( $words->[0], 'pack', q{pack'H*',$data} );
+is( $words->[1], 'unpack', q{unpack'H*',$data} );
 }
 
 

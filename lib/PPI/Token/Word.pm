@@ -252,6 +252,92 @@ sub method_call {
 	return;
 }
 
+=begin testing __TOKENIZER__on_char 27
+
+my $Document = PPI::Document->new(\<<'END_PERL');
+$foo eq'bar';
+$foo ne'bar';
+$foo ge'bar';
+$foo le'bar';
+$foo gt'bar';
+$foo lt'bar';
+END_PERL
+
+isa_ok( $Document, 'PPI::Document' );
+my $words = $Document->find('Token::Operator');
+is( scalar @{$words}, 6, 'Found the 6 test operators' );
+
+is( $words->[0], 'eq', q{$foo eq'bar'} );
+is( $words->[1], 'ne', q{$foo ne'bar'} );
+is( $words->[2], 'ge', q{$foo ge'bar'} );
+is( $words->[3], 'le', q{$foo le'bar'} );
+is( $words->[4], 'gt', q{$foo ht'bar'} );
+is( $words->[5], 'lt', q{$foo lt'bar'} );
+
+$Document = PPI::Document->new(\<<'END_PERL');
+q'foo';
+qq'foo';
+END_PERL
+
+isa_ok( $Document, 'PPI::Document' );
+$words = $Document->find('Token::Quote');
+is( scalar @{$words}, 2, 'Found the 2 test quotes' );
+
+is( $words->[0], q{q'foo'}, q{q'foo'} );
+is( $words->[1], q{qq'foo'}, q{qq'foo'} );
+
+$Document = PPI::Document->new(\<<'END_PERL');
+qx'foo';
+qw'foo';
+qr'foo';
+END_PERL
+
+isa_ok( $Document, 'PPI::Document' );
+$words = $Document->find('Token::QuoteLike');
+is( scalar @{$words}, 3, 'Found the 3 test quotelikes' );
+
+is( $words->[0], q{qx'foo'}, q{qx'foo'} );
+is( $words->[1], q{qw'foo'}, q{qw'foo'} );
+is( $words->[2], q{qr'foo'}, q{qr'foo'} );
+
+$Document = PPI::Document->new(\<<'END_PERL');
+m'foo';
+s'foo'bar';
+tr'fo'ba';
+y'fo'ba';
+END_PERL
+
+isa_ok( $Document, 'PPI::Document' );
+$words = $Document->find('Token::Regexp');
+is( scalar @{$words}, 4, 'Found the 4 test quotelikes' );
+
+is( $words->[0], q{m'foo'},     q{m'foo'} );
+is( $words->[1], q{s'foo'bar'}, q{s'foo'bar'} );
+is( $words->[2], q{tr'fo'ba'},  q{tr'fo'ba'} );
+is( $words->[3], q{y'fo'ba'},   q{y'fo'ba'} );
+
+$Document = PPI::Document->new(\<<'END_PERL');
+pack'H*',$data;
+unpack'H*',$data;
+END_PERL
+
+isa_ok( $Document, 'PPI::Document' );
+$words = $Document->find('Token::Word');
+is( scalar @{$words}, 2, 'Found the 2 test words' );
+
+is( $words->[0], 'pack', q{pack'H*',$data} );
+is( $words->[1], 'unpack', q{unpack'H*',$data} );
+
+=end testing
+
+=cut
+
+my %backoff = map { $_ => 1 } qw{
+    eq ne ge le gt lt
+    q qq qx qw qr m s tr y
+    pack unpack
+};
+
 sub __TOKENIZER__on_char {
 	my $class = shift;
 	my $t     = shift;
@@ -259,20 +345,16 @@ sub __TOKENIZER__on_char {
 	# Suck in till the end of the bareword
 	my $rest = substr( $t->{line}, $t->{line_cursor} );
 	if ( $rest =~ /^(\w+(?:(?:\'|::)(?!\d)\w+)*(?:::)?)/ ) {
-		$t->{token}->{content} .= $1;
-		$t->{line_cursor} += length $1;
-
-		# Special Case: If we accidentally treat eq'foo' like the word "eq'foo",
-		# then unwind it and just make it 'eq' (or the other stringy comparitors)
-		if ( $t->{token}->{content} =~ /^(?:eq|ne|q|qq|qx|qw|qr|m|s|tr|y)\'/ ) {
-			if ( substr($t->{token}->{content}, 1, 1) eq "'" ) {
-				$t->{line_cursor} -= (length($t->{token}->{content}) - 1);
-				$t->{token}->{content} = substr($t->{token}->{content}, 0, 1);
-			} else {
-				$t->{line_cursor} -= (length($t->{token}->{content}) - 2);
-				$t->{token}->{content} = substr($t->{token}->{content}, 0, 2);
-			}
+		my $word = $1;
+		# Special Case: If we accidentally treat eq'foo' like
+		# the word "eq'foo", then just make 'eq' (or whatever
+		# else is in the %backoff hash.
+		if ( $word =~ /^(\w+)'/ && $backoff{$1} ) {
+		    $word = $1;
 		}
+		$t->{token}->{content} .= $word;
+		$t->{line_cursor} += length $word;
+
 	}
 
 	# We might be a subroutine attribute.
@@ -337,12 +419,8 @@ sub __TOKENIZER__commit {
 	# Special Case: If we accidentally treat eq'foo' like the word "eq'foo",
 	# then unwind it and just make it 'eq' (or the other stringy comparitors)
 	my $word = $1;
-	if ( $word =~ /^(?:eq|ne|q|qq|qx|qw|qr|m|s|tr|y)\'/ ) {
-		if ( substr($word, 1, 1) eq "'" ) {
-			$word = substr($word, 0, 1);
-		} else {
-			$word = substr($word, 0, 2);
-		}
+	if ( $word =~ /^(\w+)'/ && $backoff{$1} ) {
+	    $word = $1;
 	}
 
 	# Advance the position one after the end of the bareword
