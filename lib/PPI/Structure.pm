@@ -173,7 +173,7 @@ The C<finish> method returns the finish brace for the structure (i.e. the
 closing brace).
 
 Returns the brace as a L<PPI::Token::Structure> or C<undef> if the
-structure does not have a starting brace. This can be quite common if
+structure does not have a finishing brace. This can be quite common if
 the document is not complete (for example, from an editor where the user
 may be halfway through typeing a subroutine).
 
