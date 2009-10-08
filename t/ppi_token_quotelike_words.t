@@ -13,9 +13,9 @@ BEGIN {
 use PPI;
 
 # Execute the tests
-use Test::More tests => 16;
+use Test::More tests => 12;
 
-# =begin testing literal 16
+# =begin testing literal 12
 {
 my $empty_list_document = PPI::Document->new(\<<'END_PERL');
 qw//
@@ -34,6 +34,7 @@ foreach my $token ( @{$empty_list_tokens} ) {
 my $non_empty_list_document = PPI::Document->new(\<<'END_PERL');
 qw/foo bar baz/
 qw/  foo bar baz  /
+qw {foo bar baz}
 END_PERL
 my @expected = qw/ foo bar baz /;
 
@@ -41,11 +42,11 @@ isa_ok( $non_empty_list_document, 'PPI::Document' );
 my $non_empty_list_tokens =
 	$non_empty_list_document->find('PPI::Token::QuoteLike::Words');
 is(
-	scalar @{$non_empty_list_tokens},
-	2,
+	scalar(@$non_empty_list_tokens),
+	3,
 	'Found expected non-empty word lists.',
 );
-foreach my $token ( @{$non_empty_list_tokens} ) {
+foreach my $token ( @$non_empty_list_tokens ) {
 	my $literal = $token->literal;
 	is(
 		$literal,
@@ -53,10 +54,7 @@ foreach my $token ( @{$non_empty_list_tokens} ) {
 		qq<Scalar context literal() returns the list for "$token">,
 	);
 	my @literal = $token->literal;
-	is( scalar @literal, scalar @expected, qq<Element count for "$token"> );
-	for (my $x = 0; $x < @expected; $x++) {
-		is( $literal[$x], $expected[$x], qq<Element $x of "$token"> );
-	}
+	is_deeply( [ $token->literal ], \@expected, '->literal matches expected' );
 }
 }
 

@@ -1,5 +1,12 @@
 Revision history for Perl extension PPI
 
+1.207_01 to be released
+	Summary:
+	- This is a general bug fix and accuracy release
+
+	Details:
+	- Fixed #50309: literal() wrong result on "qw (a b c)"
+
 1.206 Sun  9 Aug 2009
 	Summary:
 	- This is an optimisation release (1-2% speed up)
