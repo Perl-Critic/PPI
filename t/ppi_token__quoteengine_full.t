@@ -13,9 +13,9 @@ BEGIN {
 use PPI;
 
 # Execute the tests
-use Test::More tests => 70;
+use Test::More tests => 90;
 
-# =begin testing new 70
+# =begin testing new 90
 {
 # Verify that Token::Quote, Token::QuoteLike and Token::Regexp
 # do not have ->new functions
@@ -75,6 +75,26 @@ SCOPE: {
 			is( $s->{type}, "$opener$closer", "qw$opener correct type"      );
 		}
 		$i++;
+	}
+}
+
+SCOPE: {
+	foreach (
+		[ '/foo/i',       'foo', undef, { i => 1 }, [ '//' ] ],
+		[ 'm<foo>x',      'foo', undef, { x => 1 }, [ '<>' ] ],
+		[ 's{foo}[bar]g', 'foo', 'bar', { g => 1 }, [ '{}', '[]' ] ],
+		[ 'tr/fo/ba/',    'fo',  'ba',  {},         [ '//', '//' ] ],
+		[ 'qr{foo}smx',   'foo', undef, { s => 1, m => 1, x => 1 },
+							    [ '{}' ] ],
+	) {
+		my ( $code, $match, $subst, $mods, $delims ) = @{ $_ };
+		my $doc = PPI::Document->new( \$code );
+		$doc or warn "'$code' did not create a document";
+		my $obj = $doc->child( 0 )->child( 0 );
+		is( $obj->_section_content( 0 ), $match, "$code correct match" );
+		is( $obj->_section_content( 1 ), $subst, "$code correct subst" );
+		is_deeply( { $obj->_modifiers() }, $mods, "$code correct modifiers" );
+		is_deeply( [ $obj->_delimiters() ], $delims, "$code correct delimiters" );
 	}
 }
 }

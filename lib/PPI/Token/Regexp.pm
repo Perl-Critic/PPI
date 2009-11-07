@@ -36,6 +36,10 @@ B<not> a regular expression (which PPI takes to mean something that
 will actually examine or modify a string), but rather a quote-like
 operator that acts as a constructor for compiled L<Regexp> objects. 
 
+=head1 METHODS
+
+The following methods are inherited by this class' offspring:
+
 =cut
 
 use strict;
@@ -46,6 +50,68 @@ BEGIN {
 	$VERSION = '1.206';
 	@ISA     = 'PPI::Token';
 }
+
+
+
+
+
+#####################################################################
+# PPI::Token::Regexp Methods
+
+=pod
+
+=head2 get_match_string
+
+The C<get_match_string> method returns the portion of the regexp that
+performs the match.
+
+=cut
+
+sub get_match_string {
+	return $_[0]->_section_content( 0 );
+}
+
+=pod
+
+=head2 get_substitute_string
+
+The C<get_substitute_string> method returns the portion of the regexp
+that is substituted for the match, if any.  If the regexp does not
+substitute, C<undef> is returned.
+
+=cut
+
+sub get_substitute_string {
+	return $_[0]->_section_content( 1 );
+}
+
+=pod
+
+=head2 get_modifiers
+
+The C<get_modifiers> method returns the modifiers of the regexp.
+
+=cut
+
+sub get_modifiers {
+	return $_[0]->_modifiers();
+}
+
+=pod
+
+=head2 get_delimiters
+
+The C<get_delimiters> method returns the delimiters of the regexp as
+an array. The first element is the delimiters of the match string, and
+the second element (if any) is the delimiters of the substitute string
+(if any).
+
+=cut
+
+sub get_delimiters {
+	return $_[0]->_delimiters();
+}
+
 
 1;
 

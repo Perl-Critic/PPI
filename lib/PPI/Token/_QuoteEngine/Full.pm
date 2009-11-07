@@ -49,7 +49,7 @@ BEGIN {
 
 =pod
 
-=begin testing new 70
+=begin testing new 90
 
 # Verify that Token::Quote, Token::QuoteLike and Token::Regexp
 # do not have ->new functions
@@ -109,6 +109,26 @@ SCOPE: {
 			is( $s->{type}, "$opener$closer", "qw$opener correct type"      );
 		}
 		$i++;
+	}
+}
+
+SCOPE: {
+	foreach (
+		[ '/foo/i',       'foo', undef, { i => 1 }, [ '//' ] ],
+		[ 'm<foo>x',      'foo', undef, { x => 1 }, [ '<>' ] ],
+		[ 's{foo}[bar]g', 'foo', 'bar', { g => 1 }, [ '{}', '[]' ] ],
+		[ 'tr/fo/ba/',    'fo',  'ba',  {},         [ '//', '//' ] ],
+		[ 'qr{foo}smx',   'foo', undef, { s => 1, m => 1, x => 1 },
+							    [ '{}' ] ],
+	) {
+		my ( $code, $match, $subst, $mods, $delims ) = @{ $_ };
+		my $doc = PPI::Document->new( \$code );
+		$doc or warn "'$code' did not create a document";
+		my $obj = $doc->child( 0 )->child( 0 );
+		is( $obj->_section_content( 0 ), $match, "$code correct match" );
+		is( $obj->_section_content( 1 ), $subst, "$code correct subst" );
+		is_deeply( { $obj->_modifiers() }, $mods, "$code correct modifiers" );
+		is_deeply( [ $obj->_delimiters() ], $delims, "$code correct delimiters" );
 	}
 }
 
@@ -396,6 +416,43 @@ sub _fill_braced {
 # In a scalar context, get the number of sections
 # In an array context, get the section information
 sub _sections { wantarray ? @{$_[0]->{sections}} : scalar @{$_[0]->{sections}} }
+
+# Get a section's content
+sub _section_content {
+	my ( $self, $inx ) = @_;
+	$self->{sections} or return;
+	my $sect = $self->{sections}[$inx] or return;
+	return substr $self->content(), $sect->{position}, $sect->{size};
+}
+
+# Get the modifiers if any.
+# In list context, return the modifier hash.
+# In scalar context, clone the hash and return a reference to it.
+# If there are no modifiers, simply return.
+sub _modifiers {
+	my ( $self ) = @_;
+	$self->{modifiers} or return;
+	wantarray and return %{ $self->{modifiers} };
+	return +{ %{ $self->{modifiers} } };
+}
+
+# Get the delimiters, or at least give it a good try to get them.
+sub _delimiters {
+	my ( $self ) = @_;
+	$self->{sections} or return;
+	my @delims;
+	foreach my $sect ( @{ $self->{sections} } ) {
+		if ( exists $sect->{type} ) {
+			push @delims, $sect->{type};
+		} else {
+			my $content = $self->content();
+			push @delims,
+			substr( $content, $sect->{position} - 1, 1 ) .
+			substr( $content, $sect->{position} + $sect->{size}, 1 );
+		}
+	}
+	return @delims;
+}
 
 1;
 

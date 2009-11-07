@@ -15,7 +15,7 @@ use PPI::Find;
 use PPI::Transform;
 
 # Execute the tests
-use Test::More tests => 2911;
+use Test::More tests => 2930;
 use Test::NoWarnings;
 use Test::ClassAPI;
 
@@ -250,6 +250,10 @@ literal=method
 [PPI::Token::QuoteLike::Regexp]
 PPI::Token=isa
 PPI::Token::_QuoteEngine::Full=isa
+get_match_string=method
+get_substitute_string=method
+get_modifiers=method
+get_delimiters=method
 
 [PPI::Token::QuoteLike::Readline]
 PPI::Token=isa
@@ -257,6 +261,11 @@ PPI::Token::_QuoteEngine::Full=isa
 
 [PPI::Token::Regexp]
 PPI::Token=isa
+PPI::Token::_QuoteEngine::Full=isa
+get_match_string=method
+get_substitute_string=method
+get_modifiers=method
+get_delimiters=method
 
 [PPI::Token::Regexp::Match]
 PPI::Token=isa
