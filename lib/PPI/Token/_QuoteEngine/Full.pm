@@ -222,7 +222,7 @@ sub _fill_normal {
 			$self->{sections}->[0] = {
 				position => length($self->{content}),
 				size     => length($string),
-				type     => "$self->separator$self->separator",
+				type     => "$self->{separator}$self->{separator}",
 			};
 		} else {
 			# No sections at all
@@ -235,7 +235,7 @@ sub _fill_normal {
 	$self->{sections}->[0] = {
 		position => length $self->{content},
 		size     => length($string) - 1,
-		type     => "$self->{separator}$self->{separator}"
+		type     => "$self->{separator}$self->{separator}",
 	};
 	$self->{content} .= $string;
 
@@ -308,8 +308,63 @@ sub _fill_braced {
 	}
 
 	$section = $sections{$char};
-	unless ( $section ) {
-		# Error, it has to be a brace of some sort.
+
+	if ( $section ) {
+		# It's a brace
+
+		# Initialize the second section
+		$self->{content} .= $char;
+		$section = $self->{sections}->[1] = { %$section };
+
+		# Advance into the second region
+		$t->{line_cursor}++;
+		$section->{position} = length($self->{content});
+		$section->{size}     = 0;
+
+		# Get the content up to the close character
+		$brace_str = $self->_scan_for_brace_character( $t, $section->{_close} );
+		return undef unless defined $brace_str;
+		if ( ref $brace_str ) {
+			# End of file
+			$self->{content} .= $$brace_str;
+			$section->{size} = length($$brace_str);
+			delete $section->{_close};
+			return 0;
+		} else {
+			# Complete the properties for the second section
+			$self->{content} .= $brace_str;
+			$section->{size} = length($brace_str) - 1;
+			delete $section->{_close};
+		}
+	} elsif ( $char =~ m/ \A [^\w\s] \z /smx ) {
+		# It is some other delimiter (weird, but possible)
+
+		# Add the delimiter to the content.
+		$self->{content} .= $char;
+
+		# Advance into the next section
+		$t->{line_cursor}++;
+
+		# Get the content up to the end separator
+		my $string = $self->_scan_for_unescaped_character( $t, $char );
+		return undef unless defined $string;
+		if ( ref $string ) {
+			# End of file
+			$self->{content} .= $$string;
+			return 0;
+		}
+
+		# Complete the properties of the second section
+		$self->{sections}->[1] = {
+			position => length($self->{content}),
+			size     => length($string) - 1,
+			type     => "$char$char", 
+		};
+		$self->{content} .= $string;
+
+	} else {
+
+		# Error, it has to be a delimiter of some sort.
 		# Although this will result in a REALLY illegal regexp,
 		# we allow it anyway.
 
@@ -326,31 +381,6 @@ sub _fill_braced {
 		# Roll back the cursor one char and return signalling end of regexp
 		$t->{line_cursor}--;
 		return 0;
-	}
-
-	# Initialize the second section
-	$self->{content} .= $char;
-	$section = $self->{sections}->[1] = { %$section };
-
-	# Advance into the second region
-	$t->{line_cursor}++;
-	$section->{position} = length($self->{content});
-	$section->{size}     = 0;
-
-	# Get the content up to the close character
-	$brace_str = $self->_scan_for_brace_character( $t, $section->{_close} );
-	return undef unless defined $brace_str;
-	if ( ref $brace_str ) {
-		# End of file
-		$self->{content} .= $$brace_str;
-		$section->{size} = length($$brace_str);
-		delete $section->{_close};
-		return 0;
-	} else {
-		# Complete the properties for the second section
-		$self->{content} .= $brace_str;
-		$section->{size} = length($brace_str) - 1;
-		delete $section->{_close};
 	}
 
 	1;
