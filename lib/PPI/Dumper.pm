@@ -136,16 +136,6 @@ sub new {
 
 	$self->{indent_string} = join '', (' ' x $self->{display}->{indent});
 
-	# Try to auto-call index_locations. If it failes, turn of locations display
-	if ( $self->{display}->{locations} ) {
-		my $Document = $Element->isa('PPI::Document') ? $Element : $Element->top;
-		if ( $Document->isa('PPI::Document') ) {
-			$Document->index_locations;
-		} else {
-			$self->{display}->{locations} = 0;
-		}
-	}
-        
 	$self;
 }
 
