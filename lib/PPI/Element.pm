@@ -708,7 +708,7 @@ sub remove {
 
 =head2 delete
 
-For a given C<PPI::Element>, the C<remove> method will remove it from its
+For a given C<PPI::Element>, the C<delete> method will remove it from its
 parent, immediately deleting the C<Element> and all of its children (if it
 has any).
 
