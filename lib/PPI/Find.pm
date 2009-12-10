@@ -76,7 +76,7 @@ use Params::Util qw{_INSTANCE};
 
 use vars qw{$VERSION};
 BEGIN {
-	$VERSION = '1.206';
+	$VERSION = '1.207_01';
 }
 
 
