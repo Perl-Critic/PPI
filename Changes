@@ -8,6 +8,7 @@ Revision history for Perl extension PPI
 	- Fixed #50309: literal() wrong result on "qw (a b c)"
 	- PPI::Dumper no longer causes Elements to flush location data.
 	  Also it no longer disables location information for non-Documents.
+	- +{ package => 1 } doesn't create a PPI::Statement::Package
 
 1.206 Sun  9 Aug 2009
 	Summary:

@@ -409,7 +409,11 @@ sub _statement {
 	# my $Token  = _INSTANCE(shift, 'PPI::Token') or die "Bad param 2";
 
 	# Check for things like ( parent => ... )
-	if ( $Parent->isa('PPI::Structure::List') ) {
+	if (
+		$Parent->isa('PPI::Structure::List')
+		or
+		$Parent->isa('PPI::Structure::Constructor')
+	) {
 		if ( $Token->isa('PPI::Token::Word') ) {
 			# Is the next significant token a =>
 			# Read ahead to the next significant token

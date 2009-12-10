@@ -6,7 +6,7 @@ PPI::Document
     PPI::Token::Whitespace  	' '
     PPI::Structure::Constructor  	{ ... }
       PPI::Token::Whitespace  	' '
-      PPI::Statement
+      PPI::Statement::Expression
         PPI::Token::Word  	'foo'
         PPI::Token::Whitespace  	' '
         PPI::Token::Operator  	'=>'
@@ -24,7 +24,7 @@ PPI::Document
     PPI::Token::Whitespace  	' '
     PPI::Structure::Constructor  	{ ... }
       PPI::Token::Whitespace  	' '
-      PPI::Statement
+      PPI::Statement::Expression
         PPI::Token::Word  	'foo'
         PPI::Token::Whitespace  	' '
         PPI::Token::Operator  	'=>'

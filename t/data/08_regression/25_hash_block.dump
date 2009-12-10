@@ -6,14 +6,14 @@ PPI::Document
     PPI::Token::Whitespace  	' '
     PPI::Structure::Constructor  	{ ... }
       PPI::Token::Whitespace  	' '
-      PPI::Statement
+      PPI::Statement::Expression
         PPI::Token::Word  	'f'
         PPI::Token::Whitespace  	' '
         PPI::Token::Operator  	'=>'
         PPI::Token::Whitespace  	' '
         PPI::Structure::Constructor  	{ ... }
           PPI::Token::Whitespace  	' '
-          PPI::Statement
+          PPI::Statement::Expression
             PPI::Token::Word  	'f'
             PPI::Token::Whitespace  	' '
             PPI::Token::Operator  	'=>'
