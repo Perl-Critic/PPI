@@ -9,6 +9,9 @@ Revision history for Perl extension PPI
 	- PPI::Dumper no longer causes Elements to flush location data.
 	  Also it no longer disables location information for non-Documents.
 	- +{ package => 1 } doesn't create a PPI::Statement::Package
+	- PPI::Token::Regexp and PPI::Token::QuoteLike::Regexp how have methods
+	  for getting at the various components (delimiters, modifiers, match &
+	  substitution strings).
 
 1.206 Sun  9 Aug 2009
 	Summary:
