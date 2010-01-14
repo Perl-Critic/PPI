@@ -40,7 +40,7 @@ use PPI::Token::_QuoteEngine::Simple ();
 
 use vars qw{$VERSION @ISA};
 BEGIN {
-	$VERSION = '1.207_01';
+	$VERSION = '1.208';
 	@ISA     = qw{
 		PPI::Token::_QuoteEngine::Simple
 		PPI::Token::Quote
@@ -126,7 +126,7 @@ Adam Kennedy E<lt>adamk@cpan.orgE<gt>
 
 =head1 COPYRIGHT
 
-Copyright 2001 - 2009 Adam Kennedy.
+Copyright 2001 - 2010 Adam Kennedy.
 
 This program is free software; you can redistribute
 it and/or modify it under the same terms as Perl itself.

@@ -131,7 +131,7 @@ SCOPE: {
 		}
 
 		if ($base != 256) {
-			$^W = !1;
+			$^W = 0;
 			my $literal = eval $code;
 			if ($@) {
 				is($token->literal, undef, "literal('$code'), $@");

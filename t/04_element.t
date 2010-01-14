@@ -338,7 +338,8 @@ SCOPE: {
 # Test for CPAN #7799 - Unsupported element types are accepted by find
 #
 # The correct behaviour for a bad string is a warning, and return C<undef>
-SCOPE: { local $^W = '';
+SCOPE: {
+	local $^W = 0;
 	is( $Document->find(undef), undef, '->find(undef) failed' );
 	is( $Document->find([]),    undef, '->find([]) failed'    );
 	is( $Document->find('Foo'), undef, '->find(BAD) failed'   );
