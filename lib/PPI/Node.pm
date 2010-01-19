@@ -374,10 +374,11 @@ sub find {
 
 	# Use a queue based search, rather than a recursive one
 	my @found = ();
-	my @queue = $self->children;
+	my @queue = @{$self->{children}};
 	eval {
-		while ( my $Element = shift @queue ) {
-			my $rv = &$wanted( $self, $Element );
+		while ( @queue ) {
+			my $Element = shift @queue;
+			my $rv      = &$wanted( $self, $Element );
 			push @found, $Element if $rv;
 
 			# Support "don't descend on undef return"
@@ -390,10 +391,10 @@ sub find {
 			# better logical order.
 			if ( $Element->isa('PPI::Structure') ) {
 				unshift @queue, $Element->finish if $Element->finish;
-				unshift @queue, $Element->children;
+				unshift @queue, @{$Element->{children}};
 				unshift @queue, $Element->start if $Element->start;
 			} else {
-				unshift @queue, $Element->children;
+				unshift @queue, @{$Element->{children}};
 			}
 		}
 	};
@@ -429,11 +430,12 @@ sub find_first {
 	my $wanted = $self->_wanted(shift) or return undef;
 
 	# Use the same queue-based search as for ->find
-	my @queue = $self->children;
+	my @queue = @{$self->{children}};
 	my $rv    = eval {
 		# The defined() here prevents a ton of calls to PPI::Util::TRUE
-		while ( defined( my $Element = shift @queue ) ) {
-			my $rv = &$wanted( $self, $Element );
+		while ( @queue ) {
+			my $Element = shift @queue;
+			my $rv      = &$wanted( $self, $Element );
 			return $Element if $rv;
 
 			# Support "don't descend on undef return"
@@ -446,10 +448,10 @@ sub find_first {
 			# better logical order.
 			if ( $Element->isa('PPI::Structure') ) {
 				unshift @queue, $Element->finish if defined($Element->finish);
-				unshift @queue, $Element->children;
+				unshift @queue, @{$Element->{children}};
 				unshift @queue, $Element->start  if defined($Element->start);
 			} else {
-				unshift @queue, $Element->children;
+				unshift @queue, @{$Element->{children}};
 			}
 		}
 	};
