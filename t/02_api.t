@@ -14,8 +14,17 @@ use PPI::Dumper;
 use PPI::Find;
 use PPI::Transform;
 
-# Execute the tests
-use Test::More tests => 2930;
+# Only run this as a release test so that we can remove
+# the Test::ClassAPI that we don't really need any more
+use Test::More;
+BEGIN {
+	$DB::single = 1;
+	if ( $ENV{RELEASE_TESTING} ) {
+		plan( tests => 2930 );
+	} else {
+		plan( skip_all => "Author tests not required for installation" );
+	}
+}
 use Test::NoWarnings;
 use Test::ClassAPI;
 
