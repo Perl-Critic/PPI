@@ -24,7 +24,7 @@ use PPI::Document ();
 
 use vars qw{$VERSION @ISA};
 BEGIN {
-	$VERSION = '1.208';
+	$VERSION = '1.209';
 	@ISA     = 'PPI::Document';
 }
 

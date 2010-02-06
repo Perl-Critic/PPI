@@ -31,7 +31,7 @@ use PPI::Node       ();
 
 use vars qw{$VERSION $errstr %_PARENT};
 BEGIN {
-	$VERSION = '1.208';
+	$VERSION = '1.209';
 	$errstr  = '';
 
 	# Master Child -> Parent index

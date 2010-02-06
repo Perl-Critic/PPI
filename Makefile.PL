@@ -1,4 +1,4 @@
-use inc::Module::Install 0.91;
+use inc::Module::Install 0.92;
 
 all_from      'lib/PPI.pm';
 requires      'File::Spec'       => win32() ? '3.2701' : '0.84';
@@ -16,7 +16,6 @@ requires      'Storable'         => '2.17';
 test_requires 'Test::More'       => '0.86';
 test_requires 'Test::NoWarnings' => '0.084';
 test_requires 'Test::Object'     => '0.07';
-test_requires 'Test::ClassAPI'   => '1.04';
 test_requires 'Test::SubCalls'   => '1.07';
 test_requires 'File::Remove'     => '1.42';
 

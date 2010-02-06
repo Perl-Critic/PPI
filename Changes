@@ -1,5 +1,16 @@
 Revision history for Perl extension PPI
 
+1.209 Sat  6 Feb 2010
+	Summary:
+	- Small optimisation release
+
+	Details:
+	- No functional changes
+	- Upgrading to Module::Install 0.92
+	- Moved the Test::ClassAPI test to only run during RELEASE_TESTING
+	  to reduce the dependency load (and occasionally Test::ClassAPI seems
+	  to FAIL on CPAN Testers.
+
 1.208 Thu 14 Jan 2010
 	Summary:
 	- THIS IS THE 100TH RELEASE OF PPI!
