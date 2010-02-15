@@ -50,7 +50,7 @@ use PPI::Statement::Include::Perl6 ();
 
 use vars qw{$VERSION @ISA};
 BEGIN {
-	$VERSION = '1.209';
+	$VERSION = '1.210';
 	@ISA     = 'PPI::Statement';
 }
 

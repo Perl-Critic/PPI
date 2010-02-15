@@ -1,4 +1,4 @@
-use inc::Module::Install 0.92;
+use inc::Module::Install 0.93;
 
 all_from      'lib/PPI.pm';
 requires      'File::Spec'       => win32() ? '3.2701' : '0.84';
@@ -18,6 +18,7 @@ test_requires 'Test::NoWarnings' => '0.084';
 test_requires 'Test::Object'     => '0.07';
 test_requires 'Test::SubCalls'   => '1.07';
 test_requires 'File::Remove'     => '1.42';
+test_requires 'Class::Inspector' => '1.22';
 
 # Force the existance of the weaken function
 # (which some distributions annoyingly don't have)

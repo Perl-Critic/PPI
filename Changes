@@ -1,5 +1,14 @@
 Revision history for Perl extension PPI
 
+1.210 Mon 15 Feb 2010
+	Summary:
+	- Packaging fixes
+
+	Details:
+	- No functional changes
+	- Upgrading to Module::Install 0.93
+	- Added missing test_requires dependency for Class::Inspector
+
 1.209 Sat  6 Feb 2010
 	Summary:
 	- Small optimisation release
