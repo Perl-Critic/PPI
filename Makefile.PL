@@ -28,6 +28,4 @@ requires      'Task::Weaken';
 # so that they can regenerate the inline tests
 # test_requires 'Test::Inline' => '2.203';
 
-catalyst;
-
 WriteAll;

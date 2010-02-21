@@ -37,7 +37,7 @@ use Params::Util qw{_INSTANCE};
 
 use vars qw{$VERSION};
 BEGIN {
-	$VERSION = '1.211';
+	$VERSION = '1.211_01';
 }
 
 
@@ -268,6 +268,7 @@ sub _element_string {
 			$content =~ s/\t/\\t/g;
 			$string .= "  \t'$content'";
 		}
+
 	} elsif ( $Element->isa('PPI::Structure') ) {
 		# Add the content
 		if ( $self->{display}->{content} ) {

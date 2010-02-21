@@ -11,14 +11,18 @@ BEGIN {
 
 use Test::More tests => 43;
 use Test::NoWarnings;
+use File::Spec::Unix;
 use File::Spec::Functions ':ALL';
 use Scalar::Util  'refaddr';
 use File::Remove  ();
 use PPI::Document ();
 use PPI::Cache    ();
 
-my $this_file = catdir( 't', 'data', '03_document', 'test.dat' );
-my $cache_dir = catdir( 't', 'data', '18_cache' );
+use constant VMS  => !! ( $^O eq 'VMS' );
+use constant FILE => VMS ? 'File::Spec::Unix' : 'File::Spec';
+
+my $this_file  = FILE->catdir( 't', 'data', '03_document', 'test.dat' );
+my $cache_dir  = FILE->catdir( 't', 'data', '18_cache' );
 
 # Define, create and clear the test cache
 File::Remove::remove( \1, $cache_dir ) if -e $cache_dir;

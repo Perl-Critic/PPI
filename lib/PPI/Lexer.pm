@@ -62,7 +62,7 @@ use PPI::Exception  ();
 
 use vars qw{$VERSION $errstr *_PARENT %ROUND %RESOLVE};
 BEGIN {
-	$VERSION = '1.211';
+	$VERSION = '1.211_01';
 	$errstr  = '';
 
 	# Faster than having another method call just
@@ -1060,17 +1060,18 @@ BEGIN {
 		'do'   => 'PPI::Structure::Block',
 
 		# Hash constructors
-		'='    => 'PPI::Structure::Constructor',
-		'||='  => 'PPI::Structure::Constructor',
-		','    => 'PPI::Structure::Constructor',
-		'=>'   => 'PPI::Structure::Constructor',
-		'+'    => 'PPI::Structure::Constructor', # per perlref
+		'scalar' => 'PPI::Structure::Constructor',
+		'='      => 'PPI::Structure::Constructor',
+		'||='    => 'PPI::Structure::Constructor',
+		','      => 'PPI::Structure::Constructor',
+		'=>'     => 'PPI::Structure::Constructor',
+		'+'      => 'PPI::Structure::Constructor', # per perlref
 	);
 
 	@CURLY_LOOKAHEAD_CLASSES = (
 	    {},	# not used
 	    {
-		';'    => 'PPI::Structure::Block',      # per perlref
+		';'    => 'PPI::Structure::Block', # per perlref
 		'}'    => 'PPI::Structure::Constructor',
 	    },
 	    {

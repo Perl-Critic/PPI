@@ -40,7 +40,7 @@ use PPI::Token ();
 
 use vars qw{$VERSION @ISA %OPERATOR %QUOTELIKE};
 BEGIN {
-	$VERSION = '1.211';
+	$VERSION = '1.211_01';
 	@ISA     = 'PPI::Token';
 
 	# Copy in OPERATOR from PPI::Token::Operator
@@ -344,7 +344,7 @@ sub __TOKENIZER__on_char {
 
 	# Suck in till the end of the bareword
 	my $rest = substr( $t->{line}, $t->{line_cursor} );
-	if ( $rest =~ /^(\w+(?:(?:\'|::)(?!\d)\w+)*(?:::)?)/ ) {
+	if ( $rest =~ /^(\w+(?:(?:\'|::)\w+)*(?:::)?)/ ) {
 		my $word = $1;
 		# Special Case: If we accidentally treat eq'foo' like
 		# the word "eq'foo", then just make 'eq' (or whatever
@@ -411,7 +411,7 @@ sub __TOKENIZER__commit {
 	# Our current position is the first character of the bareword.
 	# Capture the bareword.
 	my $rest = substr( $t->{line}, $t->{line_cursor} );
-	unless ( $rest =~ /^((?!\d)\w+(?:(?:\'|::)(?!\d)\w+)*(?:::)?)/ ) {
+	unless ( $rest =~ /^((?!\d)\w+(?:(?:\'|::)\w+)*(?:::)?)/ ) {
 		# Programmer error
 		die "Fatal error... regex failed to match in '$rest' when expected";
 	}

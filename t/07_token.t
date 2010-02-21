@@ -10,7 +10,7 @@ BEGIN {
 }
 
 # Execute the tests
-use Test::More tests => 299;
+use Test::More tests => 307;
 use Test::NoWarnings;
 use File::Spec::Functions ':ALL';
 use List::MoreUtils ();

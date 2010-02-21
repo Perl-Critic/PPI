@@ -10,6 +10,7 @@ BEGIN {
 use Test::More 0.86 tests => 24;
 use Test::NoWarnings;
 use File::Spec::Functions ':ALL';
+use File::Remove;
 use PPI;
 use PPI::Transform;
 
@@ -17,7 +18,7 @@ use PPI::Transform;
 my @cleanup = ();
 END {
 	foreach ( @cleanup ) {
-		unlink $_ if -e $_;
+		File::Remove::remove( \1, $_ );
 	}
 }
 
@@ -74,9 +75,9 @@ ok( scalar @files, 'Found at least one .pm file' );
 
 foreach my $input ( @files ) {
 	# Prepare
-	my $output = "$input.out";
-	my $copy   = "$input.copy";
-	my $copy2  = "$input.copy2";
+	my $output = "${input}_out";
+	my $copy   = "${input}_copy";
+	my $copy2  = "${input}_copy2";
 	push @cleanup, $copy;
 	push @cleanup, $copy2;
 	ok( copy( $input, $copy ), "Copied $input to $copy" );

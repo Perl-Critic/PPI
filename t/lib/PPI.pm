@@ -9,7 +9,7 @@ use PPI::Dumper;
 
 use vars qw{$VERSION};
 BEGIN {
-	$VERSION = '1.211';
+	$VERSION = '1.211_01';
 }
 
 
@@ -78,6 +78,7 @@ sub unknown_objects {
 
 	1;
 }
+
 
 
 
@@ -169,6 +170,28 @@ sub valid_compound_type {
 
 
 #####################################################################
+# Does ->location work properly
+# As an aside, fixes #23788: PPI::Statement::location() returns undef for C<({})>.
+
+Test::Object->register(
+	class => 'PPI::Document',
+	tests => 1,
+	code   => \&defined_location,
+);
+
+sub defined_location {
+	my $document = shift;
+	my $bad      = $document->find( sub {
+		not defined $_[1]->location
+	} );
+	is( $bad, '', '->location always defined' );
+}
+
+
+
+
+
+#####################################################################
 # Process a .code/.dump file pair
 # plan: 2 + 14 * npairs
 
@@ -195,20 +218,23 @@ sub run_testdir {
 		ok( (-f $dumpfile and -r $dumpfile), "$codename: Found matching .dump file" );
 
 		# Create the lexer and get the Document object
-		my $Document = PPI::Document->new( $codefile );
-		ok( $Document, "$codename: Lexer->Document returns true" );
-		ok( _INSTANCE($Document, 'PPI::Document'), "$codename: Object isa PPI::Document" );
+		my $document = PPI::Document->new( $codefile );
+		ok( $document, "$codename: Lexer->Document returns true" );
+		ok( _INSTANCE($document, 'PPI::Document'), "$codename: Object isa PPI::Document" );
 
 		my $rv;
 		local *CODEFILE;
 		SKIP: {
-			skip "No Document to test", 11 unless $Document;
+			skip "No Document to test", 12 unless $document;
+
+			# Index locations
+			ok( $document->index_locations, "$codename: ->index_locations ok" );
 
 			# Check standard things
-			object_ok( $Document ); # 7 tests contained within
+			object_ok( $document ); # 7 tests contained within
 
 			# Get the dump array ref for the Document object
-			my $Dumper = PPI::Dumper->new( $Document );
+			my $Dumper = PPI::Dumper->new( $document );
 			ok( _INSTANCE($Dumper, 'PPI::Dumper'), "$codename: Object isa PPI::Dumper" );
 			my @dump_list = $Dumper->list;
 			ok( scalar @dump_list, "$codename: Got dump content from dumper" );
@@ -228,14 +254,14 @@ sub run_testdir {
 			ok( $rv, "$codename: Opened file" );
 		}
 		SKIP: {
-			unless ( $Document and $rv ) {
+			unless ( $document and $rv ) {
 				skip "Missing file", 1;
 			}
 			my $source = do { local $/ = undef; <CODEFILE> };
 			close CODEFILE;
 			$source =~ s/(?:\015{1,2}\012|\015|\012)/\n/g;
 
-			is( $Document->serialize, $source, "$codename: Round-trip back to source was ok" );
+			is( $document->serialize, $source, "$codename: Round-trip back to source was ok" );
 		}
 	}
 }
@@ -279,7 +305,7 @@ sub increment_testdir {
 		# the regression test code fragments.
 		foreach my $chars ( 1 .. length($buffer) ) {
 			my $string   = substr( $buffer, 0, $chars );
-			my $Document = eval {
+			my $document = eval {
 				PPI::Document->new( \$string );
 			};
 			is(
@@ -287,11 +313,11 @@ sub increment_testdir {
 				"$codename: $chars chars ok",
 			);
 			is(
-				ref($Document) => 'PPI::Document',
+				ref($document) => 'PPI::Document',
 				"$codename: $chars chars document",
 			);
 			is(
-				$Document->serialize => $string,
+				$document->serialize => $string,
 				"$codename: $chars char roundtrip",
 			);
 		}

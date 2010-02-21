@@ -56,8 +56,10 @@ use PPI::Document ();
 
 use vars qw{$VERSION};
 BEGIN {
-	$VERSION = '1.211';
+	$VERSION = '1.211_01';
 }
+
+use constant VMS => !! ( $^O eq 'VMS' );
 
 sub import {
 	my $class = ref $_[0] ? ref shift : shift;
@@ -67,8 +69,9 @@ sub import {
 	my $cache = $class->new(@_);
 
 	# Make PPI::Document use it
-	PPI::Document->set_cache( $cache )
-		or Carp::croak("Failed to set cache in PPI::Document");
+	unless ( PPI::Document->set_cache( $cache ) ) {
+		Carp::croak("Failed to set cache in PPI::Document");
+	}
 
 	1;
 }
@@ -223,7 +226,11 @@ sub _store {
 
 	# Save the file
 	File::Path::mkpath( $dir, 0, 0755 ) unless -d $dir;
-	Storable::lock_nstore( $object, $file );
+	if ( VMS ) {
+		Storable::lock_nstore( $object, $file );
+	} else {
+		Storable::nstore( $object, $file );
+	}
 }
 
 # Load an arbitrary object (using Storable) from a particular
@@ -234,7 +241,9 @@ sub _load {
 
 	# Load the file
 	return '' unless -f $file;
-	my $object = Storable::lock_retrieve( $file );
+	my $object = VMS
+		? Storable::retrieve( $file )
+		: Storable::lock_retrieve( $file );
 
 	# Security check
 	unless ( _INSTANCE($object, 'PPI::Document') ) {

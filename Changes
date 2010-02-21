@@ -1,8 +1,8 @@
 Revision history for Perl extension PPI
 
-1.211 Sun 21 Feb 2010
+1.211_01 Sun 21 Feb 2010
 	Summary:
-	- Support for experimentation
+	- Experimentation support and some fixes
 
 	Details:
 	- Upgraded to Module::Install 0.93
@@ -12,6 +12,9 @@ Revision history for Perl extension PPI
 	  order marks properly.
 	- Moved author tests from t to xt to reduce spurious test failures
 	  in CPAN Testers, when the testing modules change across versions
+	- Fixed #26082: scalar { %x } is misparsed
+	- Fixed #26591: VMS patch for PPI 1.118
+	- Fixed #44862: PPI cannot parse "package Foo::100;" correctly.
 
 1.210 Mon 15 Feb 2010
 	Summary:

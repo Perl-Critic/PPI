@@ -12,7 +12,7 @@ BEGIN {
 }
 
 # For each new item in t/data/08_regression add another 14 tests
-use Test::More tests => 3510;
+use Test::More tests => 3606;
 use Test::NoWarnings;
 use File::Spec::Functions ':ALL';
 use Params::Util qw{_INSTANCE};

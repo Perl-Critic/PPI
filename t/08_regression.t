@@ -12,7 +12,7 @@ BEGIN {
 }
 
 # For each new item in t/data/08_regression add another 15 tests
-use Test::More tests => 752;
+use Test::More tests => 878;
 use Test::NoWarnings;
 use File::Spec::Functions ':ALL';
 use Params::Util qw{_INSTANCE};
@@ -62,64 +62,64 @@ foreach ( 1 .. 3 ) {
 
 # Create a document with a complete braced regexp
 SCOPE: {
-my $Document = PPI::Document->new( \"s {foo} <bar>i" );
-isa_ok( $Document, 'PPI::Document' );
-my $stmt   = $Document->first_element;
-isa_ok( $stmt, 'PPI::Statement' );
-my $regexp = $stmt->first_element;
-isa_ok( $regexp, 'PPI::Token::Regexp::Substitute' );
+	my $Document = PPI::Document->new( \"s {foo} <bar>i" );
+	isa_ok( $Document, 'PPI::Document' );
+	my $stmt   = $Document->first_element;
+	isa_ok( $stmt, 'PPI::Statement' );
+	my $regexp = $stmt->first_element;
+	isa_ok( $regexp, 'PPI::Token::Regexp::Substitute' );
 
-# Check the regexp matches what we would expect (specifically
-# the fine details about the sections.
-my $expected = bless {
-	_sections => 2,
-	braced    => 1,
-	content   => 's {foo} <bar>i',
-	modifiers => { i => 1 },
-	operator  => 's',
-	sections  => [ {
-		position => 3,
-		size     => 3,
-		type     => '{}',
-	}, {
-		position => 9,
-		size     => 3,
-		type     => '<>',
-	} ],
-	separator => undef,
+	# Check the regexp matches what we would expect (specifically
+	# the fine details about the sections.
+	my $expected = {
+		_sections => 2,
+		braced    => 1,
+		content   => 's {foo} <bar>i',
+		modifiers => { i => 1 },
+		operator  => 's',
+		sections  => [ {
+			position => 3,
+			size     => 3,
+			type     => '{}',
+		}, {
+			position => 9,
+			size     => 3,
+			type     => '<>',
+		} ],
+		separator => undef,
 	};
-is_deeply( { %$regexp }, $expected, 'Complex regexp matches expected' );
+	is_deeply( { %$regexp }, $expected, 'Complex regexp matches expected' );
 }
 
 # Also test the handling of a screwed up single part multi-regexp
 SCOPE: {
-my $Document = PPI::Document->new( \"s {foo}_" );
-isa_ok( $Document, 'PPI::Document' );
-my $stmt   = $Document->first_element;
-isa_ok( $stmt, 'PPI::Statement' );
-my $regexp = $stmt->first_element;
-isa_ok( $regexp, 'PPI::Token::Regexp::Substitute' );
+	my $Document = PPI::Document->new( \"s {foo}_" );
+	isa_ok( $Document, 'PPI::Document' );
+	my $stmt   = $Document->first_element;
+	isa_ok( $stmt, 'PPI::Statement' );
+	my $regexp = $stmt->first_element;
+	isa_ok( $regexp, 'PPI::Token::Regexp::Substitute' );
 
-# Check the internal details as before
-my $expected = bless {
-	_sections => 2,
-	_error    => "No second section of regexp, or does not start with a balanced character",
-	braced    => 1,
-	content   => 's {foo}',
-	modifiers => {},
-	operator  => 's',
-	sections  => [ {
-		position => 3,
-		size     => 3,
-		type     => '{}',
-	}, {
-		position => 7,
-		size     => 0,
-		type     => '',
-	} ],
-	separator => undef,
+	# Check the internal details as before
+	my $expected = {
+		_sections => 2,
+		_error    => "No second section of regexp, or does not start with a balanced character",
+		braced    => 1,
+		content   => 's {foo}',
+		modifiers => {},
+		operator  => 's',
+		sections  => [ {
+			position => 3,
+			size     => 3,
+			type     => '{}',
+		}, {
+			position => 7,
+			size     => 0,
+			type     => '',
+		} ],
+		separator => undef,
 	};
-is_deeply( { %$regexp }, $expected, 'Badly short regexp matches expected' );
+	is_deeply( { %$regexp }, $expected, 'Badly short regexp matches expected' );
 }
 
 # Encode an assumption that the value of a zero-length substr one char
@@ -220,6 +220,10 @@ SCOPE: {
 	isa_ok( $doc->child(0), 'PPI::Statement' );
 }
 
+
+
+
+
 #####################################################################
 # Bug 21571: PPI::Token::Symbol::symbol does not properly handle
 #            variables with adjacent braces
@@ -247,6 +251,9 @@ SCOPE: {
 }
 
 
+
+
+
 #####################################################################
 # Bug 21575: PPI::Statement::Variable::variables breaks for lists
 #            with leading whitespace
@@ -257,6 +264,27 @@ SCOPE: {
 	isa_ok( $stmt, 'PPI::Statement::Variable' );
 	is_deeply( [$stmt->variables], ['$self', '$param'], 'variables() for my list with whitespace' );
 }
+
+
+
+
+
+#####################################################################
+# Bug #23788: PPI::Statement::location() returns undef for C<({})>.
+
+SCOPE: {
+	my $doc = PPI::Document->new( \'({})' );
+	isa_ok( $doc, 'PPI::Document' );
+
+	my $bad = $doc->find( sub {
+		not defined $_[1]->location
+	} );
+	is( $bad, '', 'All elements return defined for ->location' );
+}
+
+
+
+
 
 #####################################################################
 # Chris Laco on users@perlcritic.tigris.org (sorry no direct URL...)
@@ -270,6 +298,10 @@ SCOPE: {
 	is_deeply( $hash->location, [1,4,4,1,undef], 'location for empty constructor');
 }
 
+
+
+
+
 #####################################################################
 # Perl::MinimumVersion regression
 
@@ -279,6 +311,10 @@ SCOPE: {
 	isa_ok( $stmt, 'PPI::Statement::Include' );
 	is( $stmt->pragma, 'utf8', 'pragma() with numbers' );
 }
+
+
+
+
 
 #####################################################################
 # Proof that _new_token must return "1"
