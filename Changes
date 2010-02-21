@@ -1,5 +1,12 @@
 Revision history for Perl extension PPI
 
+1.211_02 to be released
+	Summary:
+	- Various bug fixes
+
+	Details:
+	- Fixed #48819: Bug in ForLoop back-compatilbilty warning
+
 1.211_01 Sun 21 Feb 2010
 	Summary:
 	- Experimentation support and bug fixes
