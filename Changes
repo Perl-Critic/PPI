@@ -2,7 +2,7 @@ Revision history for Perl extension PPI
 
 1.211_01 Sun 21 Feb 2010
 	Summary:
-	- Experimentation support and some fixes
+	- Experimentation support and bug fixes
 
 	Details:
 	- Upgraded to Module::Install 0.93
@@ -14,7 +14,9 @@ Revision history for Perl extension PPI
 	  in CPAN Testers, when the testing modules change across versions
 	- Fixed #26082: scalar { %x } is misparsed
 	- Fixed #26591: VMS patch for PPI 1.118
-	- Fixed #44862: PPI cannot parse "package Foo::100;" correctly.
+	- Fixed #44862: PPI cannot parse "package Foo::100;" correctly
+	- Fixed #54208: PPI::Token::Quote::Literal::literal is missing due
+	  to case-sensitivity error
 
 1.210 Mon 15 Feb 2010
 	Summary:

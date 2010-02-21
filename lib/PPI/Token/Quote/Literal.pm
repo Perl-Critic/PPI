@@ -29,7 +29,7 @@ Got any ideas for methods? Submit a report to rt.cpan.org!
 =cut
 
 use strict;
-use PPI::Token::Quote ();
+use PPI::Token::Quote              ();
 use PPI::Token::_QuoteEngine::Full ();
 
 use vars qw{$VERSION @ISA};
@@ -74,7 +74,22 @@ sub string {
 	substr( $self->{content}, $str->{position}, $str->{size} );	
 }
 
-*literal = *PPI::Token::Quote::Single::Literal;
+=pod
+
+=begin testing literal 4
+
+my $Document = PPI::Document->new( \"print q{foo}, q!bar!, q <foo>;" );
+isa_ok( $Document, 'PPI::Document' );
+my $literal = $Document->find('Token::Quote::Literal');
+is( $literal->[0]->literal, 'foo', '->literal returns as expected' );
+is( $literal->[1]->literal, 'bar', '->literal returns as expected' );
+is( $literal->[2]->literal, 'foo', '->literal returns as expected' );
+
+=end testing
+
+=cut
+
+*literal = *PPI::Token::Quote::Single::literal;
 
 1;
 

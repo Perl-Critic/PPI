@@ -13,7 +13,7 @@ BEGIN {
 use PPI;
 
 # Execute the tests
-use Test::More tests => 8;
+use Test::More tests => 12;
 
 # =begin testing string 8
 {
@@ -27,6 +27,18 @@ isa_ok( $literal->[2], 'PPI::Token::Quote::Literal' );
 is( $literal->[0]->string, 'foo', '->string returns as expected' );
 is( $literal->[1]->string, 'bar', '->string returns as expected' );
 is( $literal->[2]->string, 'foo', '->string returns as expected' );
+}
+
+
+
+# =begin testing literal 4
+{
+my $Document = PPI::Document->new( \"print q{foo}, q!bar!, q <foo>;" );
+isa_ok( $Document, 'PPI::Document' );
+my $literal = $Document->find('Token::Quote::Literal');
+is( $literal->[0]->literal, 'foo', '->literal returns as expected' );
+is( $literal->[1]->literal, 'bar', '->literal returns as expected' );
+is( $literal->[2]->literal, 'foo', '->literal returns as expected' );
 }
 
 
