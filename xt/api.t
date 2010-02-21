@@ -9,7 +9,7 @@ BEGIN {
 	$PPI::XS_DISABLE = 1;
 	$PPI::XS_DISABLE = 1; # Prevent warning
 	if ( $ENV{RELEASE_TESTING} ) {
-		plan( tests => 2930 );
+		plan( tests => 2931 );
 	} else {
 		plan( skip_all => 'Author tests not required for installation' );
 	}
@@ -230,6 +230,7 @@ simplify=method
 
 [PPI::Token::Quote::Literal]
 PPI::Token=isa
+literal=method
 
 [PPI::Token::Quote::Interpolate]
 PPI::Token=isa
