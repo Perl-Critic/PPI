@@ -1,0 +1,10 @@
+PPI::Document
+  PPI::Statement
+    PPI::Token::Word  	'scalar'
+    PPI::Token::Whitespace  	' '
+    PPI::Structure::Constructor  	{ ... }
+      PPI::Token::Whitespace  	' '
+      PPI::Statement
+        PPI::Token::Symbol  	'%x'
+      PPI::Token::Whitespace  	' '
+  PPI::Token::Whitespace  	'\n'

@@ -1,0 +1,7 @@
+PPI::Document
+  PPI::Statement::Package
+    PPI::Token::Word  	'package'
+    PPI::Token::Whitespace  	' '
+    PPI::Token::Word  	'Foo::100'
+    PPI::Token::Structure  	';'
+  PPI::Token::Whitespace  	'\n'
