@@ -2,11 +2,16 @@ Revision history for Perl extension PPI
 
 1.211 Sun 21 Feb 2010
 	Summary:
-	- Experimentation support
+	- Support for experimentation
 
 	Details:
+	- Upgraded to Module::Install 0.93
 	- Added support for $PPI::Lexer::X_TOKENIZER, so that alternate
 	  experimentatal tokenizers can be swapped in for testing.
+	- Added an extra 14_charsets.t case to validate we handle byte
+	  order marks properly.
+	- Moved author tests from t to xt to reduce spurious test failures
+	  in CPAN Testers, when the testing modules change across versions
 
 1.210 Mon 15 Feb 2010
 	Summary:

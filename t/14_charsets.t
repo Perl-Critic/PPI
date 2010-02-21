@@ -13,7 +13,7 @@ BEGIN {
 		Test::More->import( skip_all => "Unicode support requires perl 5.8.7" );
 		exit(0);
 	}
-	plan( tests => 12 );
+	plan( tests => 13 );
 }
 
 use Test::NoWarnings;
@@ -50,7 +50,10 @@ SKIP: {
 	# Notorious test case.
 	# In 1.203 this test case causes a memory leaking infinite loop
 	# that consumes all available memory and then crashes the process.
-	good_ok( '一();',                   "Function with Chinese characters"   );
+	good_ok( '一();', "Function with Chinese characters" );
+
+	# Byte order mark with no unicode content
+	good_ok( "\xef\xbb\xbf1;\n", "BOM without actual unicode content" );
 
 	# Testing accented characters in UTF-8
 	good_ok( 'sub func { }',           "Parsed code without accented chars" );
