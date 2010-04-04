@@ -7,8 +7,9 @@ use File::Spec::Functions ':ALL';
 BEGIN {
 	$|  = 1;
 	$^W = 1;
+	no warnings 'once';
 	$PPI::XS_DISABLE = 1;
-	$PPI::XS_DISABLE = 1; # Prevent warning
+	$PPI::Lexer::X_TOKENIZER ||= $ENV{X_TOKENIZER};
 }
 use PPI;
 

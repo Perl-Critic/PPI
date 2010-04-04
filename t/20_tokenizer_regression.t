@@ -6,9 +6,10 @@
 
 use strict;
 BEGIN {
+	no warnings 'once';
 	$| = 1;
 	$PPI::XS_DISABLE = 1;
-	$PPI::XS_DISABLE = 1; # Prevent warning
+	$PPI::Lexer::X_TOKENIZER ||= $ENV{X_TOKENIZER};
 }
 
 use File::Spec::Functions ':ALL';

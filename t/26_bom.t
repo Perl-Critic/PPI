@@ -2,9 +2,10 @@
 
 use strict;
 BEGIN {
+	no warnings 'once';
 	$| = 1;
 	$PPI::XS_DISABLE = 1;
-	$PPI::XS_DISABLE = 1; # Prevent warning
+	$PPI::Lexer::X_TOKENIZER ||= $ENV{X_TOKENIZER};
 }
 
 # For each new item in t/data/08_regression add another 14 tests

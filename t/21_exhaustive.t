@@ -5,9 +5,10 @@
 use strict;
 use Carp 'croak';
 BEGIN {
+	no warnings 'once';
 	$| = 1;
 	$PPI::XS_DISABLE = 1;
-	$PPI::XS_DISABLE = 1; # Prevent warning
+	$PPI::Lexer::X_TOKENIZER ||= $ENV{X_TOKENIZER};
 }
 
 use vars qw{$MAX_CHARS $ITERATIONS $LENGTH @ALL_CHARS};
