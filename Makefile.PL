@@ -1,4 +1,4 @@
-use inc::Module::Install 0.93;
+use inc::Module::Install 1.00;
 
 all_from      'lib/PPI.pm';
 requires      'File::Spec'       => win32() ? '3.2701' : '0.84';

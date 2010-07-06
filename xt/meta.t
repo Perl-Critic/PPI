@@ -8,7 +8,7 @@ BEGIN {
 	$^W = 1;
 }
 
-my $MODULE = 'Test::CPAN::Meta 0.07';
+my $MODULE = 'Test::CPAN::Meta 0.17';
 
 # Don't run tests for installs
 use Test::More;

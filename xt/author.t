@@ -6,7 +6,7 @@ BEGIN {
 	$^W = 1;
 }
 
-my $MODULE = 'Test::Pod 1.00';
+my $MODULE = 'Test::Pod 1.44';
 
 # Don't run tests for installs
 use Test::More;

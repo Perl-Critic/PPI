@@ -1,5 +1,14 @@
 Revision history for Perl extension PPI
 
+1.213 Tue  6 Jul 2010
+	Summary:
+	- Targetted bug fix, no changes to parsing or normal usage
+
+	Details:
+	- Updated to Module::Install 1.00
+	- Updated module depednencies in xt author tests
+	- Fixed extremely broken PPI::Token::Pod::merge and added test case
+
 1.212 Sun  9 May 2010
 	Summary:
 	- Minor bug fixes and development support

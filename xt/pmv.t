@@ -11,8 +11,8 @@ BEGIN {
 my @MODULES = (
 	'File::Find::Rule 0.32',
 	'File::Find::Rule::Perl 1.09',
-        'Perl::MinimumVersion 1.24',
-        'Test::MinimumVersion 0.10108',
+	'Perl::MinimumVersion 1.25',
+	'Test::MinimumVersion 0.101080',
 );
 
 # Don't run tests for installs

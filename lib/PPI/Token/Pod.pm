@@ -32,7 +32,7 @@ use PPI::Token   ();
 
 use vars qw{$VERSION @ISA};
 BEGIN {
-	$VERSION = '1.212';
+	$VERSION = '1.213';
 	@ISA     = 'PPI::Token';
 }
 
@@ -53,6 +53,21 @@ the content of all of them.
 
 Returns a new C<PPI::Token::Pod> object, or C<undef> on error.
 
+=begin testing merge after PPI::Node 4
+
+# Create the test fragments
+my $one = PPI::Token::Pod->new("=pod\n\nOne\n\n=cut\n");
+my $two = PPI::Token::Pod->new("=pod\n\nTwo");
+isa_ok( $one, 'PPI::Token::Pod' );
+isa_ok( $two, 'PPI::Token::Pod' );
+
+# Create the combined Pod
+my $merged = PPI::Token::Pod->merge($one, $two);
+isa_ok( $merged, 'PPI::Token::Pod' );
+is( $merged->content, "=pod\n\nOne\n\nTwo\n\n=cut\n", 'Merged POD looks ok' );
+
+=end testing
+
 =cut
 
 sub merge {
@@ -64,7 +79,7 @@ sub merge {
 	}
 
 	# Get the tokens, and extract the lines
-	my @content = (map { $_->lines } @_) or return undef;
+	my @content = ( map { [ $_->lines ] } @_ ) or return undef;
 
 	# Remove the leading =pod tags, trailing =cut tags, and any empty lines
 	# between them and the pod contents.
@@ -101,7 +116,9 @@ returning them as a list.
 
 =cut
 
-sub lines { split /(?:\015{1,2}\012|\015|\012)/, $_[0]->{content} }
+sub lines {
+	split /(?:\015{1,2}\012|\015|\012)/, $_[0]->{content};
+}
 
 
 
