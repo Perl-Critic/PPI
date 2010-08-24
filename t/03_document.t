@@ -78,4 +78,10 @@ SCOPE: {
 	# Make sure the null document round-trips
 	my $string = $doc1->serialize;
 	is( $string, '', '->serialize ok' );
+
+	# Check for warnings on null document index_locations
+	{
+		local $^W = 1;
+		$doc1->index_locations();
+	}
 }

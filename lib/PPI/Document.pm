@@ -617,14 +617,16 @@ sub index_locations {
 	}
 
 	# Calculate locations for the rest
-	foreach ( $first .. $#tokens ) {
-		my $Token = $tokens[$_];
-		$Token->{_location} = $location;
-		$location = $self->_add_location( $location, $Token, \$heredoc );
+	if ( defined $first ) {
+		foreach ( $first .. $#tokens ) {
+			my $Token = $tokens[$_];
+			$Token->{_location} = $location;
+			$location = $self->_add_location( $location, $Token, \$heredoc );
 
-		# Add any here-doc lines to the counter
-		if ( $Token->isa('PPI::Token::HereDoc') ) {
-			$heredoc += $Token->heredoc + 1;
+			# Add any here-doc lines to the counter
+			if ( $Token->isa('PPI::Token::HereDoc') ) {
+				$heredoc += $Token->heredoc + 1;
+			}
 		}
 	}
 
