@@ -138,6 +138,7 @@ sub __TOKENIZER__scan_for_end {
 			# Load in the next line
 			$string .= $search;
 			$t->_fill_line(1) or return \$string;
+			$t->{line_cursor} = 0;	# for computation of $search
 			next;
 		}
 
