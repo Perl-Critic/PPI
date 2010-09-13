@@ -1066,6 +1066,7 @@ BEGIN {
 		','      => 'PPI::Structure::Constructor',
 		'=>'     => 'PPI::Structure::Constructor',
 		'+'      => 'PPI::Structure::Constructor', # per perlref
+		'return' => 'PPI::Structure::Constructor', # per perlref
 	);
 
 	@CURLY_LOOKAHEAD_CLASSES = (
@@ -1082,7 +1083,7 @@ BEGIN {
 
 =pod
 
-=begin testing _curly 24
+=begin testing _curly 25
 
 my $document = PPI::Document->new(\<<'END_PERL');
 use constant { One => 1 };
@@ -1107,6 +1108,7 @@ One => { Two => 2 };
 @foo{'bar', 'baz'};
 @{$foo}{'bar', 'baz'};
 ${$foo}{bar};
+return { foo => 'bar' };
 END_PERL
  
 isa_ok( $document, 'PPI::Document' );
@@ -1117,7 +1119,7 @@ foreach my $elem ( @{ $document->find( 'PPI::Statement' ) || [] } ) {
 	$statements[ $elem->line_number() - 1 ] ||= $elem;
 }
 
-is( scalar(@statements), 22, 'Found 22 statements' );
+is( scalar(@statements), 23, 'Found 23 statements' );
 
 isa_ok( $statements[0]->schild(2), 'PPI::Structure::Constructor',
 	'The curly in ' . $statements[0]);
@@ -1163,6 +1165,8 @@ isa_ok( $statements[20]->schild(2), 'PPI::Structure::Subscript',
 	'The curly in ' . $statements[20]);
 isa_ok( $statements[21]->schild(2), 'PPI::Structure::Subscript',
 	'The curly in ' . $statements[21]);
+isa_ok( $statements[22]->schild(1), 'PPI::Structure::Constructor',
+	'The curly in ' . $statements[22]);
 
 =end testing
 
