@@ -266,32 +266,42 @@ sub __TOKENIZER__on_char {
 			return 'Operator';
 		}
 
+		# If it looks like a file handle or a simple scalar it
+		# is probably a readline, otherwise it is probably a
+		# glob (per perlop).
+		my $line = substr( $t->{line}, $t->{line_cursor} );
+		my $probable_class =
+			$line =~ m/ \A < (?: \$ \^? )? (?!\d) \w* > /smx ?
+			'QuoteLike::Readline' :
+			$line =~ m/ \A < .*? > /smx ?
+			'QuoteLike::Glob' : 'Operator';
+
 		# The most common group of readlines are used like
 		# while ( <...> )
 		# while <>;
 		my $prec = $prev->content;
 		if ( $prev->isa('PPI::Token::Structure') and $prec eq '(' ) {
-			return 'QuoteLike::Readline';
+			return $probable_class;
 		}
 		if ( $prev->isa('PPI::Token::Word') and $prec eq 'while' ) {
 			return 'QuoteLike::Readline';
 		}
+		if ( $prev->isa('PPI::Token::Word') and (
+			$prec eq 'for' or $prec eq 'foreach' ) ) {
+			return 'QuoteLike::Glob';
+		}
 		if ( $prev->isa('PPI::Token::Operator') and $prec eq '=' ) {
-			return 'QuoteLike::Readline';
+			return $probable_class;
 		}
 		if ( $prev->isa('PPI::Token::Operator') and $prec eq ',' ) {
-			return 'QuoteLike::Readline';
+			return $probable_class;
 		}
 
 		if ( $prev->isa('PPI::Token::Structure') and $prec eq '}' ) {
-			# Could go either way... do a regex check
+			# Could go either way...
 			# $foo->{bar} < 2;
 			# grep { .. } <foo>;
-			my $line = substr( $t->{line}, $t->{line_cursor} );
-			if ( $line =~ /^<(?!\d)\w+>/ ) {
-				# Almost definitely readline
-				return 'QuoteLike::Readline';
-			}
+			return $probable_class;
 		}
 
 		# Otherwise, we guess operator, which has been the default up

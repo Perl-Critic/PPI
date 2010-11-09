@@ -60,6 +60,7 @@ use PPI::Token::QuoteLike::Command    ();
 use PPI::Token::QuoteLike::Regexp     ();
 use PPI::Token::QuoteLike::Words      ();
 use PPI::Token::QuoteLike::Readline   ();
+use PPI::Token::QuoteLike::Glob       ();
 use PPI::Token::Regexp::Match         ();
 use PPI::Token::Regexp::Substitute    ();
 use PPI::Token::Regexp::Transliterate ();

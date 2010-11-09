@@ -4,3 +4,4 @@ while (<FOO>) {}
 print while <>;
 grep { /foo/ } <FOO>;
 my @v=<$up../*.v>;
+my @v = grep {m/foo/} <$up../*.v>;

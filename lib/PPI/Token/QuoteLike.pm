@@ -15,7 +15,7 @@ PPI::Token::QuoteLike - Quote-like operator abstract base class
 =head1 DESCRIPTION
 
 The C<PPI::Token::QuoteLike> class is never instantiated, and simply
-provides a common abstract base class for the five quote-like operator
+provides a common abstract base class for the six quote-like operator
 classes. In PPI, a "quote-like" is the set of quote-like things that
 exclude the string quotes and regular expressions.
 
@@ -32,6 +32,8 @@ The subclasses of C<PPI::Token::QuoteLike> are:
 =item qr// - L<PPI::Token::QuoteLike::Regexp>
 
 =item <FOO> - L<PPI::Token::QuoteLike::Readline>
+
+=item <*.c> - L<PPI::Token::QuoteLike::Glob>
 
 =back
 
