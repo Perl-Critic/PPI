@@ -1,0 +1,23 @@
+PPI::Document
+  PPI::Statement
+    PPI::Token::Symbol  	'@foo'
+    PPI::Token::Operator  	'='
+    PPI::Token::Word  	'map'
+    PPI::Token::Regexp::Match  	'/bar/'
+    PPI::Token::Operator  	','
+    PPI::Token::Symbol  	'@foo'
+    PPI::Token::Structure  	';'
+  PPI::Token::Whitespace  	'\n'
+  PPI::Statement
+    PPI::Token::Symbol  	'@foo'
+    PPI::Token::Whitespace  	' '
+    PPI::Token::Operator  	'='
+    PPI::Token::Whitespace  	' '
+    PPI::Token::Word  	'map'
+    PPI::Token::Whitespace  	' '
+    PPI::Token::Regexp::Match  	'/bar/'
+    PPI::Token::Operator  	','
+    PPI::Token::Whitespace  	' '
+    PPI::Token::Symbol  	'@foo'
+    PPI::Token::Structure  	';'
+  PPI::Token::Whitespace  	'\n'
