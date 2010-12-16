@@ -37,7 +37,7 @@ use PPI::Token ();
 
 use vars qw{$VERSION @ISA};
 BEGIN {
-	$VERSION = '1.213';
+	$VERSION = '1.214_01';
 	@ISA     = 'PPI::Token';
 }
 
@@ -135,10 +135,10 @@ sub __TOKENIZER__scan_for_end {
 
 		# Look for a match
 		unless ( $search =~ /^((?:\\.|[^()])*?[()])/ ) {
-			# Load in the next line
+			# Load in the next line and push to first character
 			$string .= $search;
 			$t->_fill_line(1) or return \$string;
-			$t->{line_cursor} = 0;	# for computation of $search
+			$t->{line_cursor} = 0;
 			next;
 		}
 

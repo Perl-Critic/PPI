@@ -62,7 +62,7 @@ use PPI::Exception  ();
 
 use vars qw{$VERSION $errstr *_PARENT %ROUND %RESOLVE};
 BEGIN {
-	$VERSION = '1.213';
+	$VERSION = '1.214_01';
 	$errstr  = '';
 
 	# Faster than having another method call just
@@ -336,8 +336,8 @@ sub _lex_document {
 	# If the Tokenizer has any v6 blocks to attach, do so now.
 	# Checking once at the end is faster than adding a special
 	# case check for every statement parsed.
-	my $perl6 = 0;#$self->{Tokenizer}->{'perl6'};
-	if ( 0 and @$perl6 ) {
+	my $perl6 = $self->{Tokenizer}->{'perl6'};
+	if ( @$perl6 ) {
 		my $includes = $Document->find( 'PPI::Statement::Include::Perl6' );
 		foreach my $include ( @$includes ) {
 			unless ( @$perl6 ) {

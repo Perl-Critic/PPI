@@ -1,8 +1,9 @@
 #!/usr/bin/perl
 
-# code/dump-style regression tests for known lexing problems.
-
-# Some other regressions tests are included here for simplicity.
+# Given that we know the regression tests represent potentially
+# broken locations in the code, process every single transitional
+# state between an empty document and the entire file to make sure
+# all of them parse as legal documents and don't crash the parser.
 
 use strict;
 BEGIN {
@@ -12,8 +13,7 @@ BEGIN {
 	$PPI::Lexer::X_TOKENIZER ||= $ENV{X_TOKENIZER};
 }
 
-# For each new item in t/data/08_regression add another 14 tests
-use Test::More tests => 3606;
+use Test::More tests => 3876;
 use Test::NoWarnings;
 use File::Spec::Functions ':ALL';
 use Params::Util qw{_INSTANCE};
@@ -27,6 +27,5 @@ use t::lib::PPI;
 
 #####################################################################
 # Code/Dump Testing
-# ntests = 2 + 14 * nfiles
 
 t::lib::PPI->increment_testdir(qw{ t data 08_regression });

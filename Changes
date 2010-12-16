@@ -1,5 +1,17 @@
 Revision history for Perl extension PPI
 
+1.214_01 Thu 16 Dec 2010
+	Summary:
+	- General fix release
+
+	Details:
+	- index_locations on an empty document no longer warns (WYANT)
+	- Corrected a bug in line-spanning attribute support (WYANT)
+	- Regression test for line-spanning attribute support (ADAMK)
+	- Fixed #61305 return { foo => 1 } should parse curlys as hash
+	  constructor, not block (WYANT)
+	- Fixed #63943 map and regexp confuse PPI? (ADAMK)
+
 1.213 Tue  6 Jul 2010
 	Summary:
 	- Targetted bug fix, no changes to parsing or normal usage

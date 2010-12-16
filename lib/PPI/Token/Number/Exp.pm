@@ -33,7 +33,7 @@ use PPI::Token::Number::Float ();
 
 use vars qw{$VERSION @ISA};
 BEGIN {
-	$VERSION = '1.213';
+	$VERSION = '1.214_01';
 	@ISA     = 'PPI::Token::Number::Float';
 }
 

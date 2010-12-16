@@ -47,7 +47,7 @@ use PPI::Token ();
 
 use vars qw{$VERSION @ISA};
 BEGIN {
-	$VERSION = '1.213';
+	$VERSION = '1.214_01';
 	@ISA     = 'PPI::Token';
 }
 
@@ -110,7 +110,7 @@ sub tidy {
 # Parsing Methods
 
 # Build the class and commit maps
-use vars qw{@CLASSMAP @COMMITMAP};
+use vars qw{ @CLASSMAP @COMMITMAP %MATCHWORD };
 BEGIN {
 	@CLASSMAP  = ();
 	@COMMITMAP = ();
@@ -137,6 +137,16 @@ BEGIN {
 	$CLASSMAP[10]       = 'Whitespace'; # A newline
 	$CLASSMAP[13]       = 'Whitespace'; # A carriage return
 	$CLASSMAP[32]       = 'Whitespace'; # A normal space
+
+	# Words (functions and keywords) after which a following / is
+	# almost certainly going to be a regex
+	%MATCHWORD = map { $_ => 1 } qw{
+		split
+		if
+		unless
+		grep
+		map
+	};
 }
 
 sub __TOKENIZER__on_line_start {
@@ -328,7 +338,9 @@ sub __TOKENIZER__on_char {
 
 		# After a symbol
 		return 'Operator' if $prev->isa('PPI::Token::Symbol');
-		return 'Operator' if $prev->isa('PPI::Token::Structure') && $prec eq ']';
+		if ( $prec eq ']' and $prev->isa('PPI::Token::Structure') ) {
+			return 'Operator';
+		}
 
 		# After another number
 		return 'Operator' if $prev->isa('PPI::Token::Number');
@@ -347,25 +359,11 @@ sub __TOKENIZER__on_char {
 			return 'Regexp::Match';
 		}
 
-		# Functions that we know commonly use regexs as an argument
+		# Functions and keywords
 		if (
-			$prev->isa('PPI::Token::Word')
+			$MATCHWORD{$prec}
 			and
-			$prec eq 'split'
-		) {
-			return 'Regexp::Match';
-		}
-
-		# After a keyword
-		if (
 			$prev->isa('PPI::Token::Word')
-			and (
-				$prec eq 'if'
-				or
-				$prec eq 'unless'
-				or
-				$prec eq 'grep'
-			)
 		) {
 			return 'Regexp::Match';
 		}

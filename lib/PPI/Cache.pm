@@ -56,7 +56,7 @@ use PPI::Document ();
 
 use vars qw{$VERSION};
 BEGIN {
-	$VERSION = '1.213';
+	$VERSION = '1.214_01';
 }
 
 use constant VMS => !! ( $^O eq 'VMS' );

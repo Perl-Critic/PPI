@@ -10,3 +10,27 @@ PPI::Document
     PPI::Structure::Block  	{ ... }
       PPI::Token::Whitespace  	' '
   PPI::Token::Whitespace  	'\n'
+  PPI::Statement::Sub
+    PPI::Token::Word  	'sub'
+    PPI::Token::Whitespace  	' '
+    PPI::Token::Word  	'bar'
+    PPI::Token::Whitespace  	' '
+    PPI::Token::Operator  	':'
+    PPI::Token::Whitespace  	' '
+    PPI::Token::Attribute  	'Attr(x\ny)'
+    PPI::Token::Whitespace  	' '
+    PPI::Structure::Block  	{ ... }
+      PPI::Token::Whitespace  	' '
+  PPI::Token::Whitespace  	'\n'
+  PPI::Statement::Sub
+    PPI::Token::Word  	'sub'
+    PPI::Token::Whitespace  	' '
+    PPI::Token::Word  	'baz'
+    PPI::Token::Whitespace  	' '
+    PPI::Token::Operator  	':'
+    PPI::Token::Whitespace  	' '
+    PPI::Token::Attribute  	'Attr(\n)'
+    PPI::Token::Whitespace  	' '
+    PPI::Structure::Block  	{ ... }
+      PPI::Token::Whitespace  	' '
+  PPI::Token::Whitespace  	'\n'
