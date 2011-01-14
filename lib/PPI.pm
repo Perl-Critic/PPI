@@ -449,7 +449,6 @@ based on inheritance.
             PPI::Token::QuoteLike::Regexp
             PPI::Token::QuoteLike::Words
             PPI::Token::QuoteLike::Readline
-            PPI::Token::QuoteLike::Glob
          PPI::Token::Regexp
             PPI::Token::Regexp::Match
             PPI::Token::Regexp::Substitute
