@@ -1,5 +1,16 @@
 Revision history for Perl extension PPI
 
+1.214_02 Mon 31 Jan 2011
+	Summary:
+	- More minor fixes, preparing for production release
+
+	Details:
+	- Updated copyright year to 2011 (ADAMK)
+	- Fixed RT #64247 bless {} probably contains a hash constructor (WYANT)
+	- Backed out glob fix (WYANT)
+	- Fixed RT #65199 Cast can trump braces in
+	  PPI::Token::Symbol->symbol (WYANT)
+
 1.214_01 Thu 16 Dec 2010
 	Summary:
 	- General fix release

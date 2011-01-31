@@ -47,7 +47,7 @@ use PPI::Util    ();
 
 use vars qw{$VERSION};
 BEGIN {
-	$VERSION = '1.214_01';
+	$VERSION = '1.214_02';
 }
 
 use overload 'bool' => \&PPI::Util::TRUE;
@@ -304,7 +304,7 @@ Adam Kennedy E<lt>adamk@cpan.orgE<gt>
 
 =head1 COPYRIGHT
 
-Copyright 2005 - 2010 Adam Kennedy.
+Copyright 2005 - 2011 Adam Kennedy.
 
 This program is free software; you can redistribute
 it and/or modify it under the same terms as Perl itself.

@@ -9,7 +9,7 @@ use Params::Util qw{_INSTANCE _SCALAR0 _ARRAY0};
 
 use vars qw{$VERSION @ISA @EXPORT_OK};
 BEGIN {
-	$VERSION   = '1.214_01';
+	$VERSION   = '1.214_02';
 	@ISA       = 'Exporter';
 	@EXPORT_OK = qw{_Document _slurp};
 }

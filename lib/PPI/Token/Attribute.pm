@@ -37,7 +37,7 @@ use PPI::Token ();
 
 use vars qw{$VERSION @ISA};
 BEGIN {
-	$VERSION = '1.214_01';
+	$VERSION = '1.214_02';
 	@ISA     = 'PPI::Token';
 }
 
@@ -171,7 +171,7 @@ Adam Kennedy E<lt>adamk@cpan.orgE<gt>
 
 =head1 COPYRIGHT
 
-Copyright 2001 - 2010 Adam Kennedy.
+Copyright 2001 - 2011 Adam Kennedy.
 
 This program is free software; you can redistribute
 it and/or modify it under the same terms as Perl itself.
