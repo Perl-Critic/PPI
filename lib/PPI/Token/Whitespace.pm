@@ -245,7 +245,10 @@ sub __TOKENIZER__on_char {
 
 			# An prototyped anonymous subroutine
 			my $p0 = $tokens->[0];
-			if ( $p0->isa('PPI::Token::Word') and $p0->content eq 'sub') {
+			if ( $p0->isa('PPI::Token::Word') and $p0->content eq 'sub'
+				# Maybe it's invoking a method named 'sub'
+				and not ( $p1 and $p1->isa('PPI::Token::Operator') and $p1->content eq '->')
+			) {
 				return 'Prototype';
 			}
 		}
