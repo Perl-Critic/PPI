@@ -1,5 +1,13 @@
 Revision history for Perl extension PPI
 
+1.215 Sat 26 Feb 2011
+	Summary:
+	- No changes
+
+	Details:
+	- Confirmed new Perl::Critic works with 1.214_02, so we
+	  can release a new PPI now.
+
 1.214_02 Mon 31 Jan 2011
 	Summary:
 	- More minor fixes, preparing for production release

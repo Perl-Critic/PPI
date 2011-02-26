@@ -40,7 +40,7 @@ use PPI::Token ();
 
 use vars qw{$VERSION @ISA %OPERATOR %QUOTELIKE};
 BEGIN {
-	$VERSION = '1.214_02';
+	$VERSION = '1.215';
 	@ISA     = 'PPI::Token';
 
 	# Copy in OPERATOR from PPI::Token::Operator

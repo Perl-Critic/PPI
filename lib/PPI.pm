@@ -8,7 +8,7 @@ use strict;
 # Set the version for CPAN
 use vars qw{$VERSION $XS_COMPATIBLE @XS_EXCLUDE};
 BEGIN {
-	$VERSION       = '1.214_02';
+	$VERSION       = '1.215';
 	$XS_COMPATIBLE = '0.845';
 	@XS_EXCLUDE    = ();
 }
