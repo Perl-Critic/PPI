@@ -141,6 +141,7 @@ BEGIN {
 	# Words (functions and keywords) after which a following / is
 	# almost certainly going to be a regex
 	%MATCHWORD = map { $_ => 1 } qw{
+		return
 		split
 		if
 		unless

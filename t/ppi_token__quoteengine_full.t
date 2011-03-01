@@ -14,9 +14,9 @@ BEGIN {
 use PPI;
 
 # Execute the tests
-use Test::More tests => 90;
+use Test::More tests => 93;
 
-# =begin testing new 90
+# =begin testing new 93
 {
 # Verify that Token::Quote, Token::QuoteLike and Token::Regexp
 # do not have ->new functions
@@ -59,19 +59,19 @@ SCOPE: {
 	my @seps   = ( undef, undef, '/', '#', ','  );
 	my @types  = ( '()', '<>', '//', '##', ',,' );
 	my @braced = ( qw{ 1 1 0 0 0 } );
-	my @secs   = ( qw{ 1 1 0 0 0 } );
+	my @secs   = ( qw{ 1 1 1 1 1 } );
 	my $i      = 0;
 	while ( @stuff ) {
 		my $opener = shift @stuff;
 		my $closer = shift @stuff;
-		my $d = PPI::Document->new(\"qw$opener");
+		my $d = PPI::Document->new(\"qw${opener}a");
 		my $o = $d->{children}->[0]->{children}->[0];
 		my $s = $o->{sections}->[0];
 		is( $o->{operator},  'qw',        "qw$opener correct operator"  );
 		is( $o->{_sections}, $secs[$i],   "qw$opener correct _sections" );
 		is( $o->{braced}, $braced[$i],    "qw$opener correct braced"    );
 		is( $o->{separator}, $seps[$i],   "qw$opener correct seperator" );
-		is( $o->{content},   "qw$opener", "qw$opener correct content"   );
+		is( $o->{content},   "qw${opener}a", "qw$opener correct content"   );
 		if ( $secs[$i] ) {
 			is( $s->{type}, "$opener$closer", "qw$opener correct type"      );
 		}

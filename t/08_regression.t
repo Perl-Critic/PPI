@@ -13,7 +13,7 @@ BEGIN {
 }
 
 # For each new item in t/data/08_regression add another 15 tests
-use Test::More tests => 896;
+use Test::More tests => 933;
 use Test::NoWarnings;
 use File::Spec::Functions ':ALL';
 use Params::Util qw{_INSTANCE};
@@ -325,4 +325,113 @@ SCOPE: {
 $$content =~ s/(?:\015{1,2}\012|\015|\012)/\n/gs;
 END_PERL
 	isa_ok( $doc, 'PPI::Document' );
+}
+
+
+
+
+######################################################################
+# Check quoteengine token behaviour at end of file
+
+SCOPE: {
+	my $doc = PPI::Document->new(\'s/');
+	isa_ok( $doc, 'PPI::Document' );
+	my $regexp = $doc->child(0)->child(0);
+	isa_ok( $regexp, 'PPI::Token::Regexp::Substitute' );
+	is( $regexp->_sections, 0, 'Found 0 section' );
+}
+
+SCOPE: {
+	my $doc = PPI::Document->new(\'s{');
+	isa_ok( $doc, 'PPI::Document' );
+	my $regexp = $doc->child(0)->child(0);
+	isa_ok( $regexp, 'PPI::Token::Regexp::Substitute' );
+	is( $regexp->_sections, 0, 'Found 0 section' );
+}
+
+SCOPE: {
+	my $doc = PPI::Document->new(\'s/foo');
+	isa_ok( $doc, 'PPI::Document' );
+	my $regexp = $doc->child(0)->child(0);
+	isa_ok( $regexp, 'PPI::Token::Regexp::Substitute' );
+	is( $regexp->_sections, 1, 'Found 1 section' );
+	is( $regexp->_section_content(0), 'foo', 's/foo correct at EOL' );
+}
+
+SCOPE: {
+	my $doc = PPI::Document->new(\'s{foo');
+	isa_ok( $doc, 'PPI::Document' );
+	my $regexp = $doc->child(0)->child(0);
+	isa_ok( $regexp, 'PPI::Token::Regexp::Substitute' );
+	is( $regexp->_sections, 1, 'Found 1 section' );
+	is( $regexp->_section_content(0), 'foo', 's{foo correct at EOL' );
+}
+
+SCOPE: {
+	my $doc = PPI::Document->new(\'s/foo/');
+	isa_ok( $doc, 'PPI::Document' );
+	my $regexp = $doc->child(0)->child(0);
+	isa_ok( $regexp, 'PPI::Token::Regexp::Substitute' );
+	is( $regexp->_sections, 1, 'Found 1 section' );
+}
+
+SCOPE: {
+	my $doc = PPI::Document->new(\'s{foo}{');
+	isa_ok( $doc, 'PPI::Document' );
+	my $regexp = $doc->child(0)->child(0);
+	isa_ok( $regexp, 'PPI::Token::Regexp::Substitute' );
+	is( $regexp->_sections, 1, 'Found 1 section' );
+}
+
+SCOPE: {
+	my $doc = PPI::Document->new(\'s{foo}/');
+	isa_ok( $doc, 'PPI::Document' );
+	my $regexp = $doc->child(0)->child(0);
+	isa_ok( $regexp, 'PPI::Token::Regexp::Substitute' );
+	is( $regexp->_sections, 1, 'Found 1 section' );
+}
+
+SCOPE: {
+	my $doc = PPI::Document->new(\'s/foo/bar');
+	isa_ok( $doc, 'PPI::Document' );
+	my $regexp = $doc->child(0)->child(0);
+	isa_ok( $regexp, 'PPI::Token::Regexp::Substitute' );
+	is( $regexp->_sections, 2, 'Found 2 sections' );
+	is( $regexp->_section_content(1), 'bar', 's/foo/bar correct at EOL' );
+}
+
+SCOPE: {
+	my $doc = PPI::Document->new(\'s{foo}{bar');
+	isa_ok( $doc, 'PPI::Document' );
+	my $regexp = $doc->child(0)->child(0);
+	isa_ok( $regexp, 'PPI::Token::Regexp::Substitute' );
+	is( $regexp->_sections, 2, 'Found 2 sections' );
+	is( $regexp->_section_content(1), 'bar', 's{foo}{bar correct at EOL' );
+}
+
+SCOPE: {
+	my $doc = PPI::Document->new(\'s{foo}/bar');
+	isa_ok( $doc, 'PPI::Document' );
+	my $regexp = $doc->child(0)->child(0);
+	isa_ok( $regexp, 'PPI::Token::Regexp::Substitute' );
+	is( $regexp->_sections, 2, 'Found 2 sections' );
+	is( $regexp->_section_content(1), 'bar', 's{foo}/bar correct at EOL' );
+}
+
+
+
+
+
+######################################################################
+# Confirmation of cases where we special case / to a regex
+
+SCOPE: {
+	my $doc = PPI::Document->new(\<<'END_PERL');
+@foo = split /foo/, $var;
+return / Special /x ? 0 : 1;
+print "Hello" if /regex/;
+END_PERL
+	isa_ok( $doc, 'PPI::Document' );
+	my $match = $doc->find('PPI::Token::Regexp::Match');
+	is( scalar(@$match), 3, 'Found expected number of matches' );
 }

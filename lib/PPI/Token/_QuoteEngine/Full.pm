@@ -49,7 +49,7 @@ BEGIN {
 
 =pod
 
-=begin testing new 90
+=begin testing new 93
 
 # Verify that Token::Quote, Token::QuoteLike and Token::Regexp
 # do not have ->new functions
@@ -92,19 +92,19 @@ SCOPE: {
 	my @seps   = ( undef, undef, '/', '#', ','  );
 	my @types  = ( '()', '<>', '//', '##', ',,' );
 	my @braced = ( qw{ 1 1 0 0 0 } );
-	my @secs   = ( qw{ 1 1 0 0 0 } );
+	my @secs   = ( qw{ 1 1 1 1 1 } );
 	my $i      = 0;
 	while ( @stuff ) {
 		my $opener = shift @stuff;
 		my $closer = shift @stuff;
-		my $d = PPI::Document->new(\"qw$opener");
+		my $d = PPI::Document->new(\"qw${opener}a");
 		my $o = $d->{children}->[0]->{children}->[0];
 		my $s = $o->{sections}->[0];
 		is( $o->{operator},  'qw',        "qw$opener correct operator"  );
 		is( $o->{_sections}, $secs[$i],   "qw$opener correct _sections" );
 		is( $o->{braced}, $braced[$i],    "qw$opener correct braced"    );
 		is( $o->{separator}, $seps[$i],   "qw$opener correct seperator" );
-		is( $o->{content},   "qw$opener", "qw$opener correct content"   );
+		is( $o->{content},   "qw${opener}a", "qw$opener correct content"   );
 		if ( $secs[$i] ) {
 			is( $s->{type}, "$opener$closer", "qw$opener correct type"      );
 		}
@@ -234,20 +234,22 @@ sub _fill_normal {
 	return undef unless defined $string;
 	if ( ref $string ) {
 		# End of file
-		$self->{content} .= $$string;
 		if ( length($$string) > 1 )  {
 			# Complete the properties for the first section
 			my $str = $$string;
 			chop $str;
 			$self->{sections}->[0] = {
 				position => length($self->{content}),
-				size     => length($string),
+				size     => length($$string) - 1,
 				type     => "$self->{separator}$self->{separator}",
 			};
+			$self->{_sections} = 1;
 		} else {
 			# No sections at all
+			$self->{sections}  = [ ];
 			$self->{_sections} = 0;
 		}
+		$self->{content} .= $$string;
 		return 0;
 	}
 
@@ -272,6 +274,19 @@ sub _fill_normal {
 	return undef unless defined $string;
 	if ( ref $string ) {
 		# End of file
+		if ( length($$string) > 1 )  {
+			# Complete the properties for the second section
+			my $str = $$string;
+			chop $str;
+			$self->{sections}->[1] = {
+				position => length($self->{content}),
+				size     => length($$string) - 1,
+				type     => "$self->{separator}$self->{separator}",
+			};
+		} else {
+			# No sections at all
+			$self->{_sections} = 1;
+		}
 		$self->{content} .= $$string;
 		return 0;
 	}
@@ -297,6 +312,21 @@ sub _fill_braced {
 	return undef unless defined $brace_str;
 	if ( ref $brace_str ) {
 		# End of file
+		if ( length($$brace_str) > 1 )  {
+			# Complete the properties for the first section
+			my $str = $$brace_str;
+			chop $str;
+			$self->{sections}->[0] = {
+				position => length($self->{content}),
+				size     => length($$brace_str) - 1,
+				type     => $section->{type},
+			};
+			$self->{_sections} = 1;
+		} else {
+			# No sections at all
+			$self->{sections}  = [ ];
+			$self->{_sections} = 0;
+		}
 		$self->{content} .= $$brace_str;
 		return 0;
 	}
@@ -334,27 +364,40 @@ sub _fill_braced {
 
 		# Initialize the second section
 		$self->{content} .= $char;
-		$section = $self->{sections}->[1] = { %$section };
+		$section = { %$section };
 
-		# Advance into the second region
+		# Advance into the second section
 		$t->{line_cursor}++;
-		$section->{position} = length($self->{content});
-		$section->{size}     = 0;
 
 		# Get the content up to the close character
 		$brace_str = $self->_scan_for_brace_character( $t, $section->{_close} );
 		return undef unless defined $brace_str;
 		if ( ref $brace_str ) {
 			# End of file
+			if ( length($$brace_str) > 1 )  {
+				# Complete the properties for the second section
+				my $str = $$brace_str;
+				chop $str;
+				$self->{sections}->[1] = {
+					position => length($self->{content}),
+					size     => length($$brace_str) - 1,
+					type     => $section->{type},
+				};
+				$self->{_sections} = 2;
+			} else {
+				# No sections at all
+				$self->{_sections} = 1;
+			}
 			$self->{content} .= $$brace_str;
-			$section->{size} = length($$brace_str);
-			delete $section->{_close};
 			return 0;
 		} else {
 			# Complete the properties for the second section
+			$self->{sections}->[1] = {
+				position => length($self->{content}),
+				size     => length($brace_str) - 1,
+				type     => $section->{type},
+			};
 			$self->{content} .= $brace_str;
-			$section->{size} = length($brace_str) - 1;
-			delete $section->{_close};
 		}
 	} elsif ( $char =~ m/ \A [^\w\s] \z /smx ) {
 		# It is some other delimiter (weird, but possible)
@@ -370,6 +413,19 @@ sub _fill_braced {
 		return undef unless defined $string;
 		if ( ref $string ) {
 			# End of file
+			if ( length($$string) > 1 )  {
+				# Complete the properties for the second section
+				my $str = $$string;
+				chop $str;
+				$self->{sections}->[1] = {
+					position => length($self->{content}),
+					size     => length($$string) - 1,
+					type     => "$char$char",
+				};
+			} else {
+				# Only the one section
+				$self->{_sections} = 1;
+			}
 			$self->{content} .= $$string;
 			return 0;
 		}
@@ -415,14 +471,17 @@ sub _fill_braced {
 
 # In a scalar context, get the number of sections
 # In an array context, get the section information
-sub _sections { wantarray ? @{$_[0]->{sections}} : scalar @{$_[0]->{sections}} }
+sub _sections {
+	wantarray ? @{$_[0]->{sections}} : scalar @{$_[0]->{sections}}
+}
 
 # Get a section's content
 sub _section_content {
-	my ( $self, $inx ) = @_;
+	my $self = shift;
+	my $i    = shift;
 	$self->{sections} or return;
-	my $sect = $self->{sections}[$inx] or return;
-	return substr $self->content(), $sect->{position}, $sect->{size};
+	my $section = $self->{sections}->[$i] or return;
+	return substr( $self->content, $section->{position}, $section->{size} );
 }
 
 # Get the modifiers if any.
@@ -430,7 +489,7 @@ sub _section_content {
 # In scalar context, clone the hash and return a reference to it.
 # If there are no modifiers, simply return.
 sub _modifiers {
-	my ( $self ) = @_;
+	my $self = shift;
 	$self->{modifiers} or return;
 	wantarray and return %{ $self->{modifiers} };
 	return +{ %{ $self->{modifiers} } };
@@ -438,14 +497,14 @@ sub _modifiers {
 
 # Get the delimiters, or at least give it a good try to get them.
 sub _delimiters {
-	my ( $self ) = @_;
+	my $self = shift;
 	$self->{sections} or return;
 	my @delims;
 	foreach my $sect ( @{ $self->{sections} } ) {
 		if ( exists $sect->{type} ) {
 			push @delims, $sect->{type};
 		} else {
-			my $content = $self->content();
+			my $content = $self->content;
 			push @delims,
 			substr( $content, $sect->{position} - 1, 1 ) .
 			substr( $content, $sect->{position} + $sect->{size}, 1 );
