@@ -135,6 +135,7 @@ BEGIN {
 	$CLASSMAP[ord '_']  = 'Word';
 	$CLASSMAP[9]        = 'Whitespace'; # A horizontal tab
 	$CLASSMAP[10]       = 'Whitespace'; # A newline
+	$CLASSMAP[12]       = 'Whitespace'; # A form feed
 	$CLASSMAP[13]       = 'Whitespace'; # A carriage return
 	$CLASSMAP[32]       = 'Whitespace'; # A normal space
 

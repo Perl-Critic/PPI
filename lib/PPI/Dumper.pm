@@ -266,6 +266,7 @@ sub _element_string {
 			my $content = $Element->content;
 			$content =~ s/\n/\\n/g;
 			$content =~ s/\t/\\t/g;
+			$content =~ s/\f/\\f/g;
 			$string .= "  \t'$content'";
 		}
 
