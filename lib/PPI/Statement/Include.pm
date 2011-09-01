@@ -324,6 +324,8 @@ sub version_literal {
 
 =pod
 
+=head2 arguments
+
 The C<arguments> method gives you the rest of the statement after the the
 module/pragma and module version, i.e. the stuff that will be used to
 construct what gets passed to the module's C<import()> subroutine.  This does
