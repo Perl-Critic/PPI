@@ -457,7 +457,7 @@ sub serialize {
 
 		# This token is a HereDoc.
 		# First, add the token content as normal, which in this
-		# case will definately not contain a newline.
+		# case will definitely not contain a newline.
 		$output .= $Token->content;
 
 		# Now add all of the here-doc content to the heredoc buffer.
@@ -592,7 +592,7 @@ sub index_locations {
 	my @tokens = $self->tokens;
 
 	# Whenever we hit a heredoc we will need to increment by
-	# the number of lines in it's content section when when we
+	# the number of lines in it's content section when we
 	# encounter the next token with a newline in it.
 	my $heredoc = 0;
 
