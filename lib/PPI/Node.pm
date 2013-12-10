@@ -595,7 +595,7 @@ sub prune {
 }
 
 # This method is likely to be very heavily used, to take
-# it slowly and carefuly.
+# it slowly and carefully.
 ### NOTE: Renaming this function or changing either to self will probably
 ###       break File::Find::Rule::PPI
 sub _wanted {

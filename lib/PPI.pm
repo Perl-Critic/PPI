@@ -194,7 +194,7 @@ What are the things that people might want a "Perl parser" for.
 Analyzing the contents of a Perl document to automatically generate
 documentation, in parallel to, or as a replacement for, POD documentation.
 
-Allow an indexer to to locate and process all the comments and
+Allow an indexer to locate and process all the comments and
 documentation from code for "full text search" applications.
 
 =item Structural and Quality Analysis
@@ -557,7 +557,7 @@ via the included L<PPI::Dumper>).
       PPI::Token::Structure            ';'
     PPI::Token::Whitespace             '\n'
 
-Please note that in this this example, strings are only listed for the
+Please note that in this example, strings are only listed for the
 B<actual> L<PPI::Token> that contains that string. Structures are listed
 with the type of brace characters it represents noted.
 
@@ -749,7 +749,7 @@ you are B<strongly> encouraged to do so, as the author currently maintains
 over 100 modules and it can take some time to deal with non-"Critical" bug
 reports or patches.
 
-This will also guarentee that your issue will be addressed in the next
+This will also guarantee that your issue will be addressed in the next
 release of the module.
 
 For large changes though, please consider creating a branch so that they

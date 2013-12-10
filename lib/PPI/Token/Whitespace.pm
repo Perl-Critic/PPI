@@ -191,7 +191,7 @@ sub __TOKENIZER__on_line_start {
 		}
 		push @{ $t->{perl6} }, join '', @perl6;
 
-		# We only sucked in the block, we don't actially do
+		# We only sucked in the block, we don't actually do
 		# anything to the "use v6..." line. So return as if
 		# we didn't find anything at all.
 		return 1;

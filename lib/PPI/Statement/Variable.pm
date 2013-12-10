@@ -168,7 +168,7 @@ sub symbols {
 
 		# Local is much more icky (potentially).
 		# Not that we are actually going to deal with it now,
-		# but having this seperate is likely going to be needed
+		# but having this separate is likely going to be needed
 		# for future bug reports about local() things.
 
 		# This is a slightly better way to check.

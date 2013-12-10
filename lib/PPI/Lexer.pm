@@ -690,7 +690,7 @@ sub _lex_end {
 	$self->_rollback;
 }
 
-# For many statements, it can be dificult to determine the end-point.
+# For many statements, it can be difficult to determine the end-point.
 # This method takes a statement and the next significant token, and attempts
 # to determine if the there is a statement boundary between the two, or if
 # the statement can continue with the token.

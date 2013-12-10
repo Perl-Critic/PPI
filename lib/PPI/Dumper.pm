@@ -92,7 +92,7 @@ made much clearer. True/false value, on by default.
 
 Should the dumper show comment tokens. In situations where you have
 a lot of comments, the code can often be made clearer by ignoring
-comment tokens. True/value value, on by default.
+comment tokens. True/false value, on by default.
 
 =item locations
 

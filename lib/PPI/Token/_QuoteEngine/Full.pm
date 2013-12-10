@@ -32,7 +32,7 @@ BEGIN {
 		's'   => { operator => 's',   braced => undef, separator => undef, _sections => 2, modifiers => 1 },
 		'tr'  => { operator => 'tr',  braced => undef, separator => undef, _sections => 2, modifiers => 1 },
 
-		# Y is the little used varient of tr
+		# Y is the little used variant of tr
 		'y'   => { operator => 'y',   braced => undef, separator => undef, _sections => 2, modifiers => 1 },
 
 		'/'   => { operator => undef, braced => 0,     separator => '/',   _sections => 1, modifiers => 1 },
@@ -148,7 +148,7 @@ sub new {
 	### implement a new function of their own.
 	my $self = PPI::Token::new( $class, $init ) or return undef;
 
-	# Do we have a prototype for the intializer? If so, add the extra fields
+	# Do we have a prototype for the initializer? If so, add the extra fields
 	my $options = $quotes{$init} or return $self->_error(
 		"Unknown quote type '$init'"
 	);
@@ -224,7 +224,7 @@ sub _fill {
 	}
 }
 
-# Handle the content parsing path for normally seperated
+# Handle the content parsing path for normally separated
 sub _fill_normal {
 	my $self = shift;
 	my $t    = shift;
@@ -301,7 +301,7 @@ sub _fill_normal {
 	1;
 }
 
-# Handle content parsing for matching crace seperated
+# Handle content parsing for matching brace separated
 sub _fill_braced {
 	my $self = shift;
 	my $t    = shift;
