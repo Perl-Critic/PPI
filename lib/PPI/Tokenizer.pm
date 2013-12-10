@@ -47,7 +47,7 @@ This is where the truism "Only perl can parse Perl" comes from.
 
 PPI uses a completely different approach by abandoning the (impossible)
 ability to parse Perl the same way that the interpreter does, and instead
-parsing the source as a document, using a document structure independantly
+parsing the source as a document, using a document structure independently
 derived from the Perl documentation and approximating the perl interpreter
 interpretation as closely as possible.
 
@@ -533,14 +533,14 @@ sub _process_next_line {
 # Per-character processing methods
 
 # Process on a per-character basis.
-# Note that due the the high number of times this gets
+# Note that due the high number of times this gets
 # called, it has been fairly heavily in-lined, so the code
 # might look a bit ugly and duplicated.
 sub _process_next_char {
 	my $self = shift;
 
 	### FIXME - This checks for a screwed up condition that triggers
-	###         several warnings, amoungst other things.
+	###         several warnings, amongst other things.
 	if ( ! defined $self->{line_cursor} or ! defined $self->{line_length} ) {
 		# $DB::single = 1;
 		return undef;
