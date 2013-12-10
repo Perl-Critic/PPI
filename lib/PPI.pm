@@ -541,8 +541,8 @@ via the included L<PPI::Dumper>).
   PPI::Document
     PPI::Token::Comment                '#!/usr/bin/perl\n'
     PPI::Token::Whitespace             '\n'
-    PPI::Statement::Expression
-      PPI::Token::Bareword             'print'
+    PPI::Statement
+      PPI::Token::Word                 'print'
       PPI::Structure::List             ( ... )
         PPI::Token::Whitespace         ' '
         PPI::Statement::Expression
@@ -551,8 +551,8 @@ via the included L<PPI::Dumper>).
       PPI::Token::Structure            ';'
     PPI::Token::Whitespace             '\n'
     PPI::Token::Whitespace             '\n'
-    PPI::Statement::Expression
-      PPI::Token::Bareword             'exit'
+    PPI::Statement
+      PPI::Token::Word                 'exit'
       PPI::Structure::List             ( ... )
       PPI::Token::Structure            ';'
     PPI::Token::Whitespace             '\n'
@@ -568,14 +568,14 @@ whitespace. Here it is again, sans the distracting whitespace tokens.
 
   PPI::Document
     PPI::Token::Comment                '#!/usr/bin/perl\n'
-    PPI::Statement::Expression
-      PPI::Token::Bareword             'print'
+    PPI::Statement
+      PPI::Token::Word                 'print'
       PPI::Structure::List             ( ... )
         PPI::Statement::Expression
           PPI::Token::Quote::Double    '"Hello World!"'
       PPI::Token::Structure            ';'
-    PPI::Statement::Expression
-      PPI::Token::Bareword             'exit'
+    PPI::Statement
+      PPI::Token::Word                 'exit'
       PPI::Structure::List             ( ... )
       PPI::Token::Structure            ';'
 
