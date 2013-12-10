@@ -23,7 +23,7 @@ type should actually exist in the tree.
 
 =head2 Elements vs Children
 
-A B<PPI::Structure> has an unusual existance. Unlike a L<PPI::Document>
+A B<PPI::Structure> has an unusual existence. Unlike a L<PPI::Document>
 or L<PPI::Statement>, which both simply contain other elements, a
 structure B<both> contains and consists of content.
 
