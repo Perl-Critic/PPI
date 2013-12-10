@@ -124,7 +124,7 @@ sub __TOKENIZER__on_char {
 
 		if ( $c =~ /^(\$(?:\_[\w:]|::))/ or $c =~ /^\$\'[\w]/ ) {
 			# If and only if we have $'\d, it is not a
-			# symbol. (this was apparently a concious choice)
+			# symbol. (this was apparently a conscious choice)
 			# Note that $::0 on the other hand is legal
 			if ( $c =~ /^\$\'\d$/ ) {
 				# In this case, we have a magic plus a digit.
