@@ -446,14 +446,14 @@ sub __TOKENIZER__commit {
 		# Add the rest of the line as a comment, and a whitespace newline
 		# Anything after the __END__ on the line is "ignored". So we must
 		# also ignore it, by turning it into a comment.
-		$rest = substr( $t->{line}, $t->{line_cursor} );
+		my $end_rest = substr( $t->{line}, $t->{line_cursor} );
 		$t->{line_cursor} = length $t->{line};
-		if ( $rest =~ /\n$/ ) {
-			chomp $rest;
-			$t->_new_token( 'Comment', $rest ) if length $rest;
+		if ( $end_rest =~ /\n$/ ) {
+			chomp $end_rest;
+			$t->_new_token( 'Comment', $end_rest ) if length $end_rest;
 			$t->_new_token( 'Whitespace', "\n" );
 		} else {
-			$t->_new_token( 'Comment', $rest ) if length $rest;
+			$t->_new_token( 'Comment', $end_rest ) if length $end_rest;
 		}
 		$t->_finalize_token;
 
@@ -470,14 +470,14 @@ sub __TOKENIZER__commit {
 		$t->{zone} = 'PPI::Token::Data';
 
 		# Add the rest of the line as the Data token
-		$rest = substr( $t->{line}, $t->{line_cursor} );
+		my $data_rest = substr( $t->{line}, $t->{line_cursor} );
 		$t->{line_cursor} = length $t->{line};
-		if ( $rest =~ /\n$/ ) {
-			chomp $rest;
-			$t->_new_token( 'Comment', $rest ) if length $rest;
+		if ( $data_rest =~ /\n$/ ) {
+			chomp $data_rest;
+			$t->_new_token( 'Comment', $data_rest ) if length $data_rest;
 			$t->_new_token( 'Whitespace', "\n" );
 		} else {
-			$t->_new_token( 'Comment', $rest ) if length $rest;
+			$t->_new_token( 'Comment', $data_rest ) if length $data_rest;
 		}
 		$t->_finalize_token;
 
