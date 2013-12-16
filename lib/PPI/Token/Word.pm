@@ -504,8 +504,8 @@ sub __TOKENIZER__commit {
 
 	} else {
 		# If the next character is a ':' then its a label...
-		my $string = substr( $t->{line}, $t->{line_cursor} );
-		if ( $string =~ /^(\s*:)(?!:)/ ) {
+		pos $t->{line} = $t->{line_cursor};
+		if ( $t->{line} =~ m/\G(\s*:)(?!:)/gc ) {
 			if ( $tokens and $tokens->[0]->{content} eq 'sub' ) {
 				# ... UNLESS its after 'sub' in which
 				# case it is a sub name and an attribute
