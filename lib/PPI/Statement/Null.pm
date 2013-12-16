@@ -50,7 +50,7 @@ BEGIN {
 }
 
 # A null statement is not significant
-sub significant { '' }
+sub significant() { '' }
 
 1;
 

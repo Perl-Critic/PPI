@@ -81,7 +81,7 @@ sub null {
 }
 
 ### XS -> PPI/XS.xs:_PPI_Token_Whitespace__significant 0.900+
-sub significant { '' }
+sub significant() { '' }
 
 =pod
 

@@ -129,7 +129,7 @@ sub lines {
 # PPI::Element Methods
 
 ### XS -> PPI/XS.xs:_PPI_Token_Pod__significant 0.900+
-sub significant { '' }
+sub significant() { '' }
 
 
 

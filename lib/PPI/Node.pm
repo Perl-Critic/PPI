@@ -91,7 +91,7 @@ boundary, or false if it does not.
 =cut
 
 ### XS -> PPI/XS.xs:_PPI_Node__scope 0.903+
-sub scope { '' }
+sub scope() { '' }
 
 =pod
 

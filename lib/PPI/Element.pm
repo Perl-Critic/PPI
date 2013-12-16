@@ -67,7 +67,7 @@ Returns true if the Element is significant, or false it not.
 =cut
 
 ### XS -> PPI/XS.xs:_PPI_Element__significant 0.845+
-sub significant { 1 }
+sub significant() { 1 }
 
 =pod
 
@@ -122,7 +122,7 @@ Returns the basic code as a string (excluding here-doc content).
 =cut
 
 ### XS -> PPI/XS.xs:_PPI_Element__content 0.900+
-sub content { '' }
+sub content() { '' }
 
 
 

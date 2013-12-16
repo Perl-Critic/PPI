@@ -57,9 +57,9 @@ BEGIN {
 # Tokenizer Methods
 
 ### XS -> PPI/XS.xs:_PPI_Token_End__significant 0.900+
-sub significant { '' }
+sub significant() { '' }
 
-sub __TOKENIZER__on_char { 1 }
+sub __TOKENIZER__on_char() { 1 }
 
 sub __TOKENIZER__on_line_start {
 	my $t = $_[1];

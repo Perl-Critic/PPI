@@ -48,7 +48,7 @@ BEGIN {
 	@ISA     = 'PPI::Token';
 }
 
-sub significant { '' }
+sub significant() { '' }
 
 
 
