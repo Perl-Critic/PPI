@@ -115,25 +115,22 @@ sub _scan_for_unescaped_character {
 
 	# Create the search regex.
 	# Same as above but with a negative look-behind assertion.
-	my $search = qr/^(.*?(?<!\\)(?:\\\\)*$char)/;
+	my $search = qr/(.*?(?<!\\)(?:\\\\)*$char)/;
 
 	my $string = '';
 	while ( exists $t->{line} ) {
 		# Get the search area for the current line
-		my $search_area
-			= $t->{line_cursor}
-			? substr( $t->{line}, $t->{line_cursor} )
-			: $t->{line};
+		pos $t->{line} = $t->{line_cursor};
 
 		# Can we find a match on this line
-		if ( $search_area =~ /$search/ ) {
+		if ( $t->{line} =~ m/\G$search/gc ) {
 			# Found the character on this line
 			$t->{line_cursor} += length($1) - 1;
 			return $string . $1;
 		}
 
 		# Load in the next line
-		$string .= $search_area;
+		$string .= substr $t->{line}, $t->{line_cursor};
 		my $rv = $t->_fill_line('inscan');
 		if ( $rv ) {
 			# Push to first character
