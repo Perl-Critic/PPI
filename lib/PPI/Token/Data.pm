@@ -65,7 +65,7 @@ sub handle {
 	IO::String->new( \$self->{content} );
 }
 
-sub __TOKENIZER__on_char { 1 }
+sub __TOKENIZER__on_char() { 1 }
 
 1;
 

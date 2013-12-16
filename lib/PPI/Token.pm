@@ -199,9 +199,9 @@ sub insert_after {
 #####################################################################
 # Tokenizer Methods
 
-sub __TOKENIZER__on_line_start { 1 }
-sub __TOKENIZER__on_line_end   { 1 }
-sub __TOKENIZER__on_char       { 'Unknown' }
+sub __TOKENIZER__on_line_start() { 1 }
+sub __TOKENIZER__on_line_end()   { 1 }
+sub __TOKENIZER__on_char()       { 'Unknown' }
 
 
 

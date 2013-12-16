@@ -70,7 +70,7 @@ BEGIN {
 }
 
 # Lexer clues
-sub __LEXER__normal { '' }
+sub __LEXER__normal() { '' }
 
 
 
@@ -144,7 +144,7 @@ sub type {
 #####################################################################
 # PPI::Node Methods
 
-sub scope { 1 }
+sub scope() { 1 }
 
 
 
