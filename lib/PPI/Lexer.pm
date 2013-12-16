@@ -1442,15 +1442,16 @@ sub _add_element {
 	# Handle a special case, where a statement is not fully resolved
 	if ( ref $Parent eq 'PPI::Statement' ) {
 		my $first  = $Parent->schild(0);
-		my $second = $Parent->schild(1);
-		if ( $first and $first->isa('PPI::Token::Label') and ! $second ) {
-			# It's a labelled statement
-			if ( $STATEMENT_CLASSES{$second->content} ) {
-				bless $Parent, $STATEMENT_CLASSES{$second->content};
+		if ($first && $first->isa('PPI::Token::Label')) {
+			my $second = $Parent->schild(1);
+			if ( ! $second ) {
+				# It's a labelled statement
+				if ( $STATEMENT_CLASSES{$second->content} ) {
+					bless $Parent, $STATEMENT_CLASSES{$second->content};
+				}
 			}
 		}
 	}
-
 	# Add first the delayed, from the front, then the passed element
 	foreach my $el ( @{$self->{delayed}} ) {
 		Scalar::Util::weaken(
