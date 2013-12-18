@@ -14,7 +14,7 @@ BEGIN {
 use PPI;
 
 # Execute the tests
-use Test::More tests => 61;
+use Test::More tests => 65;
 
 sub check_with {
 	my ( $code, $checker ) = @_;
@@ -225,6 +225,24 @@ is( $words->[1], 'unpack', q{unpack'H*',$data} );
 
 check_with "1.eq'bar';", sub {
 	is $_->child( 0 )->child( 2 )->content, 'eq', 'eq operator after number and concat op is recognized';
+};
+
+check_with "__DATA__", sub {
+	is $_->child( 1 ), undef, 'DATA segment without following newline does not get one added';
+};
+
+check_with "__DATA__ a", sub {
+	is $_->child( 1 )->content, ' a',
+	  'DATA segment without following newline, but text, has text added as comment in following token';
+};
+
+check_with "__END__", sub {
+	is $_->child( 1 ), undef, 'END segment without following newline does not get one added';
+};
+
+check_with "__END__ a", sub {
+	is $_->child( 0 )->child( 1 )->content, ' a',
+	  'END segment without following newline, but text, has text added as comment in children list';
 };
 
 1;
