@@ -14,7 +14,15 @@ BEGIN {
 use PPI;
 
 # Execute the tests
-use Test::More tests => 60;
+use Test::More tests => 61;
+
+sub check_with {
+	my ( $code, $checker ) = @_;
+	my $Document = PPI::Document->new( \$code );
+	is( PPI::Document->errstr, undef ) if PPI::Document->errstr;
+	local $_ = $Document;
+	$checker->();
+}
 
 # =begin testing literal 9
 {
@@ -215,5 +223,8 @@ is( $words->[0], 'pack', q{pack'H*',$data} );
 is( $words->[1], 'unpack', q{unpack'H*',$data} );
 }
 
+check_with "1.eq'bar';", sub {
+	is $_->child( 0 )->child( 2 )->content, 'eq', 'eq operator after number and concat op is recognized';
+};
 
 1;
