@@ -686,8 +686,8 @@ sub _last_significant_token {
 
 # Get an array ref of previous significant tokens.
 # Like _last_significant_token except it gets more than just one token
-# Returns array ref on success.
-# Returns 0 on not enough tokens
+# Returns array ref
+# Pads with zero-length whitespace tokens if there are less than requested
 sub _previous_significant_tokens {
 	my $self   = shift;
 	my $count  = shift || 1;

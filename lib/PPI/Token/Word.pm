@@ -359,7 +359,7 @@ sub __TOKENIZER__on_char {
 
 	# We might be a subroutine attribute.
 	my $tokens = $t->_previous_significant_tokens(1);
-	if ( $tokens and $tokens->[0]->{_attribute} ) {
+	if ( $tokens->[0]->{_attribute} ) {
 		$t->{class} = $t->{token}->set_class( 'Attribute' );
 		return $t->{class}->__TOKENIZER__commit( $t );
 	}
@@ -428,7 +428,7 @@ sub __TOKENIZER__commit {
 
 	# We might be a subroutine attribute.
 	my $tokens = $t->_previous_significant_tokens(1);
-	if ( $tokens and $tokens->[0]->{_attribute} ) {
+	if ( $tokens->[0]->{_attribute} ) {
 		$t->_new_token( 'Attribute', $word );
 		return ($t->{line_cursor} >= $t->{line_length}) ? 0
 			: $t->{class}->__TOKENIZER__on_char($t);
