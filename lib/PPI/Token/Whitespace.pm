@@ -223,37 +223,36 @@ sub __TOKENIZER__on_char {
 
 		# Get the three previous significant tokens
 		my $tokens = $t->_previous_significant_tokens(3);
-		if ( $tokens ) {
-			# A normal subroutine declaration
-			my $p1 = $tokens->[1];
-			my $p2 = $tokens->[2];
-			if (
-				$tokens->[0]->isa('PPI::Token::Word')
-				and
-				$p1->isa('PPI::Token::Word')
-				and
-				$p1->content eq 'sub'
-				and (
-					$p2->isa('PPI::Token::Structure')
-					or (
-						$p2->isa('PPI::Token::Whitespace')
-						and
-						$p2->content eq ''
-					)
-				)
-			) {
-				# This is a sub prototype
-				return 'Prototype';
-			}
 
-			# A prototyped anonymous subroutine
-			my $p0 = $tokens->[0];
-			if ( $p0->isa('PPI::Token::Word') and $p0->content eq 'sub'
-				# Maybe it's invoking a method named 'sub'
-				and not ( $p1 and $p1->isa('PPI::Token::Operator') and $p1->content eq '->')
-			) {
-				return 'Prototype';
-			}
+		# A normal subroutine declaration
+		my $p1 = $tokens->[1];
+		my $p2 = $tokens->[2];
+		if (
+			$tokens->[0]->isa('PPI::Token::Word')
+			and
+			$p1->isa('PPI::Token::Word')
+			and
+			$p1->content eq 'sub'
+			and (
+				$p2->isa('PPI::Token::Structure')
+				or (
+					$p2->isa('PPI::Token::Whitespace')
+					and
+					$p2->content eq ''
+				)
+			)
+		) {
+			# This is a sub prototype
+			return 'Prototype';
+		}
+
+		# A prototyped anonymous subroutine
+		my $p0 = $tokens->[0];
+		if ( $p0->isa('PPI::Token::Word') and $p0->content eq 'sub'
+			# Maybe it's invoking a method named 'sub'
+			and not ( $p1 and $p1->isa('PPI::Token::Operator') and $p1->content eq '->')
+		) {
+			return 'Prototype';
 		}
 
 		# This is a normal open bracket
