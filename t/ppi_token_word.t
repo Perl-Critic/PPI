@@ -14,7 +14,7 @@ BEGIN {
 use PPI;
 
 # Execute the tests
-use Test::More tests => 65;
+use Test::More tests => 66;
 
 sub check_with {
 	my ( $code, $checker ) = @_;
@@ -226,6 +226,12 @@ is( $words->[1], 'unpack', q{unpack'H*',$data} );
 check_with "1.eq'bar';", sub {
 	is $_->child( 0 )->child( 2 )->content, 'eq', 'eq operator after number and concat op is recognized';
 };
+
+check_with "1.eqm'bar';", sub {
+	is $_->child( 0 )->child( 2 )->content, "eqm'bar",
+	  "eqm' bareword after number and concat op is not mistaken for eq";
+};
+
 
 check_with "__DATA__", sub {
 	is $_->child( 1 ), undef, 'DATA segment without following newline does not get one added';
