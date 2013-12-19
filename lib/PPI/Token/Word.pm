@@ -183,7 +183,7 @@ sub __TOKENIZER__on_char {
 
 	# We might be a subroutine attribute.
 	my $tokens = $t->_previous_significant_tokens(1);
-	if ( $tokens and $tokens->[0]->{_attribute} ) {
+	if ( $tokens->[0]->{_attribute} ) {
 		$t->{class} = $t->{token}->set_class( 'Attribute' );
 		return $t->{class}->__TOKENIZER__commit( $t );
 	}
@@ -252,7 +252,7 @@ sub __TOKENIZER__commit {
 
 	# We might be a subroutine attribute.
 	my $tokens = $t->_previous_significant_tokens(1);
-	if ( $tokens and $tokens->[0]->{_attribute} ) {
+	if ( $tokens->[0]->{_attribute} ) {
 		$t->_new_token( 'Attribute', $word );
 		return ($t->{line_cursor} >= $t->{line_length}) ? 0
 			: $t->{class}->__TOKENIZER__on_char($t);
@@ -330,7 +330,7 @@ sub __TOKENIZER__commit {
 		# If the next character is a ':' then it's a label...
 		pos $t->{line} = $t->{line_cursor};
 		if ( $t->{line} =~ m/\G(\s*:)(?!:)/gc ) {
-			if ( $tokens and $tokens->[0]->{content} eq 'sub' ) {
+			if ( $tokens->[0]->{content} eq 'sub' ) {
 				# ... UNLESS it's after 'sub' in which
 				# case it is a sub name and an attribute
 				# operator.
@@ -377,20 +377,18 @@ sub __TOKENIZER__literal {
 
 	# Check the cases when we have previous tokens
 	pos $t->{line} = $t->{line_cursor};
-	if ( $tokens ) {
-		my $token = $tokens->[0] or return '';
+	my $token = $tokens->[0] or return '';
 
-		# We are forced if we are a method name
-		return 1 if $token->{content} eq '->';
+	# We are forced if we are a method name
+	return 1 if $token->{content} eq '->';
 
-		# We are forced if we are a sub name
-		return 1 if $token->isa('PPI::Token::Word') && $token->{content} eq 'sub';
+	# We are forced if we are a sub name
+	return 1 if $token->isa('PPI::Token::Word') && $token->{content} eq 'sub';
 
-		# If we are contained in a pair of curly braces,
-		# we are probably a bareword hash key
-		if ( $token->{content} eq '{' and $t->{line} =~ /\G\s*\}/gc ) {
-			return 1;
-		}
+	# If we are contained in a pair of curly braces,
+	# we are probably a bareword hash key
+	if ( $token->{content} eq '{' and $t->{line} =~ /\G\s*\}/gc ) {
+		return 1;
 	}
 
 	# In addition, if the word is followed by => it is probably
