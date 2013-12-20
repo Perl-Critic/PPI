@@ -553,20 +553,18 @@ sub __TOKENIZER__literal {
 
 	# Check the cases when we have previous tokens
 	my $rest = substr( $t->{line}, $t->{line_cursor} );
-	if ( $tokens ) {
-		my $token = $tokens->[0] or return '';
+	my $token = $tokens->[0] or return '';
 
-		# We are forced if we are a method name
-		return 1 if $token->{content} eq '->';
+	# We are forced if we are a method name
+	return 1 if $token->{content} eq '->';
 
-		# We are forced if we are a sub name
-		return 1 if $token->isa('PPI::Token::Word') && $token->{content} eq 'sub';
+	# We are forced if we are a sub name
+	return 1 if $token->isa('PPI::Token::Word') && $token->{content} eq 'sub';
 
-		# If we are contained in a pair of curly braces,
-		# we are probably a bareword hash key
-		if ( $token->{content} eq '{' and $rest =~ /^\s*\}/ ) {
-			return 1;
-		}
+	# If we are contained in a pair of curly braces,
+	# we are probably a bareword hash key
+	if ( $token->{content} eq '{' and $rest =~ /^\s*\}/ ) {
+		return 1;
 	}
 
 	# In addition, if the word is followed by => it is probably
