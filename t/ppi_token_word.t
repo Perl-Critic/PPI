@@ -14,7 +14,7 @@ BEGIN {
 use PPI;
 
 # Execute the tests
-use Test::More tests => 66;
+use Test::More tests => 68;
 
 sub check_with {
 	my ( $code, $checker ) = @_;
@@ -249,6 +249,16 @@ check_with "__END__", sub {
 check_with "__END__ a", sub {
 	is $_->child( 0 )->child( 1 )->content, ' a',
 	  'END segment without following newline, but text, has text added as comment in children list';
+};
+
+check_with "__END__ a\n", sub {
+	is $_->child( 0 )->child( 1 )->content, ' a',
+	  'END segment, followed by text and newline, has text added as comment in children list';
+};
+
+check_with "__DATA__ a\n", sub {
+	is $_->child( 1 )->content, ' a',
+	  'DATA segment, followed by text and newline, has text added as comment in following token';
 };
 
 1;
