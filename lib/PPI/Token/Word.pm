@@ -547,7 +547,7 @@ sub __TOKENIZER__literal {
 
 	# Is this a forced-word context?
 	# i.e. Would normally be seen as an operator.
-	unless ( $QUOTELIKE{$word} or $PPI::Token::Operator::OPERATOR{$word} ) {
+	unless ( $QUOTELIKE{$word} or $OPERATOR{$word} ) {
 		return '';
 	}
 
