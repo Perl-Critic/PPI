@@ -37,6 +37,7 @@ now, look at L<Perl::Critic::Utils>.
 
 use strict;
 use PPI::Token ();
+use PPI::DeadCode;
 
 use vars qw{$VERSION @ISA %OPERATOR %QUOTELIKE};
 BEGIN {
@@ -357,24 +358,16 @@ sub __TOKENIZER__on_char {
 
 	}
 
-	# We might be a subroutine attribute.
-	my $tokens = $t->_previous_significant_tokens(1);
-	if ( $tokens->[0]->{_attribute} ) {
-		$t->{class} = $t->{token}->set_class( 'Attribute' );
-		return $t->{class}->__TOKENIZER__commit( $t );
-	}
+	my $tokens = $t->_previous_significant_tokens( 1 );
+	PPI::DeadCode->token_word_char_maybe_attribute( $tokens );
 
-	# Check for a quote like operator
 	my $word = $t->{token}->{content};
-	if ( $QUOTELIKE{$word} and ! $class->__TOKENIZER__literal($t, $word, $tokens) ) {
-		$t->{class} = $t->{token}->set_class( $QUOTELIKE{$word} );
-		return $t->{class}->__TOKENIZER__on_char( $t );
-	}
+	PPI::DeadCode->token_word_char_maybe_quotelike( \%QUOTELIKE, $word, $class, $t, $tokens );
 
-	# Or one of the word operators
-	if ( $OPERATOR{$word} and ! $class->__TOKENIZER__literal($t, $word, $tokens) ) {
-	 	$t->{class} = $t->{token}->set_class( 'Operator' );
- 		return $t->_finalize_token->__TOKENIZER__on_char( $t );
+	if ( $OPERATOR{$word} ) {
+		PPI::DeadCode->token_word_char_operator_and_literal( $class, $t, $word, $tokens );
+		$t->{class} = $t->{token}->set_class( 'Operator' );
+		return $t->_finalize_token->__TOKENIZER__on_char( $t );
 	}
 
 	# Unless this is a simple identifier, at this point
@@ -383,19 +376,9 @@ sub __TOKENIZER__on_char {
 		return $t->_finalize_token->__TOKENIZER__on_char( $t );
 	}
 
-	# If the NEXT character in the line is a colon, this
-	# is a label.
 	my $char = substr( $t->{line}, $t->{line_cursor}, 1 );
-	if ( $char eq ':' ) {
-		$t->{token}->{content} .= ':';
-		$t->{line_cursor}++;
-		$t->{class} = $t->{token}->set_class( 'Label' );
-
-	# If not a label, '_' on its own is the magic filehandle
-	} elsif ( $word eq '_' ) {
-		$t->{class} = $t->{token}->set_class( 'Magic' );
-
-	}
+	PPI::DeadCode->token_word_char_maybe_label( $char );
+	PPI::DeadCode->token_word_char_maybe_magic_filehandle( $char, $word );
 
 	# Finalise and process the character again
 	$t->_finalize_token->__TOKENIZER__on_char( $t );
@@ -411,10 +394,8 @@ sub __TOKENIZER__commit {
 	# Our current position is the first character of the bareword.
 	# Capture the bareword.
 	my $rest = substr( $t->{line}, $t->{line_cursor} );
-	unless ( $rest =~ /^((?!\d)\w+(?:(?:\'|::)\w+)*(?:::)?)/ ) {
-		# Programmer error
-		die "Fatal error... regex failed to match in '$rest' when expected";
-	}
+	$rest =~ /^((?!\d)\w+(?:(?:\'|::)\w+)*(?:::)?)/;
+	PPI::DeadCode->token_word_commit_bareword_starting_with_numbers( $1 );
 
 	# Special Case: If we accidentally treat eq'foo' like the word "eq'foo",
 	# then unwind it and just make it 'eq' (or the other stringy comparitors)
@@ -430,8 +411,8 @@ sub __TOKENIZER__commit {
 	my $tokens = $t->_previous_significant_tokens(1);
 	if ( $tokens->[0]->{_attribute} ) {
 		$t->_new_token( 'Attribute', $word );
-		return ($t->{line_cursor} >= $t->{line_length}) ? 0
-			: $t->{class}->__TOKENIZER__on_char($t);
+		PPI::DeadCode->token_word_commit_eof_after_attribute( $t );
+		return $t->{class}->__TOKENIZER__on_char($t);
 	}
 
 	# Check for the end of the file
@@ -495,8 +476,8 @@ sub __TOKENIZER__commit {
 	} elsif ( $QUOTELIKE{$word} ) {
 		# Special Case: A Quote-like operator
 		$t->_new_token( $QUOTELIKE{$word}, $word );
-		return ($t->{line_cursor} >= $t->{line_length}) ? 0
-			: $t->{class}->__TOKENIZER__on_char( $t );
+		PPI::DeadCode->token_word_commit_eof_after_quotelike( $t );
+		return $t->{class}->__TOKENIZER__on_char( $t );
 
 	} elsif ( $OPERATOR{$word} ) {
 		# Word operator
@@ -531,11 +512,7 @@ sub __TOKENIZER__commit {
 
 	# Create the new token and finalise
 	$t->_new_token( $token_class, $word );
-	if ( $t->{line_cursor} >= $t->{line_length} ) {
-		# End of the line
-		$t->_finalize_token;
-		return 0;
-	}
+	PPI::DeadCode->token_word_commit_eof_at_end_of_commit( $t );
 	$t->_finalize_token->__TOKENIZER__on_char($t);
 }
 
@@ -553,7 +530,8 @@ sub __TOKENIZER__literal {
 
 	# Check the cases when we have previous tokens
 	my $rest = substr( $t->{line}, $t->{line_cursor} );
-	my $token = $tokens->[0] or return '';
+	my $token = $tokens->[0];
+	PPI::DeadCode->token_word_literal_without_preceding_tokens($token);
 
 	# We are forced if we are a method name
 	return 1 if $token->{content} eq '->';
