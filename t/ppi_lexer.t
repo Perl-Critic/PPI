@@ -89,7 +89,7 @@ isa_ok( $statements[9]->schild(1), 'PPI::Structure::Block',
 	'The curly in ' . $statements[9]);
 isa_ok( $statements[10]->schild(2), 'PPI::Structure::Constructor',
 	'The curly in ' . $statements[10]);
-isa_ok( $statements[11]->schild(3), 'PPI::Structure::Constructor',
+isa_ok( $statements[11]->schild(2), 'PPI::Structure::Constructor',
 	'The curly in ' . $statements[11]);
 isa_ok( $statements[12]->schild(2), 'PPI::Structure::Constructor',
 	'The curly in ' . $statements[12]);
