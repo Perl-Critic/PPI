@@ -5,7 +5,7 @@
 use strict;
 use File::Spec::Functions ':ALL';
 BEGIN {
-	$| = 1;
+	$|  = 1;
 	$^W = 1;
 	no warnings 'once';
 	$PPI::XS_DISABLE = 1;
@@ -16,7 +16,7 @@ use PPI;
 # Execute the tests
 use Test::More 'no_plan';
 
-# =begin testing
+# =begin testing ppi_token_operator
 {
 foreach my $op ( sort keys %PPI::Token::Operator::OPERATOR ) {
 	my $source = $op eq '<>' ? '<>;' : "1 $op 2;";
