@@ -85,7 +85,7 @@ sub __TOKENIZER__on_char {
 
 	if ( $char =~ /[\w\d]/ ) {
 		unless ( $char eq '1' or $char eq '0' ) {
-			# Add a warning if it contains non-hex chars
+			# Add a warning if it contains non-binary chars
 			$t->{token}->{_error} = "Illegal character in binary number '$char'";
 		}
 		return 1;
