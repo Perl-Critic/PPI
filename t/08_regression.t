@@ -124,7 +124,7 @@ SCOPE: {
 }
 
 # Encode an assumption that the value of a zero-length substr one char
-# after the end of the string returns ''. This assuption is used to make
+# after the end of the string returns ''. This assumption is used to make
 # the decision on the sections->[1]->{position} value being one char after
 # the end of the current string
 is( substr('foo', 3, 0), '', 'substr one char after string end returns ""' );
