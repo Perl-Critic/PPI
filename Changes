@@ -346,7 +346,7 @@ Revision history for Perl extension PPI
 	- Converted more of the Tokenizer to use exceptions
 	- Optimized away a bunch of now-unneeded "or return undef"
 	- Optimized _set_token_class down to a single statement
-	- Inlined _set_token_class out of existance
+	- Inlined _set_token_class out of existence
 	- Cache and fast-clone PPI::Token::Whitespace->null
 	- Removed some superfluous parameter checks on private methods,
 	  for conditions that would cause explosions and be noticed anyway.
