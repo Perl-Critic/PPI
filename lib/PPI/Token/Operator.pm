@@ -20,11 +20,9 @@ PPI::Token::Operator - Token class for operators
   <<   >>   lt   gt   le   ge   cmp  ~~
   ==   !=   <=>  .    ..   ...  ,
   &    |    ^    &&   ||   //
-  ?    :    **=  +=   -=   .=   *=   /=
-  %=   x=   &=   |=   ^=   <<=  >>=  &&=
-  ||=  //=  <    >    <=   >=   <>   =>   ->
-  and  or   xor  not  eq   ne
-
+  ?    :    =    +=   -=   *=   .=   //=
+  <    >    <=   >=   <>   =>   ->
+  and  or   dor  not  eq   ne
 
 =head1 DESCRIPTION
 
@@ -60,8 +58,7 @@ BEGIN {
 		< > <= >= lt gt le ge
 		== != <=> eq ne cmp ~~
 		& | ^ && || // .. ...
-		? :
-		= **= += -= .= *= /= %= x= &= |= ^= <<= >>= &&= ||= //=
+		? : = += -= *= .= /= //=
 		=> <>
 		and or xor not
 		}, ',' 	# Avoids "comma in qw{}" warning
@@ -74,51 +71,6 @@ BEGIN {
 
 #####################################################################
 # Tokenizer Methods
-
-=pod
-
-=begin testing ppi_token_operator
-
-foreach my $op ( sort keys %PPI::Token::Operator::OPERATOR ) {
-	my $source = $op eq '<>' ? '<>;' : "1 $op 2;";
-	my $doc = PPI::Document->new( \$source );
-	isa_ok( $doc, 'PPI::Document', "operator $op parsed '$source'" );
-	my $ops = $doc->find( $op eq '<>' ? 'Token::QuoteLike::Readline' : 'Token::Operator' );
-	is( ref $ops, 'ARRAY', "operator $op found operators" );
-	is( @$ops, 1, "operator $op found exactly once" );
-	is( $ops->[0]->content(), $op, "operator $op operator text matches" );
-}
-
-{
-	my $source = '$a = .987;';
-	my $doc = PPI::Document->new( \$source );
-	isa_ok( $doc, 'PPI::Document', "parsed '$source'" );
-	my $ops = $doc->find( 'Token::Number::Float' );
-	is( ref $ops, 'ARRAY', "found number" );
-	is( @$ops, 1, "number found exactly once" );
-	is( $ops->[0]->content(), '.987', "text matches" );
-
-	$ops = $doc->find( 'Token::Operator' );
-	is( ref $ops, 'ARRAY', "operator = found operators in number test" );
-	is( @$ops, 1, "operator = found exactly once in number test" );
-}
-
-{
-	my $source = '$a = <<PERL_END;' . "\n" . 'PERL_END';
-	my $doc = PPI::Document->new( \$source );
-	isa_ok( $doc, 'PPI::Document', "parsed '$source'" );
-	my $ops = $doc->find( 'Token::HereDoc' );
-	is( ref $ops, 'ARRAY', "found heredoc" );
-	is( @$ops, 1, "heredoc found exactly once" );
-
-	$ops = $doc->find( 'Token::Operator' );
-	is( ref $ops, 'ARRAY', "operator = found operators in heredoc test" );
-	is( @$ops, 1, "operator = found exactly once in heredoc test" );
-}
-
-=end testing
-
-=cut
 
 sub __TOKENIZER__on_char {
 	my $t    = $_[1];
