@@ -338,7 +338,7 @@ sub __TOKENIZER__is_an_attribute {
 		return 1;
 	}
 
-	# We arn't an attribute
+	# We aren't an attribute
 	'';	
 }
 

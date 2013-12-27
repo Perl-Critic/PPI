@@ -199,7 +199,7 @@ sub _scan_for_brace_character {
 		$string .= $1;
 		$t->{line_cursor} += length $1;
 
-		# Alter the depth and continue if we arn't at the end
+		# Alter the depth and continue if we aren't at the end
 		$depth += ($1 =~ /$open_brace$/) ? 1 : -1 and next;
 
 		# Rewind the cursor by one character ( cludgy hack )
