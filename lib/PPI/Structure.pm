@@ -47,7 +47,7 @@ loops, literal lists, and braces used for precedence-ordering purposes.
 =head2 L<PPI::Structure::For>
 
 Although B<not> used for the C<foreach> loop list, this B<is> used for
-the special case of the round-brace three-part semicolon-seperated C<for>
+the special case of the round-brace three-part semicolon-separated C<for>
 loop expression (the traditional C style for loop).
 
 =head2 L<PPI::Structure::Given>
