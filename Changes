@@ -346,7 +346,7 @@ Revision history for Perl extension PPI
 	- Converted more of the Tokenizer to use exceptions
 	- Optimized away a bunch of now-unneeded "or return undef"
 	- Optimized _set_token_class down to a single statement
-	- Inlined _set_token_class out of existance
+	- Inlined _set_token_class out of existence
 	- Cache and fast-clone PPI::Token::Whitespace->null
 	- Removed some superfluous parameter checks on private methods,
 	  for conditions that would cause explosions and be noticed anyway.
@@ -524,7 +524,7 @@ Revision history for Perl extension PPI
 	Details:
 	- Removed every single use of UNIVERSAL::isa
 	- PPI::Normal was quite broken, cleaned it up
-	- Fixed PPI::Normal::Standard::remove_statement_seperator
+	- Fixed PPI::Normal::Standard::remove_statement_separator
 	- Fixed CPAN #16674 PPI::Token::Quote::Double->interpolations
 	  (awigley)
 	- Fixed CPAN #15131 PPI::Node->find() behavior not completely
@@ -801,7 +801,7 @@ Revision history for Perl extension PPI
 	Details:
 	- Partly added Layer 2 to PPI::Normal
 	- Added function PPI::Normal::Standard::remove_useless_pragma
-	- Added function PPI::Normal::Standard::remove_statement_seperator
+	- Added function PPI::Normal::Standard::remove_statement_separator
 	- Added function PPI::Normal::Standard::remove_useless_return
 	- Renamed _on_line_start to __TOKENIZER__on_line_start
 	- Renamed _on_line_end to __TOKENIZER__on_line_end
@@ -954,8 +954,8 @@ Revision history for Perl extension PPI
 0.841 Mon Jan 10 2005
 	Summary:
 	- Completed much more documentation on the core classes
-	- PPI::Tester back in sync again (seperate distribution)
-	- PPI::Processor and PPI::Tinderbox completed (seperate distribution)
+	- PPI::Tester back in sync again (separate distribution)
+	- PPI::Processor and PPI::Tinderbox completed (separate distribution)
 
 	Details:
 	- Documented PPI::Tokenizer
@@ -1061,7 +1061,7 @@ Revision history for Perl extension PPI
 	- Vastly improved PPI::Manual
 
 0.827 Thu Aug  5 2004
-	- Added PPI::Token::Seperator class ( for __DATA__ and __END__ )
+	- Added PPI::Token::Separator class ( for __DATA__ and __END__ )
 	- Added better Tokenizer handling of __DATA__ and __END__
 	- Added better Lexer handling of __DATA__ and __END__
 	- Fixed some version inconsistencies
@@ -1093,7 +1093,7 @@ Revision history for Perl extension PPI
 	- 100% round-trip safe. What goes in, will come out.
 	- Reduced leaks by 95%. Process size 30meg after 5000 files.
 	  Still some leaks remaining when Lexing errors out.
-	- Seperated largest Tokens into their own files.
+	- Separated largest Tokens into their own files.
 	  This aligns token class structure with that of ::Statement and ::Structure
 	- Rewrote PPI::Node::DESTROY several times while hunting down more leaks
 	- Fixed Tokenizer crash on empty subroutine prototypes such as C< sub foo() {} >
@@ -1195,7 +1195,7 @@ Revision history for Perl extension PPI
 0.814 Sat Jun 26 2004
 	- Added the PPI tester, a desktop-based interactive debugger, which
 	  should greatly accelerate finding and fixing both ::Tokenizer
-	  and ::Lexer bugs. This will probably end up as a seperate
+	  and ::Lexer bugs. This will probably end up as a separate
 	  distribution though, as it has a dependency on wxPerl.
 
 	- Fixed the misparsing of Foo::Bar::Baz
@@ -1249,7 +1249,7 @@ Revision history for Perl extension PPI
 0.804 Sat Sep 06 2003
 	- Statement and Structure resolution preliminarily work.
 	  Some basic types of statements and structures are identified.
-	- PPI::Format::Apache has been seperated into a different module
+	- PPI::Format::Apache has been separated into a different module
 
 0.803 Sat Sep 06 2003
 	- Added very long line protection support.

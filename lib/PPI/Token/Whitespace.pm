@@ -204,7 +204,7 @@ sub __TOKENIZER__on_char {
 	my $t    = $_[1];
 	my $char = ord substr $t->{line}, $t->{line_cursor}, 1;
 
-	# Do we definately know what something is?
+	# Do we definitely know what something is?
 	return $COMMITMAP[$char]->__TOKENIZER__commit($t) if $COMMITMAP[$char];
 
 	# Handle the simple option first

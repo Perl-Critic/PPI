@@ -146,7 +146,7 @@ sub __TOKENIZER__scan_for_end {
 		$string .= $1;
 		$t->{line_cursor} += length $1;
 
-		# Alter the depth and continue if we arn't at the end
+		# Alter the depth and continue if we aren't at the end
 		$depth += ($1 =~ /\($/) ? 1 : -1 and next;
 
 		# Found the end

@@ -91,7 +91,7 @@ The cause of this problem was Perl's complex and dynamic grammar.
 Although there is typically not a huge diversity in the grammar of most
 Perl code, certain issues cause large problems when it comes to parsing.
 
-Indeed, quite early in Perl's history Tom Christenson introduced the Perl
+Indeed, quite early in Perl's history Tom Christiansen introduced the Perl
 community to the quote I<"Nothing but perl can parse Perl">, or as it is
 more often stated now as a truism:
 

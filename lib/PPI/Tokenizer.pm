@@ -361,7 +361,7 @@ sub all_tokens {
 
 =head2 increment_cursor
 
-Although exposed as a public method, C<increment_method> is implemented
+Although exposed as a public method, C<increment_cursor> is implemented
 for expert use only, when writing lexers or other components that work
 directly on token streams.
 
@@ -383,7 +383,7 @@ sub increment_cursor {
 
 =head2 decrement_cursor
 
-Although exposed as a public method, C<decrement_method> is implemented
+Although exposed as a public method, C<decrement_cursor> is implemented
 for expert use only, when writing lexers or other components that work
 directly on token streams.
 
@@ -764,7 +764,7 @@ sub _opcontext {
 
 =head2 How the Tokenizer Works
 
-Understanding the Tokenizer is not for the feint-hearted. It is by far
+Understanding the Tokenizer is not for the faint-hearted. It is by far
 the most complex and twisty piece of perl I've ever written that is actually
 still built properly and isn't a terrible spaghetti-like mess. In fact, you
 probably want to skip this section.

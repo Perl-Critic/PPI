@@ -575,7 +575,7 @@ sub __TOKENIZER__literal {
 		return 1;
 	}
 
-	# Otherwise we probably arn't forced
+	# Otherwise we probably aren't forced
 	'';
 }
 

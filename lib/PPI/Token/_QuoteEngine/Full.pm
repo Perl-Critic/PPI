@@ -78,7 +78,7 @@ SCOPE: {
 		is( $o->{operator},  'qw',      "$q correct operator"  );
 		is( $o->{_sections}, 1,         "$q correct _sections" );
 		is( $o->{braced}, $braced[$i],  "$q correct braced"    );
-		is( $o->{separator}, $seps[$i], "$q correct seperator" );
+		is( $o->{separator}, $seps[$i], "$q correct separator" );
 		is( $o->{content},   $q,        "$q correct content"   );
 		is( $s->{position},  3,         "$q correct position"  );
 		is( $s->{type}, $types[$i],     "$q correct type"      );
@@ -103,7 +103,7 @@ SCOPE: {
 		is( $o->{operator},  'qw',        "qw$opener correct operator"  );
 		is( $o->{_sections}, $secs[$i],   "qw$opener correct _sections" );
 		is( $o->{braced}, $braced[$i],    "qw$opener correct braced"    );
-		is( $o->{separator}, $seps[$i],   "qw$opener correct seperator" );
+		is( $o->{separator}, $seps[$i],   "qw$opener correct separator" );
 		is( $o->{content},   "qw${opener}a", "qw$opener correct content"   );
 		if ( $secs[$i] ) {
 			is( $s->{type}, "$opener$closer", "qw$opener correct type"      );

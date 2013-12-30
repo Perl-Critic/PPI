@@ -472,7 +472,7 @@ sub serialize {
 			# from the end of a file that we silently allow.
 			#
 			# When writing back out to the file we have to
-			# auto-repair these problems if we arn't going back
+			# auto-repair these problems if we aren't going back
 			# on to the end of the file.
 
 			# When calculating $last_line, ignore the final token if
