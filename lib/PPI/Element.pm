@@ -267,7 +267,7 @@ sub ancestor_of {
 =head2 statement
 
 For a C<PPI::Element> that is contained (at some depth) within a
-L<PPI::Statment>, the C<statement> method will return the first parent
+L<PPI::Statement>, the C<statement> method will return the first parent
 Statement object lexically 'above' the Element.
 
 Returns a L<PPI::Statement> object, which may be the same Element if the
