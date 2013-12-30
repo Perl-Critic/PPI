@@ -160,7 +160,7 @@ returned the null list, which may also mean simply that no Elements
 were found that matched the condition.
 
 Because of this need to explicitly check for errors, an alternative
-return value mechanism is provide. If you pass the C<array_ref => 1>
+return value mechanism is provide. If you pass the C<< array_ref => 1 >>
 parameter to the method, it will return the list of matched Elements
 as a reference to an ARRAY. The method will return false if no elements
 were matched, or C<undef> on error.
