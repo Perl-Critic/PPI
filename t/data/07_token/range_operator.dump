@@ -3,3 +3,11 @@ PPI::Document
     PPI::Token::Number  	'1'
     PPI::Token::Operator  	'..'
     PPI::Token::Number  	'2'
+    PPI::Token::Structure  	';'
+  PPI::Token::Whitespace  	'\n'
+  PPI::Statement
+    PPI::Token::Number::Float  	'12.34'
+    PPI::Token::Operator  	'..'
+    PPI::Token::Number::Float  	'56.78'
+    PPI::Token::Structure  	';'
+  PPI::Token::Whitespace  	'\n'
