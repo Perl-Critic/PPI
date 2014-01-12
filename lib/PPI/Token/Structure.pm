@@ -30,6 +30,7 @@ L<PPI::Token> and L<PPI::Element> parent classes.
 
 use strict;
 use PPI::Token ();
+use PPI::DeadCode;
 
 use vars qw{$VERSION @ISA};
 BEGIN {
@@ -132,7 +133,8 @@ sub sprevious_sibling {
 sub next_token {
 	my $self = shift;
 	return $self->SUPER::next_token if $self->{content} eq ';';
-	my $structure = $self->parent or return '';
+	my $structure = $self->parent;
+	PPI::DeadCode->token_structure_next_token_no_parent( $structure );
 
 	# If this is an opening brace, descend down into our parent
 	# structure, if it has children.
@@ -160,7 +162,8 @@ sub next_token {
 sub previous_token {
 	my $self = shift;
 	return $self->SUPER::previous_token if $self->{content} eq ';';
-	my $structure = $self->parent or return '';
+	my $structure = $self->parent;
+	PPI::DeadCode->token_structure_previous_token_no_parent( $structure );
 
 	# If this is a closing brace, descend down into our parent
 	# structure, if it has children.
@@ -169,15 +172,12 @@ sub previous_token {
 		if ( $child ) {
 			# Decend deeper, or return if it is a token
 			return $child->isa('PPI::Token') ? $child : $child->last_token;
-		} elsif ( $structure->start ) {
-			# Empty structure, so next is closing brace
-			return $structure->start;
 		}
 
-		# Anything that slips through to here is a structure
-		# with a closing brace, but no opening brace, so we
-		# just have to go with it, and continue as we would
-		# if we started with a opening brace.
+		PPI::DeadCode->token_structure_previous_token_no_start_with_no_children( $structure->start );
+
+		# Empty structure, so next is closing brace
+		return $structure->start;
 	}
 
 	# We can use the default implement, if we call it from the

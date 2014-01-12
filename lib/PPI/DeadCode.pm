@@ -85,6 +85,21 @@ sub token_word_literal_without_preceding_tokens {
 	throw_undead if !$token;
 }
 
+sub token_structure_next_token_no_parent {
+	my ( undef, $parent ) = @_;
+	throw_undead if !$parent;
+}
+
+sub token_structure_previous_token_no_parent {
+	my ( undef, $parent ) = @_;
+	throw_undead if !$parent;
+}
+
+sub token_structure_previous_token_no_start_with_no_children {
+	my ( undef, $start ) = @_;
+	throw_undead if !$start;
+}
+
 1;
 
 =pod
