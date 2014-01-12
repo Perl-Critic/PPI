@@ -8,13 +8,8 @@ use Test::More tests => 1763;
 use PPI;
 
 
-sub check_with {
-	my ( $code, $checker ) = @_;
-	my $Document = PPI::Document->new( \$code );
-	is( PPI::Document->errstr, undef ) if PPI::Document->errstr;
-	local $_ = $Document;
-	$checker->();
-}
+use lib 't/lib';
+use Helper 'check_with';
 
 LITERAL: {
 	my @pairs = (
