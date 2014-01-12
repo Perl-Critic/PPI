@@ -28,6 +28,8 @@ Revision history for Perl extension PPI
 	- expand $'x to $::main::x in Symbol->canonical as with $::x
 	  (MOREGAN)
 	- fixed parsing of large numbers in Number::Exp on Solaris 80 (JMASLAK)
+	- make remove_child actually return undef on failure to find child to
+	  remove
 
 1.220 Tue 11 Nov 2014
 	Summary:

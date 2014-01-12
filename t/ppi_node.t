@@ -42,6 +42,5 @@ REMOVE_CHILD: {
 	my $del1 = $node->child(7);
 	is $node->remove_child($del1), $del1;
 	my $fake = bless { content => 3 }, "PPI::Token::Number";
-	local $TODO = "firstidx is mis-used here";
 	is $node->remove_child($fake), undef;
 }
