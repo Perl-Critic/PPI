@@ -129,7 +129,7 @@ sub content { '' }
 
 
 #####################################################################
-# Naigation Methods
+# Navigation Methods
 
 =pod
 
