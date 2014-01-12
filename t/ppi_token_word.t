@@ -16,13 +16,8 @@ use PPI;
 # Execute the tests
 use Test::More tests => 68;
 
-sub check_with {
-	my ( $code, $checker ) = @_;
-	my $Document = PPI::Document->new( \$code );
-	is( PPI::Document->errstr, undef ) if PPI::Document->errstr;
-	local $_ = $Document;
-	$checker->();
-}
+use lib 't/lib';
+use Helper 'check_with';
 
 # =begin testing literal 9
 {
