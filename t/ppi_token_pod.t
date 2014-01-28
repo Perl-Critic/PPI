@@ -12,7 +12,7 @@ BEGIN {
 }
 use PPI;
 
-use Test::More tests => 4;
+use Test::More tests => 8;
 
 {
 	# Create the test fragments
@@ -25,6 +25,20 @@ use Test::More tests => 4;
 	my $merged = PPI::Token::Pod->merge($one, $two);
 	isa_ok( $merged, 'PPI::Token::Pod' );
 	is( $merged->content, "=pod\n\nOne\n\nTwo\n\n=cut\n", 'Merged POD looks ok' );
+}
+
+
+{
+	foreach my $test (
+		[ "=pod\n=cut", [ 'PPI::Token::Pod' ] ],
+		[ "=pod\n=cut\n", [ 'PPI::Token::Pod' ] ],
+		[ "=pod\n=cut\n\n", [ 'PPI::Token::Pod', 'PPI::Token::Whitespace' ] ],
+		[ "=pod\n=Cut\n\n", [ 'PPI::Token::Pod' ] ],  # pod doesn't end, so no whitespace token
+	) {
+		my $T = PPI::Tokenizer->new( \$test->[0] );
+		my @tokens = map { ref $_ } @{ $T->all_tokens };
+		is_deeply( \@tokens, $test->[1], 'all tokens as expected' );
+	}
 }
 
 
