@@ -132,7 +132,7 @@ sub __TOKENIZER__on_line_start {
 	# Check the line to see if it is a =cut line
 	if ( $t->{line} =~ /^=(\w+)/ ) {
 		# End of the token
-		$t->_finalize_token if lc $1 eq 'cut';
+		$t->_finalize_token if $1 eq 'cut';
 	}
 
 	0;
