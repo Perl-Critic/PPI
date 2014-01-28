@@ -11,7 +11,7 @@ BEGIN {
 }
 use PPI;
 
-use Test::More tests => 235;
+use Test::More tests => 275;
 
 
 FIND_ONE_OP: {
