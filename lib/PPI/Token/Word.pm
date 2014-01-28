@@ -501,6 +501,15 @@ sub __TOKENIZER__commit {
 	} elsif ( $OPERATOR{$word} ) {
 		# Word operator
 		$token_class = 'Operator';
+		# Special Case: "x" recognized as a word here
+		# might be the beginning of the "x=" operator.
+		if ( $word eq 'x' ) {
+			my $char = substr( $t->{line}, $t->{line_cursor}, 1 );
+			if ( $char eq '=' ) {
+				$word = 'x=';
+				++$t->{line_cursor};
+			}
+		}
 
 	} else {
 		# If the next character is a ':' then its a label...
