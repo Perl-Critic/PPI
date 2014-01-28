@@ -76,7 +76,7 @@ sub __TOKENIZER__on_char {
 	# Allow underscores straight through
 	return 1 if $char eq '_';
 
-	if ( $char =~ /[\da-f]/ ) {
+	if ( $char =~ /[\da-f]/i ) {
 		return 1;
 	}
 
