@@ -391,6 +391,12 @@ sub __TOKENIZER__on_char {
 			}
 		}
 
+		# Special Case: "x" recognized as a word here
+		# might be the beginning of the "x=" operator.
+		if ( $nextchar eq '=' ) {
+			return 'Operator';
+		}
+
 		# Otherwise, commit like a normal bareword
 		return PPI::Token::Word->__TOKENIZER__commit($t);
 
