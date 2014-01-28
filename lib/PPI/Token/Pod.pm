@@ -53,21 +53,6 @@ the content of all of them.
 
 Returns a new C<PPI::Token::Pod> object, or C<undef> on error.
 
-=begin testing merge after PPI::Node 4
-
-# Create the test fragments
-my $one = PPI::Token::Pod->new("=pod\n\nOne\n\n=cut\n");
-my $two = PPI::Token::Pod->new("=pod\n\nTwo");
-isa_ok( $one, 'PPI::Token::Pod' );
-isa_ok( $two, 'PPI::Token::Pod' );
-
-# Create the combined Pod
-my $merged = PPI::Token::Pod->merge($one, $two);
-isa_ok( $merged, 'PPI::Token::Pod' );
-is( $merged->content, "=pod\n\nOne\n\nTwo\n\n=cut\n", 'Merged POD looks ok' );
-
-=end testing
-
 =cut
 
 sub merge {
