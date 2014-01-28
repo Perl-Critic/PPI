@@ -20,9 +20,11 @@ PPI::Token::Operator - Token class for operators
   <<   >>   lt   gt   le   ge   cmp  ~~
   ==   !=   <=>  .    ..   ...  ,
   &    |    ^    &&   ||   //
-  ?    :    =    +=   -=   *=   .=   //=
-  <    >    <=   >=   <>   =>   ->
-  and  or   dor  not  eq   ne
+  ?    :    **=  +=   -=   .=   *=   /=
+  %=   x=   &=   |=   ^=   <<=  >>=  &&=
+  ||=  //=  <    >    <=   >=   <>   =>   ->
+  and  or   xor  not  eq   ne
+
 
 =head1 DESCRIPTION
 
@@ -58,7 +60,8 @@ BEGIN {
 		< > <= >= lt gt le ge
 		== != <=> eq ne cmp ~~
 		& | ^ && || // .. ...
-		? : = += -= *= .= /= //=
+		? :
+		= **= += -= .= *= /= %= x= &= |= ^= <<= >>= &&= ||= //=
 		=> <>
 		and or xor not
 		}, ',' 	# Avoids "comma in qw{}" warning
