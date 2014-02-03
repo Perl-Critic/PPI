@@ -380,22 +380,14 @@ sub __TOKENIZER__on_char {
 		return 'Operator';
 
 	} elsif ( $char == 120 ) { # $char eq 'x'
-		# Handle an arcane special case where "string"x10 means the x is an operator.
-		# String in this case means ::Single, ::Double or ::Execute, or the operator versions or same.
-		my $nextchar = substr $t->{line}, $t->{line_cursor} + 1, 1;
-		my $prev     = $t->_previous_significant_tokens(1);
-		$prev = ref $prev->[0];
-		if ( $nextchar =~ /\d/ and $prev ) {
-			if ( $prev =~ /::Quote::(?:Operator)?(?:Single|Double|Execute)$/ ) {
-				return 'Operator';
-			}
-		}
-
-		# Special Case: "x" recognized as a word here
-		# might be the beginning of the "x=" operator.
-		if ( $nextchar eq '=' ) {
-			return 'Operator';
-		}
+                # x followed immediately by a digit is an operator, not a
+                # word.
+                #
+                # x followed immediately by '=' is the 'x=' operator, not
+                # 'x ='. An important exception is '=>', which makes the x
+                # into a bareword.
+                my $remainder = substr $t->{line}, $t->{line_cursor} + 1;
+                return 'Operator' if $remainder =~ /^(\d|=(?!>))/;
 
 		# Otherwise, commit like a normal bareword
 		return PPI::Token::Word->__TOKENIZER__commit($t);
