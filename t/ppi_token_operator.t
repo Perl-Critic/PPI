@@ -1,7 +1,6 @@
 #!/usr/bin/perl
 
 use strict;
-use File::Spec::Functions ':ALL';
 BEGIN {
 	$|  = 1;
 	$^W = 1;
@@ -9,9 +8,9 @@ BEGIN {
 	$PPI::XS_DISABLE = 1;
 	$PPI::Lexer::X_TOKENIZER ||= $ENV{X_TOKENIZER};
 }
+use Test::More tests => 292;
+use Test::NoWarnings;
 use PPI;
-
-use Test::More tests => 275;
 
 
 FIND_ONE_OP: {
@@ -55,4 +54,189 @@ PARSE_ALL_OPERATORS: {
 	}
 }
 
-1;
+
+OPERATOR_X: {
+	my @tests = (
+		{
+			desc => 'integer with integer',
+			code => '1 x 3',
+			expected => [
+				'PPI::Token::Number' => '1',
+				'PPI::Token::Whitespace' => ' ',
+				'PPI::Token::Operator' => 'x',
+				'PPI::Token::Whitespace' => ' ',
+				'PPI::Token::Number' => '3',
+			],
+		},
+		{
+			desc => 'string with integer',
+			code => '"y" x 3',
+			expected => [
+				'PPI::Token::Quote::Double' => '"y"',
+				'PPI::Token::Whitespace' => ' ',
+				'PPI::Token::Operator' => 'x',
+				'PPI::Token::Whitespace' => ' ',
+				'PPI::Token::Number' => '3',
+			],
+		},
+		{
+			desc => 'string with integer',
+			code => 'qq{y} x 3',
+			expected => [
+				'PPI::Token::Quote::Interpolate' => 'qq{y}',
+				'PPI::Token::Whitespace' => ' ',
+				'PPI::Token::Operator' => 'x',
+				'PPI::Token::Whitespace' => ' ',
+				'PPI::Token::Number' => '3',
+			],
+		},
+		{
+			desc => 'string no whitespace with integer',
+			code => '"y"x 3',
+			expected => [
+				'PPI::Token::Quote::Double' => '"y"',
+				'PPI::Token::Operator' => 'x',
+				'PPI::Token::Whitespace' => ' ',
+				'PPI::Token::Number' => '3',
+			],
+		},
+		{
+			desc => 'variable with integer',
+			code => '$a x 3',
+			expected => [
+				'PPI::Token::Symbol' => '$a',
+				'PPI::Token::Whitespace' => ' ',
+				'PPI::Token::Operator' => 'x',
+				'PPI::Token::Whitespace' => ' ',
+				'PPI::Token::Number' => '3',
+			],
+		},
+		{
+			desc => 'variable with no whitespace integer',
+			code => '$a x3',
+			expected => [
+				'PPI::Token::Symbol' => '$a',
+				'PPI::Token::Whitespace' => ' ',
+				'PPI::Token::Operator' => 'x',
+				'PPI::Token::Number' => '3',
+			],
+		},
+		{
+			desc => 'variable, post ++, x, no whitespace anywhere',
+			code => '$a++x3',
+			expected => [
+				'PPI::Token::Symbol' => '$a',
+				'PPI::Token::Operator' => '++',
+				'PPI::Token::Operator' => 'x',
+				'PPI::Token::Number' => '3',
+			],
+		},
+		{
+			desc => 'double quote, no whitespace',
+			code => '"y"x 3',
+			expected => [
+				'PPI::Token::Quote::Double' => '"y"',
+				'PPI::Token::Operator' => 'x',
+				'PPI::Token::Whitespace' => ' ',
+				'PPI::Token::Number' => '3',
+			],
+		},
+		{
+			desc => 'single quote, no whitespace',
+			code => "'y'x 3",
+			expected => [
+				'PPI::Token::Quote::Single' => "'y'",
+				'PPI::Token::Operator' => 'x',
+				'PPI::Token::Whitespace' => ' ',
+				'PPI::Token::Number' => '3',
+			],
+		},
+		{
+			desc => 'parens, no whitespace, number',
+			code => "(5)x 3",
+			expected => [
+				'PPI::Structure::List' => '(5)',
+				'PPI::Token::Structure' => '(',
+				'PPI::Statement::Expression' => '5',
+				'PPI::Token::Number' => '5',
+				'PPI::Token::Structure' => ')',
+				'PPI::Token::Operator' => 'x',
+				'PPI::Token::Whitespace' => ' ',
+				'PPI::Token::Number' => '3',
+			],
+		},
+		{
+			desc => 'number following x is hex',
+			code => "1x0x1",
+			expected => [
+				'PPI::Token::Number' => '1',
+				'PPI::Token::Operator' => 'x',
+				'PPI::Token::Number::Hex' => '0x1',
+			],
+		},
+		{
+			desc => 'x followed by symbol',
+			code => '1 x$y',
+			expected => [
+				'PPI::Token::Number' => '1',
+				'PPI::Token::Whitespace' => ' ',
+				'PPI::Token::Operator' => 'x',
+				'PPI::Token::Symbol' => '$y',
+			],
+		},
+		{
+			desc => 'x= with no trailing whitespace, symbol',
+			code => '$z x=3',
+			expected => [
+				'PPI::Token::Symbol' => '$z',
+				'PPI::Token::Whitespace' => ' ',
+				'PPI::Token::Operator' => 'x=',
+				'PPI::Token::Number' => '3',
+			],
+		},
+		{
+			desc => 'x= with no trailing whitespace, symbol',
+			code => '$z x=$y',
+			expected => [
+				'PPI::Token::Symbol' => '$z',
+				'PPI::Token::Whitespace' => ' ',
+				'PPI::Token::Operator' => 'x=',
+				'PPI::Token::Symbol' => '$y',
+			],
+		},
+		{
+			desc => 'x followed by => should not be mistaken for x=',
+			code => 'x=>$x',
+			expected => [
+				'PPI::Token::Word' => 'x',
+				'PPI::Token::Operator' => '=>',
+				'PPI::Token::Symbol' => '$x',
+			],
+		},
+		{
+			desc => 'xx not mistaken for an x operator',
+			code => 'xx=>$x',
+			expected => [
+				'PPI::Token::Word' => 'xx',
+				'PPI::Token::Operator' => '=>',
+				'PPI::Token::Symbol' => '$x',
+			],
+		},
+	);
+	foreach my $test ( @tests ) {
+		my $code = $test->{code};
+
+		my $d = PPI::Document->new( \$test->{code} );
+		my $tokens = $d->find( sub { 1; } );
+		$tokens = [ map { ref($_), $_->content() } @$tokens ];
+		my $expected = $test->{expected};
+		unshift @$expected, 'PPI::Statement', $test->{code};
+		my $ok = is_deeply( $tokens, $expected, $test->{desc} );
+		if ( !$ok ) {
+			diag "$test->{code} ($test->{desc})\n";
+			diag explain $tokens;
+			diag explain $test->{expected};
+		}
+	}
+}
+
