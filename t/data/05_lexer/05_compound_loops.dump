@@ -9,6 +9,19 @@ PPI::Document
     PPI::Structure::Block  	{ ... }
   PPI::Token::Whitespace  	'\n'
   PPI::Statement::Compound
+    PPI::Token::Word  	'while'
+    PPI::Token::Whitespace  	' '
+    PPI::Structure::Condition  	( ... )
+      PPI::Statement::Expression
+        PPI::Token::Number  	'1'
+    PPI::Token::Whitespace  	' '
+    PPI::Structure::Block  	{ ... }
+    PPI::Token::Whitespace  	' '
+    PPI::Token::Word  	'continue'
+    PPI::Token::Whitespace  	' '
+    PPI::Structure::Block  	{ ... }
+  PPI::Token::Whitespace  	'\n'
+  PPI::Statement::Compound
     PPI::Token::Label  	'LABEL:'
     PPI::Token::Whitespace  	' '
     PPI::Token::Word  	'while'
@@ -16,6 +29,21 @@ PPI::Document
     PPI::Structure::Condition  	( ... )
       PPI::Statement::Expression
         PPI::Token::Number  	'1'
+    PPI::Token::Whitespace  	' '
+    PPI::Structure::Block  	{ ... }
+  PPI::Token::Whitespace  	'\n'
+  PPI::Statement::Compound
+    PPI::Token::Label  	'LABEL:'
+    PPI::Token::Whitespace  	' '
+    PPI::Token::Word  	'while'
+    PPI::Token::Whitespace  	' '
+    PPI::Structure::Condition  	( ... )
+      PPI::Statement::Expression
+        PPI::Token::Number  	'1'
+    PPI::Token::Whitespace  	' '
+    PPI::Structure::Block  	{ ... }
+    PPI::Token::Whitespace  	' '
+    PPI::Token::Word  	'continue'
     PPI::Token::Whitespace  	' '
     PPI::Structure::Block  	{ ... }
   PPI::Token::Whitespace  	'\n'
