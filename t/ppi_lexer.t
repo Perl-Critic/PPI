@@ -10,7 +10,7 @@ BEGIN {
 	$PPI::XS_DISABLE = 1;
 	$PPI::Lexer::X_TOKENIZER ||= $ENV{X_TOKENIZER};
 }
-use Test::More tests => 34;
+use Test::More tests => 39;
 use Test::NoWarnings;
 use PPI;
 
@@ -48,6 +48,11 @@ One => { Two => 2 };
 ${$foo}{bar};
 return { foo => 'bar' };
 bless { foo => 'bar' };
+$foo &&= { One => 1 };
+$foo //= { One => 1 };
+0 || { One => 1 };
+1 && { One => 1 };
+undef // { One => 1 };
 END_PERL
  
 	isa_ok( $document, 'PPI::Document' );
@@ -58,7 +63,7 @@ END_PERL
 		$statements[ $elem->line_number() - 1 ] ||= $elem;
 	}
 
-	is( scalar(@statements), 24, 'Found 24 statements' );
+	is( scalar(@statements), 29, 'Found 29 statements' );
 
 	isa_ok( $statements[0]->schild(2), 'PPI::Structure::Constructor',
 		'The curly in ' . $statements[0]);
@@ -108,6 +113,16 @@ END_PERL
 		'The curly in ' . $statements[22]);
 	isa_ok( $statements[23]->schild(1), 'PPI::Structure::Constructor',
 		'The curly in ' . $statements[23]);
+	isa_ok( $statements[24]->schild(2), 'PPI::Structure::Constructor',
+		'The curly in ' . $statements[24]);
+	isa_ok( $statements[25]->schild(2), 'PPI::Structure::Constructor',
+		'The curly in ' . $statements[25]);
+	isa_ok( $statements[26]->schild(2), 'PPI::Structure::Constructor',
+		'The curly in ' . $statements[26]);
+	isa_ok( $statements[27]->schild(2), 'PPI::Structure::Constructor',
+		'The curly in ' . $statements[27]);
+	isa_ok( $statements[28]->schild(2), 'PPI::Structure::Constructor',
+		'The curly in ' . $statements[28]);
 }
 
 

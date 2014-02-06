@@ -1043,11 +1043,18 @@ BEGIN {
 		'map'  => 'PPI::Structure::Block',
 		'sort' => 'PPI::Structure::Block',
 		'do'   => 'PPI::Structure::Block',
+		# rely on 'continue' + block being handled elsewhere
+		# rely on 'eval' + block being handled elsewhere
 
 		# Hash constructors
 		'scalar' => 'PPI::Structure::Constructor',
 		'='      => 'PPI::Structure::Constructor',
 		'||='    => 'PPI::Structure::Constructor',
+		'&&='    => 'PPI::Structure::Constructor',
+		'//='    => 'PPI::Structure::Constructor',
+		'||'     => 'PPI::Structure::Constructor',
+		'&&'     => 'PPI::Structure::Constructor',
+		'//'     => 'PPI::Structure::Constructor',
 		','      => 'PPI::Structure::Constructor',
 		'=>'     => 'PPI::Structure::Constructor',
 		'+'      => 'PPI::Structure::Constructor', # per perlref
