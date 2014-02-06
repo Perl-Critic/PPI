@@ -10,7 +10,7 @@ BEGIN {
 	$PPI::XS_DISABLE = 1;
 	$PPI::Lexer::X_TOKENIZER ||= $ENV{X_TOKENIZER};
 }
-use Test::More tests => 39;
+use Test::More tests => 44;
 use Test::NoWarnings;
 use PPI;
 
@@ -50,11 +50,15 @@ return { foo => 'bar' };
 bless { foo => 'bar' };
 $foo &&= { One => 1 };
 $foo //= { One => 1 };
+$foo //= { 'a' => 1, 'b' => 2 };
 0 || { One => 1 };
 1 && { One => 1 };
 undef // { One => 1 };
+$x ? {a=>1} : 1;
+$x ? 1 : {a=>1};
+$x ? {a=>1} : {b=>1};
 END_PERL
- 
+
 	isa_ok( $document, 'PPI::Document' );
 	$document->index_locations();
 
@@ -63,7 +67,7 @@ END_PERL
 		$statements[ $elem->line_number() - 1 ] ||= $elem;
 	}
 
-	is( scalar(@statements), 29, 'Found 29 statements' );
+	is( scalar(@statements), 33, 'Found 33 statements' );
 
 	isa_ok( $statements[0]->schild(2), 'PPI::Structure::Constructor',
 		'The curly in ' . $statements[0]);
@@ -119,10 +123,23 @@ END_PERL
 		'The curly in ' . $statements[25]);
 	isa_ok( $statements[26]->schild(2), 'PPI::Structure::Constructor',
 		'The curly in ' . $statements[26]);
+
 	isa_ok( $statements[27]->schild(2), 'PPI::Structure::Constructor',
 		'The curly in ' . $statements[27]);
 	isa_ok( $statements[28]->schild(2), 'PPI::Structure::Constructor',
 		'The curly in ' . $statements[28]);
+	isa_ok( $statements[29]->schild(2), 'PPI::Structure::Constructor',
+		'The curly in ' . $statements[29]);
+	isa_ok( $statements[30]->schild(2), 'PPI::Structure::Constructor',
+		'The curly in ' . $statements[30]);
+	isa_ok( $statements[31]->schild(4), 'PPI::Structure::Constructor',
+		'The curly in ' . $statements[31]);
+
+	# Check two things in the same statement
+	isa_ok( $statements[32]->schild(2), 'PPI::Structure::Constructor',
+		'The curly in ' . $statements[32]);
+	isa_ok( $statements[32]->schild(4), 'PPI::Structure::Constructor',
+		'The curly in ' . $statements[32]);
 }
 
 

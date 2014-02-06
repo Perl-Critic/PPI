@@ -1055,6 +1055,8 @@ BEGIN {
 		'||'     => 'PPI::Structure::Constructor',
 		'&&'     => 'PPI::Structure::Constructor',
 		'//'     => 'PPI::Structure::Constructor',
+		'?'      => 'PPI::Structure::Constructor',
+		':'      => 'PPI::Structure::Constructor',
 		','      => 'PPI::Structure::Constructor',
 		'=>'     => 'PPI::Structure::Constructor',
 		'+'      => 'PPI::Structure::Constructor', # per perlref
