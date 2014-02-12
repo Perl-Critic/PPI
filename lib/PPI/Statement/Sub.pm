@@ -74,11 +74,19 @@ false.
 =cut
 
 sub name {
-	my $self = shift;
+	my ($self) = @_;
 
-	# The second token should be the name, if we have one
-	my $Token = $self->schild(1) or return '';
-	$Token->isa('PPI::Token::Word') and $Token->content;
+	# Usually the second token is the name.
+	my $token = $self->schild(1);
+	return $token->content
+	  if defined $token and $token->isa('PPI::Token::Word');
+
+	# In the case of special subs whose 'sub' can be omitted (AUTOLOAD
+	# or DESTROY), the name will be the first token.
+	$token = $self->schild(0);
+	return $token->content
+	  if defined $token and $token->isa('PPI::Token::Word');
+	return '';
 }
 
 =pod
