@@ -10,12 +10,14 @@ BEGIN {
 	$PPI::Lexer::X_TOKENIZER ||= $ENV{X_TOKENIZER};
 }
 
-use Test::More tests => 113;
+use Test::More tests => 119;
 use Test::NoWarnings;
 use PPI;
 
 
 SUB_WORD_OPTIONAL: {
+	# 'sub' is optional for these special subs. Make sure they're
+	# recognized as subs and sub declarations.
 	foreach my $name ( qw( AUTOLOAD DESTROY ) ) {
 		foreach my $sub ( '', 'sub ' ) {
 			# '{}' -- function definition
@@ -41,4 +43,21 @@ SUB_WORD_OPTIONAL: {
 			}
 		}
 	}
+
+	# Through 1.218, the PPI statement AUTOLOAD and DESTROY would
+	# gobble up everything after them until it hit an explicit
+	# statement terminator. Make sure statements following them are
+	# not gobbled.
+	my $desc = 'regression: word+block not gobbling to statement terminator';
+	foreach my $word ( qw( AUTOLOAD DESTROY ) ) {
+		my $Document = PPI::Document->new( \"$word {} sub foo {}" );
+		my $statements = $Document->find('Statement::Sub') || [];
+		is( scalar(@$statements), 2, "$desc for $word + sub" );
+
+		$Document = PPI::Document->new( \"$word {} package;" );
+		$statements = $Document->find('Statement::Sub') || [];
+		is( scalar(@$statements), 1, "$desc for $word + package" );
+		$statements = $Document->find('Statement::Package') || [];
+		is( scalar(@$statements), 1, "$desc for $word + package" );
+ 	}
 }
