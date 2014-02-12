@@ -76,9 +76,16 @@ false.
 sub name {
 	my $self = shift;
 
-	# The second token should be the name, if we have one
-	my $Token = $self->schild(1) or return '';
-	$Token->isa('PPI::Token::Word') and $Token->content;
+	# Usually the second token is the name.
+	my $Token = $self->schild(1);
+	if ( defined $Token && $Token->isa('PPI::Token::Word') ) {
+		return $Token->content;
+	}
+
+	# In the case of special subs whose 'sub' can be omitted (AUTOLOAD
+	# or DESTROY), the name will be the first token.
+	$Token = $self->schild(0);
+	return (defined $Token && $Token->isa('PPI::Token::Word')) ? $Token->content : '';
 }
 
 =pod

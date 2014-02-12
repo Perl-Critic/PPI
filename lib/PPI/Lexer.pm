@@ -353,6 +353,10 @@ BEGIN {
 		'INIT'      => 'PPI::Statement::Scheduled',
 		'END'       => 'PPI::Statement::Scheduled',
 
+		# Special subroutines for which 'sub' is optional
+		'AUTOLOAD'  => 'PPI::Statement::Sub',
+		'DESTROY'   => 'PPI::Statement::Sub',
+
 		# Loading and context statement
 		'package'   => 'PPI::Statement::Package',
 		# 'use'       => 'PPI::Statement::Include',
