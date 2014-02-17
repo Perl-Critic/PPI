@@ -3,7 +3,7 @@
 # Unit testing for PPI::Token::QuoteLike::Words
 
 use t::lib::PPI::Test::pragmas;
-use Test::More tests => 1381;
+use Test::More tests => 1941;
 use Test::Deep;
 
 use PPI;
@@ -52,13 +52,38 @@ LITERAL: {
 
 	my $bs = '\\'; # a single backslash character
 
+	# escaped opening and closing
+	permute_test ["$bs)"],   '(', ')', [')'];
+	permute_test ["$bs("],   '(', ')', ['('];
+	permute_test ["$bs}"],   '{', '}', ['}'];
+	permute_test ["${bs}{"], '{', '}', ['{'];
+	permute_test ["$bs]"],   '[', ']', [']'];
+	permute_test ["${bs}["], '[', ']', ['['];
+	permute_test ["$bs<"],   '<', '>', ['<'];
+	permute_test ["$bs>"],   '<', '>', ['>'];
+	permute_test ["$bs/"],   '/', '/', ['/'];
+	permute_test ["$bs'"],   "'", "'", ["'"];
+	permute_test [$bs.'"'],  '"', '"', ['"'];
+
+	# alphanum delims have to be separated from qw
+	assemble_and_run " ",  ['a', "${bs}1"], '1', " ",  " ",  '1', ['a', '1'];
+	assemble_and_run " ",  ["${bs}a"],      'a', " ",  " ",  'a', ['a'];
+	assemble_and_run "\n", ["${bs}a"],      'a', "\n", "\n", 'a', ['a'];
+
 	# '#' delims cannot be separated from qw
 	assemble_and_run '',  ['a'],      '#', '',   ' ',  '#', ['a'];
 	assemble_and_run '',  ['a'],      '#', ' ',  ' ',  '#', ['a'];
+	assemble_and_run '',  ["$bs#"],   '#', '',   ' ',  '#', ['#'];
+	assemble_and_run '',  ["$bs#"],   '#', ' ',  ' ',  '#', ['#'];
+	assemble_and_run '',  ["$bs#"],   '#', "\n", "\n", '#', ['#'];
 
 	# a single backslash represents itself
 	assemble_and_run '',  [$bs],  '(', ' ',  ' ', ')', [$bs];
 	assemble_and_run '',  [$bs],  '(', "\n", ' ', ')', [$bs];
+
+	# a double backslash represents itself
+	assemble_and_run '',  ["$bs$bs"],  '(', ' ',  ' ', ')', [$bs];
+	assemble_and_run '',  ["$bs$bs"],  '(', "\n", ' ', ')', [$bs];
 
 	# even backslash can be a delimiter, in when it is, backslashes
 	# can't be embedded or escaped.
