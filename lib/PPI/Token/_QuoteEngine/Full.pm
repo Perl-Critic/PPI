@@ -32,7 +32,7 @@ BEGIN {
 		's'   => { operator => 's',   braced => undef, separator => undef, _sections => 2, modifiers => 1 },
 		'tr'  => { operator => 'tr',  braced => undef, separator => undef, _sections => 2, modifiers => 1 },
 
-		# Y is the little used variant of tr
+		# Y is the little-used variant of tr
 		'y'   => { operator => 'y',   braced => undef, separator => undef, _sections => 2, modifiers => 1 },
 
 		'/'   => { operator => undef, braced => 0,     separator => '/',   _sections => 1, modifiers => 1 },
