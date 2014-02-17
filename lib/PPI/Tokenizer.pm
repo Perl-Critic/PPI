@@ -736,7 +736,7 @@ my %OBVIOUS_CONTENT = (
 	'}' => 'operator',
 );
 
-# Try to determine operator/operand context, is possible.
+# Try to determine operator/operand context, if possible.
 # Returns "operator", "operand", or "" if unknown.
 sub _opcontext {
 	my $self   = shift;
