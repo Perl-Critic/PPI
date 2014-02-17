@@ -10,6 +10,7 @@ Revision history for Perl extension PPI
 	- less uses of List::MoreUtils in favor of List::Util
 	- do not expect '.' in @INC (PLICEASE)
 	- many parsing fixes
+	- various fixes to the behaviors of methods
 
 	Details:
 	- Remove undocumented, non-working 'timeout' attribute to
@@ -21,6 +22,8 @@ Revision history for Perl extension PPI
 	- recognize heredoc even if they have no newline at the end (AUBERTG)
 	- parse left side of => as bareword even if it looks like a keyword or
 	  op (MOREGAN)
+	- remove source code escapes in the output of QuoteLike::Words->literal
+	  (MOREGAN)
 
 1.220 Tue 11 Nov 2014
 	Summary:
