@@ -31,32 +31,6 @@ everything found until the next top-level "file scoped" package statement.
 A file may, however, contain nested temporary package, in which case you
 are mostly on your own :)
 
-
-=begin testing hash_constructors_dont_contain_packages_rt52259 2
-
-my $Document = PPI::Document->new(\<<'END_PERL');
-{    package  => "", };
-+{   package  => "", };
-{   'package' => "", };
-+{  'package' => "", };
-{   'package' ,  "", };
-+{  'package' ,  "", };
-END_PERL
-
-isa_ok( $Document, 'PPI::Document' );
-
-my $packages = $Document->find('PPI::Statement::Package');
-my $test_name = 'Found no package statements in hash constructors - RT #52259';
-if (not $packages) {
-	pass $test_name;
-} elsif ( not is(scalar @{$packages}, 0, $test_name) ) {
-	diag 'Package statements found:';
-	diag $_->parent()->parent()->content() foreach @{$packages};
-}
-
-=end testing
-
-
 =head1 METHODS
 
 C<PPI::Statement::Package> has a number of methods in addition to the standard

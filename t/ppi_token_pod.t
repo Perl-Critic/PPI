@@ -1,8 +1,8 @@
 #!/usr/bin/perl
 
-use warnings;
+# Unit testing for PPI::Token::Pod
+
 use strict;
-use File::Spec::Functions ':ALL';
 BEGIN {
 	$|  = 1;
 	$^W = 1;
@@ -10,11 +10,12 @@ BEGIN {
 	$PPI::XS_DISABLE = 1;
 	$PPI::Lexer::X_TOKENIZER ||= $ENV{X_TOKENIZER};
 }
+use Test::More tests => 9;
+use Test::NoWarnings;
 use PPI;
 
-use Test::More tests => 8;
 
-{
+MERGE: {
 	# Create the test fragments
 	my $one = PPI::Token::Pod->new("=pod\n\nOne\n\n=cut\n");
 	my $two = PPI::Token::Pod->new("=pod\n\nTwo");
@@ -28,7 +29,7 @@ use Test::More tests => 8;
 }
 
 
-{
+TOKENIZE: {
 	foreach my $test (
 		[ "=pod\n=cut", [ 'PPI::Token::Pod' ] ],
 		[ "=pod\n=cut\n", [ 'PPI::Token::Pod' ] ],
@@ -40,6 +41,3 @@ use Test::More tests => 8;
 		is_deeply( \@tokens, $test->[1], 'all tokens as expected' );
 	}
 }
-
-
-1;

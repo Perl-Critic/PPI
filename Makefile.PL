@@ -24,10 +24,6 @@ test_requires 'Class::Inspector' => '1.22';
 # (which some distributions annoyingly don't have)
 requires      'Task::Weaken';
 
-# Maintainers should also install this module
-# so that they can regenerate the inline tests
-# test_requires 'Test::Inline' => '2.203';
-
 repository 'https://github.com/adamkennedy/PPI';
 
 WriteAll;

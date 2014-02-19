@@ -69,46 +69,6 @@ BEGIN {
 	}
 }
 
-=pod
-
-=begin testing __TOKENIZER_on_char 30
-
-my $document = PPI::Document->new(\<<'END_PERL');
-$[;			# Magic  $[
-$$;			# Magic  $$
-%-;			# Magic  %-
-$#-;			# Magic  $#-
-$$foo;			# Symbol $foo		Dereference of $foo
-$^W;			# Magic  $^W
-$^WIDE_SYSTEM_CALLS;	# Magic  $^WIDE_SYSTEM_CALLS
-${^MATCH};		# Magic  ${^MATCH}
-@{^_Bar};		# Magic  @{^_Bar}
-${^_Bar}[0];		# Magic  @{^_Bar}
-%{^_Baz};		# Magic  %{^_Baz}
-${^_Baz}{burfle};	# Magic  %{^_Baz}
-$${^MATCH};		# Magic  ${^MATCH}	Dereference of ${^MATCH}
-\${^MATCH};		# Magic  ${^MATCH}
-END_PERL
-
-isa_ok( $document, 'PPI::Document' );
-
-$document->index_locations();
-
-my $symbols = $document->find( 'PPI::Token::Symbol' );
-
-is( scalar(@$symbols), 14, 'Found 14 symbols' );
-my $comments = $document->find( 'PPI::Token::Comment' );
-
-foreach my $token ( @$symbols ) {
-	my ($hash, $class, $name, $remk) =
-		split '\s+', $comments->[$token->line_number - 1], 4;
-	isa_ok( $token, "PPI::Token::$class" );
-	is( $token->symbol, $name, $remk || "The symbol is $name" );
-}
-
-=end testing
-
-=cut
 
 sub __TOKENIZER__on_char {
 	my $t = $_[1];

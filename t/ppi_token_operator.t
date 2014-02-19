@@ -1,5 +1,7 @@
 #!/usr/bin/perl
 
+# Unit testing for PPI::Token::Operator
+
 use strict;
 BEGIN {
 	$|  = 1;
