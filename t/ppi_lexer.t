@@ -1,7 +1,8 @@
 #!/usr/bin/perl
 
+# Unit testing for PPI::Lexer
+
 use strict;
-use File::Spec::Functions ':ALL';
 BEGIN {
 	$|  = 1;
 	$^W = 1;
@@ -9,26 +10,20 @@ BEGIN {
 	$PPI::XS_DISABLE = 1;
 	$PPI::Lexer::X_TOKENIZER ||= $ENV{X_TOKENIZER};
 }
+use Test::More tests => 34;
+use Test::NoWarnings;
 use PPI;
 
-# Execute the tests
-use Test::More tests => 33;
 
-# =begin testing _lex_document 3
-{
-# Validate the creation of a null statement
-SCOPE: {
-	my $token = new_ok( 'PPI::Token::Structure' => [ ')'    ] );
+UNMATCHED_BRACE: {
+	my $token = new_ok( 'PPI::Token::Structure' => [ ')' ] );
 	my $brace = new_ok( 'PPI::Statement::UnmatchedBrace' => [ $token ] );
 	is( $brace->content, ')', '->content ok' );
 }
-}
 
 
-
-# =begin testing _curly 26
-{
-my $document = PPI::Document->new(\<<'END_PERL');
+_CURLY: {
+	my $document = PPI::Document->new(\<<'END_PERL');
 use constant { One => 1 };
 use constant 1 { One => 1 };
 $foo->{bar};
@@ -55,80 +50,75 @@ return { foo => 'bar' };
 bless { foo => 'bar' };
 END_PERL
  
-isa_ok( $document, 'PPI::Document' );
-$document->index_locations();
+	isa_ok( $document, 'PPI::Document' );
+	$document->index_locations();
 
-my @statements;
-foreach my $elem ( @{ $document->find( 'PPI::Statement' ) || [] } ) {
-	$statements[ $elem->line_number() - 1 ] ||= $elem;
-}
+	my @statements;
+	foreach my $elem ( @{ $document->find( 'PPI::Statement' ) || [] } ) {
+		$statements[ $elem->line_number() - 1 ] ||= $elem;
+	}
 
-is( scalar(@statements), 24, 'Found 24 statements' );
+	is( scalar(@statements), 24, 'Found 24 statements' );
 
-isa_ok( $statements[0]->schild(2), 'PPI::Structure::Constructor',
-	'The curly in ' . $statements[0]);
-isa_ok( $statements[1]->schild(3), 'PPI::Structure::Constructor',
-	'The curly in ' . $statements[1]);
-isa_ok( $statements[2]->schild(2), 'PPI::Structure::Subscript',
-	'The curly in ' . $statements[2]);
-isa_ok( $statements[3]->schild(2), 'PPI::Structure::Subscript',
-	'The curly in ' . $statements[3]);
-isa_ok( $statements[4]->schild(1), 'PPI::Structure::Subscript',
-	'The curly in ' . $statements[4]);
-isa_ok( $statements[5]->schild(1), 'PPI::Structure::Block',
-	'The curly in ' . $statements[5]);
-isa_ok( $statements[6]->schild(1), 'PPI::Structure::Block',
-	'The curly in ' . $statements[6]);
-isa_ok( $statements[7]->schild(1), 'PPI::Structure::Block',
-	'The curly in ' . $statements[7]);
-isa_ok( $statements[8]->schild(1), 'PPI::Structure::Block',
-	'The curly in ' . $statements[8]);
-isa_ok( $statements[9]->schild(1), 'PPI::Structure::Block',
-	'The curly in ' . $statements[9]);
-isa_ok( $statements[10]->schild(2), 'PPI::Structure::Constructor',
-	'The curly in ' . $statements[10]);
-isa_ok( $statements[11]->schild(2), 'PPI::Structure::Constructor',
-	'The curly in ' . $statements[11]);
-isa_ok( $statements[12]->schild(2), 'PPI::Structure::Constructor',
-	'The curly in ' . $statements[12]);
-isa_ok( $statements[13]->schild(2), 'PPI::Structure::Constructor',
-	'The curly in ' . $statements[13]);
-isa_ok( $statements[14]->schild(0), 'PPI::Structure::Block',
-	'The curly in ' . $statements[14]);
-isa_ok( $statements[15]->schild(0), 'PPI::Structure::Constructor',
-	'The curly in ' . $statements[15]);
-isa_ok( $statements[16]->schild(0), 'PPI::Structure::Constructor',
-	'The curly in ' . $statements[16]);
-isa_ok( $statements[17]->schild(1), 'PPI::Structure::Constructor',
-	'The curly in ' . $statements[17]);
-isa_ok( $statements[18]->schild(0), 'PPI::Structure::Block',
-	'The curly in ' . $statements[18]);
-isa_ok( $statements[19]->schild(1), 'PPI::Structure::Subscript',
-	'The curly in ' . $statements[19]);
-isa_ok( $statements[20]->schild(2), 'PPI::Structure::Subscript',
-	'The curly in ' . $statements[20]);
-isa_ok( $statements[21]->schild(2), 'PPI::Structure::Subscript',
-	'The curly in ' . $statements[21]);
-isa_ok( $statements[22]->schild(1), 'PPI::Structure::Constructor',
-	'The curly in ' . $statements[22]);
-isa_ok( $statements[23]->schild(1), 'PPI::Structure::Constructor',
-	'The curly in ' . $statements[23]);
-}
-
-
-
-# =begin testing _lex_structure 4
-{
-# Validate the creation of a null statement
-SCOPE: {
-	my $token = new_ok( 'PPI::Token::Structure' => [ ';'    ] );
-	my $null  = new_ok( 'PPI::Statement::Null'  => [ $token ] );
-	is( $null->content, ';', '->content ok' );
-}
-
-# Validate the creation of an empty statement
-new_ok( 'PPI::Statement' => [ ] );
+	isa_ok( $statements[0]->schild(2), 'PPI::Structure::Constructor',
+		'The curly in ' . $statements[0]);
+	isa_ok( $statements[1]->schild(3), 'PPI::Structure::Constructor',
+		'The curly in ' . $statements[1]);
+	isa_ok( $statements[2]->schild(2), 'PPI::Structure::Subscript',
+		'The curly in ' . $statements[2]);
+	isa_ok( $statements[3]->schild(2), 'PPI::Structure::Subscript',
+		'The curly in ' . $statements[3]);
+	isa_ok( $statements[4]->schild(1), 'PPI::Structure::Subscript',
+		'The curly in ' . $statements[4]);
+	isa_ok( $statements[5]->schild(1), 'PPI::Structure::Block',
+		'The curly in ' . $statements[5]);
+	isa_ok( $statements[6]->schild(1), 'PPI::Structure::Block',
+		'The curly in ' . $statements[6]);
+	isa_ok( $statements[7]->schild(1), 'PPI::Structure::Block',
+		'The curly in ' . $statements[7]);
+	isa_ok( $statements[8]->schild(1), 'PPI::Structure::Block',
+		'The curly in ' . $statements[8]);
+	isa_ok( $statements[9]->schild(1), 'PPI::Structure::Block',
+		'The curly in ' . $statements[9]);
+	isa_ok( $statements[10]->schild(2), 'PPI::Structure::Constructor',
+		'The curly in ' . $statements[10]);
+	isa_ok( $statements[11]->schild(2), 'PPI::Structure::Constructor',
+		'The curly in ' . $statements[11]);
+	isa_ok( $statements[12]->schild(2), 'PPI::Structure::Constructor',
+		'The curly in ' . $statements[12]);
+	isa_ok( $statements[13]->schild(2), 'PPI::Structure::Constructor',
+		'The curly in ' . $statements[13]);
+	isa_ok( $statements[14]->schild(0), 'PPI::Structure::Block',
+		'The curly in ' . $statements[14]);
+	isa_ok( $statements[15]->schild(0), 'PPI::Structure::Constructor',
+		'The curly in ' . $statements[15]);
+	isa_ok( $statements[16]->schild(0), 'PPI::Structure::Constructor',
+		'The curly in ' . $statements[16]);
+	isa_ok( $statements[17]->schild(1), 'PPI::Structure::Constructor',
+		'The curly in ' . $statements[17]);
+	isa_ok( $statements[18]->schild(0), 'PPI::Structure::Block',
+		'The curly in ' . $statements[18]);
+	isa_ok( $statements[19]->schild(1), 'PPI::Structure::Subscript',
+		'The curly in ' . $statements[19]);
+	isa_ok( $statements[20]->schild(2), 'PPI::Structure::Subscript',
+		'The curly in ' . $statements[20]);
+	isa_ok( $statements[21]->schild(2), 'PPI::Structure::Subscript',
+		'The curly in ' . $statements[21]);
+	isa_ok( $statements[22]->schild(1), 'PPI::Structure::Constructor',
+		'The curly in ' . $statements[22]);
+	isa_ok( $statements[23]->schild(1), 'PPI::Structure::Constructor',
+		'The curly in ' . $statements[23]);
 }
 
 
-1;
+LEX_STRUCTURE: {
+	# Validate the creation of a null statement
+	SCOPE: {
+		my $token = new_ok( 'PPI::Token::Structure' => [ ';' ] );
+		my $null  = new_ok( 'PPI::Statement::Null'  => [ $token ] );
+		is( $null->content, ';', '->content ok' );
+	}
+
+	# Validate the creation of an empty statement
+	new_ok( 'PPI::Statement' => [ ] );
+}

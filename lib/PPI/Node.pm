@@ -530,34 +530,6 @@ and were removed, B<non-recursively>. This might also be zero, so avoid a
 simple true/false test on the return false of the C<prune> method. It
 returns C<undef> on error, which you probably B<should> test for.
 
-=begin testing prune 2
-
-# Avoids a bug in old Perls relating to the detection of scripts
-# Known to occur in ActivePerl 5.6.1 and at least one 5.6.2 install.
-my $hashbang = reverse 'lrep/nib/rsu/!#'; 
-my $document = PPI::Document->new( \<<"END_PERL" );
-$hashbang
-
-use strict;
-
-sub one { 1 }
-sub two { 2 }
-sub three { 3 }
-
-print one;
-print "\n";
-print three;
-print "\n";
-
-exit;
-END_PERL
-
-isa_ok( $document, 'PPI::Document' );
-ok( defined($document->prune ('PPI::Statement::Sub')),
-	'Pruned multiple subs ok' );
-
-=end testing
-
 =cut
 
 sub prune {
@@ -594,7 +566,7 @@ sub prune {
 	$pruned;
 }
 
-# This method is likely to be very heavily used, to take
+# This method is likely to be very heavily used, so take
 # it slowly and carefully.
 ### NOTE: Renaming this function or changing either to self will probably
 ###       break File::Find::Rule::PPI
