@@ -11,10 +11,9 @@ BEGIN {
 }
 
 # Execute the tests
-use Test::More tests => 411;
+use Test::More tests => 447;
 use Test::NoWarnings;
 use File::Spec::Functions ':ALL';
-use List::MoreUtils ();
 use t::lib::PPI;
 use PPI;
 
@@ -160,25 +159,50 @@ foreach my $code ( '08', '09', '0778', '0779' ) {
 	is($token->literal, undef, "literal('$code') is undef");
 }
 
-foreach my $code ( '0b2', '0B2', '0b012', '0B012' ) {
-	my $T = PPI::Tokenizer->new( \$code );
-	my $token = $T->get_token;
-	isa_ok($token, 'PPI::Token::Number::Binary');
-	is("$token", $code, "tokenize bad binary '$code'");
-	ok($token->{_error} && $token->{_error} =~ m/binary/i,
-	   'invalid binary number should trigger parse error');
-	is($token->literal, undef, "literal('$code') is undef");
+BINARY: {
+	my @tests = (
+		# Good binary numbers
+		{ code => '0b0',        error => 0, value => 0 },
+		{ code => '0b1',        error => 0, value => 1 },
+		{ code => '0B1',        error => 0, value => 1 },
+		{ code => '0b101',      error => 0, value => 5 },
+		{ code => '0b1_1',      error => 0, value => 3 },
+		{ code => '0b1__1',     error => 0, value => 3 },  # perl warns, but parses it
+		{ code => '0b1__1_',    error => 0, value => 3 },  # perl warns, but parses it
+		# Bad binary numbers
+		{ code => '0b2',        error => 1, value => 0 },
+		{ code => '0B2',        error => 1, value => 0 },
+		{ code => '0b012',      error => 1, value => 0 },
+		{ code => '0B012',      error => 1, value => 0 },
+		{ code => '0B0121',     error => 1, value => 0 },
+        );
+	foreach my $test ( @tests ) {
+		my $code = $test->{code};
+		my $T = PPI::Tokenizer->new( \$code );
+		my $token = $T->get_token;
+		isa_ok($token, 'PPI::Token::Number::Binary');
+                if ( $test->{error} ) {
+                    ok($token->{_error} && $token->{_error} =~ m/binary/i,
+                       'invalid binary number should trigger parse error');
+                    is($token->literal, undef, "literal('$code') is undef");
+                }
+                else {
+                    ok(!$token->{_error}, "no error for '$code'");
+                    is($token->literal, $test->{value}, "literal('$code') is $test->{value}");
+                }
+                is($token->content, $code, "parsed everything");
+	}
 }
 
 HEX: {
 	my @tests = (
 		# Good hex numbers--entire thing goes in the token
 		{ code => '0x0',        parsed => '0x0', value => 0 },
-		{ code => '0X0',        parsed => '0X0', value => 0 },
+		{ code => '0X1',        parsed => '0X1', value => 1 },
 		{ code => '0x1',        parsed => '0x1', value => 1 },
 		{ code => '0x_1',       parsed => '0x_1', value => 1 },
-		{ code => '0x__1',      parsed => '0x__1', value => 1 },
-		{ code => '0x__1_',     parsed => '0x__1_', value => 1 },  # Perl warns, but still includes trailing '_'
+		{ code => '0x__1',      parsed => '0x__1', value => 1 },  # perl warns, but parses it
+		{ code => '0x__1_',     parsed => '0x__1_', value => 1 },  # perl warns, but parses it
 		{ code => '0X1',        parsed => '0X1', value => 1 },
 		{ code => '0xc',        parsed => '0xc', value => 12 },
 		{ code => '0Xc',        parsed => '0Xc', value => 12 },
@@ -188,7 +212,7 @@ HEX: {
 		{ code => '0x0e',       parsed => '0x0e', value => 14 },
 		{ code => '0x00000e',   parsed => '0x00000e', value => 14 },
 		{ code => '0x000_00e',  parsed => '0x000_00e', value => 14 },
-		{ code => '0x000__00e', parsed => '0x000__00e', value => 14 },
+		{ code => '0x000__00e', parsed => '0x000__00e', value => 14 },  # perl warns, but parses it
 		# Bad hex numbers--tokenizing stops when bad digit seen
 		{ code => '0x',    parsed => '0x', value => 0 },
 		{ code => '0X',    parsed => '0X', value => 0 },
@@ -199,6 +223,7 @@ HEX: {
 		{ code => '0X0g',  parsed => '0X0', value => 0 },
 		{ code => '0X0G',  parsed => '0X0', value => 0 },
 		{ code => '0x1g',  parsed => '0x1', value => 1 },
+		{ code => '0x1g2', parsed => '0x1', value => 1 },
 		{ code => '0x1_g', parsed => '0x1_', value => 1 },
 	);
 	foreach my $test ( @tests ) {
@@ -208,11 +233,6 @@ HEX: {
 		isa_ok($token, 'PPI::Token::Number::Hex');
 		ok(!$token->{_error}, "no error for '$code' even on invalid digits");
 		is($token->content, $test->{parsed}, "correctly parsed everything expected");
-		if ( !$^V or $^V lt v5.14.0 ) {
-			pass("can't test value on pre-5.14 Perl, which don't accept '0X'");
-		}
-		else {
-			is($token->literal, $test->{value}, "literal('$code') is $test->{value}");
-		}
+                is($token->literal, $test->{value}, "literal('$code') is $test->{value}");
 	}
 }

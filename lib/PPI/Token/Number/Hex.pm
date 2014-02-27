@@ -57,7 +57,7 @@ sub literal {
 	my $self = shift;
 	my $str = $self->_literal;
 	my $neg = $str =~ s/^\-//;
-	my $val = hex $str;
+	my $val = hex lc( $str ); # lc for compatibility with perls before 5.14
 	return $neg ? -$val : $val;
 }
 
