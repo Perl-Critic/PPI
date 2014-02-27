@@ -60,7 +60,7 @@ sub literal {
 	return if $self->{_error};
 	my $str = $self->_literal;
 	my $neg = $str =~ s/^\-//;
-	$str =~ s/^0b//;
+	$str =~ s/^0[bB]//;
 	my $val = 0;
 	for my $bit ( $str =~ m/(.)/g ) {
 		$val = $val * 2 + $bit;

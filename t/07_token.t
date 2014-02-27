@@ -11,7 +11,7 @@ BEGIN {
 }
 
 # Execute the tests
-use Test::More tests => 415;
+use Test::More tests => 447;
 use Test::NoWarnings;
 use File::Spec::Functions ':ALL';
 use t::lib::PPI;
@@ -159,14 +159,39 @@ foreach my $code ( '08', '09', '0778', '0779' ) {
 	is($token->literal, undef, "literal('$code') is undef");
 }
 
-foreach my $code ( '0b2', '0B2', '0b012', '0B012' ) {
-	my $T = PPI::Tokenizer->new( \$code );
-	my $token = $T->get_token;
-	isa_ok($token, 'PPI::Token::Number::Binary');
-	is("$token", $code, "tokenize bad binary '$code'");
-	ok($token->{_error} && $token->{_error} =~ m/binary/i,
-	   'invalid binary number should trigger parse error');
-	is($token->literal, undef, "literal('$code') is undef");
+BINARY: {
+	my @tests = (
+		# Good binary numbers
+		{ code => '0b0',        error => 0, value => 0 },
+		{ code => '0b1',        error => 0, value => 1 },
+		{ code => '0B1',        error => 0, value => 1 },
+		{ code => '0b101',      error => 0, value => 5 },
+		{ code => '0b1_1',      error => 0, value => 3 },
+		{ code => '0b1__1',     error => 0, value => 3 },  # perl warns, but parses it
+		{ code => '0b1__1_',    error => 0, value => 3 },  # perl warns, but parses it
+		# Bad binary numbers
+		{ code => '0b2',        error => 1, value => 0 },
+		{ code => '0B2',        error => 1, value => 0 },
+		{ code => '0b012',      error => 1, value => 0 },
+		{ code => '0B012',      error => 1, value => 0 },
+		{ code => '0B0121',     error => 1, value => 0 },
+        );
+	foreach my $test ( @tests ) {
+		my $code = $test->{code};
+		my $T = PPI::Tokenizer->new( \$code );
+		my $token = $T->get_token;
+		isa_ok($token, 'PPI::Token::Number::Binary');
+                if ( $test->{error} ) {
+                    ok($token->{_error} && $token->{_error} =~ m/binary/i,
+                       'invalid binary number should trigger parse error');
+                    is($token->literal, undef, "literal('$code') is undef");
+                }
+                else {
+                    ok(!$token->{_error}, "no error for '$code'");
+                    is($token->literal, $test->{value}, "literal('$code') is $test->{value}");
+                }
+                is($token->content, $code, "parsed everything");
+	}
 }
 
 HEX: {
