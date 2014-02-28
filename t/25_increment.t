@@ -5,6 +5,7 @@
 # state between an empty document and the entire file to make sure
 # all of them parse as legal documents and don't crash the parser.
 
+use lib 't/lib';
 use strict;
 BEGIN {
 	no warnings 'once';
@@ -19,7 +20,7 @@ use File::Spec::Functions ':ALL';
 use Params::Util qw{_INSTANCE};
 use PPI::Lexer;
 use PPI::Dumper;
-use t::lib::PPI;
+use PPI::Test::Run;
 
 
 
@@ -28,4 +29,4 @@ use t::lib::PPI;
 #####################################################################
 # Code/Dump Testing
 
-t::lib::PPI->increment_testdir(qw{ t data 08_regression });
+PPI::Test::Run->increment_testdir(qw{ t data 08_regression });

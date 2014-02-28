@@ -2,6 +2,7 @@
 
 # Formal unit tests for specific PPI::Token classes
 
+use lib 't/lib';
 use strict;
 BEGIN {
 	no warnings 'once';
@@ -10,11 +11,11 @@ BEGIN {
 	$PPI::Lexer::X_TOKENIZER ||= $ENV{X_TOKENIZER};
 }
 
-# Execute the tests
 use Test::More tests => 447;
 use Test::NoWarnings;
 use File::Spec::Functions ':ALL';
-use t::lib::PPI;
+use List::MoreUtils ();
+use PPI::Test::Run;
 use PPI;
 
 
@@ -25,7 +26,7 @@ use PPI;
 # Code/Dump Testing
 # ntests = 2 + 12 * nfiles
 
-t::lib::PPI->run_testdir( catdir( 't', 'data', '07_token' ) );
+PPI::Test::Run->run_testdir( catdir( 't', 'data', '07_token' ) );
 
 
 
@@ -49,7 +50,7 @@ SCOPE: {
 		'@::foo'     => '@main::foo',
 		'$foo::bar'  => '$foo::bar',
 		'$ foo\'bar' => '$foo::bar',
-		);
+	);
 	while ( @symbols ) {
 		my ($value, $canon) = ( shift(@symbols), shift(@symbols) );
 		my $Symbol = PPI::Token::Symbol->new( $value );
@@ -155,9 +156,10 @@ foreach my $code ( '08', '09', '0778', '0779' ) {
 	isa_ok($token, 'PPI::Token::Number::Octal');
 	is("$token", $code, "tokenize bad octal '$code'");
 	ok($token->{_error} && $token->{_error} =~ m/octal/i,
-	   'invalid octal number should trigger parse error');
+		'invalid octal number should trigger parse error');
 	is($token->literal, undef, "literal('$code') is undef");
 }
+
 
 BINARY: {
 	my @tests = (
@@ -175,24 +177,25 @@ BINARY: {
 		{ code => '0b012',      error => 1, value => 0 },
 		{ code => '0B012',      error => 1, value => 0 },
 		{ code => '0B0121',     error => 1, value => 0 },
-        );
+	);
 	foreach my $test ( @tests ) {
 		my $code = $test->{code};
 		my $T = PPI::Tokenizer->new( \$code );
 		my $token = $T->get_token;
 		isa_ok($token, 'PPI::Token::Number::Binary');
-                if ( $test->{error} ) {
-                    ok($token->{_error} && $token->{_error} =~ m/binary/i,
-                       'invalid binary number should trigger parse error');
-                    is($token->literal, undef, "literal('$code') is undef");
-                }
-                else {
-                    ok(!$token->{_error}, "no error for '$code'");
-                    is($token->literal, $test->{value}, "literal('$code') is $test->{value}");
-                }
-                is($token->content, $code, "parsed everything");
+		if ( $test->{error} ) {
+			ok($token->{_error} && $token->{_error} =~ m/binary/i,
+				'invalid binary number should trigger parse error');
+			is($token->literal, undef, "literal('$code') is undef");
+		}
+		else {
+			ok(!$token->{_error}, "no error for '$code'");
+			is($token->literal, $test->{value}, "literal('$code') is $test->{value}");
+		}
+		is($token->content, $code, "parsed everything");
 	}
 }
+
 
 HEX: {
 	my @tests = (
@@ -233,6 +236,6 @@ HEX: {
 		isa_ok($token, 'PPI::Token::Number::Hex');
 		ok(!$token->{_error}, "no error for '$code' even on invalid digits");
 		is($token->content, $test->{parsed}, "correctly parsed everything expected");
-                is($token->literal, $test->{value}, "literal('$code') is $test->{value}");
+		is($token->literal, $test->{value}, "literal('$code') is $test->{value}");
 	}
 }
