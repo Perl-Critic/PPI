@@ -4,8 +4,8 @@ use warnings;
 use strict;
 
 use List::Util 1.33 'any';
-use Params::Util qw{_INSTANCE};
-use PPI::Dumper;
+use Params::Util qw{_STRING _INSTANCE};
+use File::Spec::Functions ':ALL';
 use Test::More;
 use Test::Object 0.07;
 
