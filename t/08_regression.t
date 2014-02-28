@@ -4,6 +4,7 @@
 
 # Some other regressions tests are included here for simplicity.
 
+use lib 't/lib';
 use strict;
 BEGIN {
 	no warnings 'once';
@@ -17,7 +18,7 @@ use Test::More tests => 933;
 use Test::NoWarnings;
 use File::Spec::Functions ':ALL';
 use Params::Util qw{_INSTANCE};
-use t::lib::PPI;
+use PPI::Test::Run;
 use PPI::Lexer;
 use PPI::Dumper;
 
@@ -35,7 +36,7 @@ sub pause {
 # Code/Dump Testing
 # ntests = 2 + 14 * nfiles
 
-t::lib::PPI->run_testdir(qw{ t data 08_regression });
+PPI::Test::Run->run_testdir(qw{ t data 08_regression });
 
 
 
