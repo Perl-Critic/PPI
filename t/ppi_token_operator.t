@@ -3,12 +3,15 @@
 use strict;
 BEGIN {
 	$|  = 1;
+	select STDERR;
+	$| = 1;
+	select STDOUT;
 	$^W = 1;
 	no warnings 'once';
 	$PPI::XS_DISABLE = 1;
 	$PPI::Lexer::X_TOKENIZER ||= $ENV{X_TOKENIZER};
 }
-use Test::More tests => 292;
+use Test::More tests => 299;
 use Test::NoWarnings;
 use PPI;
 
@@ -44,7 +47,7 @@ HEREDOC: {
 
 PARSE_ALL_OPERATORS: {
 	foreach my $op ( sort keys %PPI::Token::Operator::OPERATOR ) {
-		my $source = $op eq '<>' ? '<>;' : "1 $op 2;";
+		my $source = $op eq '<>' ? '<>;' : "\$foo $op 2;";
 		my $doc = PPI::Document->new( \$source );
 		isa_ok( $doc, 'PPI::Document', "operator $op parsed '$source'" );
 		my $ops = $doc->find( $op eq '<>' ? 'Token::QuoteLike::Readline' : 'Token::Operator' );
@@ -222,6 +225,100 @@ OPERATOR_X: {
 				'PPI::Token::Symbol' => '$x',
 			],
 		},
+		{
+			desc => 'RT 37892: list as arg to x operator 1',
+			code => '(1) x 6',
+			expected => [
+				'PPI::Structure::List' => '(1)',
+				'PPI::Token::Structure' => '(',
+				'PPI::Statement::Expression' => '1',
+				'PPI::Token::Number' => '1',
+				'PPI::Token::Structure' => ')',
+				'PPI::Token::Whitespace' => ' ',
+				'PPI::Token::Operator' => 'x',
+				'PPI::Token::Whitespace' => ' ',
+				'PPI::Token::Number' => '6',
+			],
+		},
+		{
+			desc => 'RT 37892: list as arg to x operator 2',
+			code => '(1) x6',
+			expected => [
+				'PPI::Structure::List' => '(1)',
+				'PPI::Token::Structure' => '(',
+				'PPI::Statement::Expression' => '1',
+				'PPI::Token::Number' => '1',
+				'PPI::Token::Structure' => ')',
+				'PPI::Token::Whitespace' => ' ',
+				'PPI::Token::Operator' => 'x',
+				'PPI::Token::Number' => '6',
+			],
+		},
+		{
+			desc => 'RT 37892: list as arg to x operator 3',
+			code => '(1)x6',
+			expected => [
+				'PPI::Structure::List' => '(1)',
+				'PPI::Token::Structure' => '(',
+				'PPI::Statement::Expression' => '1',
+				'PPI::Token::Number' => '1',
+				'PPI::Token::Structure' => ')',
+				'PPI::Token::Operator' => 'x',
+				'PPI::Token::Number' => '6',
+			],
+		},
+		{
+			desc => 'RT 37892: list as arg to x operator 4',
+			code => 'qw(1)x6',
+			expected => [
+				'PPI::Token::QuoteLike::Words' => 'qw(1)',
+				'PPI::Token::Operator' => 'x',
+				'PPI::Token::Number' => '6',
+			],
+		},
+		{
+			desc => 'RT 37892: list as arg to x operator 5',
+			code => 'qw<1>x6',
+			expected => [
+				'PPI::Token::QuoteLike::Words' => 'qw<1>',
+				'PPI::Token::Operator' => 'x',
+				'PPI::Token::Number' => '6',
+			],
+		},
+		{
+			desc => 'RT 37892: listref as arg to x operator 6',
+			code => '[1]x6',
+			expected => [
+				'PPI::Structure::Constructor' => '[1]',
+				'PPI::Token::Structure' => '[',
+				'PPI::Statement' => '1',
+				'PPI::Token::Number' => '1',
+				'PPI::Token::Structure' => ']',
+				'PPI::Token::Operator' => 'x',
+				'PPI::Token::Number' => '6',
+			],
+		},
+		{
+			desc => 'sub name /^x/',
+			code => 'sub xyzzy : _5x5 {1;}',
+			expected => [
+				'PPI::Statement::Sub' => 'sub xyzzy : _5x5 {1;}',
+				'PPI::Token::Word' => 'sub',
+				'PPI::Token::Whitespace' => ' ',
+				'PPI::Token::Word' => 'xyzzy',
+				'PPI::Token::Whitespace' => ' ',
+				'PPI::Token::Operator' => ':',
+				'PPI::Token::Whitespace' => ' ',
+				'PPI::Token::Attribute' => '_5x5',
+				'PPI::Token::Whitespace' => ' ',
+				'PPI::Structure::Block' => '{1;}',
+				'PPI::Token::Structure' => '{',
+				'PPI::Statement' => '1;',
+				'PPI::Token::Number' => '1',
+				'PPI::Token::Structure' => ';',
+				'PPI::Token::Structure' => '}',
+			]
+		},
 	);
 	foreach my $test ( @tests ) {
 		my $code = $test->{code};
@@ -230,7 +327,9 @@ OPERATOR_X: {
 		my $tokens = $d->find( sub { 1; } );
 		$tokens = [ map { ref($_), $_->content() } @$tokens ];
 		my $expected = $test->{expected};
-		unshift @$expected, 'PPI::Statement', $test->{code};
+		if ( $expected->[0] !~ /^PPI::Statement::/ ) {
+			unshift @$expected, 'PPI::Statement', $test->{code};
+		}
 		my $ok = is_deeply( $tokens, $expected, $test->{desc} );
 		if ( !$ok ) {
 			diag "$test->{code} ($test->{desc})\n";
