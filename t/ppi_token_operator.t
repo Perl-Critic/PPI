@@ -11,7 +11,7 @@ BEGIN {
 	$PPI::XS_DISABLE = 1;
 	$PPI::Lexer::X_TOKENIZER ||= $ENV{X_TOKENIZER};
 }
-use Test::More tests => 299;
+use Test::More tests => 395;
 use Test::NoWarnings;
 use PPI;
 
@@ -208,21 +208,75 @@ OPERATOR_X: {
 			],
 		},
 		{
-			desc => 'x followed by => should not be mistaken for x=',
-			code => 'x=>$x',
+			desc => 'x plus whitespace on the left of => that is not the first token in the doc',
+			code => '1;x =>1;',
 			expected => [
+				'PPI::Statement' => '1;',
+				'PPI::Token::Number' => '1',
+				'PPI::Token::Structure' => ';',
+				'PPI::Statement' => 'x =>1;',
 				'PPI::Token::Word' => 'x',
+				'PPI::Token::Whitespace' => ' ',
 				'PPI::Token::Operator' => '=>',
-				'PPI::Token::Symbol' => '$x',
+				'PPI::Token::Number' => '1',
+				'PPI::Token::Structure' => ';',
 			],
 		},
 		{
-			desc => 'xx not mistaken for an x operator',
-			code => 'xx=>$x',
+			desc => 'x on the left of => that is not the first token in the doc',
+			code => '1;x=>1;',
+			expected => [
+				'PPI::Statement' => '1;',
+				'PPI::Token::Number' => '1',
+				'PPI::Token::Structure' => ';',
+				'PPI::Statement' => 'x=>1;',
+				'PPI::Token::Word' => 'x',
+				'PPI::Token::Operator' => '=>',
+				'PPI::Token::Number' => '1',
+				'PPI::Token::Structure' => ';',
+			],
+		},
+		{
+			desc => 'x on the left of => that is not the first token in the doc',
+			code => '$hash{x}=1;',
+			expected => [
+				'PPI::Token::Symbol' => '$hash',
+				'PPI::Structure::Subscript' => '{x}',
+				'PPI::Token::Structure' => '{',
+				'PPI::Statement::Expression' => 'x',
+				'PPI::Token::Word' => 'x',
+				'PPI::Token::Structure' => '}',
+				'PPI::Token::Operator' => '=',
+				'PPI::Token::Number' => '1',
+				'PPI::Token::Structure' => ';',
+			],
+		},
+		{
+			desc => 'x plus whitespace on the left of => is not an operator',
+			code => 'x =>1',
+			expected => [
+				'PPI::Token::Word' => 'x',
+				'PPI::Token::Whitespace' => ' ',
+				'PPI::Token::Operator' => '=>',
+				'PPI::Token::Number' => '1',
+			],
+		},
+		{
+			desc => 'x immediately followed by => should not be mistaken for x=',
+			code => 'x=>1',
+			expected => [
+				'PPI::Token::Word' => 'x',
+				'PPI::Token::Operator' => '=>',
+				'PPI::Token::Number' => '1',
+			],
+		},
+		{
+			desc => 'xx on left of => not mistaken for an x operator',
+			code => 'xx=>1',
 			expected => [
 				'PPI::Token::Word' => 'xx',
 				'PPI::Token::Operator' => '=>',
-				'PPI::Token::Symbol' => '$x',
+				'PPI::Token::Number' => '1',
 			],
 		},
 		{
@@ -299,6 +353,24 @@ OPERATOR_X: {
 			],
 		},
 		{
+			desc => 'x followed by sigil $ that is not also an operator',
+			code => '1x$bar',
+			expected => [
+				'PPI::Token::Number' => '1',
+				'PPI::Token::Operator' => 'x',
+				'PPI::Token::Symbol' => '$bar',
+			],
+		},
+		{
+			desc => 'x followed by sigil @ that is not also an operator',
+			code => '1x@bar',
+			expected => [
+				'PPI::Token::Number' => '1',
+				'PPI::Token::Operator' => 'x',
+				'PPI::Token::Symbol' => '@bar',
+			],
+		},
+		{
 			desc => 'sub name /^x/',
 			code => 'sub xyzzy : _5x5 {1;}',
 			expected => [
@@ -320,6 +392,60 @@ OPERATOR_X: {
 			]
 		},
 	);
+
+	# Exhaustively test when a preceding operator implies following
+	# 'x' is word not an operator. This detects the regression in
+	# which '$obj->x86_convert()' was being parsed as an the x
+	# operator.
+	my %operators = (
+		%PPI::Token::Operator::OPERATOR,
+		map { $_ => 1 } qw( -r -w -x -o -R -W -X -O -e -z -s -f -d -l -p -S -b -c -t -u -g -k -T -B -M -A -C )
+	);
+	# Don't try to test operators for which PPI currently (1.215)
+	# doesn't recognize when they're followed immediately by a word.
+	# E.g.:
+	#     sub x3 {15;} my $z=6; print $z&x3;
+	#     sub x3 {3;} my $z=2; print $z%x3;
+	delete $operators{'&'};
+	delete $operators{'%'};
+	delete $operators{'*'};
+	foreach my $operator ( keys %operators ) {
+
+		my $code = '';
+		my @expected;
+
+		if ( $operator =~ /^\w/ ) {
+			$code .= '$a ';
+			push @expected, ( 'PPI::Token::Symbol' => '$a' );
+			push @expected, ( 'PPI::Token::Whitespace' => ' ' );
+		}
+		elsif ( $operator !~ /^-\w/ ) {  # filetest operators
+			$code .= '$a';
+			push @expected, ( 'PPI::Token::Symbol' => '$a' );
+		}
+
+		$code .= $operator;
+		push @expected, ( ($operator eq '<>' ? 'PPI::Token::QuoteLike::Readline' : 'PPI::Token::Operator') => $operator );
+
+		if ( $operator =~ /\w$/ || $operator eq '<<' ) {  # want << operator, not heredoc
+			$code .= ' ';
+			push @expected, ( 'PPI::Token::Whitespace' => ' ' );
+		}
+		$code .= 'x3';
+		my $desc;
+		if ( $operator eq '--' || $operator eq '++' || $operator eq '<>' ) {
+			push @expected, ( 'PPI::Token::Operator' => 'x' );
+			push @expected, ( 'PPI::Token::Number' => '3' );
+			$desc = "operator $operator does not imply following 'x' is a word",
+		}
+		else {
+			push @expected, ( 'PPI::Token::Word' => 'x3' );
+			$desc = "operator $operator implies following 'x' is a word",
+		}
+
+		push @tests, { desc => $desc, code => $code, expected => \@expected };
+	}
+
 	foreach my $test ( @tests ) {
 		my $code = $test->{code};
 
@@ -327,7 +453,7 @@ OPERATOR_X: {
 		my $tokens = $d->find( sub { 1; } );
 		$tokens = [ map { ref($_), $_->content() } @$tokens ];
 		my $expected = $test->{expected};
-		if ( $expected->[0] !~ /^PPI::Statement::/ ) {
+		if ( $expected->[0] !~ /^PPI::Statement/ ) {
 			unshift @$expected, 'PPI::Statement', $test->{code};
 		}
 		my $ok = is_deeply( $tokens, $expected, $test->{desc} );
