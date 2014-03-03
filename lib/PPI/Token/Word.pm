@@ -498,7 +498,7 @@ sub __TOKENIZER__commit {
 		return ($t->{line_cursor} >= $t->{line_length}) ? 0
 			: $t->{class}->__TOKENIZER__on_char( $t );
 
-	} elsif ( $OPERATOR{$word} ) {
+	} elsif ( $OPERATOR{$word} && ($word ne 'x' || $t->_current_x_is_operator) ) {
 		# Word operator
 		$token_class = 'Operator';
 

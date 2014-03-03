@@ -151,16 +151,6 @@ BEGIN {
 	};
 }
 
-# The x operator cannot follow most Perl operators, implying that
-# anything beginning with x following an operator is a word.
-# These are the exceptions.
-my %X_CAN_FOLLOW_OPERATOR = map { $_ => 1 } qw( -- ++ );
-
-# The x operator cannot follow most structure elements, implying that
-# anything beginning with x following a structure element is a word.
-# These are the exceptions.
-my %X_CAN_FOLLOW_STRUCTURE = map { $_ => 1 } qw( } ] \) );
-
 
 sub __TOKENIZER__on_line_start {
 	my $t    = $_[1];
@@ -400,16 +390,8 @@ sub __TOKENIZER__on_char {
 		# 'x ='. An important exception is x followed immediately by
 		# '=>', which makes the x into a bareword.
 		my $remainder = substr $t->{line}, $t->{line_cursor} + 1;
-		if ( $remainder =~ /^(?:\d|(?!(=>|[\w\s])))/ ) {
-			my $prev = $t->_last_significant_token;
-			if (
-				$prev
-				&& (!$prev->isa('PPI::Token::Operator') || $X_CAN_FOLLOW_OPERATOR{$prev})
-				&& (!$prev->isa('PPI::Token::Structure') || $X_CAN_FOLLOW_STRUCTURE{$prev})
-			) {
-				return 'Operator';
-			}
-		}
+		return 'Operator'
+			if $t->_current_x_is_operator and $remainder =~ /^(?:\d|(?!(=>|[\w\s])))/;
 
 		# Otherwise, commit like a normal bareword
 		return PPI::Token::Word->__TOKENIZER__commit($t);
