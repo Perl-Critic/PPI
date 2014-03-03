@@ -11,7 +11,7 @@ BEGIN {
 	$PPI::XS_DISABLE = 1;
 	$PPI::Lexer::X_TOKENIZER ||= $ENV{X_TOKENIZER};
 }
-use Test::More tests => 395;
+use Test::More tests => 398;
 use Test::NoWarnings;
 use PPI;
 
@@ -280,6 +280,24 @@ OPERATOR_X: {
 			],
 		},
 		{
+			desc => 'x right of => is not an operator',
+			code => '1=>x',
+			expected => [
+				'PPI::Token::Number' => '1',
+				'PPI::Token::Operator' => '=>',
+				'PPI::Token::Word' => 'x',
+			],
+		},
+		{
+			desc => 'xor right of => is an operator',
+			code => '1=>xor',
+			expected => [
+				'PPI::Token::Number' => '1',
+				'PPI::Token::Operator' => '=>',
+				'PPI::Token::Operator' => 'xor',
+			],
+		},
+		{
 			desc => 'RT 37892: list as arg to x operator 1',
 			code => '(1) x 6',
 			expected => [
@@ -316,6 +334,18 @@ OPERATOR_X: {
 				'PPI::Token::Structure' => '(',
 				'PPI::Statement::Expression' => '1',
 				'PPI::Token::Number' => '1',
+				'PPI::Token::Structure' => ')',
+				'PPI::Token::Operator' => 'x',
+				'PPI::Token::Number' => '6',
+			],
+		},
+		{
+			desc => 'RT 37892: x following function is operator',
+			code => 'foo()x6',
+			expected => [
+				'PPI::Token::Word' => 'foo',
+				'PPI::Structure::List' => '()',
+				'PPI::Token::Structure' => '(',
 				'PPI::Token::Structure' => ')',
 				'PPI::Token::Operator' => 'x',
 				'PPI::Token::Number' => '6',

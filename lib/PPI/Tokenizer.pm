@@ -92,6 +92,16 @@ BEGIN {
 	$VERSION = '1.216_01';
 }
 
+# The x operator cannot follow most Perl operators, implying that
+# anything beginning with x following an operator is a word.
+# These are the exceptions.
+my %X_CAN_FOLLOW_OPERATOR = map { $_ => 1 } qw( -- ++ );
+
+# The x operator cannot follow most structure elements, implying that
+# anything beginning with x following a structure element is a word.
+# These are the exceptions.
+my %X_CAN_FOLLOW_STRUCTURE = map { $_ => 1 } qw( } ] \) );
+
 
 
 
@@ -754,6 +764,19 @@ sub _opcontext {
 
 	# Otherwise, we don't know
 	return ''
+}
+
+# Assuming we are currently parsing the word 'x', return true
+# if previous tokens imply the x is an operator, false otherwise.
+sub _current_x_is_operator {
+	my $self = shift;
+
+	my $prev = $self->_last_significant_token;
+	return 
+		$prev
+		&& (!$prev->isa('PPI::Token::Operator') || $X_CAN_FOLLOW_OPERATOR{$prev})
+		&& (!$prev->isa('PPI::Token::Structure') || $X_CAN_FOLLOW_STRUCTURE{$prev})
+	;
 }
 
 1;
