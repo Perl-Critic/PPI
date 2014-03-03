@@ -151,6 +151,7 @@ BEGIN {
 	};
 }
 
+
 sub __TOKENIZER__on_line_start {
 	my $t    = $_[1];
 	my $line = $t->{line};
@@ -380,14 +381,17 @@ sub __TOKENIZER__on_char {
 		return 'Operator';
 
 	} elsif ( $char == 120 ) { # $char eq 'x'
-                # x followed immediately by a digit is an operator, not a
-                # word.
-                #
-                # x followed immediately by '=' is the 'x=' operator, not
-                # 'x ='. An important exception is '=>', which makes the x
-                # into a bareword.
-                my $remainder = substr $t->{line}, $t->{line_cursor} + 1;
-                return 'Operator' if $remainder =~ /^(\d|=(?!>))/;
+		# x followed immediately by a digit can be the x
+		# operator or a word.  Disambiguate by checking
+		# whether the previous token is an operator that cannot be
+		# followed by the x operator, e.g.: +.
+		#
+		# x followed immediately by '=' is the 'x=' operator, not
+		# 'x ='. An important exception is x followed immediately by
+		# '=>', which makes the x into a bareword.
+		my $remainder = substr $t->{line}, $t->{line_cursor} + 1;
+		return 'Operator'
+			if $t->_current_x_is_operator and $remainder =~ /^(?:\d|(?!(=>|[\w\s])))/;
 
 		# Otherwise, commit like a normal bareword
 		return PPI::Token::Word->__TOKENIZER__commit($t);
