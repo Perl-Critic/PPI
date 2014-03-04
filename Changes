@@ -3,6 +3,7 @@ Revision history for Perl extension PPI
 1.216_01 to be released
 	Summary:
 	- Fixes for various parsing bugs
+        - Stop using Test::Inline
 
 	Details:
 	- Fixed RT #27475: PPI parses regex incorrectly
