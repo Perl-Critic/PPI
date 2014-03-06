@@ -222,10 +222,7 @@ sub lex_tokenizer {
 
 	# Lex the token stream into the document
 	$self->{Tokenizer} = $Tokenizer;
-	eval {
-		$self->_lex_document($Document);
-	};
-	if ( $@ ) {
+	if ( !eval { $self->_lex_document($Document); 1 } ) {
 		# If an error occurs DESTROY the partially built document.
 		undef $Document;
 		if ( _INSTANCE($@, 'PPI::Exception') ) {

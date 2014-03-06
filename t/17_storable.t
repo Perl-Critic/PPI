@@ -13,17 +13,15 @@ BEGIN {
 use Test::More;
 BEGIN {
 	# Is Storable installed?
-	eval { require Storable; };
-	if ( $@ ) {
+	if ( eval { require Storable; 1 } ) {
+		plan( tests => 10 );
+	} else {
 		plan( 'skip_all' );
 		exit(0);
-	} else {
-		plan( tests => 10 );
 	}
 }
 
 use Test::NoWarnings;
-use File::Spec::Functions ':ALL';
 use Scalar::Util  'refaddr';
 use PPI;
 
