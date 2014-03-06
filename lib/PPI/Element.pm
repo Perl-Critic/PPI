@@ -357,7 +357,7 @@ the same object.
 
 Returns a L<PPI::Token> object, or dies on error (which should be extremely
 rare and only occur if an illegal empty L<PPI::Statement> exists below the
-current Element somewhere.
+current Element somewhere.)
 
 =cut
 
@@ -385,7 +385,7 @@ the itself.
 
 Returns a L<PPI::Token> object, or dies on error (which should be extremely
 rare and only occur if an illegal empty L<PPI::Statement> exists below the
-current Element somewhere.
+current Element somewhere.)
 
 =cut
 
@@ -510,7 +510,7 @@ In future, this method may be enhanced to allow the insertion of multiple
 Elements, inline-parsed code strings or L<PPI::Document::Fragment> objects.
 
 Returns true if the Element was inserted, false if it can not be inserted,
-or C<undef> if you do not provide a L<PPI::Element> object as a parameter.
+or C<undef> if you do not provide a C<PPI::Element> object as a parameter.
 
 =cut
 
@@ -535,7 +535,7 @@ In future, this method may be enhanced to allow the insertion of multiple
 Elements, inline-parsed code strings or L<PPI::Document::Fragment> objects.
 
 Returns true if the Element was inserted, false if it can not be inserted,
-or C<undef> if you do not provide a L<PPI::Element> object as a parameter.
+or C<undef> if you do not provide a C<PPI::Element> object as a parameter.
 
 =cut
 
