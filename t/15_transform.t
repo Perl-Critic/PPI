@@ -14,6 +14,8 @@ use File::Spec::Functions ':ALL';
 use File::Remove;
 use PPI;
 use PPI::Transform;
+use Scalar::Util 'refaddr';
+use File::Copy;
 
 # Files to clean up
 my @cleanup = ();
@@ -30,21 +32,23 @@ END {
 #####################################################################
 # Begin Tests
 
-my $code = 'my $foo = "bar";';
-
-my $rv = MyCleaner->apply( \$code );
-ok( $rv, 'MyCleaner->apply( \$code ) returns true' );
-is( $code, 'my$foo="bar";', 'MyCleaner->apply( \$code ) modifies code as expected' );
-
-ok(
-	PPI::Transform->register_apply_handler( 'Foo', \&Foo::get, \&Foo::set ),
-	"register_apply_handler worked",
-);
-$Foo::VALUE = 'my $foo = "bar";';
-my $Foo = Foo->new;
-isa_ok( $Foo, 'Foo' );
-ok( MyCleaner->apply( $Foo ), 'MyCleaner->apply( $Foo ) returns true' );
-is( $Foo::VALUE, 'my$foo="bar";', 'MyCleaner->apply( $Foo ) modifies code as expected' );
+APPLY: {
+	my $code = 'my $foo = "bar";';
+	
+	my $rv = MyCleaner->apply( \$code );
+	ok( $rv, 'MyCleaner->apply( \$code ) returns true' );
+	is( $code, 'my$foo="bar";', 'MyCleaner->apply( \$code ) modifies code as expected' );
+	
+	ok(
+		PPI::Transform->register_apply_handler( 'Foo', \&Foo::get, \&Foo::set ),
+		"register_apply_handler worked",
+	);
+	$Foo::VALUE = 'my $foo = "bar";';
+	my $Foo = Foo->new;
+	isa_ok( $Foo, 'Foo' );
+	ok( MyCleaner->apply( $Foo ), 'MyCleaner->apply( $Foo ) returns true' );
+	is( $Foo::VALUE, 'my$foo="bar";', 'MyCleaner->apply( $Foo ) modifies code as expected' );
+}
 
 
 
@@ -52,9 +56,6 @@ is( $Foo::VALUE, 'my$foo="bar";', 'MyCleaner->apply( $Foo ) modifies code as exp
 
 #####################################################################
 # File transforms
-
-use Scalar::Util 'refaddr';
-use File::Copy;
 
 my $testdir = catdir( 't', 'data', '15_transform');
 

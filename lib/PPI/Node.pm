@@ -435,11 +435,11 @@ sub find_first {
 		# The defined() here prevents a ton of calls to PPI::Util::TRUE
 		while ( @queue ) {
 			my $Element = shift @queue;
-			my $rv      = &$wanted( $self, $Element );
-			return $Element if $rv;
+			my $element_rv      = &$wanted( $self, $Element );
+			return $Element if $element_rv;
 
 			# Support "don't descend on undef return"
-			next unless defined $rv;
+			next unless defined $element_rv;
 
 			# Skip if the Element doesn't have any children
 			next unless $Element->isa('PPI::Node');
