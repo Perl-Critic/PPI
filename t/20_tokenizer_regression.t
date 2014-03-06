@@ -90,8 +90,6 @@ exit(0);
 #####################################################################
 # Support Functions
 
-my $failures = 0;
-
 sub test_code {
 	my $code     = shift;
 	my $quotable = quotable($code);

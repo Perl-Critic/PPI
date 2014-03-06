@@ -479,8 +479,6 @@ OPERATOR_X: {
 	}
 
 	foreach my $test ( @tests ) {
-		my $code = $test->{code};
-
 		my $d = PPI::Document->new( \$test->{code} );
 		my $tokens = $d->find( sub { 1; } );
 		$tokens = [ map { ref($_), $_->content() } @$tokens ];
