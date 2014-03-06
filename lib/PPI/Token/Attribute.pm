@@ -71,7 +71,7 @@ That is, for the attribute C<foo(bar)>, the C<parameters> method would
 return C<"bar">.
 
 Returns the parameters as a string (including the null string C<''> for
-the case of an attribute such as C<foo()>.
+the case of an attribute such as C<foo()>.)
 
 Returns C<undef> if the attribute does not have parameters.
 
