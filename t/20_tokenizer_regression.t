@@ -21,8 +21,9 @@ use Params::Util qw{_INSTANCE};
 
 sub pause {
 	local $@;
-	eval { require Time::HiRes; };
-	$@ ? sleep(1) : Time::HiRes::sleep(0.1);
+	if ( ! eval { require Time::HiRes; Time::HiRes::sleep(0.1); 1; } ) {
+		sleep(1);
+	}
 }
 
 
