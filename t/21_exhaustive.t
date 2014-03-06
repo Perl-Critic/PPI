@@ -108,7 +108,7 @@ foreach my $len ( 1 .. $MAX_CHARS ) {
 #####################################################################
 # Test a series of random strings
 
-foreach my $i ( 1 .. $ITERATIONS ) {
+for ( 1 .. $ITERATIONS ) {
 	# Generate a random string
 	my $code = join( '',
 		map { $ALL_CHARS[$_] }

@@ -123,13 +123,13 @@ sub quickcheck {
 
 	while ( length $fails ) {
 		chop $code;
-		my $Document = PPI::Document->new(\$code) or last;
+		PPI::Document->new(\$code) or last;
 		$fails = $code;
 	}
 
 	while ( length $fails ) {
 		substr( $code, 0, 1, '' );
-		my $Document = PPI::Document->new(\$code) or return $fails;
+		PPI::Document->new(\$code) or return $fails;
 		$fails = $code;
 	}
 
