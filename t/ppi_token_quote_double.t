@@ -8,56 +8,47 @@ use PPI::Test qw( :cmp );
 use Test::More tests => 14;
 use PPI;
 
+sub t {
+	{ class => shift, content => shift, @_ };
+}
+
+sub i {
+	my ( $code, $interpolations, %args ) = @_;
+	cmp_element(
+		$code,
+		t( 'PPI::Token::Quote::Double', $code, interpolations => $interpolations, %args )
+	);
+}
+
+sub si {
+	cmp_element( shift, { class => 'PPI::Token::Quote::Double', simplify => shift } );
+}
 
 INTERPOLATIONS: {
-	for my $test (
-		{ interpolations => '', code => '"no interpolations"' },
-		{ interpolations => '', code => '"no \@interpolations"' },
-		{ interpolations => 1,  code => '"has $interpolation"' },
-		{ interpolations => 1,  code => '"has @interpolation"' },
-		{ interpolations => 1,  code => '"has \\\\@interpolation"' },
-		{
-			interpolations => '',
-			code => '"" # False content to test double-negation scoping',
-			content => '""',
-			STOP => 1,
-		},
-	) {
-		my $code = delete $test->{code};
-		cmp_element(
-			$code,
-			{
-				class => 'PPI::Token::Quote::Double',
-				content => $code,
-				%$test,
-			}
-		);
-	}
+	i( '"no interpolations"',                                '' );
+	i( '"no \@interpolations"',                              '' );
+	i( '"has $interpolation"',                               1 );
+	i( '"has @interpolation"',                               1 );
+	i( '"has \\\\@interpolation"',                           1 );
+	i( '"" # False content to test double-negation scoping', '', content => '""', STOP => 1 );
 }
-
 
 SIMPLIFY: {
-	for my $test (
-		{ code => '"no special characters"', simplify => q<'no special characters'>, },
-		{ code => '"has \"double\" quotes"', simplify => q<"has \"double\" quotes">, },
-		{ code => '"has \'single\' quotes"', simplify => q<"has 'single' quotes">,   },
-		{ code => '"has $interpolation"',    simplify => q<"has $interpolation">,    },
-		{ code => '"has @interpolation"',    simplify => q<"has @interpolation">,    },
-		{ code => '""',                      simplify => q<''>,                      },
-	) {
-		my $code = delete $test->{code};
-		cmp_element( $code, { class => 'PPI::Token::Quote::Double', %$test } );
-	}
+	si( '"no special characters"', q<'no special characters'> );
+	si( '"has \"double\" quotes"', q<"has \"double\" quotes"> );
+	si( '"has \'single\' quotes"', q<"has 'single' quotes">   );
+	si( '"has $interpolation"',    q<"has $interpolation">    );
+	si( '"has @interpolation"',    q<"has @interpolation">    );
+	si( '""',                      q<''>                      );
 }
-
 
 PARSING: {
 	cmp_selement(
 		'print "foo";',
 		[
-			{ class => 'PPI::Token::Word',          content => 'print' },
-			{ class => 'PPI::Token::Quote::Double', content => '"foo"' },
-			{ class => 'PPI::Token::Structure',     content => ';' },
+			t( "PPI::Token::Word",          'print' ),
+			t( "PPI::Token::Quote::Double", '"foo"' ),
+			t( "PPI::Token::Structure",     ';' ),
 		]
 	);
 }
