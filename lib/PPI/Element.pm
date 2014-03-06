@@ -597,7 +597,7 @@ one being replaced.
 
 sub replace {
 	my $self    = ref $_[0] ? shift : return undef;
-	my $Element = _INSTANCE(shift, ref $self) or return undef;
+	_INSTANCE(shift, ref $self) or return undef;
 	die "The ->replace method has not yet been implemented";
 }
 
