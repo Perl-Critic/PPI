@@ -66,7 +66,7 @@ sub pause {
 # adding a weak reference to the has index.
 use Scalar::Util ();
 SCOPE: {
-	my %hash = ();
+	my %hash;
 	my $counter = 0;
 
 	SCOPE: {

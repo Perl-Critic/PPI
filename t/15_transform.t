@@ -18,7 +18,7 @@ use Scalar::Util 'refaddr';
 use File::Copy;
 
 # Files to clean up
-my @cleanup = ();
+my @cleanup;
 END {
 	foreach ( @cleanup ) {
 		File::Remove::remove( \1, $_ );

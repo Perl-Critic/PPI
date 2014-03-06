@@ -86,7 +86,7 @@ BEGIN {
 use PPI::Document::Fragment ();
 
 # Document cache
-my $CACHE = undef;
+my $CACHE;
 
 # Convenience constants related to constants
 use constant LOCATION_LINE         => 0;
