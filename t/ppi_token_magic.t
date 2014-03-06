@@ -48,7 +48,7 @@ END_PERL
 
 	foreach my $token ( @$symbols ) {
 		my ($hash, $class, $name, $remk) =
-			split '\s+', $comments->[$token->line_number - 1], 4;
+			split /\s+/, $comments->[$token->line_number - 1], 4;
 		isa_ok( $token, "PPI::Token::$class" );
 		is( $token->symbol, $name, $remk || "The symbol is $name" );
 	}
