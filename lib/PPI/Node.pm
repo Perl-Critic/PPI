@@ -373,7 +373,7 @@ sub find {
 	my $wanted = $self->_wanted(shift) or return undef;
 
 	# Use a queue based search, rather than a recursive one
-	my @found = ();
+	my @found;
 	my @queue = @{$self->{children}};
 	my $ok = eval {
 		while ( @queue ) {

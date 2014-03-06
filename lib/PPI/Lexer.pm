@@ -1161,7 +1161,7 @@ sub _curly {
 	# We need to scan ahead.
 	my $Next;
 	my $position = 0;
-	my @delayed  = ();
+	my @delayed;
 	while ( $Next = $self->_get_token ) {
 		unless ( $Next->significant ) {
 			push @delayed, $Next;

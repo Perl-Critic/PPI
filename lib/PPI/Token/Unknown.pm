@@ -78,7 +78,7 @@ sub __TOKENIZER__on_char {
 
 		if ( $char eq '$' ) {
 			# Operator/operand-sensitive, multiple or GLOB cast
-			my $_class = undef;
+			my $_class;
 			my $tokens = $t->_previous_significant_tokens(1);
 			my $p0     = $tokens->[0];
 			if ( $p0 ) {
