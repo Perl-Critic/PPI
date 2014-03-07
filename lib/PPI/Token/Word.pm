@@ -211,10 +211,10 @@ sub __TOKENIZER__commit {
 
 	# Our current position is the first character of the bareword.
 	# Capture the bareword.
-	my $rest = substr( $t->{line}, $t->{line_cursor} );
-	unless ( $rest =~ /^((?!\d)\w+(?:(?:\'|::)\w+)*(?:::)?)/ ) {
+	pos $t->{line} = $t->{line_cursor};
+	unless ( $t->{line} =~ m/\G((?!\d)\w+(?:(?:\'|::)\w+)*(?:::)?)/gc ) {
 		# Programmer error
-		die "Fatal error... regex failed to match in '$rest' when expected";
+		die sprintf "Fatal error... regex failed to match in '%s' when expected", substr $t->{line}, $t->{line_cursor};
 	}
 
 	# Special Case: If we accidentally treat eq'foo' like the word "eq'foo",
