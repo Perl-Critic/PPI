@@ -353,7 +353,7 @@ sub __TOKENIZER__literal {
 	}
 
 	# Check the cases when we have previous tokens
-	my $rest = substr( $t->{line}, $t->{line_cursor} );
+	pos $t->{line} = $t->{line_cursor};
 	if ( $tokens ) {
 		my $token = $tokens->[0] or return '';
 
@@ -365,14 +365,14 @@ sub __TOKENIZER__literal {
 
 		# If we are contained in a pair of curly braces,
 		# we are probably a bareword hash key
-		if ( $token->{content} eq '{' and $rest =~ /^\s*\}/ ) {
+		if ( $token->{content} eq '{' and $t->{line} =~ /\G\s*\}/gc ) {
 			return 1;
 		}
 	}
 
 	# In addition, if the word is followed by => it is probably
 	# also actually a word and not a regex.
-	if ( $rest =~ /^\s*=>/ ) {
+	if ( $t->{line} =~ /\G\s*=>/gc ) {
 		return 1;
 	}
 
