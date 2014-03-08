@@ -1,5 +1,8 @@
 package t::lib::PPI;
 
+use warnings;
+use strict;
+
 use File::Spec::Functions ':ALL';
 use Test::More;
 use Test::Object;
@@ -158,7 +161,7 @@ Test::Object->register(
 
 sub valid_compound_type {
 	my $document = shift;
-	my $compound = $document->find('PPI::Statement::Compound');
+	my $compound = $document->find('PPI::Statement::Compound') || [];
 	is(
 		scalar( grep { not defined $_->type } @$compound ),
 		0, 'All compound statements have defined ->type',
