@@ -97,7 +97,9 @@ If it has one, the C<prototype> method returns the subroutine's prototype.
 It is returned in the same format as L<PPI::Token::Prototype/prototype>,
 cleaned and removed from its brackets.
 
-Returns false if the subroutine does not define a prototype
+Returns the subroutine's prototype, or undef if the subroutine does not
+define one. Note that when the sub has an empty prototype (C<()>) the
+return is an empty string.
 
 =cut
 
@@ -106,7 +108,7 @@ sub prototype {
 	my $Prototype = List::Util::first {
 		_INSTANCE($_, 'PPI::Token::Prototype')
 	} $self->children;
-	defined($Prototype) ? $Prototype->prototype : '';
+	defined($Prototype) ? $Prototype->prototype : undef;
 }
 
 =pod

@@ -11,7 +11,7 @@ BEGIN {
 	$PPI::Lexer::X_TOKENIZER ||= $ENV{X_TOKENIZER};
 }
 
-use Test::More tests => 119;
+use Test::More tests => 131;
 use Test::NoWarnings;
 use PPI;
 
@@ -45,6 +45,27 @@ SUB_WORD_OPTIONAL: {
 		is( scalar(@$statements), 1, "$desc for $word + package" );
 		$statements = $Document->find('Statement::Package') || [];
 		is( scalar(@$statements), 1, "$desc for $word + package" );
+	}
+}
+
+PROTOTYPE: {
+	# Doesn't have to be as thorough as ppi_token_prototype.t, since
+	# we're just making sure PPI::Token::Prototype->prototype gets
+	# passed through correctly.
+	for my $test (
+		[ '',         undef ],
+		[ '()',       '' ],
+		[ '( $*Z@ )', '$*Z@' ],
+	) {
+		my ( $proto_text, $expected ) = @$test;
+
+		my $Document = PPI::Document->new( \"sub foo $proto_text {}" );
+		isa_ok( $Document, 'PPI::Document', "$proto_text got document" );
+
+		my ( $sub_statement, $dummy ) = $Document->schildren();
+		isa_ok( $sub_statement, 'PPI::Statement::Sub', "$proto_text document child is a sub" );
+		is( $dummy, undef, "$proto_text document has exactly one child" );
+		is( $sub_statement->prototype, $expected, "$proto_text: prototype matches" );
 	}
 }
 
