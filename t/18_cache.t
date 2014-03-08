@@ -138,8 +138,6 @@ SKIP: {
 	is( PPI::Document->get_cache, undef,    '->get_cache returns undef' );
 
 	# Next, test the import mechanism
-	local $@;
-	eval "use PPI::Cache path => '$cache_dir'; 1;";
 	is( eval "use PPI::Cache path => '$cache_dir'; 1;", 1, 'use PPI::Cache path => ...; succeeded' );
 	isa_ok( PPI::Document->get_cache, 'PPI::Cache' );
 	is( scalar(PPI::Document->get_cache->path), $cache_dir, '->path returns the original path'    );
