@@ -61,10 +61,9 @@ sub __TOKENIZER__on_char {
 
 	# Suck in until we find the closing bracket (or the end of line)
 	pos $t->{line} = $t->{line_cursor};
-	if ( $t->{line} =~ m/\G(.*?(?:\)|$))/gc ) {
-		$t->{token}->{content} .= $1;
-		$t->{line_cursor} += length $1;
-	}
+	die "regex should always match" if $t->{line} !~ m/\G(.*?(?:\)|$))/gc;
+	$t->{token}->{content} .= $1;
+	$t->{line_cursor} += length $1;
 
 	# Shortcut if end of line
 	return 0 unless $1 =~ /\)$/;
