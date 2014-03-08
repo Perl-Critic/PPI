@@ -297,7 +297,7 @@ sub increment_testdir {
 		# Load the file
 		local *CODEFILE;
 		local $/ = undef;
-		open( CODEFILE, $codefile ) or die "open: $!";
+		open( CODEFILE, '<', $codefile ) or die "open: $!";
 		my $buffer = <CODEFILE>;
 		close( CODEFILE ) or die "close: $!";
 
