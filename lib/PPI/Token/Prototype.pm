@@ -78,14 +78,18 @@ sub __TOKENIZER__on_char {
 =head2 prototype
 
 The C<prototype> accessor returns the actual prototype pattern, stripped
-of braces and any whitespace inside the pattern.
+of flanking braces and of all whitespace. This mirrors the behavior of
+the Perl C<prototype> builtin function.
+
+Note that stripping braces and whitespace means that the return of
+C<prototype> can be an empty string.
 
 =cut
 
 sub prototype {
 	my $self  = shift;
 	my $proto = $self->content;
-	$proto =~ s/\(\)\s//g; # Strip brackets and whitespace
+	$proto =~ s/(^\(|\)$|\s+)//g;
 	$proto;
 }
 
