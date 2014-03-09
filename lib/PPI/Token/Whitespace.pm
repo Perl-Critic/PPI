@@ -303,8 +303,8 @@ sub __TOKENIZER__on_char {
 			# Could go either way... do a regex check
 			# $foo->{bar} < 2;
 			# grep { .. } <foo>;
-			my $line = substr( $t->{line}, $t->{line_cursor} );
-			if ( $line =~ /^<(?!\d)\w+>/ ) {
+			pos $t->{line} = $t->{line_cursor};
+			if ( $t->{line} =~ m/\G<(?!\d)\w+>/gc ) {
 				# Almost definitely readline
 				return 'QuoteLike::Readline';
 			}
