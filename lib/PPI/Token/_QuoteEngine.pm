@@ -219,19 +219,16 @@ sub _scan_quote_like_operator_gap {
 	my $string = '';
 	while ( exists $t->{line} ) {
 		# Get the search area for the current line
-		my $search_area
-			= $t->{line_cursor}
-			? substr( $t->{line}, $t->{line_cursor} )
-			: $t->{line};
+		pos $t->{line} = $t->{line_cursor};
 
 		# Since this regex can match zero characters, it should always match
-		$search_area =~ /^(\s*(?:\#.*)?)/s or return undef;
+		$t->{line} =~ /\G(\s*(?:\#.*)?)/gc or return undef;
 
 		# Add the chars found to the string
 		$string .= $1;
 
 		# Did we match the entire line?
-		unless ( length $1 == length $search_area ) {
+		unless ( $t->{line_cursor} + length $1 == length $t->{line} ) {
 			# Partial line match, which means we are at
 			# the end of the gap. Fix the cursor and return
 			# the string.
