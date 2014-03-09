@@ -112,7 +112,7 @@ sub __TOKENIZER__on_char {
 			# This _might_ be a dereference of one of the
 			# control-character symbols.
 			pos $t->{line} = $t->{line_cursor} + 1;
-			if ( $t->{line} =~ m/$PPI::Token::Unknown::CURLY_SYMBOL_MGC/gc ) {
+			if ( $t->{line} =~ m/$PPI::Token::Unknown::CURLY_SYMBOL/gc ) {
 				# This is really a dereference. ( $${^_foo} )
 				# Add the current token as the cast...
 				$t->{token} = PPI::Token::Cast->new( '$' );
@@ -177,7 +177,7 @@ sub __TOKENIZER__on_char {
 		$t->{token}->{content} = $c;
 	} else {
 		pos $t->{line} = $t->{line_cursor};
-		if ( $t->{line} =~ m/($PPI::Token::Unknown::CURLY_SYMBOL_MGC)/gc ) {
+		if ( $t->{line} =~ m/($PPI::Token::Unknown::CURLY_SYMBOL)/gc ) {
 			# control character symbol (e.g. ${^MATCH})
 			$t->{token}->{content} .= $1;
 			$t->{line_cursor}      += length $1;
