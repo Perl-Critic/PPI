@@ -129,14 +129,12 @@ sub __TOKENIZER__scan_for_end {
 	my $depth = 0;
 	while ( exists $t->{line} ) {
 		# Get the search area
-		my $search = $t->{line_cursor}
-			? substr( $t->{line}, $t->{line_cursor} )
-			: $t->{line};
+		pos $t->{line} = $t->{line_cursor};
 
 		# Look for a match
-		unless ( $search =~ /^((?:\\.|[^()])*?[()])/ ) {
+		unless ( $t->{line} =~ /\G((?:\\.|[^()])*?[()])/gc ) {
 			# Load in the next line and push to first character
-			$string .= $search;
+			$string .= substr( $t->{line}, $t->{line_cursor} );
 			$t->_fill_line(1) or return \$string;
 			$t->{line_cursor} = 0;
 			next;
