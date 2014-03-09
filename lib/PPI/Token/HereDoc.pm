@@ -152,8 +152,8 @@ sub __TOKENIZER__on_char {
 	### FIXME - This regex, and this method in general, do not yet allow
 	### for the null here-doc, which terminates at the first
 	### empty line.
-	my $rest_of_line = substr( $t->{line}, $t->{line_cursor} );
-	unless ( $rest_of_line =~ /^( \s* (?: "[^"]*" | '[^']*' | `[^`]*` | \\?\w+ ) )/x  ) {
+	pos $t->{line} = $t->{line_cursor};
+	if ( $t->{line} !~ m/\G( \s* (?: "[^"]*" | '[^']*' | `[^`]*` | \\?\w+ ) )/gcx ) {
 		# Degenerate to a left-shift operation
 		$t->{token}->set_class('Operator');
 		return $t->_finalize_token->__TOKENIZER__on_char( $t );
