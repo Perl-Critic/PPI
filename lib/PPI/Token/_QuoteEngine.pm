@@ -69,45 +69,11 @@ sub __TOKENIZER__on_char {
 # and quote like stuff, and accessible to the child classes
 
 # An outright scan, raw and fast.
-# Searches for a particular character, loading in new
+# Searches for a particular character, not escaped, loading in new
 # lines as needed.
 # When called, we start at the current position.
 # When leaving, the position should be set to the position
 # of the character, NOT the one after it.
-sub _scan_for_character {
-	my $class = shift;
-	my $t     = shift;
-	my $char  = (length $_[0] == 1) ? quotemeta shift : return undef;
-
-	# Create the search regex
-	my $search = qr/^(.*?$char)/;
-
-	my $string = '';
-	while ( exists $t->{line} ) {
-		# Get the search area for the current line
-		my $search_area
-			= $t->{line_cursor}
-			? substr( $t->{line}, $t->{line_cursor} )
-			: $t->{line};
-
-		# Can we find a match on this line
-		if ( $search_area =~ /$search/ ) {
-			# Found the character on this line
-			$t->{line_cursor} += length($1) - 1;
-			return $string . $1;
-		}
-
-		# Load in the next line
-		$string .= $search_area;
-		return undef unless defined $t->_fill_line;
-		$t->{line_cursor} = 0;
-	}
-
-	# Returning the string as a reference indicates EOF
-	\$string;
-}
-
-# Scan for a character, but not if it is escaped
 sub _scan_for_unescaped_character {
 	my $class = shift;
 	my $t     = shift;
