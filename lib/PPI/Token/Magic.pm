@@ -176,8 +176,8 @@ sub __TOKENIZER__on_char {
 		$t->{line_cursor} += length( $c ) - length( $t->{token}->{content} );
 		$t->{token}->{content} = $c;
 	} else {
-		my $line = substr( $t->{line}, $t->{line_cursor} );
-		if ( $line =~ /($PPI::Token::Unknown::CURLY_SYMBOL)/ ) {
+		pos $t->{line} = $t->{line_cursor};
+		if ( $t->{line} =~ m/($PPI::Token::Unknown::CURLY_SYMBOL_MGC)/gc ) {
 			# control character symbol (e.g. ${^MATCH})
 			$t->{token}->{content} .= $1;
 			$t->{line_cursor}      += length $1;
