@@ -203,8 +203,8 @@ sub __TOKENIZER__on_char {
 
 		if ( $char eq '{' ) {
 			# Get rest of line
-			my $rest = substr( $t->{line}, $t->{line_cursor} + 1 );
-			if ( $rest =~ m/$CURLY_SYMBOL/ ) {
+			pos $t->{line} = $t->{line_cursor} + 1;
+			if ( $t->{line} =~ m/$CURLY_SYMBOL_MGC/gc ) {
 				# control-character symbol (e.g. @{^_Foo})
 				$t->{class} = $t->{token}->set_class( 'Magic' );
 				return 1;
