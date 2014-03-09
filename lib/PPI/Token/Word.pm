@@ -144,8 +144,8 @@ sub __TOKENIZER__on_char {
 	my $t     = shift;
 
 	# Suck in till the end of the bareword
-	my $rest = substr( $t->{line}, $t->{line_cursor} );
-	if ( $rest =~ /^(\w+(?:(?:\'|::)\w+)*(?:::)?)/ ) {
+	pos $t->{line} = $t->{line_cursor};
+	if ( $t->{line} =~ m/\G(\w+(?:(?:\'|::)\w+)*(?:::)?)/gc ) {
 		my $word = $1;
 		# Special Case: If we accidentally treat eq'foo' like
 		# the word "eq'foo", then just make 'eq' (or whatever
