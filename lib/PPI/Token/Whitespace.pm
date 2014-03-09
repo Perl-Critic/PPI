@@ -389,9 +389,9 @@ sub __TOKENIZER__on_char {
 		# x followed immediately by '=' is the 'x=' operator, not
 		# 'x ='. An important exception is x followed immediately by
 		# '=>', which makes the x into a bareword.
-		my $remainder = substr $t->{line}, $t->{line_cursor} + 1;
+		pos $t->{line} = $t->{line_cursor} + 1;
 		return 'Operator'
-			if $t->_current_x_is_operator and $remainder =~ /^(?:\d|(?!(=>|[\w\s])))/;
+			if $t->_current_x_is_operator and $t->{line} =~ m/\G(?:\d|(?!(=>|[\w\s])))/gc;
 
 		# Otherwise, commit like a normal bareword
 		return PPI::Token::Word->__TOKENIZER__commit($t);
