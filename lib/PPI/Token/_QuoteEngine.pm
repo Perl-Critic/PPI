@@ -161,22 +161,19 @@ sub _scan_for_brace_character {
 	# Create the search string
 	$close_brace = quotemeta $close_brace;
 	$open_brace = quotemeta $open_brace;
-	my $search = qr/^(.*?(?<!\\)(?:\\\\)*(?:$open_brace|$close_brace))/;
+	my $search = qr/\G(.*?(?<!\\)(?:\\\\)*(?:$open_brace|$close_brace))/;
 
 	# Loop as long as we can get new lines
 	my $string = '';
 	my $depth = 1;
 	while ( exists $t->{line} ) {
 		# Get the search area
-		my $search_area
-			= $t->{line_cursor}
-			? substr( $t->{line}, $t->{line_cursor} )
-			: $t->{line};
+		pos $t->{line} = $t->{line_cursor};
 
 		# Look for a match
-		unless ( $search_area =~ /$search/ ) {
+		unless ( $t->{line} =~ /$search/gc ) {
 			# Load in the next line
-			$string .= $search_area;
+			$string .= substr( $t->{line}, $t->{line_cursor} );
 			my $rv = $t->_fill_line('inscan');
 			if ( $rv ) {
 				# Push to first character
