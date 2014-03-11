@@ -43,7 +43,7 @@ Returns the base for the number: 16.
 
 =cut
 
-sub base () { 16 }
+sub base() { 16 }
 
 =pod
 

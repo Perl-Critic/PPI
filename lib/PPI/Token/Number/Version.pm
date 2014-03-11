@@ -47,9 +47,7 @@ Returns the base for the number: 256.
 
 =cut
 
-sub base {
-	return 256;
-}
+sub base() { 256 }
 
 =pod
 

@@ -178,7 +178,7 @@ use PPI::Statement::When           ();
 # "Normal" statements end at a statement terminator ;
 # Some are not, and need the more rigorous _continues to see
 # if we are at an implicit statement boundary.
-sub __LEXER__normal { 1 }
+sub __LEXER__normal() { 1 }
 
 
 

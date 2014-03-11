@@ -45,7 +45,7 @@ Returns the base for the number: 10.
 
 =cut
 
-sub base () { 10 }
+sub base() { 10 }
 
 =pod
 

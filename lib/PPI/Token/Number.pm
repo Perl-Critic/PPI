@@ -47,9 +47,7 @@ This is 10 for decimal, 16 for hexadecimal, 2 for binary, etc.
 
 =cut
 
-sub base {
-	return 10;
-}
+sub base() { 10 }
 
 =pod
 
