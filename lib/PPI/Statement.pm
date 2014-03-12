@@ -68,7 +68,7 @@ a ';' statement terminator.
 
 A statement that breaks out of a structure.
 
-This includes all of 'redo', 'next', 'last' and 'return' statements.
+This includes all of 'redo', 'goto', 'next', 'last' and 'return' statements.
 
 =head2 L<PPI::Statement::Given>
 
