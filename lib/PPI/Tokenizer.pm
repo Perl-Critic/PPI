@@ -182,16 +182,7 @@ sub new {
 
 	# We can't handle a null string
 	$self->{source_bytes} = length $self->{source};
-	if ( $self->{source_bytes} > 1048576 ) {
-		# Dammit! It's ALWAYS the "Perl" modules larger than a
-		# meg that seems to blow up the Tokenizer/Lexer.
-		# Nobody actually writes real programs larger than a meg
-		# Perl::Tidy (the largest) is only 800k.
-		# It is always these idiots with massive Data::Dumper
-		# structs or huge RecDescent parser.
-		PPI::Exception::ParserRejection->throw("File is too large");
-
-	} elsif ( $self->{source_bytes} ) {
+	if ( $self->{source_bytes} ) {
 		# Split on local newlines
 		$self->{source} =~ s/(?:\015{1,2}\012|\015|\012)/\n/g;
 		$self->{source} = [ split /(?<=\n)/, $self->{source} ];

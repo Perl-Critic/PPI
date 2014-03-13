@@ -144,8 +144,8 @@ sub __TOKENIZER__on_char {
 	my $t     = shift;
 
 	# Suck in till the end of the bareword
-	my $rest = substr( $t->{line}, $t->{line_cursor} );
-	if ( $rest =~ /^(\w+(?:(?:\'|::)\w+)*(?:::)?)/ ) {
+	pos $t->{line} = $t->{line_cursor};
+	if ( $t->{line} =~ m/\G(\w+(?:(?:\'|::)\w+)*(?:::)?)/gc ) {
 		my $word = $1;
 		# Special Case: If we accidentally treat eq'foo' like
 		# the word "eq'foo", then just make 'eq' (or whatever
@@ -211,10 +211,10 @@ sub __TOKENIZER__commit {
 
 	# Our current position is the first character of the bareword.
 	# Capture the bareword.
-	my $rest = substr( $t->{line}, $t->{line_cursor} );
-	unless ( $rest =~ /^((?!\d)\w+(?:(?:\'|::)\w+)*(?:::)?)/ ) {
+	pos $t->{line} = $t->{line_cursor};
+	unless ( $t->{line} =~ m/\G((?!\d)\w+(?:(?:\'|::)\w+)*(?:::)?)/gc ) {
 		# Programmer error
-		die "Fatal error... regex failed to match in '$rest' when expected";
+		die sprintf "Fatal error... regex failed to match in '%s' when expected", substr $t->{line}, $t->{line_cursor};
 	}
 
 	# Special Case: If we accidentally treat eq'foo' like the word "eq'foo",
@@ -247,14 +247,14 @@ sub __TOKENIZER__commit {
 		# Add the rest of the line as a comment, and a whitespace newline
 		# Anything after the __END__ on the line is "ignored". So we must
 		# also ignore it, by turning it into a comment.
-		$rest = substr( $t->{line}, $t->{line_cursor} );
+		my $end_rest = substr( $t->{line}, $t->{line_cursor} );
 		$t->{line_cursor} = length $t->{line};
-		if ( $rest =~ /\n$/ ) {
-			chomp $rest;
-			$t->_new_token( 'Comment', $rest ) if length $rest;
+		if ( $end_rest =~ /\n$/ ) {
+			chomp $end_rest;
+			$t->_new_token( 'Comment', $end_rest ) if length $end_rest;
 			$t->_new_token( 'Whitespace', "\n" );
 		} else {
-			$t->_new_token( 'Comment', $rest ) if length $rest;
+			$t->_new_token( 'Comment', $end_rest ) if length $end_rest;
 		}
 		$t->_finalize_token;
 
@@ -271,14 +271,14 @@ sub __TOKENIZER__commit {
 		$t->{zone} = 'PPI::Token::Data';
 
 		# Add the rest of the line as the Data token
-		$rest = substr( $t->{line}, $t->{line_cursor} );
+		my $data_rest = substr( $t->{line}, $t->{line_cursor} );
 		$t->{line_cursor} = length $t->{line};
-		if ( $rest =~ /\n$/ ) {
-			chomp $rest;
-			$t->_new_token( 'Comment', $rest ) if length $rest;
+		if ( $data_rest =~ /\n$/ ) {
+			chomp $data_rest;
+			$t->_new_token( 'Comment', $data_rest ) if length $data_rest;
 			$t->_new_token( 'Whitespace', "\n" );
 		} else {
-			$t->_new_token( 'Comment', $rest ) if length $rest;
+			$t->_new_token( 'Comment', $data_rest ) if length $data_rest;
 		}
 		$t->_finalize_token;
 
@@ -305,8 +305,8 @@ sub __TOKENIZER__commit {
 
 	} else {
 		# If the next character is a ':' then its a label...
-		my $string = substr( $t->{line}, $t->{line_cursor} );
-		if ( $string =~ /^(\s*:)(?!:)/ ) {
+		pos $t->{line} = $t->{line_cursor};
+		if ( $t->{line} =~ m/\G(\s*:)(?!:)/gc ) {
 			if ( $tokens and $tokens->[0]->{content} eq 'sub' ) {
 				# ... UNLESS its after 'sub' in which
 				# case it is a sub name and an attribute
@@ -353,7 +353,7 @@ sub __TOKENIZER__literal {
 	}
 
 	# Check the cases when we have previous tokens
-	my $rest = substr( $t->{line}, $t->{line_cursor} );
+	pos $t->{line} = $t->{line_cursor};
 	if ( $tokens ) {
 		my $token = $tokens->[0] or return '';
 
@@ -365,14 +365,14 @@ sub __TOKENIZER__literal {
 
 		# If we are contained in a pair of curly braces,
 		# we are probably a bareword hash key
-		if ( $token->{content} eq '{' and $rest =~ /^\s*\}/ ) {
+		if ( $token->{content} eq '{' and $t->{line} =~ /\G\s*\}/gc ) {
 			return 1;
 		}
 	}
 
 	# In addition, if the word is followed by => it is probably
 	# also actually a word and not a regex.
-	if ( $rest =~ /^\s*=>/ ) {
+	if ( $t->{line} =~ /\G\s*=>/gc ) {
 		return 1;
 	}
 

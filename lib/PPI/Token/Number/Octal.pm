@@ -43,7 +43,7 @@ Returns the base for the number: 8.
 
 =cut
 
-sub base () { 8 }
+sub base() { 8 }
 
 =pod
 

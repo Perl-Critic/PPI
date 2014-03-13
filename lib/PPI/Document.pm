@@ -842,7 +842,7 @@ sub complete {
 
 # We are a scope boundary
 ### XS -> PPI/XS.xs:_PPI_Document__scope 0.903+
-sub scope { 1 }
+sub scope() { 1 }
 
 
 

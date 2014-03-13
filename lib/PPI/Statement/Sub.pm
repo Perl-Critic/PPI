@@ -42,7 +42,7 @@ BEGIN {
 }
 
 # Lexer clue
-sub __LEXER__normal { '' }
+sub __LEXER__normal() { '' }
 
 sub _complete {
 	my $child = $_[0]->schild(-1);

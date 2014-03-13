@@ -51,7 +51,7 @@ BEGIN {
 }
 
 # Lexer clues
-sub __LEXER__normal { '' }
+sub __LEXER__normal() { '' }
 
 sub _complete {
 	my $child = $_[0]->schild(-1);
@@ -71,7 +71,7 @@ sub _complete {
 #####################################################################
 # PPI::Node Methods
 
-sub scope {
+sub scope() {
 	1;
 }
 

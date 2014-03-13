@@ -94,11 +94,11 @@ sub __TOKENIZER__on_char {
 
 	# Handle the special case if we might be a here-doc
 	if ( $content eq '<<' ) {
-		my $line = substr( $t->{line}, $t->{line_cursor} );
+		pos $t->{line} = $t->{line_cursor};
 		# Either <<FOO or << 'FOO' or <<\FOO
 		### Is the zero-width look-ahead assertion really
 		### supposed to be there?
-		if ( $line =~ /^(?: (?!\d)\w | \s*['"`] | \\\w ) /x ) {
+		if ( $t->{line} =~ m/\G(?: (?!\d)\w | \s*['"`] | \\\w ) /gcx ) {
 			# This is a here-doc.
 			# Change the class and move to the HereDoc's own __TOKENIZER__on_char method.
 			$t->{class} = $t->{token}->set_class('HereDoc');

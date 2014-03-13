@@ -59,7 +59,7 @@ BEGIN {
 # PPI::Element Methods
 
 # This is a scope boundary
-sub scope { 1 }
+sub scope() { 1 }
 
 1;
 

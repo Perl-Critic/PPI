@@ -60,8 +60,8 @@ sub __TOKENIZER__on_char {
 	my $t     = shift;
 
 	# Suck in until we find the closing bracket (or the end of line)
-	my $line = substr( $t->{line}, $t->{line_cursor} );
-	if ( $line =~ /^(.*?(?:\)|$))/ ) {
+	pos $t->{line} = $t->{line_cursor};
+	if ( $t->{line} =~ m/\G(.*?(?:\)|$))/gc ) {
 		$t->{token}->{content} .= $1;
 		$t->{line_cursor} += length $1;
 	}

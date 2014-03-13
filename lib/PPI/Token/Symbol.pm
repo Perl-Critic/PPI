@@ -161,8 +161,8 @@ sub __TOKENIZER__on_char {
 	my $t = $_[1];
 
 	# Suck in till the end of the symbol
-	my $line = substr( $t->{line}, $t->{line_cursor} );
-	if ( $line =~ /^([\w:\']+)/ ) {
+	pos $t->{line} = $t->{line_cursor};
+	if ( $t->{line} =~ m/\G([\w:\']+)/gc ) {
 		$t->{token}->{content} .= $1;
 		$t->{line_cursor}      += length $1;
 	}
