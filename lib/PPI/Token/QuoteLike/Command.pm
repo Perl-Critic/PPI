@@ -24,8 +24,6 @@ There are no methods available for C<PPI::Token::QuoteLike::Command>
 beyond those provided by the parent L<PPI::Token::QuoteLike>, L<PPI::Token>
 and L<PPI::Element> classes.
 
-Got any ideas for methods? Submit a report to rt.cpan.org!
-
 =cut
 
 use strict;

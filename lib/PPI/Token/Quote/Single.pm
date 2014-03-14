@@ -30,8 +30,6 @@ There are no methods available for C<PPI::Token::Quote::Single> beyond
 those provided by the parent L<PPI::Token::Quote>, L<PPI::Token> and
 L<PPI::Element> classes.
 
-Got any ideas for methods? Submit a report to rt.cpan.org!
-
 =cut
 
 use strict;

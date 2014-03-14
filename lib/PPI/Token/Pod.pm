@@ -22,8 +22,6 @@ documentation within a Perl document.
 This class provides some additional methods beyond those provided by its
 L<PPI::Token> and L<PPI::Element> parent classes.
 
-Got any ideas for more methods? Submit a report to rt.cpan.org!
-
 =cut
 
 use strict;

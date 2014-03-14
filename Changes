@@ -7,6 +7,7 @@ Revision history for Perl extension PPI
 	- Moved repository to GitHub: https://github.com/adamkennedy/PPI
 
 	Details:
+	- Stop directing bugs to rt.cpan.org (GitHub #40) (MOREGAN)
 	- Fix documentation reference to List::Util (RT #75308) (RWSTAUNER)
 	- Improve scalability of parsing long lines, and remove the size
 	  limit on documents PPI will parse (GitHub #5) (MITHALDU)
