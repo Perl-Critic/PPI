@@ -329,7 +329,7 @@ class name (full or shortened), or a C<CODE>/function reference.
   # The same thing with a shortened class name
   $Document->find('Quote::Single');
   
-  # Anything more elaborate, we so with the sub
+  # Anything more elaborate, we go with the sub
   $Document->find( sub {
   	# At the top level of the file...
   	$_[1]->parent == $_[0]
@@ -411,7 +411,7 @@ sub find {
 =head2 find_first $class | \&wanted
 
 If the normal C<find> method is like a grep, then C<find_first> is
-equivalent to the L<Scalar::Util> C<first> function.
+equivalent to the L<List::Util> C<first> function.
 
 Given an element class or a wanted function, it will search depth-first
 through a tree until it finds something that matches the condition,
