@@ -149,7 +149,7 @@ sub __TOKENIZER__on_char {
 		}
 
 		if ( $c =~ /^\$\#\{/ ) {
-			# The $# is actually a case, and { is its block
+			# The $# is actually a cast, and { is its block
 			# Add the current token as the cast...
 			$t->{token} = PPI::Token::Cast->new( '$#' );
 			$t->_finalize_token;
@@ -181,6 +181,13 @@ sub __TOKENIZER__on_char {
 			# control character symbol (e.g. ${^MATCH})
 			$t->{token}->{content} .= $1;
 			$t->{line_cursor}      += length $1;
+		} elsif ( $c =~ /^\$\d+$/ ) {
+			# 2 characters of capture variable at least. See if
+			# it's longer.
+			if ( $t->{line} =~ /\G(\d+)/gc ) {
+				$t->{token}->{content} .= $1;
+				$t->{line_cursor} += length $1;
+			}
 		}
 	}
 
