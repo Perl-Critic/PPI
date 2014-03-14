@@ -2,12 +2,40 @@ Revision history for Perl extension PPI
 
 1.216_01 to be released
 	Summary:
-	- Fixes for various parsing bugs
-        - Stop using Test::Inline
+	- Fixes for various parsing and documentation bugs
+	- 1MB limit on input document size removed
+	- Moved repository to GitHub: https://github.com/adamkennedy/PPI
 
 	Details:
-	- Fixed RT #27475: PPI parses regex incorrectly
-	- Fixed RT #40103: missing dereference, length called on reference.
+	- Fix documentation reference to List::Util (RT #75308) (RWSTAUNER)
+	- Improve scalability of parsing long lines, and remove the size
+	  limit on documents PPI will parse (GitHub #5) (MITHALDU)
+	- Speed up adding an element to an unlabeled statement.
+	  Allow inlining of some methods. (WOLFSAGE)
+	- Expanded test coverage (DOLMEN, MOREGAN)
+	- Convert inline tests to standalone tests (GitHub #12) (MOREGAN)
+	- Fix for '1=>x' being parsed as x operator (GitHub #46) (MOREGAN)
+	- Recognize that '1 x3' is the x operator followed by a 3
+	  (RT #37892, GitHub #27) (MOREGAN)
+	- Support all augmented assignment operators (<<=, ||=, etc.)
+	  (RT #68176, 71705) (MOREGAN)
+	- Stop upper-case "=CUT" from terminating POD (RT #75039) (JAE)
+	- Support upper-case digits in hex and binary numbers, including
+	  in the leading '0X' and '0B'. (RT #36540) (KRYDE, MOREGAN)
+	- Fix float argument to range operator misparsed as version
+	  string (RT #45014) (MOREGAN)
+	- Fix POD markup in PPI::Find (RT #51693) (FWIE)
+	- Fix spelling of "Tom Christiansen" (RT #67264) (TADMC)
+	- Fix a large raft of spelling and grammar errors (RT #85049) (David
+	  Steinbrunner, DOLMEN, MOREGAN)
+	- Fix errors in documentation of the PPI::Element class hierarchy
+	  (RT #30863, 69026) (SJQUINNEY)
+	- Prevent PPI::XSAccessor packages from hiding corresponding PPI
+	  packages in CPAN (RT #90792) (MITHALDU)
+	- Recognize the formfeed character as whitespace (RT #67517) (WYANT)
+	- Recognize regex match following 'return' (RT #27475) (ADAMK)
+	- Fix missing dereference, length called on reference (RT #40103)
+	  (ADAMK)
 
 1.215 Sat 26 Feb 2011
 	Summary:
