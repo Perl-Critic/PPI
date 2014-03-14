@@ -28,8 +28,6 @@ treated by Perl (and thus by us) as a single string.
 This class provides some additional methods beyond those provided by its
 L<PPI::Token> and L<PPI::Element> parent classes.
 
-Got any ideas for methods? Submit a report to rt.cpan.org!
-
 =cut
 
 use strict;

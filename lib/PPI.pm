@@ -756,10 +756,10 @@ For large changes though, please consider creating a branch so that they
 can be properly reviewed and trialed before being applied to the trunk.
 
 If you cannot provide a direct test or fix, or don't have time to do so,
-then regular bug reports are still accepted and appreciated via the CPAN
-bug tracker.
+then regular bug reports are still accepted and appreciated via the
+GitHub bug tracker.
 
-L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=PPI>
+L<https://github.com/adamkennedy/PPI/issues>
 
 For other issues or questions, contact the C<Parse::Perl> project mailing
 list.
