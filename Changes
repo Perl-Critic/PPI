@@ -7,6 +7,8 @@ Revision history for Perl extension PPI
 	- Moved repository to GitHub: https://github.com/adamkennedy/PPI
 
 	Details:
+	- Disallow Perl4 package separator ' immediately after keywords
+	  (GitHub #58) (MOREGAN)
 	- Stop directing bugs to rt.cpan.org (GitHub #40) (MOREGAN)
 	- Fix documentation reference to List::Util (RT #75308) (RWSTAUNER)
 	- Improve scalability of parsing long lines, and remove the size
