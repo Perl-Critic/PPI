@@ -1,5 +1,8 @@
 Revision history for Perl extension PPI
 
+	- Disallow Perl4 package separator ' immediately after keywords
+	  (GitHub #58) (MOREGAN)
+
 1.218 Sat 16 Aug 2014
 	Summary:
 	- Fixes for various parsing and documentation bugs
