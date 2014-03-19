@@ -171,29 +171,34 @@ sub __TOKENIZER__on_char {
 	if ( $content =~ /^\<\<(\w+)$/ ) {
 		# Bareword
 		$token->{_mode}       = 'interpolate';
+		$token->{_raw_terminator} = $1;
 		$token->{_terminator} = $1;
 
 	} elsif ( $content =~ /^\<\<\s*\'(.*)\'$/ ) {
 		# ''-quoted literal
 		$token->{_mode}       = 'literal';
+		$token->{_raw_terminator} = "'$1'";
 		$token->{_terminator} = $1;
 		$token->{_terminator} =~ s/\\'/'/g;
 
 	} elsif ( $content =~ /^\<\<\s*\"(.*)\"$/ ) {
 		# ""-quoted literal
 		$token->{_mode}       = 'interpolate';
+		$token->{_raw_terminator} = "\"$1\"";
 		$token->{_terminator} = $1;
 		$token->{_terminator} =~ s/\\"/"/g;
 
 	} elsif ( $content =~ /^\<\<\s*\`(.*)\`$/ ) {
 		# ``-quoted command
 		$token->{_mode}       = 'command';
+		$token->{_raw_terminator} = "`$1`";
 		$token->{_terminator} = $1;
 		$token->{_terminator} =~ s/\\`/`/g;
 
 	} elsif ( $content =~ /^\<\<\\(\w+)$/ ) {
 		# Legacy forward-slashed bareword
 		$token->{_mode}       = 'literal';
+		$token->{_raw_terminator} = "\\$1";
 		$token->{_terminator} = $1;
 
 	} else {
@@ -207,9 +212,9 @@ sub __TOKENIZER__on_char {
 
 	# Suck in the HEREDOC
 	$token->{_heredoc} = [];
-	my $terminator = $token->{_terminator} . "\n";
+	my $raw_terminator = $token->{_raw_terminator} . "\n";
 	while ( defined($line = $t->_get_line) ) {
-		if ( $line eq $terminator ) {
+		if ( $line eq $raw_terminator ) {
 			# Keep the actual termination line for consistency
 			# when we are re-assembling the file
 			$token->{_terminator_line} = $line;
