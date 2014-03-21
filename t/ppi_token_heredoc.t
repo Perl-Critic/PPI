@@ -76,6 +76,70 @@ my @tests = (
 		},
 	},
 
+	# Tests without a carriage return after the termination marker.
+	{
+		name     => 'Bareword terminator (no return).',
+		content  => "my \$heredoc = <<HERE;\nLine 1\nLine 2\nHERE",
+		expected => {
+			_terminator_line => 'HERE',
+			_damaged         => 1,
+			_terminator      => 'HERE',
+			_mode            => 'interpolate',
+		},
+	},
+	{
+		name     => 'Single-quoted bareword terminator (no return).',
+		content  => "my \$heredoc = <<'HERE';\nLine 1\nLine 2\nHERE",
+		expected => {
+			_terminator_line => "HERE",
+			_damaged         => 1,
+			_terminator      => 'HERE',
+			_mode            => 'literal',
+		},
+	},
+	{
+		name     => 'Double-quoted bareword terminator (no return).',
+		content  => "my \$heredoc = <<\"HERE\";\nLine 1\nLine 2\nHERE",
+		expected => {
+			_terminator_line => 'HERE',
+			_damaged         => 1,
+			_terminator      => 'HERE',
+			_mode            => 'interpolate',
+		},
+	},
+	{
+		name     => 'Command-quoted terminator (no return).',
+		content  => "my \$heredoc = <<`HERE`;\nLine 1\nLine 2\nHERE",
+		expected => {
+			_terminator_line => 'HERE',
+			_damaged         => 1,
+			_terminator      => 'HERE',
+			_mode            => 'command',
+		},
+	},
+	{
+		name     => 'Legacy escaped bareword terminator (no return).',
+		content  => "my \$heredoc = <<\\HERE;\nLine 1\nLine 2\nHERE",
+		expected => {
+			_terminator_line => 'HERE',
+			_damaged         => 1,
+			_terminator      => 'HERE',
+			_mode            => 'literal',
+		},
+	},
+
+	# Tests without a terminator.
+	{
+		name     => 'Unterminated heredoc block.',
+		content  => "my \$heredoc = <<HERE;\nLine 1\nLine 2\n",
+		expected => {
+			_terminator_line => undef,
+			_damaged         => 1,
+			_terminator      => 'HERE',
+			_mode            => 'interpolate',
+		},
+	}
+
 );
 
 plan tests => 1 + @tests;
