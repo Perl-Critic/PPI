@@ -13,6 +13,7 @@ requires      'Digest::MD5'      => '2.35';
 requires      'Storable'         => '2.17';
 
 # Test-time dependencies (bundle as many as we can)
+test_requires 'Test::Deep';
 test_requires 'Test::More'       => '0.86';
 test_requires 'Test::NoWarnings' => '0.084';
 test_requires 'Test::Object'     => '0.07';
