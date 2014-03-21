@@ -70,8 +70,6 @@ h	{
 		},
 	};
 
-TODO: {
-local $TODO = "parsing bugs need to be fixed yet";
 	# Tests without a carriage return after the termination marker.
 h	{
 		name     => 'Bareword terminator (no return).',
@@ -123,7 +121,6 @@ h	{
 			_mode            => 'literal',
 		},
 	};
-}
 
 	# Tests without a terminator.
 h	{

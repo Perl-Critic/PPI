@@ -9,6 +9,7 @@ Revision history for Perl extension PPI
 	- removal of Test::NoWarnings
 	- less uses of List::MoreUtils in favor of List::Util
 	- do not expect '.' in @INC (PLICEASE)
+	- many parsing fixes
 
 	Details:
 	- Remove undocumented, non-working 'timeout' attribute to
@@ -17,6 +18,7 @@ Revision history for Perl extension PPI
 	- first cut of a travis configuration
 	- do hex number matching with [[:xdigit:]]
 	- some readability improvements on the code of HereDoc.pm
+	- recognize heredoc even if they have no newline at the end (AUBERTG)
 
 1.220 Tue 11 Nov 2014
 	Summary:
