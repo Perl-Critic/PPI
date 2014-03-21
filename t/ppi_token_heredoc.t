@@ -18,7 +18,7 @@ use PPI;
 
 sub h;
 
-plan tests => 1 + 5;
+plan tests => 1 + 11;
 
 # List of tests to perform. Each test requires the following information:
 #     - 'name': the name of the test in the output.
@@ -76,6 +76,73 @@ h	{
 			_damaged         => undef,
 			_terminator      => 'HERE',
 			_mode            => 'literal',
+		},
+	};
+
+TODO: {
+local $TODO = "parsing bugs need to be fixed yet";
+	# Tests without a carriage return after the termination marker.
+h	{
+		name     => 'Bareword terminator (no return).',
+		content  => "my \$heredoc = <<HERE;\nLine 1\nLine 2\nHERE",
+		expected => {
+			_terminator_line => 'HERE',
+			_damaged         => 1,
+			_terminator      => 'HERE',
+			_mode            => 'interpolate',
+		},
+	};
+h	{
+		name     => 'Single-quoted bareword terminator (no return).',
+		content  => "my \$heredoc = <<'HERE';\nLine 1\nLine 2\nHERE",
+		expected => {
+			_terminator_line => "HERE",
+			_damaged         => 1,
+			_terminator      => 'HERE',
+			_mode            => 'literal',
+		},
+	};
+h	{
+		name     => 'Double-quoted bareword terminator (no return).',
+		content  => "my \$heredoc = <<\"HERE\";\nLine 1\nLine 2\nHERE",
+		expected => {
+			_terminator_line => 'HERE',
+			_damaged         => 1,
+			_terminator      => 'HERE',
+			_mode            => 'interpolate',
+		},
+	};
+h	{
+		name     => 'Command-quoted terminator (no return).',
+		content  => "my \$heredoc = <<`HERE`;\nLine 1\nLine 2\nHERE",
+		expected => {
+			_terminator_line => 'HERE',
+			_damaged         => 1,
+			_terminator      => 'HERE',
+			_mode            => 'command',
+		},
+	};
+h	{
+		name     => 'Legacy escaped bareword terminator (no return).',
+		content  => "my \$heredoc = <<\\HERE;\nLine 1\nLine 2\nHERE",
+		expected => {
+			_terminator_line => 'HERE',
+			_damaged         => 1,
+			_terminator      => 'HERE',
+			_mode            => 'literal',
+		},
+	};
+}
+
+	# Tests without a terminator.
+h	{
+		name     => 'Unterminated heredoc block.',
+		content  => "my \$heredoc = <<HERE;\nLine 1\nLine 2\n",
+		expected => {
+			_terminator_line => undef,
+			_damaged         => 1,
+			_terminator      => 'HERE',
+			_mode            => 'interpolate',
 		},
 	};
 
