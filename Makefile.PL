@@ -40,6 +40,7 @@ test_requires 'Test::More'       => '0.86';
 test_requires 'Test::NoWarnings' => '0.084';
 test_requires 'Test::Object'     => '0.07';
 test_requires 'Test::SubCalls'   => '1.07';
+test_requires 'Test::Deep';
 
 # Force the existence of the weaken function
 # (which some distributions annoyingly don't have)
