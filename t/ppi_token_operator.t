@@ -13,7 +13,7 @@ BEGIN {
 	$PPI::XS_DISABLE = 1;
 	$PPI::Lexer::X_TOKENIZER ||= $ENV{X_TOKENIZER};
 }
-use Test::More tests => 398;
+use Test::More tests => 393;
 use Test::NoWarnings;
 use PPI;
 
@@ -30,20 +30,6 @@ FIND_ONE_OP: {
 	$ops = $doc->find( 'Token::Operator' );
 	is( ref $ops, 'ARRAY', "operator = found operators in number test" );
 	is( @$ops, 1, "operator = found exactly once in number test" );
-}
-
-
-HEREDOC: {
-	my $source = '$a = <<PERL_END;' . "\n" . 'PERL_END';
-	my $doc = PPI::Document->new( \$source );
-	isa_ok( $doc, 'PPI::Document', "parsed '$source'" );
-	my $ops = $doc->find( 'Token::HereDoc' );
-	is( ref $ops, 'ARRAY', "found heredoc" );
-	is( @$ops, 1, "heredoc found exactly once" );
-
-	$ops = $doc->find( 'Token::Operator' );
-	is( ref $ops, 'ARRAY', "operator = found operators in heredoc test" );
-	is( @$ops, 1, "operator = found exactly once in heredoc test" );
 }
 
 
