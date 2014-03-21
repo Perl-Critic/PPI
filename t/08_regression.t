@@ -13,13 +13,10 @@ BEGIN {
 }
 
 # For each new item in t/data/08_regression add another 15 tests
-use Test::More tests => 933;
+use Test::More tests => 932;
 use Test::NoWarnings;
-use File::Spec::Functions ':ALL';
-use Params::Util qw{_INSTANCE};
 use t::lib::PPI;
-use PPI::Lexer;
-use PPI::Dumper;
+use PPI;
 
 sub pause {
 	local $@;
@@ -44,11 +41,11 @@ t::lib::PPI->run_testdir(qw{ t data 08_regression });
 # Regression Test for rt.cpan.org #11522
 
 # Check that objects created in a foreach don't leak circulars.
-is( scalar(keys(%PPI::Element::_PARENT)), 0, 'No parent links initially' );
 foreach ( 1 .. 3 ) {
 	pause();
-	is( scalar(keys(%PPI::Element::_PARENT)), 0, 'No parent links at start of loop time' );
-	my $Document = PPI::Document->new(\q[print "Foo!"]);
+	is( scalar(keys(%PPI::Element::_PARENT)), 0, "No parent links at start of loop $_" );
+	# Keep the document from going out of scope before the _PARENT test below.
+	my $Document = PPI::Document->new(\q[print "Foo!"]);  ## no critic ( Variables::ProhibitUnusedVarsStricter )
 	is( scalar(keys(%PPI::Element::_PARENT)), 4, 'Correct number of keys created' );
 }
 
