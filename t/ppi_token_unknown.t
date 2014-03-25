@@ -176,16 +176,16 @@ OPERATOR_CAST: {
 		]
 	);
 {
-	local %known_bad_seps = map { $_ => 1 } qw( null space );
+	local %known_bad_seps = map { $_ => 1 } qw( space );
 	test_varying_whitespace( @package, @asterisk_cast, @scalar, 1 );
 	test_varying_whitespace( @package, @asterisk_cast, @hashctor3, 1 );
 	test_varying_whitespace( @package, @percent_cast, @scalar, 1 );
 	test_varying_whitespace( @package, @percent_cast, @hashctor3, 1 );
 	test_varying_whitespace( @package, @ampersand_cast, @scalar, 1 );
 	test_varying_whitespace( @package, @ampersand_cast, @hashctor3, 1 );
+}
 	test_varying_whitespace( @package, @at_cast, @scalar, 1 );
 	test_varying_whitespace( @package, @at_cast, @listctor, 1 );
-}
 
 	my @sub = (
 		'sub foo {}',

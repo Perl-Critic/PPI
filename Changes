@@ -34,6 +34,8 @@ Revision history for Perl extension PPI
 	  or variable type casts (*&% etc.) (MOREGAN)
 	- parse x as the first element of code as a word, not an operator
 	  (MOREGAN)
+	- recognize the implied end of a package statement that includes a block
+	  (MOREGAN)
 
 1.220 Tue 11 Nov 2014
 	Summary:

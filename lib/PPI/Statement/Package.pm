@@ -47,6 +47,9 @@ BEGIN {
 	@ISA     = 'PPI::Statement';
 }
 
+# Lexer clues
+sub __LEXER__normal() { '' }
+
 =pod
 
 =head2 namespace
