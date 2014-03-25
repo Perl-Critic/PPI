@@ -696,20 +696,23 @@ sub _continues {
 		return '';
 	}
 
-	# Alrighty then, there are only five implied end statement types,
-	# ::Scheduled blocks, ::Sub declarations, ::Compound, ::Given, and ::When
-	# statements.
-	unless ( ref($Statement) =~ /\b(?:Scheduled|Sub|Compound|Given|When)$/ ) {
+	# Alrighty then, there are six implied-end statement types:
+	# ::Scheduled blocks, ::Sub declarations, ::Compound, ::Given, ::When,
+	# and ::Package statements.
+	unless ( ref($Statement) =~ /\b(?:Scheduled|Sub|Compound|Given|When|Package)$/ ) {
 		return 1;
 	}
 
-	# Of these five, ::Scheduled, ::Sub, ::Given, and ::When follow the same
-	# simple rule and can be handled first.
+	# Of these six, ::Scheduled, ::Sub, ::Given, and ::When follow the same
+	# simple rule and can be handled first.  The block form of ::Package
+	# follows the rule, too.  (The non-block form of ::Package
+	# requires a statement terminator, and thus doesn't need to have
+	# an implied end detected.)
 	my @part      = $Statement->schildren;
 	my $LastChild = $part[-1];
 	unless ( $Statement->isa('PPI::Statement::Compound') ) {
 		# If the last significant element of the statement is a block,
-		# then a scheduled statement is done, no questions asked.
+		# then an implied-end statement is done, no questions asked.
 		return ! $LastChild->isa('PPI::Structure::Block');
 	}
 
