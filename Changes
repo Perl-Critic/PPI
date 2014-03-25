@@ -1,5 +1,13 @@
 Revision history for Perl extension PPI
 
+1.221_01
+	Summary:
+	- support Perl 5.12 "package NAMESPACE VERSION BLOCK" syntax
+
+	Details:
+	- support Perl 5.12 "package NAMESPACE VERSION BLOCK" syntax
+	  (RT #67831, GitHub #70) (BDFOY, MOREGAN)
+
 1.220 Tue 11 Nov 2014
 	Summary:
 	- incompatible behavior fixes on PPI::Statement::Sub->prototype
