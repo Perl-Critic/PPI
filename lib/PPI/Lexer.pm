@@ -1149,6 +1149,12 @@ sub _curly {
 					and return 'PPI::Structure::Subscript';
 			}
 		}
+
+		# Are we the second or third argument of package?
+		# E.g.: 'package Foo {}' or 'package Foo v1.2.3 {}'
+		return 'PPI::Structure::Block'
+			if $Parent->isa('PPI::Statement::Package');
+
 		if ( $CURLY_CLASSES{$content} ) {
 			# Known type
 			return $CURLY_CLASSES{$content};

@@ -36,6 +36,8 @@ Revision history for Perl extension PPI
 	  (MOREGAN)
 	- recognize the implied end of a package statement that includes a block
 	  (MOREGAN)
+	- parse package names that look like operators as strings, not ops
+	  (MOREGAN)
 
 1.220 Tue 11 Nov 2014
 	Summary:
