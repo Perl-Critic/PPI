@@ -195,6 +195,12 @@ sub __TOKENIZER__on_char {
 		return $t->{class}->__TOKENIZER__on_char( $t );
 	}
 
+	# Check for a Perl keyword that is forced to be a normal word instead
+	if ( $KEYWORDS{$word} and $class->__TOKENIZER__literal($t, $word, $tokens) ) {
+		$t->{class} = $t->{token}->set_class( 'Word' );
+		return $t->{class}->__TOKENIZER__on_char( $t );
+	}
+
 	# Or one of the word operators
 	if ( $OPERATOR{$word} and ! $class->__TOKENIZER__literal($t, $word, $tokens) ) {
 	 	$t->{class} = $t->{token}->set_class( 'Operator' );
@@ -371,9 +377,7 @@ sub __TOKENIZER__literal {
 
 	# Is this a forced-word context?
 	# i.e. Would normally be seen as an operator.
-	unless ( $QUOTELIKE{$word} or $PPI::Token::Operator::OPERATOR{$word} ) {
-		return '';
-	}
+	return '' if !$KEYWORDS{$word};
 
 	# Check the cases when we have previous tokens
 	pos $t->{line} = $t->{line_cursor};
@@ -383,8 +387,9 @@ sub __TOKENIZER__literal {
 		# We are forced if we are a method name
 		return 1 if $token->{content} eq '->';
 
-		# We are forced if we are a sub name
-		return 1 if $token->isa('PPI::Token::Word') && $token->{content} eq 'sub';
+		# We are forced if we are a sub name or a package name
+		return 1 if $token->isa('PPI::Token::Word') and
+			( $token->{content} eq 'sub' or $token->{content} eq 'package' );
 
 		# If we are contained in a pair of curly braces,
 		# we are probably a bareword hash key

@@ -10,7 +10,7 @@ BEGIN {
 	$PPI::XS_DISABLE = 1;
 	$PPI::Lexer::X_TOKENIZER ||= $ENV{X_TOKENIZER};
 }
-use Test::More tests => 129;
+use Test::More tests => 14829;
 use Test::NoWarnings;
 use PPI;
 
@@ -62,8 +62,16 @@ END_PERL
 
 PERL_5_12_SYNTAX: {
 	my @names = (
-		'Foo',
-		'package',
+		'Foo',  # normal name
+		# Keywords must parse as Word and not influence lexing
+		# of subsequent curly braces.
+		keys %PPI::Token::Word::KEYWORDS,
+		# Other weird and/or special words
+		'__PACKAGE__',
+		'__FILE__',
+		'__LINE__',
+		'__SUB__',
+		'AUTOLOAD',
 	);
 	my @versions = (
 		[ 'v1.2.3 ', 'PPI::Token::Number::Version' ],
