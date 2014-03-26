@@ -37,6 +37,8 @@ Revision history for Perl extension PPI
 	- Moved repository to GitHub: https://github.com/adamkennedy/PPI
 
 	Details:
+	- Prevent package names like 'x' from being parsed as operators
+	  (GitHub #75) (MOREGAN)
 	- Support Perl 5.12 "package NAMESPACE VERSION BLOCK" syntax
 	  (RT #67831, GitHub #70) (BDFOY, MOREGAN)
 	- Stop directing bugs to rt.cpan.org (GitHub #40) (MOREGAN)
