@@ -165,16 +165,16 @@ Returns true if it is a special reserved subroutine, or false if not.
 sub reserved {
 	my $self = shift;
 	my $name = $self->name or return '';
+	# perlsub is silent on whether reserveds can contain:
+	# - underscores;
+	# we allow them due to existing practice like CLONE_SKIP and __SUB__.
+	# - numbers; we allow them by PPI tradition.
 	$name eq uc $name;
 }
 
 1;
 
 =pod
-
-=head1 TO DO
-
-- Write unit tests for this package
 
 =head1 SUPPORT
 
