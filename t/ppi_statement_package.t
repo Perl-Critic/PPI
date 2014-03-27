@@ -10,7 +10,7 @@ BEGIN {
 	$PPI::XS_DISABLE = 1;
 	$PPI::Lexer::X_TOKENIZER ||= $ENV{X_TOKENIZER};
 }
-use Test::More tests => 14829;
+use Test::More tests => 14889;
 use Test::NoWarnings;
 use PPI;
 
@@ -62,11 +62,14 @@ END_PERL
 
 PERL_5_12_SYNTAX: {
 	for my $name (
-		'Foo',  # normal name
+                # normal name
+		'Foo',
 		# Keywords must parse as Word and not influence lexing
 		# of subsequent curly braces.
 		keys %PPI::Token::Word::KEYWORDS,
-		# Other weird and/or special words
+                # regression: misparsed as version string
+		'v10',
+		# Other weird and/or special words, just in case
 		'__PACKAGE__',
 		'__FILE__',
 		'__LINE__',
