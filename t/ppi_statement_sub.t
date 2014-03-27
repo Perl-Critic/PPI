@@ -3,7 +3,6 @@
 # Test PPI::Statement::Sub
 
 use strict;
-
 BEGIN {
 	$^W = 1;
 	no warnings 'once';
@@ -11,7 +10,7 @@ BEGIN {
 	$PPI::Lexer::X_TOKENIZER ||= $ENV{X_TOKENIZER};
 }
 
-use Test::More tests => 131;
+use Test::More tests => 6083;
 use Test::NoWarnings;
 use PPI;
 
@@ -89,6 +88,78 @@ sub test_sub_as {
 	else {
 		ok( !$sub_statement->block, "$code: has no block" );
 	}
+
+	return;
+}
+
+KEYWORDS_AS_SUB_NAMES: {
+	my @names = (
+		# normal name
+		'foo',
+		# Keywords must parse as Word and not influence lexing
+		# of subsequent curly braces.
+		keys %PPI::Token::Word::KEYWORDS,
+		# regression: misparsed as version string
+		'v10',
+		# Other weird and/or special words, just in case
+		'__PACKAGE__',
+		'__FILE__',
+		'__LINE__',
+		'__SUB__',
+		'AUTOLOAD',
+	);
+	my @blocks = (
+		[ ';', 'PPI::Token::Structure' ],
+		[ ' ;', 'PPI::Token::Structure' ],
+		[ '{ 1 }', 'PPI::Structure::Block' ],
+		[ ' { 1 }', 'PPI::Structure::Block' ],
+	);
+	$_->[2] = strip_ws_padding( $_->[0] ) for @blocks;
+
+	for my $name ( @names ) {
+		for my $block_pair ( @blocks ) {
+			my @test = prepare_sub_test( $block_pair, $name );
+			test_subs( @test );
+		}
+	}
+}
+
+sub strip_ws_padding {
+	my ( $string ) = @_;
+	$string =~ s/(^\s+|\s+$)//g;
+	return $string;
+}
+
+sub prepare_sub_test {
+	my ( $block_pair, $name ) = @_;
+
+	my ( $block, $block_type, $block_stripped ) = @{$block_pair};
+
+	my $code = "sub $name $block";
+
+	my $expected_sub_tokens = [
+		[ 'PPI::Token::Word', 'sub' ],
+		[ 'PPI::Token::Word', $name ],
+		[ $block_type, $block_stripped ],
+	];
+
+	return ( $code, $expected_sub_tokens );
+}
+
+sub test_subs {
+	my ( $code, $expected_sub_tokens ) = @_;
+
+	my $Document = PPI::Document->new( \"$code 999;" );
+	is(     $Document->schildren, 2, "$code number of statements in document" );
+	isa_ok( $Document->schild(0), 'PPI::Statement::Sub', $code );
+
+	my $got_tokens = [ map { [ ref $_, "$_" ] } $Document->schild(0)->schildren ];
+	is_deeply( $got_tokens, $expected_sub_tokens, "$code tokens as expected" );
+
+	# second child not swallowed up by the first
+	isa_ok( $Document->schild(1), 'PPI::Statement', "$code prior statement end recognized" );
+	isa_ok( $Document->schild(1)->schild(0), 'PPI::Token::Number', $code );
+	is(     $Document->schild(1)->schild(0), '999', "$code number correct"  );
 
 	return;
 }
