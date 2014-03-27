@@ -727,6 +727,9 @@ my %OBVIOUS_CONTENT = (
 	'}' => 'operator',
 );
 
+
+my %USUALLY_FORCES = map { $_ => 1 } qw( sub package use no );
+
 # Try to determine operator/operand context, if possible.
 # Returns "operator", "operand", or "" if unknown.
 sub _opcontext {
@@ -761,6 +764,58 @@ sub _current_x_is_operator {
 		&& (!$prev->isa('PPI::Token::Operator') || $X_CAN_FOLLOW_OPERATOR{$prev})
 		&& (!$prev->isa('PPI::Token::Structure') || $X_CAN_FOLLOW_STRUCTURE{$prev})
 	;
+}
+
+
+# Assuming we are at the end of parsing the current token that could be a word,
+# a wordlike operator, or a version string, try to determine whether context
+# before or after it forces it to be a bareword. This method is only useful
+# during tokenization.
+sub __current_token_is_forced_word {
+	my ( $t, $word ) = @_;
+
+	# Check if forced by preceding tokens.
+
+	my ( $prev, $prevprev ) = $t->_previous_significant_tokens(2);
+	if ( !$prev ) {
+		pos $t->{line} = $t->{line_cursor};
+	}
+	else {
+		my $content = $prev->{content};
+
+		# We are forced if we are a method name.
+		# '->' will always be an operator, so we don't check its type.
+		return 1 if $content eq '->';
+
+		# If we are contained in a pair of curly braces, we are probably a
+		# forced bareword hash key. '{' is never a word or operator, so we
+		# don't check its type.
+		pos $t->{line} = $t->{line_cursor};
+		return 1 if $content eq '{' and $t->{line} =~ /\G\s*\}/gc;
+
+		# sub, package, use, and no all indicate that what immediately follows
+		# is a word not an operator or (in the case of sub and package) a
+		# version string.  However, we don't want to be fooled by 'package
+		# package v10' or 'use no v10'. We're a forced package unless we're
+		# preceded by 'package sub', in which case we're a version string.
+		# We also have to make sure that the sub/package/etc doing the forcing
+		# is not a method call.
+		if( $USUALLY_FORCES{$content}) {
+			return if $word =~ /^v[0-9]+$/ and ( $content eq "use" or $content eq "no" );
+			return 1 if not $prevprev;
+			return 1 if not $USUALLY_FORCES{$prevprev->content} and $prevprev->content ne '->';
+			return;
+		}
+	}
+	# pos on $t->{line} is guaranteed to be set at this point.
+
+	# Check if forced by following tokens.
+
+	# If the word is followed by => it is probably a word, not a regex.
+	return 1 if $t->{line} =~ /\G\s*=>/gc;
+
+	# Otherwise we probably aren't forced
+	return '';
 }
 
 1;

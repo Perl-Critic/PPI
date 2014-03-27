@@ -38,6 +38,8 @@ Revision history for Perl extension PPI
 	  (MOREGAN)
 	- parse package names that look like operators as strings, not ops
 	  (MOREGAN)
+	- parse package names that look like v10 as strings, not versions
+	  (MOREGAN)
 
 1.220 Tue 11 Nov 2014
 	Summary:

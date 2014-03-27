@@ -175,7 +175,7 @@ sub test_sub_as {
 	return;
 }
 
-my %known_bad = map { ( "sub $_" => 1 ) } 'v10 ;', 'v10  ;', 'v10 { 1 }', 'v10  { 1 }', 'scalar { 1 }', 'scalar  { 1 }', 'bless { 1 }', 'bless  { 1 }', 'return { 1 }', 'return  { 1 }';
+my %known_bad = map { ( "sub $_" => 1 ) } 'scalar { 1 }', 'scalar  { 1 }', 'bless { 1 }', 'bless  { 1 }', 'return { 1 }', 'return  { 1 }';
 
 KEYWORDS_AS_SUB_NAMES: {
 	my @names = (
