@@ -1122,6 +1122,12 @@ sub _curly {
 			}
 		}
 
+		# Are we the last argument of sub?
+		# E.g.: 'sub foo {}', 'sub foo ($) {}'
+		if ( $Parent->isa('PPI::Statement::Sub') ) {
+			return 'PPI::Structure::Block';
+		}
+
 		# Are we the second or third argument of package?
 		# E.g.: 'package Foo {}' or 'package Foo v1.2.3 {}'
 		if ( $Parent->isa('PPI::Statement::Package') ) {
