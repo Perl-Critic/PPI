@@ -172,8 +172,6 @@ sub test_sub_as {
 	return;
 }
 
-my %known_bad = map { ( "sub $_" => 1 ) } 'scalar { 1 }', 'scalar  { 1 }', 'bless { 1 }', 'bless  { 1 }', 'return { 1 }', 'return  { 1 }';
-
 KEYWORDS_AS_SUB_NAMES: {
 	my @names = (
 		# normal name
@@ -231,8 +229,6 @@ sub prepare_sub_test {
 sub test_subs {
 	my ( $code, $expected_sub_tokens ) = @_;
 
-TODO:   {
-	local $TODO = $known_bad{$code} ? "known bug" : undef;
 	subtest "'$code'", => sub {
 
 	my $Document = PPI::Document->new( \"$code 999;" );
@@ -248,7 +244,6 @@ TODO:   {
 	is(     eval { $Document->schild(1)->schild(0) }, '999', "number correct"  );
 
 	};
-}
 
 	return;
 }
