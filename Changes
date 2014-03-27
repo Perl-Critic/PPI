@@ -9,6 +9,8 @@ Revision history for Perl extension PPI
 	  (RT #67831, GitHub #70) (BDFOY, MOREGAN)
 	- Prevent package names like 'x' from being parsed as operators
 	  (GitHub #75) (MOREGAN)
+	- Prevent package names like 'v10' from being parsed as version
+	  strings (GitHub #76) (MOREGAN)
 
 1.220 Tue 11 Nov 2014
 	Summary:
