@@ -736,6 +736,9 @@ my %OBVIOUS_CONTENT = (
 	'}' => 'operator',
 );
 
+
+my %USUALLY_FORCES = map { $_ => 1 } qw( sub package use no );
+
 # Try to determine operator/operand context, is possible.
 # Returns "operator", "operand", or "" if unknown.
 sub _opcontext {
@@ -798,16 +801,13 @@ sub __current_token_is_forced_word {
 		pos $t->{line} = $t->{line_cursor};
 		return 1 if $content eq '{' and $t->{line} =~ /\G\s*\}/gc;
 
-		# We are forced if we are a sub name or a package name. 'sub' and
-		# 'package' will always be words, so we don't check their type. We're a
-		# forced package unless we're preceded by 'package sub', in which case
-		# we're a version string.
-		return ( !$prevprev || $prevprev->content ne 'package' ) if $content eq 'sub';
-
-		# We're a forced package unless we're preceded by 'package package', in
-		# which case we're a version string.
-		return ( !$prevprev || $prevprev->content ne 'package' )
-			if $content eq 'package';
+		# sub, package, use, and no all indicate that what immediately follows
+		# is a word not an operator or (in the case of sub and package) a
+		# version string.  However, we don't want to be fooled by 'package
+		# package v10' or 'use no v10'. We're a forced package unless we're
+		# preceded by 'package sub', in which case we're a version string.
+		return ( !$prevprev || !$USUALLY_FORCES{$prevprev->content} )
+			if $USUALLY_FORCES{$content};
 	}
 	# pos on $t->{line} is guaranteed to be set at this point.
 

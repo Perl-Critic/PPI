@@ -102,21 +102,23 @@ sub __TOKENIZER__on_char {
 sub __TOKENIZER__commit {
 	my $t = $_[1];
 
-	# Forced to be a word. Done.
-	return PPI::Token::Word->__TOKENIZER__commit($t)
-		if $t->__current_token_is_forced_word;
-
 	# Capture the rest of the token
 	pos $t->{line} = $t->{line_cursor};
-	if ( $t->{line} !~ m/\G(v\d+(?:\.\d+)*)/gc ) {
+	if ( $t->{line} !~ m/\G(v\d+(?:\.\d+)+|v\d+\b)/gc ) {
 		# This was not a v-string after all (it's a word)
 		return PPI::Token::Word->__TOKENIZER__commit($t);
 	}
 
+	my $content = $1;
+
+	# If there are no periods this could be a word starting with v\d
+	# Forced to be a word. Done.
+	return PPI::Token::Word->__TOKENIZER__commit($t)
+		if $content !~ /\./ and $t->__current_token_is_forced_word;
+
 	# This is a v-string
-	my $vstring = $1;
-	$t->{line_cursor} += length($vstring);
-	$t->_new_token('Number::Version', $vstring);
+	$t->{line_cursor} += length $content;
+	$t->_new_token( 'Number::Version', $content );
 	$t->_finalize_token->__TOKENIZER__on_char($t);
 }
 
