@@ -40,6 +40,8 @@ Revision history for Perl extension PPI
 	  (MOREGAN)
 	- parse package names that look like v10 as strings, not versions
 	  (MOREGAN)
+	- parse things like v49use as a single bareword, not v-string + keyword
+	  (MOREGAN)
 
 1.220 Tue 11 Nov 2014
 	Summary:

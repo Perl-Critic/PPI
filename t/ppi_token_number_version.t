@@ -26,7 +26,6 @@ LITERAL: {
 
 
 VSTRING_ENDS_CORRECTLY: {
-	my %known_bad = map { $_ => 1 } map { "v49$_" } qw'abs accept alarm and atan2 bind binmode bless break caller chdir chmod chomp chop chown chr chroot close closedir cmp connect continue cos crypt dbmclose dbmopen default defined delete die do dump e10 each else elsif endgrent endhostent endnetent endprotoent endpwent endservent eof eq eval evalbytes exec exists exit exp fc fcntl fileno flock for foreach fork format formline ge getc getgrent getgrgid getgrnam gethostbyaddr gethostbyname gethostent getlogin getnetbyaddr getnetbyname getnetent getpeername getpgrp getppid getpriority getprotobyname getprotobynumber getprotoent getpwent getpwnam getpwuid getservbyname getservbyport getservent getsockname getsockopt given glob gmtime goto grep gt hex if index int ioctl join keys kill last lc lcfirst le length link listen local localtime lock log lstat lt m map mkdir msgctl msgget msgrcv msgsnd my ne next no not oct open opendir or ord our pack package pipe pop pos print printf prototype push q qq qr quotemeta qw qx rand read readdir readline readlink readpipe recv redo ref rename require reset return reverse rewinddir rindex rmdir s say scalar seek seekdir select semctl semget semop send setgrent sethostent setnetent setpgrp setpriority setprotoent setpwent setservent setsockopt shift shmctl shmget shmread shmwrite shutdown sin sleep socket socketpair sort splice split sprintf sqrt srand stat state study sub substr symlink syscall sysopen sysread sysseek system syswrite tell telldir tie tied time times tr truncate uc ucfirst umask undef unless unlink unpack unshift untie until use utime values vec wait waitpid wantarray warn when while write x x3 xor y';
 	my @tests = (
 		(
 			map {
@@ -87,15 +86,12 @@ VSTRING_ENDS_CORRECTLY: {
 		$tokens = [ map { ref($_), $_->content() } @$tokens ];
 		my $expected = $test->{expected};
 		unshift @$expected, 'PPI::Statement', $test->{code};
-TODO: {
-		local $TODO = $known_bad{$test->{code}} ? "known bug" : undef;
 		my $ok = is_deeply( $tokens, $expected, $test->{desc} );
-		if ( !$known_bad{$test->{code}} and !$ok ) {
+		if ( !$ok ) {
 			diag "$test->{code} ($test->{desc})\n";
 			diag explain $tokens;
 			diag explain $test->{expected};
 		}
-}
 	}
 }
 
