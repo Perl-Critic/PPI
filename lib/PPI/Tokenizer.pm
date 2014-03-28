@@ -776,6 +776,9 @@ sub _current_x_is_operator {
 # be a word, a wordlike operator, or a version string, try to determine
 # whether context before or after it forces it to be a bareword.
 # This method is only useful during tokenization.
+
+my %_usually_forces = map { $_ => 1 } qw( sub package use no );
+
 sub __current_token_is_forced_word {
 	my $t = shift;
 
@@ -795,20 +798,15 @@ sub __current_token_is_forced_word {
 			return 1;
 		}
 
-		# We are forced if we are a sub name or a package name.
-		# 'sub' and 'package' will always be words, so we don't
-		# check their type.
-		if ( $prev->{content} eq 'sub' ) {
+		# sub, package, use, and no all indicate that what immediately
+		# follows is a word not an operator or (in the case of sub and
+		# package) a version string.  However, we don't want to be
+		# fooled by 'package package v10' or 'use no v10'.
+		if ( $_usually_forces{$prev->{content}} ) {
 			# We're a forced package unless we're preceded by
 			# 'package sub', in which case we're a
 			# version string.
-			return !$prevprev || $prevprev->content ne 'package';
-		}
-		if ( $prev->{content} eq 'package' ) {
-			# We're a forced package unless we're preceded by
-			# 'package package', in which case we're a
-			# version string.
-			return !$prevprev || $prevprev->content ne 'package';
+			return !$prevprev || !$_usually_forces{$prevprev->content};
 		}
 	}
 	else {

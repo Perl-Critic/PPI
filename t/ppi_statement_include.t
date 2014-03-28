@@ -10,7 +10,7 @@ BEGIN {
 	$PPI::XS_DISABLE = 1;
 	$PPI::Lexer::X_TOKENIZER ||= $ENV{X_TOKENIZER};
 }
-use Test::More tests => 64;
+use Test::More tests => 12066;
 use Test::NoWarnings;
 use PPI;
 
@@ -45,11 +45,13 @@ use No::Version;
 use No::Version::With::Argument 'x';
 use No::Version::With::Arguments 1, 2;
 use 5.005;
+use VString::Version v10;
+use VString::Version::Decimal v1.5;
 END_PERL
 
 	isa_ok( $document, 'PPI::Document' );
 	my $statements = $document->find('PPI::Statement::Include');
-	is( scalar @{$statements}, 7, 'Found expected include statements.' );
+	is( scalar @{$statements}, 9, 'Found expected include statements.' );
 	is( $statements->[0]->module_version, 1, 'Integer version' );
 	is( $statements->[1]->module_version, 1.5, 'Float version' );
 	is( $statements->[2]->module_version, 1, 'Version and argument' );
@@ -57,6 +59,8 @@ END_PERL
 	is( $statements->[4]->module_version, undef, 'No version, with argument' );
 	is( $statements->[5]->module_version, undef, 'No version, with arguments' );
 	is( $statements->[6]->module_version, undef, 'Version include, no module' );
+	is( $statements->[7]->module_version, 'v10', 'Version string' );
+	is( $statements->[8]->module_version, 'v1.5', 'Version string with decimal' );
 }
 
 
@@ -234,4 +238,51 @@ END_PERL
 		9,
 		'arguments with Test::More',
 	);
+}
+
+
+KEYWORDS_AS_MODULE_NAMES: {
+	for my $name (
+		# normal names
+		'Foo',
+		'Foo::Bar',
+		'Foo::Bar::Baz',
+		'version',
+		# Keywords must parse as Word and not influence lexing
+		# of subsequent curly braces.
+		keys %PPI::Token::Word::KEYWORDS,
+		# Other weird and/or special words, just in case
+		'__PACKAGE__',
+		'__FILE__',
+		'__LINE__',
+		'__SUB__',
+		'AUTOLOAD',
+	) {
+		for my $include ( 'use', 'no' ) {  # 'require' does not force tokes to be words
+			for my $version ( '', 'v1.2.3', '1.2.3', 'v10' ) {
+				my $code = "$include $name $version;";
+
+				my $Document = PPI::Document->new( \"$code 999;" );
+				is( $Document->schildren(), 2, "$code number of statements in document" );
+				isa_ok( $Document->schild(0), 'PPI::Statement::Include', $code );
+
+				# first child is the include statement
+				my $expected_tokens = [
+					[ 'PPI::Token::Word', $include ],
+					[ 'PPI::Token::Word', $name ],
+				];
+				if ( $version ) {
+					push @$expected_tokens, [ 'PPI::Token::Number::Version', $version ];
+				}
+				push @$expected_tokens, [ 'PPI::Token::Structure', ';' ];
+				my $got_tokens = [ map { [ ref $_, "$_" ] } $Document->schild(0)->schildren() ];
+				is_deeply( $got_tokens, $expected_tokens, "$code tokens as expected" );
+
+				# second child not swallowed up by the first
+				isa_ok( $Document->schild(1), 'PPI::Statement', "$code prior statement end recognized" );
+				isa_ok( $Document->schild(1)->schild(0), 'PPI::Token::Number', $code );
+				is(     $Document->schild(1)->schild(0), '999', "$code number correct"  );
+			}
+		}
+	}
 }
