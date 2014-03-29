@@ -172,7 +172,7 @@ sub content {
 sub insert_before {
 	my $self    = shift;
 	my $Element = _INSTANCE(shift, 'PPI::Element')  or return undef;
-	if ( $Element->isa('PPI::Structure') ) {
+	if ( $Element->isa('PPI::Statement') ) {
 		return $self->__insert_before($Element);
 	} elsif ( $Element->isa('PPI::Token') ) {
 		return $self->__insert_before($Element);
@@ -184,7 +184,7 @@ sub insert_before {
 sub insert_after {
 	my $self    = shift;
 	my $Element = _INSTANCE(shift, 'PPI::Element') or return undef;
-	if ( $Element->isa('PPI::Structure') ) {
+	if ( $Element->isa('PPI::Statement') ) {
 		return $self->__insert_after($Element);
 	} elsif ( $Element->isa('PPI::Token') ) {
 		return $self->__insert_after($Element);
