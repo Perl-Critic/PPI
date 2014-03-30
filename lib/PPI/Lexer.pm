@@ -440,6 +440,28 @@ sub _statement {
 
 	# Is it a token in our known classes list
 	my $class = $STATEMENT_CLASSES{$Token->content};
+	if ( $class ) {
+		# Is the next significant token a =>
+		# Read ahead to the next significant token
+		my $Next;
+		while ( $Next = $self->_get_token ) {
+			if ( !$Next->significant ) {
+				push @{$self->{delayed}}, $Next;
+				next;
+			}
+
+			last if
+				!$Next->isa( 'PPI::Token::Operator' ) or $Next->content ne '=>';
+
+			# Got the next token
+			# Is an ordinary expression
+			$self->_rollback( $Next );
+			return 'PPI::Statement';
+		}
+
+		# Rollback and continue
+		$self->_rollback( $Next );
+	}
 
 	# Handle potential barewords for subscripts
 	if ( $Parent->isa('PPI::Structure::Subscript') ) {
@@ -533,8 +555,16 @@ sub _statement {
 			}
 
 			# Found the next significant token.
+			if (
+				$Next->isa('PPI::Token::Operator')
+				and
+				$Next->content eq '=>'
+			) {
+				# Is an ordinary expression
+				$self->_rollback( $Next );
+				return 'PPI::Statement';
 			# Is it a v6 use?
-			if ( $Next->content eq 'v6' ) {
+			} elsif ( $Next->content eq 'v6' ) {
 				$self->_rollback( $Next );
 				return 'PPI::Statement::Include::Perl6';
 			} else {
