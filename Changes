@@ -19,6 +19,8 @@ Revision history for Perl extension PPI
 	- do hex number matching with [[:xdigit:]]
 	- some readability improvements on the code of HereDoc.pm
 	- recognize heredoc even if they have no newline at the end (AUBERTG)
+	- parse left side of => as bareword even if it looks like a keyword or
+	  op (MOREGAN)
 
 1.220 Tue 11 Nov 2014
 	Summary:

@@ -601,7 +601,6 @@ TODO: {
 
 
 OPERATOR_FAT_COMMA: {
-	my %known_bad = map { $_ => 1 } map { "$_=>2" } qw( default  for  foreach  given  goto  if  last  local  my  next  no  our  package  redo  require  return  state  unless  until  use  when  while );
 	my @tests = (
 		{
 			desc => 'integer with integer',
@@ -683,15 +682,12 @@ OPERATOR_FAT_COMMA: {
 		if ( $expected->[0] !~ /^PPI::Statement/ ) {
 			unshift @$expected, 'PPI::Statement', $test->{code};
 		}
-TODO: {
-		local $TODO = $known_bad{$test->{code}} ? "known bug" : undef;
 		my $ok = is_deeply( $tokens, $expected, $test->{desc} );
 		if ( !$ok ) {
 			diag "$test->{code} ($test->{desc})\n";
 			diag explain $tokens;
 			diag explain $test->{expected};
 		}
-}
 	}
 }
 
