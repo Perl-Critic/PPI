@@ -67,7 +67,7 @@ PERL_5_12_SYNTAX: {
 		# Keywords must parse as Word and not influence lexing
 		# of subsequent curly braces.
 		keys %PPI::Token::Word::KEYWORDS,
-                # regression: misparsed as version string
+		# regression: misparsed as version string
 		'v10',
 		# Other weird and/or special words, just in case
 		'__PACKAGE__',

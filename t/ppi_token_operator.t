@@ -13,7 +13,7 @@ BEGIN {
 	$PPI::XS_DISABLE = 1;
 	$PPI::Lexer::X_TOKENIZER ||= $ENV{X_TOKENIZER};
 }
-use Test::More tests => 393;
+use Test::More tests => 1119;
 use Test::NoWarnings;
 use PPI;
 
@@ -465,6 +465,98 @@ OPERATOR_X: {
 	}
 
 	foreach my $test ( @tests ) {
+		my $d = PPI::Document->new( \$test->{code} );
+		my $tokens = $d->find( sub { 1; } );
+		$tokens = [ map { ref($_), $_->content() } @$tokens ];
+		my $expected = $test->{expected};
+		if ( $expected->[0] !~ /^PPI::Statement/ ) {
+			unshift @$expected, 'PPI::Statement', $test->{code};
+		}
+		my $ok = is_deeply( $tokens, $expected, $test->{desc} );
+		if ( !$ok ) {
+			diag "$test->{code} ($test->{desc})\n";
+			diag explain $tokens;
+			diag explain $test->{expected};
+		}
+	}
+}
+
+
+OPERATOR_FAT_COMMA: {
+	my @tests = (
+		{
+			desc => 'integer with integer',
+			code => '1 => 2',
+			expected => [
+				'PPI::Token::Number' => '1',
+				'PPI::Token::Whitespace' => ' ',
+				'PPI::Token::Operator' => '=>',
+				'PPI::Token::Whitespace' => ' ',
+				'PPI::Token::Number' => '2',
+			],
+		},
+		{
+			desc => 'word with integer',
+			code => 'foo => 2',
+			expected => [
+				'PPI::Token::Word' => 'foo',
+				'PPI::Token::Whitespace' => ' ',
+				'PPI::Token::Operator' => '=>',
+				'PPI::Token::Whitespace' => ' ',
+				'PPI::Token::Number' => '2',
+			],
+		},
+		{
+			desc => 'dashed word with integer',
+			code => '-foo => 2',
+			expected => [
+				'PPI::Token::Word' => '-foo',
+				'PPI::Token::Whitespace' => ' ',
+				'PPI::Token::Operator' => '=>',
+				'PPI::Token::Whitespace' => ' ',
+				'PPI::Token::Number' => '2',
+			],
+		},
+		( map { {
+			desc=>$_,
+			code=>"$_=>2",
+			expected=>[
+				'PPI::Token::Word' => $_,
+				'PPI::Token::Operator' => '=>',
+				'PPI::Token::Number' => '2',
+		    ]
+		} } keys %PPI::Token::Word::KEYWORDS ),
+		( map { {
+			desc=>$_,
+			code=>"($_=>2)",
+			expected=>[
+				'PPI::Structure::List' => "($_=>2)",
+				'PPI::Token::Structure' => '(',
+				'PPI::Statement::Expression' => "$_=>2",
+				'PPI::Token::Word' => $_,
+				'PPI::Token::Operator' => '=>',
+				'PPI::Token::Number' => '2',
+				'PPI::Token::Structure' => ')',
+		    ]
+		} } keys %PPI::Token::Word::KEYWORDS ),
+		( map { {
+			desc=>$_,
+			code=>"{$_=>2}",
+			expected=>[
+				'PPI::Structure::Constructor' => "{$_=>2}",
+				'PPI::Token::Structure' => '{',
+				'PPI::Statement::Expression' => "$_=>2",
+				'PPI::Token::Word' => $_,
+				'PPI::Token::Operator' => '=>',
+				'PPI::Token::Number' => '2',
+				'PPI::Token::Structure' => '}',
+		    ]
+		} } keys %PPI::Token::Word::KEYWORDS ),
+	);
+
+	foreach my $test ( @tests ) {
+		my $code = $test->{code};
+
 		my $d = PPI::Document->new( \$test->{code} );
 		my $tokens = $d->find( sub { 1; } );
 		$tokens = [ map { ref($_), $_->content() } @$tokens ];

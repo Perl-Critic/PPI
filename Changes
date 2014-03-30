@@ -37,6 +37,8 @@ Revision history for Perl extension PPI
 	- Moved repository to GitHub: https://github.com/adamkennedy/PPI
 
 	Details:
+	- Prevent left side of fat comma from parsing as operator
+	  operators (MOREGAN)
 	- Prevent 'use' and 'no' package names from being parsed as
 	  operators (MOREGAN)
 	- Prevent sub names like 'v10' from being parsed as version
