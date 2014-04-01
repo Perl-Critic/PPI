@@ -221,9 +221,10 @@ sub __TOKENIZER__on_char {
 	# End of file.
 	# Error: Didn't reach end of here-doc before end of file.
 
-	# If the last line matches the terminator but is missing the newline, we want
-	# to allow it anyway (like perl itself does). In this case perl would
-	# normally throw a warning, but we will also ignore that as well.
+	# If the here-doc block is not empty, look at the last line to determine if
+	# the here-doc terminator is missing a newline (which Perl would fail to
+	# compile but is easy to detect) or if the here-doc block was just not
+	# terminated at all (which Perl would fail to compile as well).
 	$token->{_terminator_line} = undef;
 	if ( scalar( @{$token->{_heredoc}} ) != 0 && defined( $token->{_heredoc}->[-1] ) )
 	{
