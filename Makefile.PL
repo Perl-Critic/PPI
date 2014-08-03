@@ -1,6 +1,7 @@
 use inc::Module::Install 1.00;
 
 all_from      'lib/PPI.pm';
+readme_from   'lib/PPI.pm'; # Module::Install::ReadmeFromPod
 requires      'File::Spec'       => win32() ? '3.2701' : '0.84';
 requires      'Clone'            => '0.30';
 requires      'List::Util'       => '1.20';
