@@ -39,7 +39,7 @@ use PPI::Structure ();
 
 use vars qw{$VERSION @ISA};
 BEGIN {
-	$VERSION = '1.217_01';
+	$VERSION = '1.218';
 	@ISA     = 'PPI::Structure';
 }
 

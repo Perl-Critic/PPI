@@ -89,7 +89,7 @@ use PPI::Exception::ParserRejection ();
 
 use vars qw{$VERSION};
 BEGIN {
-	$VERSION = '1.217_01';
+	$VERSION = '1.218';
 }
 
 # The x operator cannot follow most Perl operators, implying that

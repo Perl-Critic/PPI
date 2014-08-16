@@ -1,10 +1,6 @@
 Revision history for Perl extension PPI
 
-1.217_01 Mon 04 Aug 2014
-	Summary:
-	- release cleanup
-
-1.216_01 Sat 15 Mar 2014
+1.218 Sat 16 Aug 2014
 	Summary:
 	- Fixes for various parsing and documentation bugs
 	- 1MB limit on input document size removed
