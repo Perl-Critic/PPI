@@ -3,11 +3,24 @@ use warnings;
 
 use inc::Module::Install 1.10;
 
-# only needed by author to run 'perl Makefile.PL'
-# use Module::Install::ReadmeFromPod 0.22;
-
 all_from 'lib/PPI.pm';
-readme_from 'lib/PPI.pm';    # Module::Install::ReadmeFromPod
+
+# This code is only needed by author to generate README and README.md
+eval {
+	eval "use Module::Install::ReadmeFromPod 0.22";
+	eval "use Pod::Markdown 2.002";
+
+	my $pod = 'lib/PPI.pm';
+	readme_from $pod;    # Module::Install::ReadmeFromPod
+
+	my $parser = Pod::Markdown->new;
+	open my $in,  "<", $pod;
+	open my $out, ">", "README.md";
+	if ($parser and $in and $out) {
+		$parser->parse_from_filehandle($in);
+		print $out $parser->as_markdown;
+	}
+};
 
 requires 'Clone'           => '0.30';
 requires 'File::Spec'      => win32() ? '3.2701' : '0.84';
