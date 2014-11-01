@@ -222,10 +222,7 @@ sub lex_tokenizer {
 
 	# Lex the token stream into the document
 	$self->{Tokenizer} = $Tokenizer;
-	eval {
-		$self->_lex_document($Document);
-	};
-	if ( $@ ) {
+	if ( ! eval { $self->_lex_document($Document); } ) {
 		# If an error occurs DESTROY the partially built document.
 		undef $Document;
 		if ( _INSTANCE($@, 'PPI::Exception') ) {
@@ -1164,7 +1161,7 @@ sub _curly {
 	# We need to scan ahead.
 	my $Next;
 	my $position = 0;
-	my @delayed  = ();
+	my @delayed;
 	while ( $Next = $self->_get_token ) {
 		unless ( $Next->significant ) {
 			push @delayed, $Next;

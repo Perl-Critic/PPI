@@ -25,6 +25,7 @@ L<PPI::Token> and L<PPI::Element> parent classes.
 =cut
 
 use strict;
+use List::MoreUtils ();
 use Params::Util qw{_INSTANCE};
 use PPI::Token   ();
 
@@ -57,7 +58,7 @@ sub merge {
 	my $class = (! ref $_[0]) ? shift : return undef;
 
 	# Check there are no bad arguments
-	if ( grep { ! _INSTANCE($_, 'PPI::Token::Pod') } @_ ) {
+	if ( List::MoreUtils::any { ! _INSTANCE($_, 'PPI::Token::Pod') } @_ ) {
 		return undef;
 	}
 

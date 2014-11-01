@@ -21,8 +21,9 @@ use Params::Util qw{_INSTANCE};
 
 sub pause {
 	local $@;
-	eval { require Time::HiRes; };
-	$@ ? sleep(1) : Time::HiRes::sleep(0.1);
+	if ( ! eval { require Time::HiRes; Time::HiRes::sleep(0.1); 1; } ) {
+		sleep(1);
+	}
 }
 
 
@@ -91,8 +92,6 @@ exit(0);
 #####################################################################
 # Support Functions
 
-my $failures = 0;
-
 sub test_code {
 	my $code     = shift;
 	my $quotable = quotable($code);
@@ -124,13 +123,13 @@ sub quickcheck {
 
 	while ( length $fails ) {
 		chop $code;
-		my $Document = PPI::Document->new(\$code) or last;
+		PPI::Document->new(\$code) or last;
 		$fails = $code;
 	}
 
 	while ( length $fails ) {
 		substr( $code, 0, 1, '' );
-		my $Document = PPI::Document->new(\$code) or return $fails;
+		PPI::Document->new(\$code) or return $fails;
 		$fails = $code;
 	}
 

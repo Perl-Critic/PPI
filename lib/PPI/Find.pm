@@ -190,10 +190,7 @@ sub in {
 	$self->{matches} = [];
 
 	# Execute the search
-	eval {
-		$self->_execute;
-	};
-	if ( $@ ) {
+	if ( ! eval { $self->_execute; 1; } ) {
 		my $errstr = $@;
 		$errstr =~ s/\s+at\s+line\s+.+$//;
 		return $self->_error("Error while searching: $errstr", %params);
@@ -249,10 +246,7 @@ sub start {
 	$self->{matches} = [];
 
 	# Execute the search
-	eval {
-		$self->_execute;
-	};
-	if ( $@ ) {
+	if ( ! eval { $self->_execute; 1; } ) {
 		my $errstr = $@;
 		$errstr =~ s/\s+at\s+line\s+.+$//;
 		$self->_error("Error while searching: $errstr");

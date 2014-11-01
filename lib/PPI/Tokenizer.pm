@@ -335,7 +335,7 @@ sub all_tokens {
 
 	# Catch exceptions and return undef, so that we
 	# can start to convert code to exception-based code.
-	eval {
+	my $ok = eval {
 		# Process lines until we get EOF
 		unless ( $self->{token_eof} ) {
 			my $rv;
@@ -347,8 +347,9 @@ sub all_tokens {
 			# Clean up the end of the tokenizer
 			$self->_clean_eof;
 		}
+		1;
 	};
-	if ( $@ ) {
+	if ( !$ok ) {
 		my $errstr = $@;
 		$errstr =~ s/^(.*) at line .+$/$1/;
 		PPI::Exception->throw( $errstr );

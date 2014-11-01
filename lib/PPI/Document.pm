@@ -86,7 +86,7 @@ BEGIN {
 use PPI::Document::Fragment ();
 
 # Document cache
-my $CACHE = undef;
+my $CACHE;
 
 # Convenience constants related to constants
 use constant LOCATION_LINE         => 0;
@@ -176,26 +176,25 @@ sub new {
 
 		# When loading from a filename, use the caching layer if it exists.
 		if ( $CACHE ) {
-			my $file   = $source;
-			my $source = PPI::Util::_slurp( $file );
-			unless ( ref $source ) {
+			my $file_contents = PPI::Util::_slurp( $source );
+			unless ( ref $file_contents ) {
 				# Errors returned as plain string
-				return $class->_error($source);
+				return $class->_error($file_contents);
 			}
 
 			# Retrieve the document from the cache
-			my $document = $CACHE->get_document($source);
+			my $document = $CACHE->get_document($file_contents);
 			return $class->_setattr( $document, %attr ) if $document;
 
 			if ( $timeout ) {
 				eval {
 					local $SIG{ALRM} = sub { die "alarm\n" };
 					alarm( $timeout );
-					$document = PPI::Lexer->lex_source( $$source );
+					$document = PPI::Lexer->lex_source( $$file_contents );
 					alarm( 0 );
 				};
 			} else {
-				$document = PPI::Lexer->lex_source( $$source );
+				$document = PPI::Lexer->lex_source( $$file_contents );
 			}
 			if ( $document ) {
 				# Save in the cache

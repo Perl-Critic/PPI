@@ -108,8 +108,7 @@ foreach my $len ( 1 .. $MAX_CHARS ) {
 #####################################################################
 # Test a series of random strings
 
-my $count = 0;
-foreach my $i ( 1 .. $ITERATIONS ) {
+for ( 1 .. $ITERATIONS ) {
 	# Generate a random string
 	my $code = join( '',
 		map { $ALL_CHARS[$_] }
@@ -167,27 +166,6 @@ sub test_code {
 		diag( "\"$joined_quotable\" (round-trips to)" );
 		return;
 	}
-}
-
-# Find the shortest failing substring of known bad string
-sub quickcheck {
-	my $code       = shift;
-	my $fails      = $code;
-	# $SIG{__WARN__} = sub { croak('Triggered a warning') };
-
-	while ( length $fails ) {
-		chop $code;
-		my $Document = PPI::Document->new(\$code) or last;
-		$fails = $code;
-	}
-
-	while ( length $fails ) {
-		substr( $code, 0, 1, '' );
-		my $Document = PPI::Document->new(\$code) or return $fails;
-		$fails = $code;
-	}
-
-	return $fails;
 }
 
 sub quotable {

@@ -468,19 +468,17 @@ OPERATOR_X: {
 		if ( $operator eq '--' || $operator eq '++' || $operator eq '<>' ) {
 			push @expected, ( 'PPI::Token::Operator' => 'x' );
 			push @expected, ( 'PPI::Token::Number' => '3' );
-			$desc = "operator $operator does not imply following 'x' is a word",
+			$desc = "operator $operator does not imply following 'x' is a word";
 		}
 		else {
 			push @expected, ( 'PPI::Token::Word' => 'x3' );
-			$desc = "operator $operator implies following 'x' is a word",
+			$desc = "operator $operator implies following 'x' is a word";
 		}
 
 		push @tests, { desc => $desc, code => $code, expected => \@expected };
 	}
 
 	foreach my $test ( @tests ) {
-		my $code = $test->{code};
-
 		my $d = PPI::Document->new( \$test->{code} );
 		my $tokens = $d->find( sub { 1; } );
 		$tokens = [ map { ref($_), $_->content() } @$tokens ];

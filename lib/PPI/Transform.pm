@@ -33,8 +33,8 @@ BEGIN {
 #####################################################################
 # Apply Handler Registration
 
-my %HANDLER = ();
-my @ORDER   = ();
+my %HANDLER;
+my @ORDER;
 
 # Yes, you can use this yourself.
 # I'm just leaving it undocumented for now.

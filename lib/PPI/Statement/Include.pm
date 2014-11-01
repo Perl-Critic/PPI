@@ -35,7 +35,7 @@ But basically, they cover three situations.
 
 Firstly, a dependency on a particular version of perl (for which the
 C<version> method returns true), a pragma (for which the C<pragma> method
-returns true, or the loading (and unloading via no) of modules.
+returns true), or the loading (and unloading via no) of modules.
 
 =head1 METHODS
 

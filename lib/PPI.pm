@@ -30,9 +30,10 @@ use PPI::Lexer                ();
 
 # If it is installed, load in PPI::XS
 unless ( $PPI::XS_DISABLE ) {
-	eval { require PPI::XS };
-	# Only ignore the failure to load PPI::XS if not installed
-	die if $@ && $@ !~ /^Can't locate .*? at /;
+	if ( ! eval { require PPI::XS; 1; } ) {
+		# Only ignore the failure to load PPI::XS if not installed
+		die if $@ !~ /^Can't locate .*? at /;
+	}
 }
 
 1;

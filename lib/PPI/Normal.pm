@@ -186,10 +186,7 @@ sub process {
 	$self->{Document} = _Document(shift) or return undef;
 
 	# Work out what functions we need to call
-	my @functions = ();
-	foreach ( 1 .. $self->layer ) {
-		push @functions, @{ $LAYER{$_} };
-	}
+	my @functions = map { @{ $LAYER{$_} } } ( 1 .. $self->layer );
 
 	# Execute each function
 	foreach my $function ( @functions ) {

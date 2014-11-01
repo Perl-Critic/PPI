@@ -73,7 +73,7 @@ actual characters.
 
 =cut
 
-my $null = undef;
+my $null;
 
 sub null {
 	$null ||= $_[0]->new('');
@@ -184,7 +184,7 @@ sub __TOKENIZER__on_line_start {
 		# Indicates a Perl 6 block. Make the initial
 		# implementation just suck in the entire rest of the
 		# file.
-		my @perl6 = ();
+		my @perl6;
 		while ( 1 ) {
 			my $line6 = $t->_get_line;
 			last unless defined $line6;

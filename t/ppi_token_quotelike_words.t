@@ -52,7 +52,6 @@ END_PERL
 			scalar @expected,
 			qq<Scalar context literal() returns the list for "$token">,
 		);
-		my @literal = $token->literal;
 		is_deeply( [ $token->literal ], \@expected, '->literal matches expected' );
 	}
 }

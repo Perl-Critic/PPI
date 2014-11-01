@@ -58,7 +58,6 @@ QW: {
 QW2: {
 	my @stuff  = ( qw-( ) < > / / -, '#', '#', ',',',' );
 	my @seps   = ( undef, undef, '/', '#', ','  );
-	my @types  = ( '()', '<>', '//', '##', ',,' );
 	my @braced = ( qw{ 1 1 0 0 0 } );
 	my @secs   = ( qw{ 1 1 1 1 1 } );
 	my $i      = 0;
