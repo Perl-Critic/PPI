@@ -1,7 +1,32 @@
 Revision history for Perl extension PPI
 
-	- Disallow Perl4 package separator ' immediately after keywords
-	  (GitHub #58) (MOREGAN)
+1.219_001 Sat 16 Aug 2014
+	Summary:
+	- incompatible behavior fixes on PPI::Statement::Sub->prototype
+	- improved parsing of various syntax elements
+	- code quality improvements
+
+	Details:
+	- {} is now recognized as anonymous hash constructor instead of a code
+	  block after these operators: &&= //= || && // ? :
+	  (GitHub #36) (MOREGAN)
+	- regex capture variables greater than $9 are now parsed completely,
+	  instead of being parsed as single digit captures with numbers after
+	  them (GitHub #38) (MOREGAN)
+	- DESTROY and AUTOLOAD subs are now parsed even without the sub
+	  keyword (GitHub #39) (MOREGAN)
+	- PPI::Statement::Sub->prototype behavior now matches its
+	  documentation, instead of returning the prototype string
+	  unchanged and still including the parens (GitHub #56) (MOREGAN)
+	- PPI::Statement::Sub->prototype now returns undef on subs without a
+	  prototype, instead of returning an empty string
+	  (GitHub #56) (MOREGAN)
+	- list of keywords which are not parsed as packages when followed by
+	  the Perl4 package separator ' has been increased
+	  (GitHub #77) (MOREGAN)
+	- application of a number of Perl::Critic policies and documentation
+	  fixes (GitHub #53) (MOREGAN, MITHALDU)
+	- automation of README.md generation for git (GitHub #86) (COWENS)
 
 1.218 Sat 16 Aug 2014
 	Summary:
