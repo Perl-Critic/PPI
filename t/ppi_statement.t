@@ -10,6 +10,7 @@ BEGIN {
 	$PPI::XS_DISABLE = 1;
 	$PPI::Lexer::X_TOKENIZER ||= $ENV{X_TOKENIZER};
 }
+
 use Test::More tests => 23;
 use Test::NoWarnings;
 use PPI;
