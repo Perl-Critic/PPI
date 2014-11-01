@@ -10,7 +10,7 @@ BEGIN {
 	$PPI::XS_DISABLE = 1;
 	$PPI::Lexer::X_TOKENIZER ||= $ENV{X_TOKENIZER};
 }
-use Test::More tests => 31;
+use Test::More tests => 39;
 use Test::NoWarnings;
 use PPI;
 
@@ -31,6 +31,10 @@ ${^_Bar}[0];            # Magic  @{^_Bar}
 ${^_Baz}{burfle};       # Magic  %{^_Baz}
 $${^MATCH};             # Magic  ${^MATCH}  Dereference of ${^MATCH}
 \${^MATCH};             # Magic  ${^MATCH}
+$0;                     # Magic  $0  -- program being executed
+$0x2;                   # Magic  $0  -- program being executed
+$10;                    # Magic  $10 -- capture variable
+$1100;                  # Magic  $1100 -- capture variable
 END_PERL
 
 	isa_ok( $document, 'PPI::Document' );
@@ -39,7 +43,7 @@ END_PERL
 
 	my $symbols = $document->find( 'PPI::Token::Symbol' );
 
-	is( scalar(@$symbols), 14, 'Found 14 symbols' );
+	is( scalar(@$symbols), 18, 'Found the correct number of symbols' );
 	my $comments = $document->find( 'PPI::Token::Comment' );
 
 	foreach my $token ( @$symbols ) {
