@@ -202,7 +202,7 @@ sub __TOKENIZER__on_char {
 	}
 
 	# Suck in the HEREDOC
-	$token->{_heredoc} = [];
+	$token->{_heredoc} = \my @heredoc;
 	my $terminator = $token->{_terminator} . "\n";
 	while ( defined( my $line = $t->_get_line ) ) {
 		if ( $line eq $terminator ) {
@@ -215,7 +215,7 @@ sub __TOKENIZER__on_char {
 		}
 
 		# Add the line
-		push @{$token->{_heredoc}}, $line;
+		push @heredoc, $line;
 	}
 
 	# End of file.
@@ -226,19 +226,19 @@ sub __TOKENIZER__on_char {
 	# compile but is easy to detect) or if the here-doc block was just not
 	# terminated at all (which Perl would fail to compile as well).
 	$token->{_terminator_line} = undef;
-	if ( @{$token->{_heredoc}} and defined $token->{_heredoc}[-1] ) {
+	if ( @heredoc and defined $heredoc[-1] ) {
 		# See PPI::Tokenizer, the algorithm there adds a space at the end of the
 		# document that we need to make sure we remove.
 		if ( $t->{source_eof_chop} ) {
-			chop $token->{_heredoc}[-1];
+			chop $heredoc[-1];
 			$t->{source_eof_chop} = '';
 		}
 
 		# Check if the last line of the file matches the terminator without
 		# newline at the end. If so, remove it from the content and set it as
 		# the terminator line.
-		$token->{_terminator_line} = pop @{$token->{_heredoc}}
-		  if $token->{_heredoc}[-1] eq $token->{_terminator};
+		$token->{_terminator_line} = pop @heredoc
+		  if $heredoc[-1] eq $token->{_terminator};
 	}
 
 	# Set a hint for PPI::Document->serialize so it can
