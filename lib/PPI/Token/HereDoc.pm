@@ -206,7 +206,7 @@ sub __TOKENIZER__on_char {
 	my $line;
 
 	# Suck in the HEREDOC
-	$token->{_heredoc} = [];
+	$token->{_heredoc} = \my @heredoc;
 	my $terminator = $token->{_terminator} . "\n";
 	while ( defined($line = $t->_get_line) ) {
 		if ( $line eq $terminator ) {
@@ -219,7 +219,7 @@ sub __TOKENIZER__on_char {
 		}
 
 		# Add the line
-		push @{$token->{_heredoc}}, $line;
+		push @heredoc, $line;
 	}
 
 	# End of file.
@@ -231,15 +231,15 @@ sub __TOKENIZER__on_char {
 		# it anyway (like perl itself does). In this case
 		# perl would normally throw a warning, but we will
 		# also ignore that as well.
-		pop @{$token->{_heredoc}};
+		pop @heredoc;
 		$token->{_terminator_line} = $line;
 	} else {
 		# The HereDoc was not properly terminated.
 		$token->{_terminator_line} = undef;
 
 		# Trim off the trailing whitespace
-		if ( defined $token->{_heredoc}->[-1] and $t->{source_eof_chop} ) {
-			chop $token->{_heredoc}->[-1];
+		if ( defined $heredoc[-1] and $t->{source_eof_chop} ) {
+			chop $heredoc[-1];
 			$t->{source_eof_chop} = '';
 		}
 	}
