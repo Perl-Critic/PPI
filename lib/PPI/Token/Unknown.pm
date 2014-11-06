@@ -90,7 +90,7 @@ sub __TOKENIZER__on_char {
 				} elsif (
 					$p0->isa('PPI::Token::Structure')
 					and
-					$p0->content =~ /^(?:\)|\])$/
+					$p0->content =~ /^(?:\)|\]|\})$/
 				) {
 					$_class = 'Operator';
 				} else {
