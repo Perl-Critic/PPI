@@ -1,4 +1,6 @@
 Revision history for Perl extension PPI
+	- Support Perl 5.12 "package NAMESPACE VERSION BLOCK" syntax
+	  (RT #67831, GitHub #70) (BDFOY, MOREGAN)
 
 1.220 Tue 11 Nov 2014
 	Summary:
@@ -47,8 +49,6 @@ Revision history for Perl extension PPI
 	  strings (GitHub #76) (MOREGAN)
 	- Prevent package names like 'x' from being parsed as operators
 	  (GitHub #75) (MOREGAN)
-	- Support Perl 5.12 "package NAMESPACE VERSION BLOCK" syntax
-	  (RT #67831, GitHub #70) (BDFOY, MOREGAN)
 	- Stop directing bugs to rt.cpan.org (GitHub #40) (MOREGAN)
 	- Fix documentation reference to List::Util (RT #75308) (RWSTAUNER)
 	- Improve scalability of parsing long lines, and remove the size
