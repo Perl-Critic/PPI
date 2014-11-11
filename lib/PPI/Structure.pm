@@ -96,7 +96,7 @@ use PPI::Exception ();
 
 use vars qw{$VERSION @ISA *_PARENT};
 BEGIN {
-	$VERSION = '1.219_001';
+	$VERSION = '1.220';
 	@ISA     = 'PPI::Node';
 	*_PARENT = *PPI::Element::_PARENT;
 }

@@ -1,10 +1,11 @@
 Revision history for Perl extension PPI
 
-1.219_001 Sat 16 Aug 2014
+1.220 Tue 11 Nov 2014
 	Summary:
 	- incompatible behavior fixes on PPI::Statement::Sub->prototype
 	- improved parsing of various syntax elements
 	- code quality improvements
+	- various small documentation fixes
 
 	Details:
 	- {} is now recognized as anonymous hash constructor instead of a code
@@ -27,6 +28,7 @@ Revision history for Perl extension PPI
 	- application of a number of Perl::Critic policies and documentation
 	  fixes (GitHub #53) (MOREGAN, MITHALDU)
 	- automation of README.md generation for git (GitHub #86) (COWENS)
+	- various small documentation fixes (Github #96) (MOREGAN)
 
 1.218 Sat 16 Aug 2014
 	Summary:

@@ -12,7 +12,7 @@ use PPI::Dumper;
 
 use vars qw{$VERSION};
 BEGIN {
-	$VERSION = '1.219_001';
+	$VERSION = '1.220';
 }
 
 
