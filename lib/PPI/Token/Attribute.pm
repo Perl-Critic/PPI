@@ -65,7 +65,7 @@ sub identifier {
 
 =head2 parameters
 
-The C<parameters> method returns the parameter strong for the attribute.
+The C<parameters> method returns the parameter string for the attribute.
 
 That is, for the attribute C<foo(bar)>, the C<parameters> method would
 return C<"bar">.
