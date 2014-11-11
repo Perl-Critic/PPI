@@ -75,12 +75,12 @@ sub interpolations {
 For various reasons, some people find themselves compelled to have
 their code in the simplest form possible.
 
-The C<simply> method will turn a simple double-quoted string into the
-equivalent single-quoted string.
+The C<simplify> method will, if possible, modify a simple double-quoted
+string token in place, turning it into the equivalent single-quoted
+string. If the token is modified, it is reblessed into the
+L<PPI::Token::Quote::Single> package.
 
-If the double can be simplified, it will be modified in place and
-returned as a convenience, or returns false if the string cannot be
-simplified.
+The object itself is returned as a convenience.
 
 =cut
 
