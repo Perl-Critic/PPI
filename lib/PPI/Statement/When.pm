@@ -4,7 +4,7 @@ package PPI::Statement::When;
 
 =head1 NAME
 
-PPI::Statement::When - Describes all compound statements
+PPI::Statement::When - A when statement
 
 =head1 SYNOPSIS
 
