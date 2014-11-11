@@ -4,7 +4,7 @@ package PPI::Statement::Given;
 
 =head1 NAME
 
-PPI::Statement::Given - Describes all compound statements
+PPI::Statement::Given - A given-when statement
 
 =head1 SYNOPSIS
 
