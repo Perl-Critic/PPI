@@ -24,7 +24,7 @@ and newlines may not matter in most Perl code, but they matter in here-docs.
 They are also tricky to store as an object. They look sort of like an
 operator and a string, but they don't act like it. And they have a second
 section that should be something like a separate token, but isn't because a
-strong can span from above the here-doc content to below it.
+string can span from above the here-doc content to below it.
 
 So when parsing, this is what we do.
 
