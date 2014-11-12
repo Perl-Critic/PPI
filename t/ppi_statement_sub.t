@@ -10,9 +10,38 @@ BEGIN {
 	$PPI::Lexer::X_TOKENIZER ||= $ENV{X_TOKENIZER};
 }
 
-use Test::More tests => 6083;
+use Test::More tests => 6204;
 use Test::NoWarnings;
 use PPI;
+
+NAME: {
+	for my $test (
+		{ code => 'sub   foo   {}', name => 'foo' },
+		{ code => 'sub foo{}',  name => 'foo' },
+		{ code => 'sub FOO {}', name => 'FOO' },
+		{ code => 'sub _foo {}', name => '_foo' },
+		{ code => 'sub _0foo {}', name => '_0foo' },
+		{ code => 'sub _foo0 {}', name => '_foo0' },
+		{ code => 'sub ___ {}', name => '___' },
+		{ code => 'sub bar() {}', name => 'bar' },
+		{ code => 'sub baz : method{}', name => 'baz' },
+		{ code => 'sub baz : method lvalue{}', name => 'baz' },
+		{ code => 'sub baz : method:lvalue{}', name => 'baz' },
+		{ code => 'sub baz (*) : method : lvalue{}', name => 'baz' },
+	) {
+		my $code = $test->{code};
+		my $name = $test->{name};
+
+		my $Document = PPI::Document->new( \$code );
+		isa_ok( $Document, 'PPI::Document', "$code: got document" );
+
+		my ( $sub_statement, $dummy ) = $Document->schildren;
+		isa_ok( $sub_statement, 'PPI::Statement::Sub', "$code: document child is a sub" );
+		is( $dummy, undef, "$code: document has exactly one child" );
+
+		is( $sub_statement->name, $name, "$code: name() correct" );
+	}
+}
 
 SUB_WORD_OPTIONAL: {
 	# 'sub' is optional for these special subs. Make sure they're
@@ -65,6 +94,57 @@ PROTOTYPE: {
 		isa_ok( $sub_statement, 'PPI::Statement::Sub', "$proto_text document child is a sub" );
 		is( $dummy, undef, "$proto_text document has exactly one child" );
 		is( $sub_statement->prototype, $expected, "$proto_text: prototype matches" );
+	}
+}
+
+BLOCK_AND_FORWARD: {
+	for my $test (
+		{ code => 'sub foo {1;}', block => '{1;}' },
+		{ code => 'sub foo{2;};', block => '{2;}' },
+		{ code => "sub foo\n{3;};", block => '{3;}' },
+		{ code => 'sub foo;', block => '' },
+		{ code => 'sub foo', block => '' },
+	) {
+		my $code = $test->{code};
+		my $block = $test->{block};
+
+		my $Document = PPI::Document->new( \$code );
+		isa_ok( $Document, 'PPI::Document', "$code: got document" );
+
+		my ( $sub_statement, $dummy ) = $Document->schildren();
+		isa_ok( $sub_statement, 'PPI::Statement::Sub', "$code: document child is a sub" );
+		is( $dummy, undef, "$code: document has exactly one child" );
+		is( $sub_statement->block, $block, "$code: block matches" );
+
+		is( !$sub_statement->block, !!$sub_statement->forward, "$code: block and forward are opposites" );
+	}
+}
+
+RESERVED: {
+	for my $test (
+		{ code => 'sub BEGIN {}', reserved => 1 },
+		{ code => 'sub CHECK {}', reserved => 1 },
+		{ code => 'sub UNITCHECK {}', reserved => 1 },
+		{ code => 'sub INIT {}', reserved => 1 },
+		{ code => 'sub END {}', reserved => 1 },
+		{ code => 'sub AUTOLOAD {}', reserved => 1 },
+		{ code => 'sub CLONE_SKIP {}', reserved => 1 },
+		{ code => 'sub __SUB__ {}', reserved => 1 },
+		{ code => 'sub _FOO {}', reserved => 1 },
+		{ code => 'sub FOO9 {}', reserved => 1 },
+		{ code => 'sub FO9O {}', reserved => 1 },
+		{ code => 'sub FOo {}', reserved => 0 },
+	) {
+		my $code = $test->{code};
+		my $reserved = $test->{reserved};
+
+		my $Document = PPI::Document->new( \$code );
+		isa_ok( $Document, 'PPI::Document', "$code: got document" );
+
+		my ( $sub_statement, $dummy ) = $Document->schildren();
+		isa_ok( $sub_statement, 'PPI::Statement::Sub', "$code: document child is a sub" );
+		is( $dummy, undef, "$code: document has exactly one child" );
+		is( !!$sub_statement->reserved, !!$reserved, "$code: reserved matches" );
 	}
 }
 
