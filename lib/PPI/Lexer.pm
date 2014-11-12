@@ -440,6 +440,34 @@ sub _statement {
 
 	# Is it a token in our known classes list
 	my $class = $STATEMENT_CLASSES{$Token->content};
+	if ( $class ) {
+		# Is the next significant token a =>
+		# Read ahead to the next significant token
+		my $Next;
+		while ( $Next = $self->_get_token ) {
+			unless ( $Next->significant ) {
+				push @{$self->{delayed}}, $Next;
+				# $self->_delay_element( $Next );
+				next;
+			}
+
+			# Got the next token
+			if (
+				$Next->isa('PPI::Token::Operator')
+				and
+				$Next->content eq '=>'
+			) {
+				# Is an ordinary expression
+				$self->_rollback( $Next );
+				return 'PPI::Statement';
+			} else {
+				last;
+			}
+		}
+
+		# Rollback and continue
+		$self->_rollback( $Next );
+	}
 
 	# Handle potential barewords for subscripts
 	if ( $Parent->isa('PPI::Structure::Subscript') ) {
@@ -533,8 +561,16 @@ sub _statement {
 			}
 
 			# Found the next significant token.
+			if (
+				$Next->isa('PPI::Token::Operator')
+				and
+				$Next->content eq '=>'
+			) {
+				# Is an ordinary expression
+				$self->_rollback( $Next );
+				return 'PPI::Statement';
 			# Is it a v6 use?
-			if ( $Next->content eq 'v6' ) {
+			} elsif ( $Next->content eq 'v6' ) {
 				$self->_rollback( $Next );
 				return 'PPI::Statement::Include::Perl6';
 			} else {
@@ -696,20 +732,23 @@ sub _continues {
 		return '';
 	}
 
-	# Alrighty then, there are only five implied end statement types,
-	# ::Scheduled blocks, ::Sub declarations, ::Compound, ::Given, and ::When
-	# statements.
-	unless ( ref($Statement) =~ /\b(?:Scheduled|Sub|Compound|Given|When)$/ ) {
+	# Alrighty then, there are six implied-end statement types:
+	# ::Scheduled blocks, ::Sub declarations, ::Compound, ::Given, ::When,
+	# and ::Package statements.
+	unless ( ref($Statement) =~ /\b(?:Scheduled|Sub|Compound|Given|When|Package)$/ ) {
 		return 1;
 	}
 
-	# Of these five, ::Scheduled, ::Sub, ::Given, and ::When follow the same
-	# simple rule and can be handled first.
+	# Of these six, ::Scheduled, ::Sub, ::Given, and ::When follow the same
+	# simple rule and can be handled first.  The block form of ::Package
+	# follows the rule, too.  (The non-block form of ::Package
+	# requires a statement terminator, and thus doesn't need to have
+	# an implied end detected.)
 	my @part      = $Statement->schildren;
 	my $LastChild = $part[-1];
 	unless ( $Statement->isa('PPI::Statement::Compound') ) {
 		# If the last significant element of the statement is a block,
-		# then a scheduled statement is done, no questions asked.
+		# then an implied-end statement is done, no questions asked.
 		return ! $LastChild->isa('PPI::Structure::Block');
 	}
 
@@ -1118,6 +1157,19 @@ sub _curly {
 					and return 'PPI::Structure::Subscript';
 			}
 		}
+
+		# Are we the last argument of sub?
+		# E.g.: 'sub foo {}', 'sub foo ($) {}'
+		if ( $Parent->isa('PPI::Statement::Sub') ) {
+			return 'PPI::Structure::Block';
+		}
+
+		# Are we the second or third argument of package?
+		# E.g.: 'package Foo {}' or 'package Foo v1.2.3 {}'
+		if ( $Parent->isa('PPI::Statement::Package') ) {
+			return 'PPI::Structure::Block';
+		}
+
 		if ( $CURLY_CLASSES{$content} ) {
 			# Known type
 			return $CURLY_CLASSES{$content};

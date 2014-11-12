@@ -771,6 +771,60 @@ sub _current_x_is_operator {
 	;
 }
 
+
+# Assuming we are at the end of parsing the current token that could
+# be a word, a wordlike operator, or a version string, try to determine
+# whether context before or after it forces it to be a bareword.
+# This method is only useful during tokenization.
+
+my %_usually_forces = map { $_ => 1 } qw( sub package use no );
+
+sub __current_token_is_forced_word {
+	my $t = shift;
+
+	# Check if forced by preceding tokens.
+
+	my ( $prev, $prevprev ) = @{ $t->_previous_significant_tokens(2) };
+	if ( $prev ) {
+		# We are forced if we are a method name.
+		# '->' will always be an operator, so we don't check its type.
+		return 1 if $prev->{content} eq '->';
+
+		# If we are contained in a pair of curly braces,
+		# we are probably a forced bareword hash key.
+		# '{' is never a word or operator, so we don't check its type.
+		pos $t->{line} = $t->{line_cursor};
+		if ( $prev->{content} eq '{' and $t->{line} =~ /\G\s*\}/gc ) {
+			return 1;
+		}
+
+		# sub, package, use, and no all indicate that what immediately
+		# follows is a word not an operator or (in the case of sub and
+		# package) a version string.  However, we don't want to be
+		# fooled by 'package package v10' or 'use no v10'.
+		if ( $_usually_forces{$prev->{content}} ) {
+			# We're a forced package unless we're preceded by
+			# 'package sub', in which case we're a
+			# version string.
+			return !$prevprev || !$_usually_forces{$prevprev->content};
+		}
+	}
+	else {
+		pos $t->{line} = $t->{line_cursor};
+	}
+	# pos on $t->{line} is guaranteed to be set at this point.
+
+	# Check if forced by following tokens.
+
+	# If the word is followed by => it is probably a word, not a regex.
+	if ( $t->{line} =~ /\G\s*=>/gc ) {
+		return 1;
+	}
+
+	# Otherwise we probably aren't forced
+	return '';
+}
+
 1;
 
 =pod
