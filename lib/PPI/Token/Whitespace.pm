@@ -203,7 +203,8 @@ sub __TOKENIZER__on_line_start {
 
 sub __TOKENIZER__on_char {
 	my $t    = $_[1];
-	my $char = ord substr $t->{line}, $t->{line_cursor}, 1;
+	my $c = substr $t->{line}, $t->{line_cursor}, 1;
+	my $char = ord $c;
 
 	# Do we definitely know what something is?
 	return $COMMITMAP[$char]->__TOKENIZER__commit($t) if $COMMITMAP[$char];
@@ -407,9 +408,9 @@ sub __TOKENIZER__on_char {
 		}
 
 	} elsif ( $char >= 128 ) { # Outside ASCII
-		return 'PPI::Token::Word'->__TOKENIZER__commit($t) if $t =~ /\w/;
-		return 'Whitespace' if $t =~ /\s/;
-        }
+		return 'PPI::Token::Word'->__TOKENIZER__commit($t) if $c =~ /\w/;
+		return 'Whitespace' if $c =~ /\s/;
+	}
 
 
 	# All the whitespaces are covered, so what to do
