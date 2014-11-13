@@ -2,23 +2,13 @@
 
 # Unit testing for PPI::Token::HereDoc
 
-use strict;
+use t::lib::PPI::Test::pragmas;
+use Test::More tests => 12;
 
-BEGIN {
-	$|  = 1;
-	$^W = 1;
-	no warnings 'once';
-	$PPI::XS_DISABLE = 1;
-	$PPI::Lexer::X_TOKENIZER ||= $ENV{X_TOKENIZER};
-}
-use Test::Deep;
-use Test::More;
-use Test::NoWarnings;
 use PPI;
+use Test::Deep;
 
 sub h;
-
-plan tests => 1 + 11;
 
 # List of tests to perform. Each test requires the following information:
 #     - 'name': the name of the test in the output.

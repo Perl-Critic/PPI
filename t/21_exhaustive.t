@@ -2,14 +2,11 @@
 
 # Exhaustively test all possible Perl programs to a particular length
 
-use strict;
-use Carp 'croak';
-BEGIN {
-	no warnings 'once';
-	$| = 1;
-	$PPI::XS_DISABLE = 1;
-	$PPI::Lexer::X_TOKENIZER ||= $ENV{X_TOKENIZER};
-}
+use t::lib::PPI::Test::pragmas;
+use Test::More; # Plan comes later
+
+use Params::Util qw{_INSTANCE};
+use PPI;
 
 use vars qw{$MAX_CHARS $ITERATIONS $LENGTH @ALL_CHARS};
 BEGIN {
@@ -35,18 +32,7 @@ BEGIN {
 	#	);
 }
 
-
-
-
-
-#####################################################################
-# Prepare
-
 use Test::More tests => ($MAX_CHARS + $ITERATIONS + 3);
-use Test::NoWarnings;
-use File::Spec::Functions ':ALL';
-use Params::Util qw{_INSTANCE};
-use PPI;
 
 
 
@@ -147,7 +133,7 @@ sub test_code2 {
 sub test_code {
 	my $code      = shift;
 	my $Document  = eval {
-		# $SIG{__WARN__} = sub { croak('Triggered a warning') };
+		# use Carp 'croak'; $SIG{__WARN__} = sub { croak('Triggered a warning') };
 		PPI::Document->new(\$code);
 	};
 

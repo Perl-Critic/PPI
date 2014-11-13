@@ -5,20 +5,13 @@
 # This does an empiric test that when we try to parse something,
 # something ( anything ) comes out the other side.
 
-use strict;
-use File::Spec::Functions ':ALL';
-BEGIN {
-	no warnings 'once';
-	$| = 1;
-	$PPI::XS_DISABLE = 1;
-	$PPI::Lexer::X_TOKENIZER ||= $ENV{X_TOKENIZER};
-}
-use PPI::Lexer ();
-
-# Execute the tests
+use t::lib::PPI::Test::pragmas;
 use Test::More tests => 221;
-use Test::NoWarnings;
+
+use File::Spec::Functions ':ALL';
+use PPI;
 use Scalar::Util 'refaddr';
+
 
 sub is_object {
 	my ($left, $right, $message) = @_;

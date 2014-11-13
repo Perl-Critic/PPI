@@ -4,19 +4,11 @@
 
 # Some other regressions tests are included here for simplicity.
 
-use strict;
-BEGIN {
-	no warnings 'once';
-	$| = 1;
-	$PPI::XS_DISABLE = 1;
-	$PPI::Lexer::X_TOKENIZER ||= $ENV{X_TOKENIZER};
-}
-
-# For each new item in t/data/08_regression add another 15 tests
+use t::lib::PPI::Test::pragmas;
 use Test::More tests => 932;
-use Test::NoWarnings;
-use t::lib::PPI;
+
 use PPI;
+use t::lib::PPI;
 
 sub pause {
 	local $@;
@@ -25,11 +17,8 @@ sub pause {
 
 
 
-
-
 #####################################################################
 # Code/Dump Testing
-# ntests = 2 + 14 * nfiles
 
 t::lib::PPI->run_testdir(qw{ t data 08_regression });
 

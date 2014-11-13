@@ -2,20 +2,16 @@
 
 # Basic first pass API testing for PPI
 
-use strict;
+use t::lib::PPI::Test::pragmas;
 use Test::More;
 BEGIN {
-	$| = 1;
-	$PPI::XS_DISABLE = 1;
-	$PPI::XS_DISABLE = 1; # Prevent warning
 	if ( $ENV{RELEASE_TESTING} ) {
 		plan( tests => 2931 );
 	} else {
-		plan( skip_all => 'Author tests not required for installation' );
+		plan( tests => 2931, skip_all => 'Author tests not required for installation' );
 	}
 }
-use File::Spec::Functions ':ALL';
-use Test::NoWarnings;
+
 use Test::ClassAPI;
 use PPI;
 use PPI::Dumper;

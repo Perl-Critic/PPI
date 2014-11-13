@@ -1,14 +1,7 @@
 ﻿#!/usr/bin/perl
 
-use strict;
-BEGIN {
-	no warnings 'once';
-	$| = 1;
-	$PPI::XS_DISABLE = 1;
-	$PPI::Lexer::X_TOKENIZER ||= $ENV{X_TOKENIZER};
-}
+use t::lib::PPI::Test::pragmas;
 use Test::More;
-
 BEGIN {
 	if ($] < 5.008007) {
 		Test::More->import( skip_all => "Unicode support requires perl 5.8.7" );
@@ -17,9 +10,7 @@ BEGIN {
 	plan( tests => 17 );
 }
 
-use Test::NoWarnings;
-use utf8;
-use File::Spec::Functions ':ALL';
+use utf8;  # perl version check above says this is okay
 use Params::Util qw{_INSTANCE};
 use PPI;
 

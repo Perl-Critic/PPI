@@ -1,19 +1,10 @@
 #!/usr/bin/perl
 
-# Unit testing for PPI::Token::Word
+# Unit testing for PPI::Token::Unknown
 
-use strict;
-use warnings;
-
-BEGIN {
-	$|  = 1;
-	$^W = 1;
-	no warnings 'once';
-	$PPI::XS_DISABLE = 1;
-	$PPI::Lexer::X_TOKENIZER ||= $ENV{X_TOKENIZER};
-}
+use t::lib::PPI::Test::pragmas;
 use Test::More tests => 133;
-use Test::NoWarnings;
+
 use PPI;
 
 
