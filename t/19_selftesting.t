@@ -5,16 +5,9 @@
 
 # Using PPI to analyse its own code at install-time? Fuck yeah! :)
 
-use strict;
-BEGIN {
-	no warnings 'once';
-	$| = 1;
-	$PPI::XS_DISABLE = 1;
-	$PPI::Lexer::X_TOKENIZER ||= $ENV{X_TOKENIZER};
-}
-
+use t::lib::PPI::Test::pragmas;
 use Test::More; # Plan comes later
-use Test::NoWarnings;
+
 use Test::Object;
 use File::Spec::Functions ':ALL';
 use Params::Util qw{_CLASS _ARRAY _INSTANCE _IDENTIFIER};

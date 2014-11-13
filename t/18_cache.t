@@ -1,23 +1,17 @@
 #!/usr/bin/perl
 
-# Test compatibility with Storable
+# Test PPI::Cache
 
-use strict;
-BEGIN {
-	no warnings 'once';
-	$| = 1;
-	$PPI::XS_DISABLE = 1;
-	$PPI::Lexer::X_TOKENIZER ||= $ENV{X_TOKENIZER};
-}
-
+use t::lib::PPI::Test::pragmas;
 use Test::More tests => 43;
-use Test::NoWarnings;
+
 use File::Spec::Unix;
 use File::Spec::Functions ':ALL';
 use Scalar::Util  'refaddr';
 use File::Remove  ();
 use PPI::Document ();
 use PPI::Cache    ();
+use Test::SubCalls;
 
 use constant VMS  => !! ( $^O eq 'VMS' );
 use constant FILE => VMS ? 'File::Spec::Unix' : 'File::Spec';
@@ -107,10 +101,7 @@ isa_ok( PPI::Document->get_cache, 'PPI::Cache' );
 is( refaddr($Cache), refaddr(PPI::Document->get_cache),
 	'->get_cache returns the same cache object' );
 
-SKIP: {
-	skip("Test::SubCalls requires >= 5.6", 7 ) if $] < 5.006;
-	require Test::SubCalls;
-
+SCOPE: {
 	# Set the tracking on the Tokenizer constructor
 	ok( Test::SubCalls::sub_track( 'PPI::Tokenizer::new' ), 'Tracking calls to PPI::Tokenizer::new' );
 	Test::SubCalls::sub_calls( 'PPI::Tokenizer::new', 0 );
@@ -130,9 +121,7 @@ SKIP: {
 		'PPI::Document->new with cache enabled returns two identical objects' );
 }
 
-SKIP: {
-	skip("Test::SubCalls requires >= 5.6", 8 ) if $] < 5.006;
-
+SCOPE: {
 	# Done now, can we clear the cache?
 	is( PPI::Document->set_cache(undef), 1, '->set_cache(undef) returns true' );
 	is( PPI::Document->get_cache, undef,    '->get_cache returns undef' );

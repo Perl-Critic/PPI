@@ -3,19 +3,11 @@
 # Load ALL of the PPI files, lex them in, dump them
 # out, and verify that the code goes in and out cleanly.
 
-use strict;
-BEGIN {
-	no warnings 'once';
-	$| = 1;
-	$PPI::XS_DISABLE = 1;
-	$PPI::Lexer::X_TOKENIZER ||= $ENV{X_TOKENIZER};
-}
+use t::lib::PPI::Test::pragmas;
 use Test::More; # Plan comes later
-use Test::NoWarnings;
+
 use File::Spec::Functions ':ALL';
 use PPI;
-
-
 
 
 

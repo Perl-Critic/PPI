@@ -2,16 +2,9 @@
 
 # Unit testing for PPI::Node
 
-use strict;
-BEGIN {
-	$|  = 1;
-	$^W = 1;
-	no warnings 'once';
-	$PPI::XS_DISABLE = 1;
-	$PPI::Lexer::X_TOKENIZER ||= $ENV{X_TOKENIZER};
-}
+use t::lib::PPI::Test::pragmas;
 use Test::More tests => 3;
-use Test::NoWarnings;
+
 use PPI;
 
 
@@ -19,6 +12,7 @@ PRUNE: {
 	# Avoids a bug in old Perls relating to the detection of scripts
 	# Known to occur in ActivePerl 5.6.1 and at least one 5.6.2 install.
 	my $hashbang = reverse 'lrep/nib/rsu/!#'; 
+
 	my $document = PPI::Document->new( \<<"END_PERL" );
 $hashbang
 
