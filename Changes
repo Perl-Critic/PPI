@@ -1,11 +1,9 @@
 Revision history for Perl extension PPI
-	- Fix 1.218 regression where packages, subs, and words after
-	  labels like /^x\d+/ would parse as x operator (GitHub #122)
-	  (MOREGAN)
 
 1.221_01
 	Summary:
 	- support Perl 5.12 "package NAMESPACE VERSION BLOCK" syntax
+	- incompatible behavior fixes on PPI::Token::Attribute->parameters
 
 	Details:
 	- support Perl 5.12 "package NAMESPACE VERSION BLOCK" syntax
@@ -20,6 +18,15 @@ Revision history for Perl extension PPI
 	  operators (MOREGAN)
 	- Prevent left side of fat comma from parsing as operator
 	  operators (MOREGAN)
+	- Fix 1.218 regression where packages, subs, and words after
+	  labels like /^x\d+/ would parse as x operator (GitHub #122)
+	  (MOREGAN)
+	- Fix misparsing of sub attributes separated by whitespace
+	  (GitHub #117) (MOREGAN)
+	- Make PPI::Token::Attribute->parameters return undef not empty
+	  string when attribute has no parameters (GitHub #117) (MOREGAN)
+	- Fix misparsing of sub attributes separated only by whitespace
+	  (GitHub #116) (MOREGAN)
 
 1.220 Tue 11 Nov 2014
 	Summary:

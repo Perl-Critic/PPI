@@ -182,8 +182,7 @@ sub __TOKENIZER__on_char {
 	}
 
 	# We might be a subroutine attribute.
-	my $tokens = $t->_previous_significant_tokens(1);
-	if ( $tokens and $tokens->[0]->{_attribute} ) {
+	if ( __current_token_is_attribute($t) ) {
 		$t->{class} = $t->{token}->set_class( 'Attribute' );
 		return $t->{class}->__TOKENIZER__commit( $t );
 	}
@@ -259,8 +258,7 @@ sub __TOKENIZER__commit {
 	$t->{line_cursor} += length $word;
 
 	# We might be a subroutine attribute.
-	my $tokens = $t->_previous_significant_tokens(1);
-	if ( $tokens and $tokens->[0]->{_attribute} ) {
+	if ( __current_token_is_attribute($t) ) {
 		$t->_new_token( 'Attribute', $word );
 		return ($t->{line_cursor} >= $t->{line_length}) ? 0
 			: $t->{class}->__TOKENIZER__on_char($t);
@@ -335,6 +333,9 @@ sub __TOKENIZER__commit {
 		$token_class = 'Operator';
 
 	} else {
+		# Get tokens early to be sure to not disturb state set up by pos and m//gc.
+		my $tokens = $t->_previous_significant_tokens(1);
+
 		# If the next character is a ':' then its a label...
 		pos $t->{line} = $t->{line_cursor};
 		if ( $t->{line} =~ m/\G(\s*:)(?!:)/gc ) {
@@ -369,6 +370,23 @@ sub __TOKENIZER__commit {
 		return 0;
 	}
 	$t->_finalize_token->__TOKENIZER__on_char($t);
+}
+
+
+
+# Is the current Word really a subroutine attribute?
+sub __current_token_is_attribute {
+	my ( $t ) = @_;
+	my $tokens = $t->_previous_significant_tokens(1);
+	return (
+		$tokens
+		and (
+			# hint from tokenizer
+			$tokens->[0]->{_attribute}
+			# nothing between attribute and us except whitespace
+			or $tokens->[0]->isa('PPI::Token::Attribute')
+		)
+	);
 }
 
 1;
