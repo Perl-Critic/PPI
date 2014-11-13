@@ -2,16 +2,9 @@
 
 # Unit testing for PPI::Normal
 
-use strict;
-BEGIN {
-	$|  = 1;
-	$^W = 1;
-	no warnings 'once';
-	$PPI::XS_DISABLE = 1;
-	$PPI::Lexer::X_TOKENIZER ||= $ENV{X_TOKENIZER};
-}
+use t::lib::PPI::Test::pragmas;
 use Test::More tests => 28;
-use Test::NoWarnings;
+
 use PPI;
 
 
