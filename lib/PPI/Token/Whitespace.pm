@@ -390,19 +390,30 @@ sub __TOKENIZER__on_char {
 		return 'Operator';
 
 	} elsif ( $char == 120 ) { # $char eq 'x'
-		# x followed immediately by a digit can be the x
-		# operator or a word.  Disambiguate by checking
-		# whether the previous token is an operator that cannot be
-		# followed by the x operator, e.g.: +.
-		#
-		# x followed immediately by '=' is the 'x=' operator, not
-		# 'x ='. An important exception is x followed immediately by
-		# '=>', which makes the x into a bareword.
-		pos $t->{line} = $t->{line_cursor} + 1;
-		return 'Operator'
-			if $t->_current_x_is_operator and $t->{line} =~ m/\G(?:\d|(?!(=>|[\w\s])))/gc;
+		# Could be a word, the x= operator, the x operator
+		# followed by whitespace, or the x operator without any
+		# space between itself and its operand, e.g.: '$a x3',
+		# which is the same as '$a x 3'.  _current_x_is_operator
+		# assumes we have a complete 'x' token, but we don't
+		# yet.  We may need to split this x character apart from
+		# what follows it.
+		if ( $t->_current_x_is_operator ) {
+			pos $t->{line} = $t->{line_cursor} + 1;
+			return 'Operator' if $t->{line} =~ m/\G(?:
+				\d  # x op with no whitespace e.g. 'x3'
+				|
+				(?!(  # negative lookahead
+					=>  # not on left of fat comma
+					|
+					\w  # not a word like "xyzzy"
+					|
+					\s  # not x op plus whitespace
+				))
+			)/gcx;
+		}
 
-		# Otherwise, commit like a normal bareword
+		# Otherwise, commit like a normal bareword, including x
+		# operator followed by whitespace.
 		return PPI::Token::Word->__TOKENIZER__commit($t);
 
 	} elsif ( $char == 45 ) { # $char eq '-'

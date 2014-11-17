@@ -63,10 +63,6 @@ END_PERL
 	is( $packages->[3]->version, '0.09', 'Package 4 returns correct version' );
 }
 
-my %known_bad = map { ( "package $_" => 1 ) }
-  'x64 0.50 ;', 'x64 0.50 { 1 }', 'x64 0.50;', 'x64 0.50{ 1 }', 'x64 ;', 'x64 v1.2.3 ;', 'x64 v1.2.3 { 1 }', 'x64 v1.2.3;', 'x64 v1.2.3{ 1 }', 'x64 { 1 }',
-  ;
-
 PERL_5_12_SYNTAX: {
 	my @names = (
 		# normal name
@@ -135,8 +131,6 @@ sub prepare_package_test {
 sub test_package_blocks {
 	my ( $code, $expected_package_tokens ) = @_;
 
-TODO: {
-	local $TODO = $known_bad{$code} ? "known bug" : undef;
 	subtest "'$code'", sub {
 
 	my $Document = PPI::Document->new( \"$code 999;" );
@@ -151,7 +145,8 @@ TODO: {
 	isa_ok( $Document->schild(1), 'PPI::Statement', "code prior statement end recognized" );
 	isa_ok( eval { $Document->schild(1)->schild(0) }, 'PPI::Token::Number', "inner code" );
 	is(     eval { $Document->schild(1)->schild(0) }, '999', "number correct"  );
+
 	};
-}
+
 	return;
 }

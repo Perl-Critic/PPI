@@ -102,7 +102,35 @@ my %X_CAN_FOLLOW_OPERATOR = map { $_ => 1 } qw( -- ++ );
 # These are the exceptions.
 my %X_CAN_FOLLOW_STRUCTURE = map { $_ => 1 } qw( } ] \) );
 
-
+# Something that looks like the x operator but follows a word
+# is usually that word's argument.
+# These are the exceptions.
+# chop, chomp, dump are ambiguous because they can have either parms
+# or no parms.
+my %X_CAN_FOLLOW_WORD = map { $_ => 1 } qw(
+		endgrent
+		endhostent
+		endnetent
+		endprotoent
+		endpwent
+		endservent
+		fork
+		getgrent
+		gethostent
+		getlogin
+		getnetent
+		getppid
+		getprotoent
+		getpwent
+		getservent
+		setgrent
+		setpwent
+		time
+		times
+		wait
+		wantarray
+		__SUB__
+);
 
 
 
@@ -756,13 +784,17 @@ sub _opcontext {
 # Assuming we are currently parsing the word 'x', return true
 # if previous tokens imply the x is an operator, false otherwise.
 sub _current_x_is_operator {
-	my $self = shift;
+	my ( $self ) = @_;
+	return if !@{$self->{tokens}};
 
-	my $prev = $self->_last_significant_token;
-	return 
-		$prev
-		&& (!$prev->isa('PPI::Token::Operator') || $X_CAN_FOLLOW_OPERATOR{$prev})
+	my ($prev, $prevprev) = $self->_previous_significant_tokens(2);
+	return if !$prev;
+
+	return !$self->__current_token_is_forced_word if $prev->isa('PPI::Token::Word');
+
+	return (!$prev->isa('PPI::Token::Operator') || $X_CAN_FOLLOW_OPERATOR{$prev})
 		&& (!$prev->isa('PPI::Token::Structure') || $X_CAN_FOLLOW_STRUCTURE{$prev})
+		&& !$prev->isa('PPI::Token::Label')
 	;
 }
 

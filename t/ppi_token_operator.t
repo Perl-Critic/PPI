@@ -587,15 +587,12 @@ OPERATOR_X: {
 		if ( $expected->[0] !~ /^PPI::Statement/ ) {
 			unshift @$expected, 'PPI::Statement', $test->{code};
 		}
-TODO: {
-		local $TODO = $test->{code} eq "LABEL: x64" ? "known bug" : undef;
 		my $ok = is_deeply( $tokens, $expected, $test->{desc} );
 		if ( !$ok ) {
 			diag "$test->{code} ($test->{desc})\n";
 			diag explain $tokens;
 			diag explain $test->{expected};
 		}
-}
 	}
 }
 

@@ -27,8 +27,6 @@ NAME: {
 		my $code = $test->{code};
 		my $name = $test->{name};
 
-TODO:   {
-		local $TODO = $code eq 'sub x64 {}' ? "known bug" : undef;
 		subtest "'$code'", => sub {
 
 		my $Document = PPI::Document->new( \$code );
@@ -41,7 +39,6 @@ TODO:   {
 		is( eval { $sub_statement->name }, $name, "name() correct" );
 
 		};
-}
 
 	}
 }

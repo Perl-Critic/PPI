@@ -42,6 +42,7 @@ Revision history for Perl extension PPI
 	  (MOREGAN)
 	- parse things like v49use as a single bareword, not v-string + keyword
 	  (MOREGAN)
+	- parse x64 as a word, not x operator + number (MOREGAN)
 
 1.220 Tue 11 Nov 2014
 	Summary:
