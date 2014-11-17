@@ -552,7 +552,7 @@ sub _process_next_char {
 	return 0 if ++$self->{line_cursor} >= $self->{line_length};
 
 	# Pass control to the token class
-        my $result;
+	my $result;
 	unless ( $result = $self->{class}->__TOKENIZER__on_char( $self ) ) {
 		# undef is error. 0 is "Did stuff ourself, you don't have to do anything"
 		return defined $result ? 1 : undef;

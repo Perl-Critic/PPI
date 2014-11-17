@@ -524,7 +524,7 @@ OPERATOR_FAT_COMMA: {
 				'PPI::Token::Word' => $_,
 				'PPI::Token::Operator' => '=>',
 				'PPI::Token::Number' => '2',
-		    ]
+			]
 		} } keys %PPI::Token::Word::KEYWORDS ),
 		( map { {
 			desc=>$_,
@@ -537,7 +537,7 @@ OPERATOR_FAT_COMMA: {
 				'PPI::Token::Operator' => '=>',
 				'PPI::Token::Number' => '2',
 				'PPI::Token::Structure' => ')',
-		    ]
+			]
 		} } keys %PPI::Token::Word::KEYWORDS ),
 		( map { {
 			desc=>$_,
@@ -550,7 +550,7 @@ OPERATOR_FAT_COMMA: {
 				'PPI::Token::Operator' => '=>',
 				'PPI::Token::Number' => '2',
 				'PPI::Token::Structure' => '}',
-		    ]
+			]
 		} } keys %PPI::Token::Word::KEYWORDS ),
 	);
 
