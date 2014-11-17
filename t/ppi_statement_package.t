@@ -81,11 +81,11 @@ PERL_5_12_SYNTAX: {
 		[ 'v1.2.3', 'PPI::Token::Number::Version' ],
 		[ '0.50 ', 'PPI::Token::Number::Float' ],
 		[ '0.50', 'PPI::Token::Number::Float' ],
-		[ '', '' ],  # omit version
+		[ '', '' ],  # omit version, traditional
 	);
 	my @blocks = (
-		[ ';', 'PPI::Token::Structure' ],
-		[ '{ 1 }', 'PPI::Structure::Block' ],
+		[ ';', 'PPI::Token::Structure' ],  # traditional package syntax
+		[ '{ 1 }', 'PPI::Structure::Block' ],  # 5.12 package syntax
 	);
 	$_->[2] = strip_ws_padding( $_->[0] ) for @versions, @blocks;
 

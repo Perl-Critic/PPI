@@ -13,7 +13,7 @@ BEGIN {
 	$PPI::XS_DISABLE = 1;
 	$PPI::Lexer::X_TOKENIZER ||= $ENV{X_TOKENIZER};
 }
-use Test::More tests => 1119;
+use Test::More tests => 1141;
 use Test::NoWarnings;
 use PPI;
 
@@ -462,6 +462,45 @@ OPERATOR_X: {
 		}
 
 		push @tests, { desc => $desc, code => $code, expected => \@expected };
+	}
+
+
+	# Test that Perl builtins known to have a null prototype do not
+	# force a following 'x' to be a word.
+	my %noprotos = map { $_ => 1 } qw(
+		endgrent
+		endhostent
+		endnetent
+		endprotoent
+		endpwent
+		endservent
+		fork
+		getgrent
+		gethostent
+		getlogin
+		getnetent
+		getppid
+		getprotoent
+		getpwent
+		getservent
+		setgrent
+		setpwent
+		time
+		times
+		wait
+		wantarray
+		__SUB__
+	);
+	foreach my $noproto ( keys %noprotos ) {
+		my $code = "$noproto x3";
+		my @expected = (
+			'PPI::Token::Word' => $noproto,
+			'PPI::Token::Whitespace' => ' ',
+			'PPI::Token::Operator' => 'x',
+			'PPI::Token::Number' => '3',
+		);
+		my $desc = "builtin $noproto does not force following x to be a word";
+		push @tests, { desc => "builtin $noproto does not force following x to be a word", code => $code, expected => \@expected };
 	}
 
 	foreach my $test ( @tests ) {
