@@ -10,7 +10,7 @@ BEGIN {
 	$PPI::XS_DISABLE = 1;
 	$PPI::Lexer::X_TOKENIZER ||= $ENV{X_TOKENIZER};
 }
-use Test::More tests => 14889;
+use Test::More tests => 14949;
 use Test::NoWarnings;
 use PPI;
 
@@ -69,6 +69,8 @@ PERL_5_12_SYNTAX: {
 		keys %PPI::Token::Word::KEYWORDS,
 		# regression: misparsed as version string
 		'v10',
+		# regression GitHub #122: 'x' parsed as x operator
+		'x64',
 		# Other weird and/or special words, just in case
 		'__PACKAGE__',
 		'__FILE__',

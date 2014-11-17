@@ -13,7 +13,7 @@ BEGIN {
 	$PPI::XS_DISABLE = 1;
 	$PPI::Lexer::X_TOKENIZER ||= $ENV{X_TOKENIZER};
 }
-use Test::More tests => 1141;
+use Test::More tests => 1142;
 use Test::NoWarnings;
 use PPI;
 
@@ -407,6 +407,17 @@ OPERATOR_X: {
 				'PPI::Token::Number' => '1',
 				'PPI::Token::Structure' => ';',
 				'PPI::Token::Structure' => '}',
+			]
+		},
+		{
+			desc => 'label plus x',
+			code => 'LABEL: x64',
+			expected => [
+				'PPI::Statement::Compound' => 'LABEL:',
+				'PPI::Token::Label' => 'LABEL:',
+				'PPI::Token::Whitespace' => ' ',
+				'PPI::Statement' => 'x64',
+				'PPI::Token::Word' => 'x64',
 			]
 		},
 	);

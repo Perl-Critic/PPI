@@ -10,7 +10,7 @@ BEGIN {
 	$PPI::Lexer::X_TOKENIZER ||= $ENV{X_TOKENIZER};
 }
 
-use Test::More tests => 6204;
+use Test::More tests => 6208;
 use Test::NoWarnings;
 use PPI;
 
@@ -28,6 +28,7 @@ NAME: {
 		{ code => 'sub baz : method lvalue{}', name => 'baz' },
 		{ code => 'sub baz : method:lvalue{}', name => 'baz' },
 		{ code => 'sub baz (*) : method : lvalue{}', name => 'baz' },
+		{ code => 'sub x64 {}',  name => 'x64' },  # should not be parsed as x operator
 	) {
 		my $code = $test->{code};
 		my $name = $test->{name};

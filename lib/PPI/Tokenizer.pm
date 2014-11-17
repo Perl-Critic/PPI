@@ -102,7 +102,35 @@ my %X_CAN_FOLLOW_OPERATOR = map { $_ => 1 } qw( -- ++ );
 # These are the exceptions.
 my %X_CAN_FOLLOW_STRUCTURE = map { $_ => 1 } qw( } ] \) );
 
-
+# Something that looks like the x operator but follows a word
+# is usually that word's argument. 
+# These are the exceptions.
+# chop, chomp, dump are ambiguous because they can have either parms
+# or no parms.
+my %X_CAN_FOLLOW_WORD = map { $_ => 1 } qw(
+		endgrent
+		endhostent
+		endnetent
+		endprotoent
+		endpwent
+		endservent
+		fork
+		getgrent
+		gethostent
+		getlogin
+		getnetent
+		getppid
+		getprotoent
+		getpwent
+		getservent
+		setgrent
+		setpwent
+		time
+		times
+		wait
+		wantarray
+		__SUB__
+);
 
 
 
@@ -771,6 +799,8 @@ sub _current_x_is_operator {
 		$prev
 		&& (!$prev->isa('PPI::Token::Operator') || $X_CAN_FOLLOW_OPERATOR{$prev})
 		&& (!$prev->isa('PPI::Token::Structure') || $X_CAN_FOLLOW_STRUCTURE{$prev})
+		&& (!$prev->isa('PPI::Token::Word') || $X_CAN_FOLLOW_WORD{$prev})
+		&& !$prev->isa('PPI::Token::Label')
 	;
 }
 
