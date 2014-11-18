@@ -2,20 +2,12 @@
 
 # Formal unit tests for specific PPI::Token classes
 
-use strict;
-BEGIN {
-	no warnings 'once';
-	$| = 1;
-	$PPI::XS_DISABLE = 1;
-	$PPI::Lexer::X_TOKENIZER ||= $ENV{X_TOKENIZER};
-}
-
-# Execute the tests
+use t::lib::PPI::Test::pragmas;
 use Test::More tests => 447;
-use Test::NoWarnings;
+
 use File::Spec::Functions ':ALL';
-use t::lib::PPI;
 use PPI;
+use t::lib::PPI;
 
 
 
@@ -23,7 +15,6 @@ use PPI;
 
 #####################################################################
 # Code/Dump Testing
-# ntests = 2 + 12 * nfiles
 
 t::lib::PPI->run_testdir( catdir( 't', 'data', '07_token' ) );
 
@@ -33,7 +24,7 @@ t::lib::PPI->run_testdir( catdir( 't', 'data', '07_token' ) );
 
 #####################################################################
 # PPI::Token::Symbol Unit Tests
-# Note: braces and the symbol() method are tested in regression.t
+# Note: braces and the symbol() method are tested in 08_regression.t
 
 SCOPE: {
 	# Test both creation methods

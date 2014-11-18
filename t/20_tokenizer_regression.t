@@ -1,30 +1,12 @@
 #!/usr/bin/perl
 
-# code/dump-style regression tests for known lexing problems.
+# Regression tests for known tokenization problems.
 
-# Some other regressions tests are included here for simplicity.
+use t::lib::PPI::Test::pragmas;
+use Test::More; # Plan comes later
 
-use strict;
-BEGIN {
-	no warnings 'once';
-	$| = 1;
-	$PPI::XS_DISABLE = 1;
-	$PPI::Lexer::X_TOKENIZER ||= $ENV{X_TOKENIZER};
-}
-
-use File::Spec::Functions ':ALL';
-
-use PPI::Lexer;
-use PPI::Dumper;
-use Carp 'croak';
 use Params::Util qw{_INSTANCE};
-
-sub pause {
-	local $@;
-	sleep 1 if !eval { require Time::HiRes; Time::HiRes::sleep(0.1); 1 };
-}
-
-
+use PPI;
 
 
 
@@ -61,15 +43,14 @@ BEGIN {
 		);
 }
 
-use Test::More tests => 1 + scalar(@FAILURES) * 3;
-use Test::NoWarnings;
+Test::More::plan( tests => 1 + scalar(@FAILURES) * 3 );
 
 
 
 
 
 #####################################################################
-# Code/Dump Testing
+# Test all the failures
 
 foreach my $code ( @FAILURES ) {
 	test_code( $code );
@@ -94,7 +75,7 @@ sub test_code {
 	my $code     = shift;
 	my $quotable = quotable($code);
 	my $Document = eval {
-		# $SIG{__WARN__} = sub { croak('Triggered a warning') };
+		# use Carp 'croak'; $SIG{__WARN__} = sub { croak('Triggered a warning') };
 		PPI::Document->new(\$code);
 	};
 	ok( _INSTANCE($Document, 'PPI::Document'),
@@ -117,7 +98,7 @@ sub test_code {
 sub quickcheck {
 	my $code       = shift;
 	my $fails      = $code;
-	# $SIG{__WARN__} = sub { croak('Triggered a warning') };
+	# use Carp 'croak'; $SIG{__WARN__} = sub { croak('Triggered a warning') };
 
 	while ( length $fails ) {
 		chop $code;
