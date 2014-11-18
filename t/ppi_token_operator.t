@@ -13,7 +13,7 @@ BEGIN {
 	$PPI::XS_DISABLE = 1;
 	$PPI::Lexer::X_TOKENIZER ||= $ENV{X_TOKENIZER};
 }
-use Test::More tests => 1119;
+use Test::More tests => 1142;
 use Test::NoWarnings;
 use PPI;
 
@@ -409,6 +409,17 @@ OPERATOR_X: {
 				'PPI::Token::Structure' => '}',
 			]
 		},
+		{
+			desc => 'label plus x',
+			code => 'LABEL: x64',
+			expected => [
+				'PPI::Statement::Compound' => 'LABEL:',
+				'PPI::Token::Label' => 'LABEL:',
+				'PPI::Token::Whitespace' => ' ',
+				'PPI::Statement' => 'x64',
+				'PPI::Token::Word' => 'x64',
+			]
+		},
 	);
 
 	# Exhaustively test when a preceding operator implies following
@@ -462,6 +473,45 @@ OPERATOR_X: {
 		}
 
 		push @tests, { desc => $desc, code => $code, expected => \@expected };
+	}
+
+
+	# Test that Perl builtins known to have a null prototype do not
+	# force a following 'x' to be a word.
+	my %noprotos = map { $_ => 1 } qw(
+		endgrent
+		endhostent
+		endnetent
+		endprotoent
+		endpwent
+		endservent
+		fork
+		getgrent
+		gethostent
+		getlogin
+		getnetent
+		getppid
+		getprotoent
+		getpwent
+		getservent
+		setgrent
+		setpwent
+		time
+		times
+		wait
+		wantarray
+		__SUB__
+	);
+	foreach my $noproto ( keys %noprotos ) {
+		my $code = "$noproto x3";
+		my @expected = (
+			'PPI::Token::Word' => $noproto,
+			'PPI::Token::Whitespace' => ' ',
+			'PPI::Token::Operator' => 'x',
+			'PPI::Token::Number' => '3',
+		);
+		my $desc = "builtin $noproto does not force following x to be a word";
+		push @tests, { desc => "builtin $noproto does not force following x to be a word", code => $code, expected => \@expected };
 	}
 
 	foreach my $test ( @tests ) {
@@ -524,7 +574,7 @@ OPERATOR_FAT_COMMA: {
 				'PPI::Token::Word' => $_,
 				'PPI::Token::Operator' => '=>',
 				'PPI::Token::Number' => '2',
-		    ]
+			]
 		} } keys %PPI::Token::Word::KEYWORDS ),
 		( map { {
 			desc=>$_,
@@ -537,7 +587,7 @@ OPERATOR_FAT_COMMA: {
 				'PPI::Token::Operator' => '=>',
 				'PPI::Token::Number' => '2',
 				'PPI::Token::Structure' => ')',
-		    ]
+			]
 		} } keys %PPI::Token::Word::KEYWORDS ),
 		( map { {
 			desc=>$_,
@@ -550,7 +600,7 @@ OPERATOR_FAT_COMMA: {
 				'PPI::Token::Operator' => '=>',
 				'PPI::Token::Number' => '2',
 				'PPI::Token::Structure' => '}',
-		    ]
+			]
 		} } keys %PPI::Token::Word::KEYWORDS ),
 	);
 

@@ -1,4 +1,7 @@
 Revision history for Perl extension PPI
+	- Fix 1.218 regression where packages, subs, and words after
+	  labels like /^x\d+/ would parse as x operator (GitHub #122)
+	  (MOREGAN)
 
 1.221_01
 	Summary:
