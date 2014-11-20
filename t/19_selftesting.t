@@ -84,7 +84,7 @@ is_deeply( $bad, [ 'Bad::Class1', 'Bad::Class2', 'Bad::Class3', 'Bad::Class4' ],
 foreach my $file ( @files ) {
 	# MD5 the raw file
 	my $md5a = PPI::Util::md5hex_file($file);
-	like( $md5a, qr/^[0-9a-f]{32}\z/, 'md5hex_file ok' );
+	like( $md5a, qr/^[[:xdigit:]]{32}\z/, 'md5hex_file ok' );
 
 	# Load the file
 	my $Document = PPI::Document->new($file);
