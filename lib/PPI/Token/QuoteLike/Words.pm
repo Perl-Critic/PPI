@@ -42,7 +42,7 @@ BEGIN {
 
 =head2 literal
 
-Returns the words contained.  Note that this method does not check the
+Returns the words contained as a list.  Note that this method does not check the
 context that the token is in; it always returns the list and not merely
 the last element if the token is in scalar context.
 
@@ -50,12 +50,21 @@ the last element if the token is in scalar context.
 
 sub literal {
 	my $self    = shift;
-	my $section = $self->{sections}->[0];
-	return split ' ', substr(
-		$self->{content},
-		$section->{position},
-		$section->{size},
-	);
+
+	my @words;
+
+	my $content = $self->_section_content(0);
+	if ( defined $content ) {
+		# Undo backslash escaping of '\', the left delimiter,
+		# and the right delimiter.  The right delimiter will
+		# only exist with paired delimiters: qw() qw[] qw<> qw{}.
+		my ( $left, $right ) = ( $self->_delimiters, '', '' );
+		$content =~ s/\\([\Q$left$right\\\E])/$1/g;
+
+		@words = split ' ', $content;
+	}
+
+	return @words;
 }
 
 1;
