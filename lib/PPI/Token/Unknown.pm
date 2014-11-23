@@ -46,7 +46,7 @@ BEGIN {
 # Tokenizer Methods
 
 sub __TOKENIZER__on_char {
-	my $t    = $_[1];                                      # Tokenizer object
+	my ( $self, $t ) = @_;                                 # Self and Tokenizer
 	my $c    = $t->{token}->{content};                     # Current token
 	my $char = substr( $t->{line}, $t->{line_cursor}, 1 ); # Current character
 
@@ -77,35 +77,7 @@ sub __TOKENIZER__on_char {
 		}
 
 		if ( $char eq '$' ) {
-			# Operator/operand-sensitive, multiple or GLOB cast
-			my $_class;
-			my $tokens = $t->_previous_significant_tokens(1);
-			my $p0     = $tokens->[0];
-			if ( $p0 ) {
-				# Is it a token or a number
-				if ( $p0->isa('PPI::Token::Symbol') ) {
-					$_class = 'Operator';
-				} elsif ( $p0->isa('PPI::Token::Number') ) {
-					$_class = 'Operator';
-				} elsif (
-					$p0->isa('PPI::Token::Structure')
-					and
-					$p0->content =~ /^(?:\)|\]|\})$/
-				) {
-					$_class = 'Operator';
-				} else {
-					### This is pretty weak, there's
-					### room for a dozen more tests
-					### before going with a default.
-					### Or even better, a proper
-					### operator/operand method :(
-					$_class = 'Cast';
-				}
-			} else {
-				# Nothing before it, must be glob cast
-				$_class = 'Cast';
-			}
-
+			my $_class = $self->_cast_or_op( $t );
 			# Set class and rerun
 			$t->{class} = $t->{token}->set_class( $_class );
 			return $t->_finalize_token->__TOKENIZER__on_char( $t );
@@ -283,7 +255,7 @@ sub __TOKENIZER__on_char {
 		# Now, : acts very very differently in different contexts.
 		# Mainly, we need to find out if this is a subroutine attribute.
 		# We'll leave a hint in the token to indicate that, if it is.
-		if ( $_[0]->__TOKENIZER__is_an_attribute( $t ) ) {
+		if ( $self->__TOKENIZER__is_an_attribute( $t ) ) {
 			# This : is an attribute indicator
 			$t->{class} = $t->{token}->set_class( 'Operator' );
 			$t->{token}->{_attribute} = 1;
@@ -297,6 +269,28 @@ sub __TOKENIZER__on_char {
 
 	# erm...
 	PPI::Exception->throw('Unknown value in PPI::Token::Unknown token');
+}
+
+# Operator/operand-sensitive, multiple or GLOB cast
+sub _cast_or_op {
+	my ( undef, $t ) = @_;
+	my ( $prev ) = @{ $t->_previous_significant_tokens(1) };
+	return 'Cast' if !$prev;
+
+	return 'Operator' if
+		$prev->isa('PPI::Token::Symbol')
+		or
+		$prev->isa('PPI::Token::Number')
+		or
+		(
+			$prev->isa('PPI::Token::Structure')
+			and
+			$prev->content =~ /^(?:\)|\]|\})$/
+		);
+
+	# This is pretty weak, there's room for a dozen more tests before going with
+	# a default. Or even better, a proper operator/operand method :(
+	return 'Cast';
 }
 
 # Are we at a location where a ':' would indicate a subroutine attribute
