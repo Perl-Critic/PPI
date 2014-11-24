@@ -288,7 +288,7 @@ stop the iteration prematurely. It resets the Find object and allows it to
 be safely reused.
 
 A Find object will be automatically finished when C<match> returns false.
-This means you should only need to call C<finnish> when you stop
+This means you should only need to call C<finish> when you stop
 iterating early.
 
 You may safely call this method even when not iterating and it will return
