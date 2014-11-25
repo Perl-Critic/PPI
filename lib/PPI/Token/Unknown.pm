@@ -76,18 +76,13 @@ sub __TOKENIZER__on_char {
 			}
 		}
 
-		if ( $char eq '$' ) {
-			my $_class = $self->_cast_or_op( $t );
-			# Set class and rerun
-			$t->{class} = $t->{token}->set_class( $_class );
-			return $t->_finalize_token->__TOKENIZER__on_char( $t );
-		}
-
 		if ( $char eq '*' || $char eq '=' ) {
 			# Power operator '**' or mult-assign '*='
 			$t->{class} = $t->{token}->set_class( 'Operator' );
 			return 1;
 		}
+
+		return $self->_as_cast_or_op($t) if $self->_is_cast_or_op($char);
 
 		$t->{class} = $t->{token}->set_class( 'Operator' );
 		return $t->_finalize_token->__TOKENIZER__on_char( $t );
@@ -182,12 +177,7 @@ sub __TOKENIZER__on_char {
 			}
 		}
 
-		if ( $char =~ /[\$@%*{]/ ) {
-			# It's a cast
-			$t->{class} = $t->{token}->set_class( 'Cast' );
-			return $t->_finalize_token->__TOKENIZER__on_char( $t );
-
-		}
+		return $self->_as_cast_or_op($t) if $self->_is_cast_or_op($char);
 
 		# Probably the mod operator
 		$t->{class} = $t->{token}->set_class( 'Operator' );
@@ -209,11 +199,7 @@ sub __TOKENIZER__on_char {
 			return 1;
 		}
 
-		if ( $char =~ /[\$@%{]/ ) {
-			# The ampersand is a cast
-			$t->{class} = $t->{token}->set_class( 'Cast' );
-			return $t->_finalize_token->__TOKENIZER__on_char( $t );
-		}
+		return $self->_as_cast_or_op($t) if $self->_is_cast_or_op($char);
 
 		# Probably the binary and operator
 		$t->{class} = $t->{token}->set_class( 'Operator' );
@@ -269,6 +255,23 @@ sub __TOKENIZER__on_char {
 
 	# erm...
 	PPI::Exception->throw('Unknown value in PPI::Token::Unknown token');
+}
+
+sub _is_cast_or_op {
+	my ( $self, $char ) = @_;
+	return 1 if $char eq '$';
+	return 1 if $char eq '@';
+	return 1 if $char eq '%';
+	return 1 if $char eq '*';
+	return 1 if $char eq '{';
+	return;
+}
+
+sub _as_cast_or_op {
+	my ( $self, $t ) = @_;
+	my $class = $self->_cast_or_op( $t );
+	$t->{class} = $t->{token}->set_class( $class );
+	return $t->_finalize_token->__TOKENIZER__on_char( $t );
 }
 
 # Operator/operand-sensitive, multiple or GLOB cast
