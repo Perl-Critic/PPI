@@ -8,6 +8,7 @@ use Test::More; # Plan comes later
 
 use File::Spec::Functions ':ALL';
 use PPI;
+use t::lib::PPI::Test 'find_files';
 
 
 
@@ -95,18 +96,4 @@ sub roundtrip_ok {
 				"$file: Contains no PPI::Statement::Unknown elements" );
 		}
 	}	
-}
-
-# Find file names in named t/data dirs
-sub find_files {
-	my $testdir  = shift;
-	
-	# Does the test directory exist?
-	-e $testdir and -d $testdir and -r $testdir or die "Failed to find test directory $testdir";
-	
-	# Find the .code test files
-	opendir( TESTDIR, $testdir ) or die "opendir: $!";
-	my @perl = map { catfile( $testdir, $_ ) } sort grep { /\.(?:code|pm|t)$/ } readdir(TESTDIR);
-	closedir( TESTDIR ) or die "closedir: $!";
-	return @perl;
 }
