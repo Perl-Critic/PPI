@@ -8,12 +8,8 @@ use t::lib::PPI::Test::pragmas;
 use Test::More tests => 932;
 
 use PPI;
+use t::lib::PPI::Test 'pause';
 use t::lib::PPI::Test::Run;
-
-sub pause {
-	local $@;
-	sleep 1 if !eval { require Time::HiRes; Time::HiRes::sleep(0.1); 1 };
-}
 
 
 
