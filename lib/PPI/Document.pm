@@ -48,7 +48,7 @@ C<PPI::Document> implements the necessary C<STORABLE_freeze> and
 C<STORABLE_thaw> hooks to provide native support for L<Storable>,
 if you have it installed.
 
-However if you want to clone clone a Document, you are highly recommended
+However if you want to clone a Document, you are highly recommended
 to use the internal C<$Document-E<gt>clone> method rather than Storable's
 C<dclone> function (although C<dclone> should still work).
 
