@@ -3,11 +3,29 @@ package t::lib::PPI::Test;
 use warnings;
 use strict;
 
+use File::Spec::Functions ();
+
 use vars qw{$VERSION @ISA @EXPORT_OK %EXPORT_TAGS};
 BEGIN {
 	$VERSION = '1.220';
 	@ISA = 'Exporter';
-	@EXPORT_OK = qw( pause );
+	@EXPORT_OK = qw( pause find_files );
+}
+
+
+# Find file names in named t/data dirs
+sub find_files {
+	my ( $testdir ) = @_;
+
+	# Does the test directory exist?
+	die "Failed to find test directory $testdir" if !-e $testdir or !-d $testdir or !-r $testdir;
+
+	# Find the .code test files
+	opendir my $TESTDIR, $testdir or die "opendir: $!";
+	my @perl = map { File::Spec::Functions::catfile( $testdir, $_ ) } sort grep { /\.(?:code|pm|t)$/ } readdir $TESTDIR;
+	closedir $TESTDIR or die "closedir: $!";
+
+	return @perl;
 }
 
 

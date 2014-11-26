@@ -7,6 +7,7 @@ use Test::More;
 
 use File::Spec::Functions ':ALL';
 use PPI;
+use t::lib::PPI::Test 'find_files';
 
 # This test uses a series of ordered files, containing test code.
 # The letter after the number acts as a boolean yes/no answer to
@@ -33,24 +34,4 @@ foreach my $file ( @files ) {
 	my $expected = !! ($file =~ /\d+y\w+\.code$/);
 	my $isnot    = ($got == $expected) ? 'is' : 'is NOT';
 	is( $got, $expected, "File $file $isnot complete" );
-}
-
-
-
-
-
-#####################################################################
-# Support Functions
-
-sub find_files {
-	my $testdir  = shift;
-	
-	# Does the test directory exist?
-	-e $testdir and -d $testdir and -r $testdir or die "Failed to find test directory $testdir";
-	
-	# Find the .code test files
-	opendir( TESTDIR, $testdir ) or die "opendir: $!";
-	my @perl = map { catfile( $testdir, $_ ) } sort grep { /\.(?:code|pm|t)$/ } readdir(TESTDIR);
-	closedir( TESTDIR ) or die "closedir: $!";
-	return @perl;
 }

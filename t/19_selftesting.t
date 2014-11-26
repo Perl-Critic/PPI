@@ -13,6 +13,7 @@ use File::Spec::Functions ':ALL';
 use Params::Util qw{_CLASS _ARRAY _INSTANCE _IDENTIFIER};
 use Class::Inspector;
 use PPI;
+use t::lib::PPI::Test 'find_files';
 use t::lib::PPI::Test::Object;
 
 use constant CI => 'Class::Inspector';
@@ -35,7 +36,7 @@ my @files = sort values %tests;
 
 # Find all the testable perl files in t/data
 foreach my $dir ( '05_lexer', '08_regression', '11_util', '13_data', '15_transform' ) {
-	my @perl = find_files( $dir );
+	my @perl = find_files( catdir('t', 'data', $dir) );
 	push @files, @perl;
 }
 
@@ -125,21 +126,6 @@ foreach my $file ( @files ) {
 
 #####################################################################
 # Test Functions
-
-# Find file names in named t/data dirs
-sub find_files {
-	my $dir  = shift;
-	my $testdir = catdir( 't', 'data', $dir );
-	
-	# Does the test directory exist?
-	-e $testdir and -d $testdir and -r $testdir or die "Failed to find test directory $testdir";
-	
-	# Find the .code test files
-	opendir( TESTDIR, $testdir ) or die "opendir: $!";
-	my @perl = map { catfile( $testdir, $_ ) } sort grep { /\.(?:code|pm)$/ } readdir(TESTDIR);
-	closedir( TESTDIR ) or die "closedir: $!";
-	return @perl;
-}
 
 # Check for accidental use of illegal or non-existant classes in
 # ->isa calls. This has happened at least once, presumably because
