@@ -33,17 +33,7 @@ BEGIN {
 	#	);
 }
 
-use Test::More tests => ($MAX_CHARS + $ITERATIONS + 3);
-
-
-
-
-
-#####################################################################
-# Retest Previous Failures
-
-test_code2( "( {8" );
-
+use Test::More tests => ($MAX_CHARS + $ITERATIONS + 1);
 
 
 
@@ -51,15 +41,14 @@ test_code2( "( {8" );
 #####################################################################
 # Code/Dump Testing
 
-my $failures   = 0;
 my $last_index = scalar(@ALL_CHARS) - 1;
 LENGTHLOOP:
 foreach my $len ( 1 .. $MAX_CHARS ) {
-	# Initialise the char array and failure count
-	my $failures = 0;
+	# Initialise the char array
 	my @chars    = (0) x $len;
 
 	# The main test loop
+	my $failures = 0;  # simulate subtests
 	CHARLOOP:
 	while ( 1 ) {
 		# Test the current set of chars
@@ -67,7 +56,7 @@ foreach my $len ( 1 .. $MAX_CHARS ) {
 		unless ( length($code) == $len ) {
 			die "Failed sanity check. Error in the code generation mechanism";
 		}
-		test_code( $code );
+		$failures += 1 if !compare_code( $code );
 
 		# Increment the last character
 		$chars[$len - 1]++;
@@ -102,19 +91,11 @@ for ( 1 .. $ITERATIONS ) {
 		map { int(rand($last_index) + 1) }
 		(1 .. $LENGTH)
 		);
-
-	# Test it as normal
-	test_code2( $code );
-
-	# Verify there are no stale %PARENT entries
-	#my $quotable = t::lib::PPI::Test::quotable($code);
-	#is( scalar(keys %PPI::Element::PARENT), 0,
-	#	"%PARENT is clean \"$quotable\"" );
+	ok( compare_code($code), "round trip successful" );
 }
 
-is( scalar(keys %PPI::Element::PARENT), 0,
-	'No stale \%PARENT entries at the end of testing' );
-%PPI::Element::PARENT = %PPI::Element::PARENT;
+
+exit(0);
 
 
 
@@ -123,37 +104,41 @@ is( scalar(keys %PPI::Element::PARENT), 0,
 #####################################################################
 # Support Functions
 
-sub test_code2 {
-	$failures    = 0;
-	my $string   = shift;
-	my $quotable = t::lib::PPI::Test::quotable($string);
-	test_code( $string );
-	is( $failures, 0, "String parses ok \"$quotable\"" );	
+sub compare_code {
+	my ( $code ) = @_;
+
+	my $round_tripped = round_trip_code($code);
+	my $ok = ($code eq $round_tripped);
+	if ( !$ok ) {
+		my $code_quoted = t::lib::PPI::Test::quotable($code);
+		my $round_tripped_quoted = t::lib::PPI::Test::quotable($round_tripped);
+		diag( qq{input:  "$code_quoted"} );
+		diag( qq{output: "$round_tripped_quoted"} );
+	}
+
+	if ( scalar(keys %PPI::Element::PARENT) != 0 ) {
+		$ok = 0;
+		my $code_quoted = t::lib::PPI::Test::quotable($code);
+		diag( qq{ Stale \%PARENT entries at the end of testing of "$code_quoted"} );
+	}
+	%PPI::Element::PARENT = %PPI::Element::PARENT;
+
+	return $ok;
 }
 
-sub test_code {
-	my $code      = shift;
+
+sub round_trip_code {
+	my ( $code ) = @_;
+
+	my $result;
+
 	my $Document  = eval {
 		# use Carp 'croak'; $SIG{__WARN__} = sub { croak('Triggered a warning') };
 		PPI::Document->new(\$code);
 	};
+	if ( _INSTANCE($Document, 'PPI::Document') ) {
+		$result = $Document->serialize;
+	}
 
-	# Version of the code for use in error messages
-	my $quotable = t::lib::PPI::Test::quotable($code);
-	unless ( _INSTANCE($Document, 'PPI::Document') ) {
-		$failures++;
-		diag( "\"$quotable\": Parser did not return a Document" );
-		return;
-	}
-	my $joined          = $Document->serialize;
-	my $joined_quotable = t::lib::PPI::Test::quotable($joined);
-	unless ( $joined eq $code ) {
-		$failures++;
-		diag( "\"$quotable\": Document round-trips ok" );
-		diag( "\"$joined_quotable\" (round-trips to)" );
-		return;
-	}
+	return $result;
 }
-
-
-exit(0);

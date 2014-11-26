@@ -40,7 +40,8 @@ BEGIN {
 		# More-specific single cases thrown up during the heavy testing
 		'$:::z', '*:::z', "\\\@::'9:!", "} mz}~<<ts", "<\@<<q-r8\n/",
 		"W<<s`[\n(", "X<<f+X;g(<~\" \n1\n*", "c<<t* 9\ns\n~^{s ",
-		"<<V=-<<Wt", "[<<g/.<<r>\nV"
+		"<<V=-<<Wt", "[<<g/.<<r>\nV",
+		"( {8",
 		);
 }
 
