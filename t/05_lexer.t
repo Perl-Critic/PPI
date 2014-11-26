@@ -8,9 +8,9 @@ use Test::More tests => 219;
 
 use File::Spec::Functions ':ALL';
 use PPI::Lexer;
-use t::lib::PPI;
+use t::lib::PPI::Test::Run;
 
 #####################################################################
 # Code/Dump Testing
 
-t::lib::PPI->run_testdir( catdir( 't', 'data', '05_lexer' ) );
+t::lib::PPI::Test::Run->run_testdir( catdir( 't', 'data', '05_lexer' ) );
