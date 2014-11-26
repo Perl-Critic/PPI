@@ -86,7 +86,7 @@ of the quotes.
 
 =head2 literal
 
-The C<literal> method is provided by ::Quote:Literal and
+The C<literal> method is provided by ::Quote::Literal and
 ::Quote::Single.  This returns the value of the string as Perl sees
 it: without the quote marks and with C<\\> and C<\'> resolved to C<\>
 and C<'>.
