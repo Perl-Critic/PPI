@@ -11,6 +11,7 @@ use Test::More tests => 221;
 use File::Spec::Functions ':ALL';
 use PPI;
 use Scalar::Util 'refaddr';
+use t::lib::PPI::Test;
 
 
 sub is_object {
@@ -40,13 +41,6 @@ sub omethod_fails {
 		is( $object->$method( $args ), undef, ref($object) . "->$method fails correctly" );
 	}
 }
-
-sub pause {
-	local $@;
-	sleep 1 if !eval { require Time::HiRes; Time::HiRes::sleep(0.1); 1 };
-}
-
-
 
 
 
@@ -78,7 +72,7 @@ SCOPE: {
 		ok( Scalar::Util::isweak( $hash{bar} ), 'index entry is weak' );
 		ok( ! Scalar::Util::isweak( $object3 ), 'original is not weak' );
 
-		pause();
+		t::lib::PPI::Test::pause();
 
 		# Do all the objects still exist
 		isa_ok( $object1, 'My::WeakenTest' );
@@ -87,7 +81,7 @@ SCOPE: {
 		isa_ok( $hash{foo}, 'My::WeakenTest' );
 		isa_ok( $hash{bar}, 'My::WeakenTest' );
 	}
-	pause();
+	t::lib::PPI::Test::pause();
 	# Two of the three should have destroyed
 	is( $counter, 2, 'Counter increments as expected normally' );
 
@@ -437,7 +431,7 @@ SCOPE: {
 		is( $k2, $k1 + 1, 'PARENT keys increases after adding element' );
 		$Statement->DESTROY;
 	}
-	pause();
+	t::lib::PPI::Test::pause();
 	$k3 = scalar keys %PPI::Element::_PARENT;
 	is( $k3, $k1, 'PARENT keys returns to original on DESTROY' );
 }
@@ -454,7 +448,7 @@ SCOPE: {
 		ok( $k2 > ($k1 + 3000), 'PARENT keys increases after loading document' );
 		$NodeDocument->DESTROY;
 	}
-	pause();
+	t::lib::PPI::Test::pause();
 	$k3 = scalar keys %PPI::Element::_PARENT;
 	is( $k3, $k1, 'PARENT keys returns to original on explicit Document DESTROY' );
 }
@@ -470,7 +464,7 @@ SCOPE: {
 		$k2 = scalar keys %PPI::Element::_PARENT;
 		ok( $k2 > ($k1 + 3000), 'PARENT keys increases after loading document' );
 	}
-	pause();
+	t::lib::PPI::Test::pause();
 	$k3 = scalar keys %PPI::Element::_PARENT;
 	is( $k3, $k1, 'PARENT keys returns to original on implicit Document DESTROY' );
 }

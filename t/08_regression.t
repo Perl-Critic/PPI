@@ -8,12 +8,8 @@ use t::lib::PPI::Test::pragmas;
 use Test::More tests => 932;
 
 use PPI;
+use t::lib::PPI::Test;
 use t::lib::PPI::Test::Run;
-
-sub pause {
-	local $@;
-	sleep 1 if !eval { require Time::HiRes; Time::HiRes::sleep(0.1); 1 };
-}
 
 
 
@@ -31,7 +27,7 @@ t::lib::PPI::Test::Run->run_testdir(qw{ t data 08_regression });
 
 # Check that objects created in a foreach don't leak circulars.
 foreach ( 1 .. 3 ) {
-	pause();
+	t::lib::PPI::Test::pause();
 	is( scalar(keys(%PPI::Element::_PARENT)), 0, "No parent links at start of loop $_" );
 	# Keep the document from going out of scope before the _PARENT test below.
 	my $Document = PPI::Document->new(\q[print "Foo!"]);  ## no critic ( Variables::ProhibitUnusedVarsStricter )
