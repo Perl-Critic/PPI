@@ -7,6 +7,7 @@ use Test::More; # Plan comes later
 
 use Params::Util qw{_INSTANCE};
 use PPI;
+use t::lib::PPI::Test;
 
 
 
@@ -56,7 +57,7 @@ foreach my $code ( @FAILURES ) {
 	test_code( $code );
 
 	# Verify there are no stale %PARENT entries
-	my $quotable = quotable($code);
+	my $quotable = t::lib::PPI::Test::quotable($code);
 	is( scalar(keys %PPI::Element::PARENT), 0,
 		"\"$quotable\": No stale %PARENT entries" );
 	%PPI::Element::PARENT = %PPI::Element::PARENT;
@@ -73,7 +74,7 @@ exit(0);
 
 sub test_code {
 	my $code     = shift;
-	my $quotable = quotable($code);
+	my $quotable = t::lib::PPI::Test::quotable($code);
 	my $Document = eval {
 		# use Carp 'croak'; $SIG{__WARN__} = sub { croak('Triggered a warning') };
 		PPI::Document->new(\$code);
@@ -82,14 +83,14 @@ sub test_code {
 		"\"$quotable\": Document parses ok" );
 	unless ( _INSTANCE($Document, 'PPI::Document') ) {
 		diag( "\"$quotable\": Parsing failed" );
-		my $short = quotable(quickcheck($code));
+		my $short = t::lib::PPI::Test::quotable(quickcheck($code));
 		diag( "Shortest failing substring: \"$short\"" );
 		return;		
 	}
 
 	# Version of the code for use in error messages
 	my $joined          = $Document->serialize;
-	my $joined_quotable = quotable($joined);
+	my $joined_quotable = t::lib::PPI::Test::quotable($joined);
 	is( $joined, $code,
 		"\"$quotable\": Document round-trips ok: \"$joined_quotable\"" );
 }
@@ -113,14 +114,4 @@ sub quickcheck {
 	}
 
 	return $fails;
-}
-
-sub quotable {
-	my $quotable = shift;
-	$quotable =~ s/\\/\\\\/g;
-	$quotable =~ s/\t/\\t/g;
-	$quotable =~ s/\n/\\n/g;
-	$quotable =~ s/\$/\\\$/g;
-	$quotable =~ s/\@/\\\@/g;
-	return $quotable;
 }

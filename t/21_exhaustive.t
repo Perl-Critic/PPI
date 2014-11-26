@@ -7,6 +7,7 @@ use Test::More; # Plan comes later
 
 use Params::Util qw{_INSTANCE};
 use PPI;
+use t::lib::PPI::Test;
 
 use vars qw{$MAX_CHARS $ITERATIONS $LENGTH @ALL_CHARS};
 BEGIN {
@@ -106,7 +107,7 @@ for ( 1 .. $ITERATIONS ) {
 	test_code2( $code );
 
 	# Verify there are no stale %PARENT entries
-	#my $quotable = quotable($code);
+	#my $quotable = t::lib::PPI::Test::quotable($code);
 	#is( scalar(keys %PPI::Element::PARENT), 0,
 	#	"%PARENT is clean \"$quotable\"" );
 }
@@ -125,7 +126,7 @@ is( scalar(keys %PPI::Element::PARENT), 0,
 sub test_code2 {
 	$failures    = 0;
 	my $string   = shift;
-	my $quotable = quotable($string);
+	my $quotable = t::lib::PPI::Test::quotable($string);
 	test_code( $string );
 	is( $failures, 0, "String parses ok \"$quotable\"" );	
 }
@@ -138,14 +139,14 @@ sub test_code {
 	};
 
 	# Version of the code for use in error messages
-	my $quotable = quotable($code);
+	my $quotable = t::lib::PPI::Test::quotable($code);
 	unless ( _INSTANCE($Document, 'PPI::Document') ) {
 		$failures++;
 		diag( "\"$quotable\": Parser did not return a Document" );
 		return;
 	}
 	my $joined          = $Document->serialize;
-	my $joined_quotable = quotable($joined);
+	my $joined_quotable = t::lib::PPI::Test::quotable($joined);
 	unless ( $joined eq $code ) {
 		$failures++;
 		diag( "\"$quotable\": Document round-trips ok" );
@@ -154,15 +155,5 @@ sub test_code {
 	}
 }
 
-sub quotable {
-	my $quotable = shift;
-	$quotable =~ s/\\/\\\\/g;
-	$quotable =~ s/\t/\\t/g;
-	$quotable =~ s/\n/\\n/g;
-	$quotable =~ s/\$/\\\$/g;
-	$quotable =~ s/\@/\\\@/g;
-	$quotable =~ s/\"/\\\"/g;
-	return $quotable;
-}
 
 exit(0);
