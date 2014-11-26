@@ -9,7 +9,7 @@ use Params::Util qw{_INSTANCE};
 use PPI;
 use t::lib::PPI::Test 'quotable';
 
-use vars qw{$MAX_CHARS $ITERATIONS $LENGTH @ALL_CHARS};
+use vars qw{$MAX_CHARS $ITERATIONS $LENGTH @ALL_CHARS @FAILURES};
 BEGIN {
 	# When distributing, keep this in to verify the test script
 	# is working correctly, but limit to 2 (maaaaybe 3) so we
@@ -31,19 +31,38 @@ BEGIN {
 	#	'!', '~', '^', '*', '$', '@', '&', ':', '%', '#', ',', "'", '"', '`',
 	#	'\\', '/', '_', ' ', "\n", "\t", '-',
 	#	);
+
+	# Cases known to have failed in the past.
+	@FAILURES = (
+		# Failed cases 3 chars or less
+		'!%:', '!%:',  '!%:',  '!%:',  '!*:', '!@:',  '%:',  '%:,',
+		'%:;', '*:',   '*:,',  '*::',  '*:;', '+%:',  '+*:', '+@:',
+		'-%:', '-*:',  '-@:',  ';%:',  ';*:', ';@:',  '@:',  '@:,',
+		'@::', '@:;',  '\%:',  '\&:',  '\*:', '\@:',  '~%:', '~*:',
+		'~@:', '(<',   '(<',   '=<',   'm(',  'm(',   'm<',  'm[',
+		'm{',  'q(',   'q<',   'q[',   'q{',  's(',   's<',  's[',
+		's{',  'y(',   'y<',   'y[',   'y{',  '$\'0', '009', '0bB',
+		'0xX', '009;', '0bB;', '0xX;', "<<'", '<<"',  '<<`', '&::',
+		'<<a', '<<V',  '<<s',  '<<y',  '<<_',
+
+		# Failed cases 4 chars long.
+		# This isn't the complete set, as they tend to fail in groups
+		# of 50 or so, but I've used a representative sample.
+		'm;;_', 'm[]_', 'm]]_', 'm{}_', 'm}}_', 'm--_', 's[]a', 's[]b',
+		's[]0', 's[];', 's[]]', 's[]=', 's[].', 's[]_', 's{}]', 's{}?',
+		's<>s', 's<>-',
+		'*::0', '*::1', '*:::', '*::\'', '$::0',  '$:::', '$::\'',
+		'@::0', '@::1', '@:::', '&::0',  '&::\'', '%:::', '%::\'',
+
+		# More-specific single cases thrown up during the heavy testing
+		'$:::z', '*:::z', "\\\@::'9:!", "} mz}~<<ts", "<\@<<q-r8\n/",
+		"W<<s`[\n(", "X<<f+X;g(<~\" \n1\n*", "c<<t* 9\ns\n~^{s ",
+		"<<V=-<<Wt", "[<<g/.<<r>\nV",
+		"( {8",
+	);
 }
 
-use Test::More tests => ($MAX_CHARS + $ITERATIONS + 3);
-
-
-
-
-
-#####################################################################
-# Retest Previous Failures
-
-test_code2( "( {8" );
-
+use Test::More tests => ($MAX_CHARS + $ITERATIONS + @FAILURES + 1);
 
 
 
@@ -51,15 +70,14 @@ test_code2( "( {8" );
 #####################################################################
 # Code/Dump Testing
 
-my $failures   = 0;
 my $last_index = scalar(@ALL_CHARS) - 1;
 LENGTHLOOP:
 foreach my $len ( 1 .. $MAX_CHARS ) {
-	# Initialise the char array and failure count
-	my $failures = 0;
+	# Initialise the char array
 	my @chars    = (0) x $len;
 
 	# The main test loop
+	my $failures = 0;  # simulate subtests
 	CHARLOOP:
 	while ( 1 ) {
 		# Test the current set of chars
@@ -67,7 +85,7 @@ foreach my $len ( 1 .. $MAX_CHARS ) {
 		unless ( length($code) == $len ) {
 			die "Failed sanity check. Error in the code generation mechanism";
 		}
-		test_code( $code );
+		$failures += 1 if !compare_code( $code );
 
 		# Increment the last character
 		$chars[$len - 1]++;
@@ -102,19 +120,21 @@ for ( 1 .. $ITERATIONS ) {
 		map { int(rand($last_index) + 1) }
 		(1 .. $LENGTH)
 		);
-
-	# Test it as normal
-	test_code2( $code );
-
-	# Verify there are no stale %PARENT entries
-	#my $quotable = quotable($code);
-	#is( scalar(keys %PPI::Element::PARENT), 0,
-	#	"%PARENT is clean \"$quotable\"" );
+	ok( compare_code($code), "round trip successful" );
 }
 
-is( scalar(keys %PPI::Element::PARENT), 0,
-	'No stale \%PARENT entries at the end of testing' );
-%PPI::Element::PARENT = %PPI::Element::PARENT;
+
+
+
+#####################################################################
+# Test all the failures
+
+foreach my $code ( @FAILURES ) {
+	ok( compare_code($code), "round trip of old failure successful" );
+}
+
+
+exit(0);
 
 
 
@@ -123,37 +143,65 @@ is( scalar(keys %PPI::Element::PARENT), 0,
 #####################################################################
 # Support Functions
 
-sub test_code2 {
-	$failures    = 0;
-	my $string   = shift;
-	my $quotable = quotable($string);
-	test_code( $string );
-	is( $failures, 0, "String parses ok \"$quotable\"" );	
+sub compare_code {
+	my ( $code ) = @_;
+
+	my $round_tripped = round_trip_code($code);
+	my $ok = ($code eq $round_tripped);
+	if ( !$ok ) {
+		my $code_quoted = quotable($code);
+		diag( qq{input:  "$code_quoted"} );
+		my $round_tripped_quoted = quotable($round_tripped);
+		diag( qq{output: "$round_tripped_quoted"} );
+		my $shortest = quotable(quickcheck($code));
+                diag( qq{shorted failing substring: "$shortest"} );
+	}
+
+	if ( scalar(keys %PPI::Element::PARENT) != 0 ) {
+		$ok = 0;
+		my $code_quoted = quotable($code);
+		diag( qq{ Stale \%PARENT entries at the end of testing of "$code_quoted"} );
+	}
+	%PPI::Element::PARENT = %PPI::Element::PARENT;
+
+	return $ok;
 }
 
-sub test_code {
-	my $code      = shift;
+
+sub round_trip_code {
+	my ( $code ) = @_;
+
+	my $result;
+
 	my $Document  = eval {
 		# use Carp 'croak'; $SIG{__WARN__} = sub { croak('Triggered a warning') };
 		PPI::Document->new(\$code);
 	};
+	if ( _INSTANCE($Document, 'PPI::Document') ) {
+		$result = $Document->serialize;
+	}
 
-	# Version of the code for use in error messages
-	my $quotable = quotable($code);
-	unless ( _INSTANCE($Document, 'PPI::Document') ) {
-		$failures++;
-		diag( "\"$quotable\": Parser did not return a Document" );
-		return;
-	}
-	my $joined          = $Document->serialize;
-	my $joined_quotable = quotable($joined);
-	unless ( $joined eq $code ) {
-		$failures++;
-		diag( "\"$quotable\": Document round-trips ok" );
-		diag( "\"$joined_quotable\" (round-trips to)" );
-		return;
-	}
+	return $result;
 }
 
 
-exit(0);
+# Find the shortest failing substring of known bad string
+sub quickcheck {
+	my $code       = shift;
+	my $fails      = $code;
+	# use Carp 'croak'; $SIG{__WARN__} = sub { croak('Triggered a warning') };
+
+	while ( length $fails ) {
+		chop $code;
+		PPI::Document->new(\$code) or last;
+		$fails = $code;
+	}
+
+	while ( length $fails ) {
+		substr( $code, 0, 1, '' );
+		PPI::Document->new(\$code) or return $fails;
+		$fails = $code;
+	}
+
+	return $fails;
+}
