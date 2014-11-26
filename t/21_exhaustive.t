@@ -7,6 +7,7 @@ use Test::More; # Plan comes later
 
 use Params::Util qw{_INSTANCE};
 use PPI;
+use t::lib::PPI::Test 'quotable';
 
 use vars qw{$MAX_CHARS $ITERATIONS $LENGTH @ALL_CHARS};
 BEGIN {
@@ -154,15 +155,5 @@ sub test_code {
 	}
 }
 
-sub quotable {
-	my $quotable = shift;
-	$quotable =~ s/\\/\\\\/g;
-	$quotable =~ s/\t/\\t/g;
-	$quotable =~ s/\n/\\n/g;
-	$quotable =~ s/\$/\\\$/g;
-	$quotable =~ s/\@/\\\@/g;
-	$quotable =~ s/\"/\\\"/g;
-	return $quotable;
-}
 
 exit(0);
