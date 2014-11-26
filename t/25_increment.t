@@ -9,7 +9,7 @@ use t::lib::PPI::Test::pragmas;
 use Test::More tests => 3876;
 
 use PPI;
-use t::lib::PPI;
+use t::lib::PPI::Test::Run;
 
 
 
@@ -18,4 +18,4 @@ use t::lib::PPI;
 #####################################################################
 # Code/Dump Testing
 
-t::lib::PPI->increment_testdir(qw{ t data 08_regression });
+t::lib::PPI::Test::Run->increment_testdir(qw{ t data 08_regression });
