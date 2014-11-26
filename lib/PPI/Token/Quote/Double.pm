@@ -80,6 +80,9 @@ string token in place, turning it into the equivalent single-quoted
 string. If the token is modified, it is reblessed into the
 L<PPI::Token::Quote::Single> package.
 
+Because the length of the content is not changed, there is no need
+to call the document's C<flush_locations> method.
+
 The object itself is returned as a convenience.
 
 =cut
