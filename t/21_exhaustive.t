@@ -9,7 +9,7 @@ use Params::Util qw{_INSTANCE};
 use PPI;
 use t::lib::PPI::Test;
 
-use vars qw{$MAX_CHARS $ITERATIONS $LENGTH @ALL_CHARS};
+use vars qw{$MAX_CHARS $ITERATIONS $LENGTH @ALL_CHARS @FAILURES};
 BEGIN {
 	# When distributing, keep this in to verify the test script
 	# is working correctly, but limit to 2 (maaaaybe 3) so we
@@ -31,9 +31,38 @@ BEGIN {
 	#	'!', '~', '^', '*', '$', '@', '&', ':', '%', '#', ',', "'", '"', '`',
 	#	'\\', '/', '_', ' ', "\n", "\t", '-',
 	#	);
+
+	# Cases known to have failed in the past.
+	@FAILURES = (
+		# Failed cases 3 chars or less
+		'!%:', '!%:',  '!%:',  '!%:',  '!*:', '!@:',  '%:',  '%:,',
+		'%:;', '*:',   '*:,',  '*::',  '*:;', '+%:',  '+*:', '+@:',
+		'-%:', '-*:',  '-@:',  ';%:',  ';*:', ';@:',  '@:',  '@:,',
+		'@::', '@:;',  '\%:',  '\&:',  '\*:', '\@:',  '~%:', '~*:',
+		'~@:', '(<',   '(<',   '=<',   'm(',  'm(',   'm<',  'm[',
+		'm{',  'q(',   'q<',   'q[',   'q{',  's(',   's<',  's[',
+		's{',  'y(',   'y<',   'y[',   'y{',  '$\'0', '009', '0bB',
+		'0xX', '009;', '0bB;', '0xX;', "<<'", '<<"',  '<<`', '&::',
+		'<<a', '<<V',  '<<s',  '<<y',  '<<_',
+
+		# Failed cases 4 chars long.
+		# This isn't the complete set, as they tend to fail in groups
+		# of 50 or so, but I've used a representative sample.
+		'm;;_', 'm[]_', 'm]]_', 'm{}_', 'm}}_', 'm--_', 's[]a', 's[]b',
+		's[]0', 's[];', 's[]]', 's[]=', 's[].', 's[]_', 's{}]', 's{}?',
+		's<>s', 's<>-',
+		'*::0', '*::1', '*:::', '*::\'', '$::0',  '$:::', '$::\'',
+		'@::0', '@::1', '@:::', '&::0',  '&::\'', '%:::', '%::\'',
+
+		# More-specific single cases thrown up during the heavy testing
+		'$:::z', '*:::z', "\\\@::'9:!", "} mz}~<<ts", "<\@<<q-r8\n/",
+		"W<<s`[\n(", "X<<f+X;g(<~\" \n1\n*", "c<<t* 9\ns\n~^{s ",
+		"<<V=-<<Wt", "[<<g/.<<r>\nV",
+		"( {8",
+	);
 }
 
-use Test::More tests => ($MAX_CHARS + $ITERATIONS + 1);
+use Test::More tests => ($MAX_CHARS + $ITERATIONS + @FAILURES + 1);
 
 
 
@@ -95,6 +124,16 @@ for ( 1 .. $ITERATIONS ) {
 }
 
 
+
+
+#####################################################################
+# Test all the failures
+
+foreach my $code ( @FAILURES ) {
+	ok( compare_code($code), "round trip of old failure successful" );
+}
+
+
 exit(0);
 
 
@@ -111,9 +150,11 @@ sub compare_code {
 	my $ok = ($code eq $round_tripped);
 	if ( !$ok ) {
 		my $code_quoted = t::lib::PPI::Test::quotable($code);
-		my $round_tripped_quoted = t::lib::PPI::Test::quotable($round_tripped);
 		diag( qq{input:  "$code_quoted"} );
+		my $round_tripped_quoted = t::lib::PPI::Test::quotable($round_tripped);
 		diag( qq{output: "$round_tripped_quoted"} );
+		my $shortest = t::lib::PPI::Test::quotable(quickcheck($code));
+                diag( qq{shorted failing substring: "$shortest"} );
 	}
 
 	if ( scalar(keys %PPI::Element::PARENT) != 0 ) {
@@ -141,4 +182,26 @@ sub round_trip_code {
 	}
 
 	return $result;
+}
+
+
+# Find the shortest failing substring of known bad string
+sub quickcheck {
+	my $code       = shift;
+	my $fails      = $code;
+	# use Carp 'croak'; $SIG{__WARN__} = sub { croak('Triggered a warning') };
+
+	while ( length $fails ) {
+		chop $code;
+		PPI::Document->new(\$code) or last;
+		$fails = $code;
+	}
+
+	while ( length $fails ) {
+		substr( $code, 0, 1, '' );
+		PPI::Document->new(\$code) or return $fails;
+		$fails = $code;
+	}
+
+	return $fails;
 }
