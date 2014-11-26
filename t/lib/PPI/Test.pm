@@ -9,7 +9,7 @@ use vars qw{$VERSION @ISA @EXPORT_OK %EXPORT_TAGS};
 BEGIN {
 	$VERSION = '1.220';
 	@ISA = 'Exporter';
-	@EXPORT_OK = qw( pause find_files );
+	@EXPORT_OK = qw( find_files quotable pause );
 }
 
 
@@ -26,6 +26,18 @@ sub find_files {
 	closedir $TESTDIR or die "closedir: $!";
 
 	return @perl;
+}
+
+
+sub quotable {
+	my ( $quotable ) = @_;
+	$quotable =~ s|\\|\\\\|g;
+	$quotable =~ s|\t|\\t|g;
+	$quotable =~ s|\n|\\n|g;
+	$quotable =~ s|\$|\\\$|g;
+	$quotable =~ s|\@|\\\@|g;
+	$quotable =~ s|\"|\\\"|g;
+	return $quotable;
 }
 
 
