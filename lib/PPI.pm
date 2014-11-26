@@ -139,8 +139,8 @@ resources, such as libraries upon which the code may depend, and
 without needing to run an instance of perl alongside or inside the parser.
 
 Historically, using an embedded perl parser was widely considered to be
-the most likely avenue for finding a solution to C<Parse::Perl>. It was
-investigated from time to time and attempts have generally failed or
+the most likely avenue for finding a solution to parsing Perl. It has been
+investigated from time to time, but attempts have generally failed or
 suffered from sufficiently bad corner cases that they were abandoned.
 
 =head2 What Does PPI Stand For?
@@ -168,16 +168,6 @@ Since that time I've been able to prove to my own satisfaction that it
 B<is> truly impossible to accurately parse Perl as both code and document
 at once. For the academics, parsing Perl suffers from the "Halting Problem".
 
-With this in mind C<Parse::Perl> has now been co-opted as the title for
-the SourceForge project that publishes PPI and a large collection of other
-applications and modules related to the (document) parsing of Perl source
-code.
-
-You can find this project at L<http://sf.net/projects/parseperl>,
-however we no longer use the SourceForge CVS server.  Instead, the
-current development version of PPI is available via SVN at
-L<http://svn.ali.as/cpan/trunk/PPI/>.
-
 =head2 Why Parse Perl?
 
 Once you can accept that we will never be able to parse Perl well enough
@@ -203,6 +193,9 @@ situations relating to particular phrases, techniques or locations.
 
 Index functions, variables and packages within Perl code, and doing search
 and graph (in the node/edge sense) analysis of large code bases.
+
+L<Perl::Critic>, based on PPI, is a large, thriving tool for bug detection
+and style analysis of Perl code.
 
 =item Refactoring
 
@@ -268,13 +261,9 @@ Specifically, it allows the use characters from the Latin-1 character
 set to be used in quotes, comments, and POD. Primarily, this covers
 languages from Europe and South America.
 
-PPI does B<not> currently provide support for Unicode, although there
-is an initial implementation available in a development branch from
-CVS.
-
-If you need Unicode support, and would like to help stress test the
-Unicode support so we can move it to the main branch and enable it
-in the main release should contact the author. (contact details below)
+PPI does B<not> currently provide support for Unicode.
+If you need Unicode support and would like to help,
+contact the author. (contact details below)
 
 =head2 Round Trip Safe
 
@@ -640,7 +629,7 @@ The base class for all Perl statements. Generic "evaluate for side-effects"
 statements are of this actual type. Other more interesting statement types
 belong to one of its children.
 
-See it's own documentation for a longer description and list of all of the
+See its own documentation for a longer description and list of all of the
 different statement types and sub-classes.
 
 =item L<PPI::Structure>
@@ -704,20 +693,15 @@ apply.
 
 =head1 EXTENDING
 
-The PPI namespace itself is reserved for the sole use of the modules under
-the umbrella of the C<Parse::Perl> SourceForge project.
-
-L<http://sf.net/projects/parseperl>
-
+The PPI namespace itself is reserved for use by PPI itself.
 You are recommended to use the PPIx:: namespace for PPI-specific
 modifications or prototypes thereof, or Perl:: for modules which provide
 a general Perl language-related functions.
 
-If what you wish to implement looks like it fits into PPIx:: namespace,
-you should consider contacting the C<Parse::Perl> mailing list (detailed on
-the SourceForge site) first, as what you want may already be in progress,
-or you may wish to consider joining the team and doing it within the
-C<Parse::Perl> project itself.
+If what you wish to implement looks like it fits into the PPIx:: namespace,
+you should consider contacting the PPI maintainers on GitHub first, as what
+you want may already be in progress, or you may wish to consider contributing
+to PPI itself.
 
 =head1 TO DO
 
@@ -735,36 +719,32 @@ C<Parse::Perl> project itself.
 
 =head1 SUPPORT
 
-This module is stored in an Open Repository at the following address.
+The most recent version of PPI is available at the following address.
 
-L<http://svn.ali.as/cpan/trunk/PPI>
+L<http://search.cpan.org/~mithaldu/PPI/>
 
-Write access to the repository is made available automatically to any
-published CPAN author, and to most other volunteers on request.
+PPI source is maintained in a GitHub repository at the following address.
 
-If you are able to submit your bug report in the form of new (failing)
-unit tests, or can apply your fix directly instead of submitting a patch,
-you are B<strongly> encouraged to do so, as the author currently maintains
-over 100 modules and it can take some time to deal with non-"Critical" bug
-reports or patches.
+L<https://github.com/adamkennedy/PPI>
 
-This will also guarantee that your issue will be addressed in the next
-release of the module.
+Contributions via GitHub pull request are welcome.
 
-For large changes though, please consider creating a branch so that they
-can be properly reviewed and trialed before being applied to the trunk.
+Bug fixes in the form of pull requests or bug reports with
+new (failing) unit tests have the best chance of being addressed
+by busy maintainers, and are B<strongly> encouraged.
 
-If you cannot provide a direct test or fix, or don't have time to do so,
+If you cannot provide a test or fix, or don't have time to do so,
 then regular bug reports are still accepted and appreciated via the
 GitHub bug tracker.
 
 L<https://github.com/adamkennedy/PPI/issues>
 
-For other issues or questions, contact the C<Parse::Perl> project mailing
-list.
+The C<ppidump> utility that is part of the L<Perl::Critic> distribution
+is a useful tool for demonstrating how PPI is parsing (or misparsing)
+small code snippets, and for providing information for bug reports.
 
-For commercial or media-related enquiries, or to have your SVN commit bit
-enabled, contact the author.
+For other issues, questions, or commercial or media-related enquiries,
+contact the author.
 
 =head1 AUTHOR
 
