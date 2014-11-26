@@ -13,7 +13,7 @@ use File::Spec::Functions ':ALL';
 use Params::Util qw{_CLASS _ARRAY _INSTANCE _IDENTIFIER};
 use Class::Inspector;
 use PPI;
-use t::lib::PPI;
+use t::lib::PPI::Test::Object;
 
 use constant CI => 'Class::Inspector';
 
