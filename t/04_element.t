@@ -11,6 +11,7 @@ use Test::More tests => 221;
 use File::Spec::Functions ':ALL';
 use PPI;
 use Scalar::Util 'refaddr';
+use t::lib::PPI::Test 'pause';
 
 
 sub is_object {
@@ -40,13 +41,6 @@ sub omethod_fails {
 		is( $object->$method( $args ), undef, ref($object) . "->$method fails correctly" );
 	}
 }
-
-sub pause {
-	local $@;
-	sleep 1 if !eval { require Time::HiRes; Time::HiRes::sleep(0.1); 1 };
-}
-
-
 
 
 
