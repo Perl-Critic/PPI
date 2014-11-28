@@ -7,7 +7,7 @@ use Test::More tests => 447;
 
 use File::Spec::Functions ':ALL';
 use PPI;
-use t::lib::PPI;
+use t::lib::PPI::Test::Run;
 
 
 
@@ -16,7 +16,7 @@ use t::lib::PPI;
 #####################################################################
 # Code/Dump Testing
 
-t::lib::PPI->run_testdir( catdir( 't', 'data', '07_token' ) );
+t::lib::PPI::Test::Run->run_testdir( catdir( 't', 'data', '07_token' ) );
 
 
 

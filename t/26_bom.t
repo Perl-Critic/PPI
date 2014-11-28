@@ -3,8 +3,7 @@
 use t::lib::PPI::Test::pragmas;
 use Test::More tests => 21;
 
-use t::lib::PPI;
-use PPI;
+use t::lib::PPI::Test::Run;
 
 
 
@@ -13,4 +12,4 @@ use PPI;
 #####################################################################
 # Code/Dump Testing
 
-t::lib::PPI->run_testdir(qw{ t data 26_bom });
+t::lib::PPI::Test::Run->run_testdir(qw{ t data 26_bom });

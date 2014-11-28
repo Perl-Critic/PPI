@@ -8,6 +8,7 @@ use Test::More; # Plan comes later
 
 use File::Spec::Functions ':ALL';
 use PPI;
+use t::lib::PPI::Test;
 
 
 
@@ -32,12 +33,12 @@ foreach my $dir (
 	'13_data',
 	'15_transform'
 ) {
-	my @perl = find_files( catdir( 't', 'data', $dir ) );
+	my @perl = t::lib::PPI::Test::find_files( catdir( 't', 'data', $dir ) );
 	push @files, @perl;
 }
 
 # Add the test scripts themselves
-push @files, find_files( 't' );
+push @files, t::lib::PPI::Test::find_files( 't' );
 
 # Declare our plan
 Test::More::plan( tests => 1 + scalar(@files) * 9 );
@@ -95,18 +96,4 @@ sub roundtrip_ok {
 				"$file: Contains no PPI::Statement::Unknown elements" );
 		}
 	}	
-}
-
-# Find file names in named t/data dirs
-sub find_files {
-	my $testdir  = shift;
-	
-	# Does the test directory exist?
-	-e $testdir and -d $testdir and -r $testdir or die "Failed to find test directory $testdir";
-	
-	# Find the .code test files
-	opendir( TESTDIR, $testdir ) or die "opendir: $!";
-	my @perl = map { catfile( $testdir, $_ ) } sort grep { /\.(?:code|pm|t)$/ } readdir(TESTDIR);
-	closedir( TESTDIR ) or die "closedir: $!";
-	return @perl;
 }
