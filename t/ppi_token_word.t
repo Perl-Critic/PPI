@@ -472,7 +472,7 @@ sub _compare_child {
 }
 
 check_with "1.eqm'bar';", sub {
-	is $_->child( 0 )->child( 2 )->content, "eqm'bar",
+	is $_->child( 0 )->child( 1 )->content, "eqm'bar",
 	  "eqm' bareword after number and concat op is not mistaken for eq";
 };
 

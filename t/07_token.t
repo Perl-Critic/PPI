@@ -6,7 +6,7 @@ sub warns_on_misplaced_underscore { $] >= 5.006 and $] < 5.008 }
 
 use lib 't/lib';
 use PPI::Test::pragmas;
-use Test::More tests => (warns_on_misplaced_underscore() ? 572 : 570) + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+use Test::More tests => 568 + (warns_on_misplaced_underscore() ? 2 : 0 ) + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use File::Spec::Functions ':ALL';
 use PPI;
@@ -20,11 +20,6 @@ use PPI::Test::Run;
 # Code/Dump Testing
 
 PPI::Test::Run->run_testdir( catdir( 't', 'data', '07_token' ) );
-
-{
-local $ENV{TODO} = "known bug";
-PPI::Test::Run->run_testdir( catdir( 't', 'data', '07_token_todo' ) );
-}
 
 
 

@@ -43,6 +43,7 @@ Revision history for Perl extension PPI
 	- parse things like v49use as a single bareword, not v-string + keyword
 	  (MOREGAN)
 	- parse x64 as a word, not x operator + number (MOREGAN)
+	- parse 1.eq 1 as float + op, not concatenation
 
 1.220 Tue 11 Nov 2014
 	Summary:
