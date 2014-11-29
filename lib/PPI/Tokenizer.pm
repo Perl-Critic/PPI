@@ -889,7 +889,7 @@ called in whatever token class we are currently in, which will examine the
 character at the current position, and handle it.
 
 As the handler methods in the various token classes are called, they
-build up a output token array for the source code.
+build up an output token array for the source code.
 
 Various parts of the Tokenizer use look-ahead, arbitrary-distance
 look-behind (although currently the maximum is three significant tokens),

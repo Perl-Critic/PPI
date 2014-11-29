@@ -292,7 +292,7 @@ sub _lex_document {
 		# Is this the close of a structure.
 		if ( $Token->__LEXER__closes ) {
 			# Because we are at the top of the tree, this is an error.
-			# This means either a mis-parsing, or an mistake in the code.
+			# This means either a mis-parsing, or a mistake in the code.
 			# To handle this, we create a "Naked Close" statement
 			$self->_add_element( $Document,
 				PPI::Statement::UnmatchedBrace->new($Token)
@@ -1350,7 +1350,7 @@ sub _get_token {
 #     $self->{Tokenizer}->get_token;
 # }
 
-# Delay the addition of a insignificant elements.
+# Delay the addition of insignificant elements.
 # This ended up being inlined.
 # sub _delay_element {
 #     my $self    = shift;

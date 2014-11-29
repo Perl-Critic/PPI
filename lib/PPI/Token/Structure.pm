@@ -177,7 +177,7 @@ sub previous_token {
 		# Anything that slips through to here is a structure
 		# with a closing brace, but no opening brace, so we
 		# just have to go with it, and continue as we would
-		# if we started with a opening brace.
+		# if we started with an opening brace.
 	}
 
 	# We can use the default implement, if we call it from the

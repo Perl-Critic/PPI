@@ -414,7 +414,7 @@ OPERATOR_X: {
 
 	# Exhaustively test when a preceding operator implies following
 	# 'x' is word not an operator. This detects the regression in
-	# which '$obj->x86_convert()' was being parsed as an the x
+	# which '$obj->x86_convert()' was being parsed as an x
 	# operator.
 	my %operators = (
 		%PPI::Token::Operator::OPERATOR,
