@@ -368,7 +368,7 @@ sub __TOKENIZER__on_char {
 		return 'Regexp::Match' if $prec eq '';
 
 		# What about the char after the slash? There's some things
-		# that would be highly illogical to see if its an operator.
+		# that would be highly illogical to see if it's an operator.
 		my $next_char = substr $t->{line}, $t->{line_cursor} + 1, 1;
 		if ( defined $next_char and length $next_char ) {
 			if ( $next_char =~ /(?:\^|\[|\\)/ ) {

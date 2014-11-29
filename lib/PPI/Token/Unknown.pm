@@ -290,7 +290,7 @@ sub __TOKENIZER__on_char {
 			return $t->_finalize_token->__TOKENIZER__on_char( $t );
 		}
 
-		# It MIGHT be a label, but its probably the ?: trinary operator
+		# It MIGHT be a label, but it's probably the ?: trinary operator
 		$t->{class} = $t->{token}->set_class( 'Operator' );
 		return $t->{class}->__TOKENIZER__on_char( $t );
 	}
