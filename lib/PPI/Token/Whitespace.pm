@@ -246,7 +246,7 @@ sub __TOKENIZER__on_char {
 				return 'Prototype';
 			}
 
-			# An prototyped anonymous subroutine
+			# A prototyped anonymous subroutine
 			my $p0 = $tokens->[0];
 			if ( $p0->isa('PPI::Token::Word') and $p0->content eq 'sub'
 				# Maybe it's invoking a method named 'sub'

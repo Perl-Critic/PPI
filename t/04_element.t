@@ -274,7 +274,7 @@ SCOPE: {
 	my $start = $doc->first_token;
 	isa_ok( $start, 'PPI::Token::Structure' );
 	is( $start->content, '{', 'Got start token' );
-	is( $start->previous_sibling, '', '->previous_sibling for an start opening brace returns false' );
+	is( $start->previous_sibling, '', '->previous_sibling for a start opening brace returns false' );
 	my $braces = $doc->find_first( sub {
 		$_[1]->isa('PPI::Structure') and $_[1]->braces eq '()'
 		} );
