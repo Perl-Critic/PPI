@@ -3,9 +3,10 @@ package t::lib::PPI::Test;
 use warnings;
 use strict;
 
+use Exporter ();
 use File::Spec::Functions ();
 
-use vars qw{$VERSION @ISA @EXPORT_OK %EXPORT_TAGS};
+use vars qw{$VERSION @ISA @EXPORT_OK};
 BEGIN {
 	$VERSION = '1.220';
 	@ISA = 'Exporter';
@@ -44,6 +45,7 @@ sub quotable {
 sub pause {
 	local $@;
 	sleep 1 if !eval { require Time::HiRes; Time::HiRes::sleep(0.1); 1 };
+	return;
 }
 
 
