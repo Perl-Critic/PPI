@@ -3,7 +3,7 @@
 # Unit testing for PPI::Token::Operator
 
 use t::lib::PPI::Test::pragmas;
-use Test::More tests => 1142;
+use Test::More tests => 1143;
 
 use PPI;
 
@@ -38,6 +38,47 @@ PARSE_ALL_OPERATORS: {
 
 OPERATOR_X: {
 	my @tests = (
+		{
+			desc => 'method with integer',
+			code => 'sort { $a->package cmp $b->package } ();',
+			expected => [
+				'PPI::Token::Word' => 'sort',
+				'PPI::Token::Whitespace' => ' ',
+				'PPI::Structure::Block'=> '{ $a->package cmp $b->package }',
+				'PPI::Token::Structure'=> '{',
+				'PPI::Token::Whitespace'=> ' ',
+				'PPI::Statement'=> '$a->package cmp $b->package',
+				'PPI::Token::Symbol'=> '$a',
+				'PPI::Token::Operator'=> '->',
+				'PPI::Token::Word'=> 'package',
+				'PPI::Token::Whitespace'=> ' ',
+				'PPI::Token::Operator'=> 'cmp',
+				'PPI::Token::Whitespace'=> ' ',
+				'PPI::Token::Symbol'=> '$b',
+				'PPI::Token::Operator'=> '->',
+				'PPI::Token::Word'=> 'package',
+				'PPI::Token::Whitespace'=> ' ',
+				'PPI::Token::Structure'=> '}',
+				'PPI::Token::Whitespace'=> ' ',
+				'PPI::Structure::List'=> '()',
+				'PPI::Token::Structure'=> '(',
+				'PPI::Token::Structure'=> ')',
+				'PPI::Token::Structure'=> ';'
+			],
+		},
+		{
+			desc => 'method with integer',
+			code => 'c->d x 3',
+			expected => [
+				'PPI::Token::Word' => 'c',
+				'PPI::Token::Operator' => '->',
+				'PPI::Token::Word' => 'd',
+				'PPI::Token::Whitespace' => ' ',
+				'PPI::Token::Operator' => 'x',
+				'PPI::Token::Whitespace' => ' ',
+				'PPI::Token::Number' => '3',
+			],
+		},
 		{
 			desc => 'integer with integer',
 			code => '1 x 3',
@@ -517,6 +558,7 @@ OPERATOR_X: {
 			diag "$test->{code} ($test->{desc})\n";
 			diag explain $tokens;
 			diag explain $test->{expected};
+			exit;
 		}
 	}
 }

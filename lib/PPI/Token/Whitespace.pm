@@ -392,7 +392,7 @@ sub __TOKENIZER__on_char {
 		# '=>', which makes the x into a bareword.
 		pos $t->{line} = $t->{line_cursor} + 1;
 		return 'Operator'
-			if $t->_current_x_is_operator and $t->{line} =~ m/\G(?:\d|(?!(=>|[\w\s])))/gc;
+			if $t->_current_x_is_operator and $t->{line} =~ m/\G(?:\d|(?!(\s*=>|[\w])))/gc;
 
 		# Otherwise, commit like a normal bareword
 		return PPI::Token::Word->__TOKENIZER__commit($t);

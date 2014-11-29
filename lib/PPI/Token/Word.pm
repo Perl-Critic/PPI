@@ -319,6 +319,10 @@ sub __TOKENIZER__commit {
 		# Since it's not a simple identifier...
 		$token_class = 'Word';
 
+	} elsif ( $OPERATOR{$word} && ($word ne 'x' || $t->_current_x_is_operator) ) {
+		# Word operator
+		$token_class = 'Operator';
+
 	} elsif ( $KEYWORDS{$word} and $t->__current_token_is_forced_word ) {
 		$token_class = 'Word';
 
@@ -327,10 +331,6 @@ sub __TOKENIZER__commit {
 		$t->_new_token( $QUOTELIKE{$word}, $word );
 		return ($t->{line_cursor} >= $t->{line_length}) ? 0
 			: $t->{class}->__TOKENIZER__on_char( $t );
-
-	} elsif ( $OPERATOR{$word} && ($word ne 'x' || $t->_current_x_is_operator) ) {
-		# Word operator
-		$token_class = 'Operator';
 
 	} else {
 		# Get tokens early to be sure to not disturb state set up by pos and m//gc.
