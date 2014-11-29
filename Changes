@@ -24,9 +24,8 @@ Revision history for Perl extension PPI
 	- Fix misparsing of sub attributes separated by whitespace
 	  (GitHub #117) (MOREGAN)
 	- Make PPI::Token::Attribute->parameters return undef not empty
-	  string when attribute has no parameters (GitHub #117) (MOREGAN)
-	- Fix misparsing of sub attributes separated only by whitespace
-	  (GitHub #116) (MOREGAN)
+	  string when attribute has no parameters (GitHub #116) (MOREGAN)
+	- Unit tests for PPI::Token::Attribute (GitHub #115) (MOREGAN)
 
 1.220 Tue 11 Nov 2014
 	Summary:
