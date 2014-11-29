@@ -49,7 +49,7 @@ C<STORABLE_thaw> hooks to provide native support for L<Storable>,
 if you have it installed.
 
 However if you want to clone a Document, you are highly recommended
-to use the internal C<$Document-E<gt>clone> method rather than Storable's
+to use the C<$Document-E<gt>clone> method rather than Storable's
 C<dclone> function (although C<dclone> should still work).
 
 =head1 METHODS
@@ -791,7 +791,7 @@ Returns a L<PPI::Document::Normalized> object, or C<undef> on error.
 sub normalized {
 	# The normalization process will utterly destroy and mangle
 	# anything passed to it, so we are going to only give it a
-	# clone of ourself.
+	# clone of ourselves.
 	PPI::Normal->process( $_[0]->clone );
 }
 
