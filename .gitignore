@@ -7,3 +7,5 @@
 /inc
 /pm_to_blib
 /MANIFEST
+/nytprof*
+/cover_db
