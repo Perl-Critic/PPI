@@ -98,7 +98,11 @@ sub __TOKENIZER__on_char {
 			return 1;
 		}
 	}
-	if ($char eq 'e' || $char eq 'E') {
+
+	# perl seems to regard pretty much anything that's not strictly an exp num
+	# as float + stuff
+	my $char2 = substr $t->{line}, $t->{line_cursor}+1, 1;
+	if ("$char$char2" =~ /[eE][0-9+-]/) {
 		$t->{class} = $t->{token}->set_class( 'Number::Exp' );
 		return 1;
 	}

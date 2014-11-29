@@ -6,5 +6,13 @@
 e-1;
 0 e0;
 1.e();
-1.exp(1);
 1__E+__1__0;
+1.eq 1;
+1.ne 1;
+1.eqm 1;
+1.equals 1;
+1.exuals 1;
+1.Equals 1;
+1.EQUALS 1;
+1.whatever 1;
+1.exp(1); # don't really care, keyword here is a syntax error
