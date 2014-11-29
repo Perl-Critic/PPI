@@ -316,7 +316,7 @@ sub __TOKENIZER__commit {
 
 	my $token_class;
 	if ( $word =~ /\:/ ) {
-		# Since its not a simple identifier...
+		# Since it's not a simple identifier...
 		$token_class = 'Word';
 
 	} elsif ( $KEYWORDS{$word} and $t->__current_token_is_forced_word ) {
@@ -336,11 +336,11 @@ sub __TOKENIZER__commit {
 		# Get tokens early to be sure to not disturb state set up by pos and m//gc.
 		my $tokens = $t->_previous_significant_tokens(1);
 
-		# If the next character is a ':' then its a label...
+		# If the next character is a ':' then it's a label...
 		pos $t->{line} = $t->{line_cursor};
 		if ( $t->{line} =~ m/\G(\s*:)(?!:)/gc ) {
 			if ( $tokens and $tokens->[0]->{content} eq 'sub' ) {
-				# ... UNLESS its after 'sub' in which
+				# ... UNLESS it's after 'sub' in which
 				# case it is a sub name and an attribute
 				# operator.
 				# We COULD have checked this at the top
