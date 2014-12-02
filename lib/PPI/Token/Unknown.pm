@@ -82,7 +82,7 @@ sub __TOKENIZER__on_char {
 			return 1;
 		}
 
-		return $self->_as_cast_or_op($t) if $self->_is_cast_or_op($char);
+		return $self->_as_cast_or_op($t) if __is_cast_or_op($char);
 
 		$t->{class} = $t->{token}->set_class( 'Operator' );
 		return $t->_finalize_token->__TOKENIZER__on_char( $t );
@@ -171,13 +171,13 @@ sub __TOKENIZER__on_char {
 			# Get rest of line
 			pos $t->{line} = $t->{line_cursor} + 1;
 			if ( $t->{line} =~ m/$CURLY_SYMBOL/gc ) {
-				# control-character symbol (e.g. @{^_Foo})
+				# control-character symbol (e.g. %{^_Foo})
 				$t->{class} = $t->{token}->set_class( 'Magic' );
 				return 1;
 			}
 		}
 
-		return $self->_as_cast_or_op($t) if $self->_is_cast_or_op($char);
+		return $self->_as_cast_or_op($t) if __is_cast_or_op($char);
 
 		# Probably the mod operator
 		$t->{class} = $t->{token}->set_class( 'Operator' );
@@ -199,7 +199,7 @@ sub __TOKENIZER__on_char {
 			return 1;
 		}
 
-		return $self->_as_cast_or_op($t) if $self->_is_cast_or_op($char);
+		return $self->_as_cast_or_op($t) if __is_cast_or_op($char);
 
 		# Probably the binary and operator
 		$t->{class} = $t->{token}->set_class( 'Operator' );
@@ -257,8 +257,8 @@ sub __TOKENIZER__on_char {
 	PPI::Exception->throw('Unknown value in PPI::Token::Unknown token');
 }
 
-sub _is_cast_or_op {
-	my ( $self, $char ) = @_;
+sub __is_cast_or_op {
+	my ( $char ) = @_;
 	return 1 if $char eq '$';
 	return 1 if $char eq '@';
 	return 1 if $char eq '%';
@@ -269,31 +269,87 @@ sub _is_cast_or_op {
 
 sub _as_cast_or_op {
 	my ( $self, $t ) = @_;
-	my $class = $self->_cast_or_op( $t );
+	my $class = _cast_or_op( $t );
 	$t->{class} = $t->{token}->set_class( $class );
 	return $t->_finalize_token->__TOKENIZER__on_char( $t );
 }
 
 # Operator/operand-sensitive, multiple or GLOB cast
 sub _cast_or_op {
-	my ( undef, $t ) = @_;
-	my ( $prev ) = @{ $t->_previous_significant_tokens(1) };
-	return 'Cast' if !$prev;
+	my ( $t ) = @_;
 
-	return 'Operator' if
-		$prev->isa('PPI::Token::Symbol')
-		or
-		$prev->isa('PPI::Token::Number')
-		or
-		(
-			$prev->isa('PPI::Token::Structure')
-			and
-			$prev->content =~ /^(?:\)|\]|\})$/
-		);
+	my $tokens = $t->{tokens};
+	my $cursor = scalar(@$tokens)-1;
+	my $token;
 
-	# This is pretty weak, there's room for a dozen more tests before going with
-	# a default. Or even better, a proper operator/operand method :(
-	return 'Cast';
+	while ( $cursor >= 0 ) {
+		$token = $tokens->[$cursor--];
+		last if $token->significant;
+	}
+	return 'Cast' if !$token;  # token was first in the document
+
+	if ( $token->isa('PPI::Token::Structure') ) {
+		if ( $token->content eq '}' ) {
+			# Scan the token stream backwards an arbitrarily long way,
+			# looking for the matching opening curly brace.
+			my $structure_depth = 1;
+
+			$token = undef;
+			while ( $cursor >= 0 ) {
+				$token = $tokens->[$cursor--];
+				next if !$token->significant;
+				next if !$token->isa( 'PPI::Token::Structure' );
+
+				if ( $token eq '}' ) {
+					++$structure_depth ;
+					next;
+				}
+				elsif ( $token eq '{' ) {
+					--$structure_depth;
+					last if !$structure_depth;
+					next;
+				}
+			}
+			return 'Operator' if !$token; # no matching '{', probably an unbalanced '}'
+
+			# Scan past any whitespace
+			$token = undef;
+			while ( $cursor >= 0 ) {
+				$token = $tokens->[$cursor--];
+				last if $token->significant;
+			}
+			return 'Operator' if !$token; # Document began with what must be a hash constructor.
+			return 'Operator' if $token->isa( 'PPI::Token::Symbol' ); # subscript
+			return 'Operator' if $token->content eq '->' || $token->content eq '}' || $token->content eq ']'; # subscript
+
+			my $content = $token->content;
+			my $produces_or_wants_value = $token->isa('PPI::Token::Word') && ( $content eq 'do' or $content eq 'eval' );
+			return $produces_or_wants_value ? 'Operator' : 'Cast';
+		}
+		elsif ( $token->content eq ';' || $token->content eq '(' || $token->content eq '{' || $token->content eq '[' ) {
+			return 'Cast';
+		}
+	}
+	elsif ( $token->isa('PPI::Token::Cast') ) {
+		return 'Cast';
+	}
+	elsif ( $token->isa('PPI::Token::Operator') ) {
+		return 'Cast';
+	}
+	elsif ( $token->isa('PPI::Token::Label') ) {
+		return 'Cast';
+	}
+	elsif ( $token->isa('PPI::Token::Word') ) {
+		$token = undef;
+		while ( $cursor >= 0 ) {
+			$token = $tokens->[$cursor--];
+			last if $token->significant;
+		}
+		return 'Cast'
+                        if !$token || $token->content ne '->';
+	}
+
+	return 'Operator';
 }
 
 # Are we at a location where a ':' would indicate a subroutine attribute
