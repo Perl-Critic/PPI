@@ -100,8 +100,6 @@ OPERATOR_CAST: {
 	test_varying_whitespace( @nothing, @asterisk_cast, @scalar );
 }
 
-{
-	local %known_bad_seps = map { $_ => 1 } qw( null );
 	test_varying_whitespace( @number, @percent_op, @scalar );
 	test_varying_whitespace( @number, @percent_op, @list );
 	test_varying_whitespace( @number, @percent_op, @hash );
@@ -109,7 +107,6 @@ OPERATOR_CAST: {
 	test_varying_whitespace( @number, @percent_op, @hashctor1 );
 	test_varying_whitespace( @number, @percent_op, @hashctor2 );
 	test_varying_whitespace( @number, @percent_op, @hashctor3 );
-}
 	test_varying_whitespace( @number, @percenteq_op, @bareword );
 	test_varying_whitespace( @number, @percenteq_op, @hashctor3 );  # doesn't compile, but make sure it's an operator
 {
@@ -117,19 +114,14 @@ OPERATOR_CAST: {
 	test_varying_whitespace( @nothing, @percent_cast, @scalar );
 }
 
-{
-	local %known_bad_seps = map { $_ => 1 } qw( null );
 	test_varying_whitespace( @number, @ampersand_op, @scalar );
 	test_varying_whitespace( @number, @ampersand_op, @list );
 	test_varying_whitespace( @number, @ampersand_op, @hash );
-}
+
 	test_varying_whitespace( @number, @ampersand_op, @glob );
-{
-	local %known_bad_seps = map { $_ => 1 } qw( null );
 	test_varying_whitespace( @number, @ampersand_op, @hashctor1 );
 	test_varying_whitespace( @number, @ampersand_op, @hashctor2 );
 	test_varying_whitespace( @number, @ampersand_op, @hashctor3 );
-}
 	test_varying_whitespace( @number, @ampersandeq_op, @bareword );
 	test_varying_whitespace( @number, @ampersandeq_op, @hashctor3 );  # doesn't compile, but make sure it's an operator
 {
@@ -156,10 +148,11 @@ OPERATOR_CAST: {
 }
 
 	my @single = ( "'3'", [ 'PPI::Token::Quote::Single' => "'3'", ] );
+	test_varying_whitespace( @single, @asterisk_op, @scalar );
 {
 	local %known_bad_seps = map { $_ => 1 } qw( null );
-	test_varying_whitespace( @single, @asterisk_op, @scalar );
 	test_varying_whitespace( @single, @asterisk_op, @hashctor3 );
+}
 	test_varying_whitespace( @single, @percent_op, @scalar );
 	test_varying_whitespace( @single, @percent_op, @hashctor3 );
 	test_varying_whitespace( @single, @ampersand_op, @scalar );
@@ -167,16 +160,16 @@ OPERATOR_CAST: {
 
 	my @double = ( '"3"', [ 'PPI::Token::Quote::Double' => '"3"', ] );
 	test_varying_whitespace( @double, @asterisk_op, @scalar );
+{
+	local %known_bad_seps = map { $_ => 1 } qw( null );
 	test_varying_whitespace( @double, @asterisk_op, @hashctor3 );
+}
 	test_varying_whitespace( @double, @percent_op, @scalar );
 	test_varying_whitespace( @double, @percent_op, @hashctor3 );
 	test_varying_whitespace( @double, @ampersand_op, @scalar );
 	test_varying_whitespace( @double, @ampersand_op, @hashctor3 );
-}
 
 	test_varying_whitespace( @scalar, @asterisk_op, @scalar );
-{
-	local %known_bad_seps = map { $_ => 1 } qw( null );
 	test_varying_whitespace( @scalar, @percent_op, @scalar );
 	test_varying_whitespace( @scalar, @ampersand_op, @scalar );
 
@@ -192,7 +185,7 @@ OPERATOR_CAST: {
 		]
 	);
 {
-	local %known_bad_seps = ( %known_bad_seps, map { $_ => 1 } qw( space ) );
+	local %known_bad_seps = map { $_ => 1 } qw( null space );
 	test_varying_whitespace( @package, @asterisk_cast, @scalar, 1 );
 	test_varying_whitespace( @package, @asterisk_cast, @hashctor3, 1 );
 	test_varying_whitespace( @package, @percent_cast, @scalar, 1 );
@@ -201,7 +194,6 @@ OPERATOR_CAST: {
 	test_varying_whitespace( @package, @ampersand_cast, @hashctor3, 1 );
 	test_varying_whitespace( @package, @at_cast, @scalar, 1 );
 	test_varying_whitespace( @package, @at_cast, @listctor, 1 );
-}
 }
 
 	my @sub = (
@@ -300,10 +292,11 @@ OPERATOR_CAST: {
 			'PPI::Token::Structure' => '}',
 		]
 	);
+	test_varying_whitespace( @evalblock, @asterisk_op, @scalar );
 {
 	local %known_bad_seps = map { $_ => 1 } qw( null );
-	test_varying_whitespace( @evalblock, @asterisk_op, @scalar );
 	test_varying_whitespace( @evalblock, @asterisk_op, @hashctor3 );
+}
 	test_varying_whitespace( @evalblock, @percent_op, @scalar );
 	test_varying_whitespace( @evalblock, @percent_op, @hashctor3 );
 	test_varying_whitespace( @evalblock, @ampersand_op, @scalar );
@@ -317,12 +310,14 @@ OPERATOR_CAST: {
 		]
 	);
 	test_varying_whitespace( @evalstring, @asterisk_op, @scalar );
+{
+	local %known_bad_seps = map { $_ => 1 } qw( null );
 	test_varying_whitespace( @evalstring, @asterisk_op, @hashctor3 );
+}
 	test_varying_whitespace( @evalstring, @percent_op, @scalar );
 	test_varying_whitespace( @evalstring, @percent_op, @hashctor3 );
 	test_varying_whitespace( @evalstring, @ampersand_op, @scalar );
 	test_varying_whitespace( @evalstring, @ampersand_op, @hashctor3 );
-}
 
 	my @curly_subscript1 = (
 		'$y->{x}',
@@ -383,8 +378,6 @@ OPERATOR_CAST: {
 		]
 	);
 
-{
-	local %known_bad_seps = map { $_ => 1 } qw( null );
 	test_varying_whitespace( @curly_subscript1, @asterisk_op, @scalar );
 	test_varying_whitespace( @curly_subscript1, @percent_op, @scalar );
 	test_varying_whitespace( @curly_subscript1, @ampersand_op, @scalar );
@@ -394,13 +387,9 @@ OPERATOR_CAST: {
 	test_varying_whitespace( @curly_subscript3, @asterisk_op, @scalar );
 	test_varying_whitespace( @curly_subscript3, @percent_op, @scalar );
 	test_varying_whitespace( @curly_subscript3, @ampersand_op, @scalar );
-}
 	test_varying_whitespace( @square_subscript1, @asterisk_op, @scalar );
-{
-	local %known_bad_seps = map { $_ => 1 } qw( null );
 	test_varying_whitespace( @square_subscript1, @percent_op, @scalar );
 	test_varying_whitespace( @square_subscript1, @ampersand_op, @scalar );
-}
 
 {
 	local %known_bad_seps = map { $_ => 1 } qw( space );
@@ -411,8 +400,6 @@ OPERATOR_CAST: {
 	test_varying_whitespace( 'values', [ 'PPI::Token::Word' => 'values' ], @percent_cast, @hashctor3 );
 }
 
-TODO: {
-	local $TODO = "known bug";
 	test_statement(
 		'} *$a', # unbalanced '}' before '*', arbitrary decision
 		[
@@ -423,7 +410,6 @@ TODO: {
 			'PPI::Token::Symbol' => '$a',
 		]
 	);
-}
 
 	test_statement(
 		'$bar = \%*$foo', # multiple consecutive casts
@@ -437,8 +423,6 @@ TODO: {
 		]
 	);
 
-TODO: {
-	local $TODO = "known bug";
 	test_statement(
 		'$#tmp*$#tmp2',
 		[
@@ -447,7 +431,6 @@ TODO: {
 			'PPI::Token::ArrayIndex' => '$#tmp2',
 		]
 	);
-}
 
 	test_statement(
 		'[ %{$req->parameters} ]',  # preceded by '['
@@ -484,8 +467,6 @@ TODO: {
 		]
 	);
 
-TODO: {
-	local $TODO = "known bug";
 	test_statement(
 		'++$i%$f',  # '%' wrongly a cast through 1.220.
 		[
@@ -496,7 +477,6 @@ TODO: {
 			'PPI::Token::Symbol' => '$f',
 		]
 	);
-}
 
 {   # these need to be fixed in PPI::Lexer->_statement, fixing these will break other tests that need to be changed
 	local $TODO = "clarify type of statement in constructor";
