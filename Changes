@@ -30,6 +30,8 @@ Revision history for Perl extension PPI
 	- fixed parsing of large numbers in Number::Exp on Solaris 80 (JMASLAK)
 	- make remove_child actually return undef on failure to find child to
 	  remove
+	- higher accuracy when deciding whether certain characters are operators
+	  or variable type casts (*&% etc.) (MOREGAN)
 
 1.220 Tue 11 Nov 2014
 	Summary:
