@@ -792,12 +792,18 @@ sub _opcontext {
 # Assuming we are currently parsing the word 'x', return true
 # if previous tokens imply the x is an operator, false otherwise.
 sub _current_x_is_operator {
-	my $self = shift;
+	my ( $self ) = @_;
+	return if !@{$self->{tokens}};
 
-	my $prev = $self->_last_significant_token;
-	return 
-		$prev
-		&& (!$prev->isa('PPI::Token::Operator') || $X_CAN_FOLLOW_OPERATOR{$prev})
+	my ($prev, $prevprev) = @{ $self->_previous_significant_tokens(2) };
+	return if !$prev;
+
+	return 1 if $prevprev
+		and $prevprev->isa('PPI::Token::Operator')
+		and $prevprev->content eq "->"
+		and $prev->isa('PPI::Token::Word');
+	
+	return (!$prev->isa('PPI::Token::Operator') || $X_CAN_FOLLOW_OPERATOR{$prev})
 		&& (!$prev->isa('PPI::Token::Structure') || $X_CAN_FOLLOW_STRUCTURE{$prev})
 		&& (!$prev->isa('PPI::Token::Word') || $X_CAN_FOLLOW_WORD{$prev})
 		&& !$prev->isa('PPI::Token::Label')

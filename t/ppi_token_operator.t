@@ -3,7 +3,7 @@
 # Unit testing for PPI::Token::Operator
 
 use t::lib::PPI::Test::pragmas;
-use Test::More tests => 1142;
+use Test::More tests => 1143;
 
 use PPI;
 
@@ -38,6 +38,19 @@ PARSE_ALL_OPERATORS: {
 
 OPERATOR_X: {
 	my @tests = (
+		{
+			desc => 'method with integer',
+			code => 'c->d x 3',
+			expected => [
+				'PPI::Token::Word' => 'c',
+				'PPI::Token::Operator' => '->',
+				'PPI::Token::Word' => 'd',
+				'PPI::Token::Whitespace' => ' ',
+				'PPI::Token::Operator' => 'x',
+				'PPI::Token::Whitespace' => ' ',
+				'PPI::Token::Number' => '3',
+			],
+		},
 		{
 			desc => 'integer with integer',
 			code => '1 x 3',
