@@ -842,7 +842,9 @@ sub __current_token_is_forced_word {
 		# version string.  However, we don't want to be fooled by 'package
 		# package v10' or 'use no v10'. We're a forced package unless we're
 		# preceded by 'package sub', in which case we're a version string.
-		return ( !$prevprev || !$USUALLY_FORCES{$prevprev->content} )
+		# We also have to make sure that the sub/package/etc doing the forcing
+		# is not a method call.
+		return ( !$prevprev || !($USUALLY_FORCES{$prevprev->content} || $prevprev->content eq '->') )
 			if $USUALLY_FORCES{$content};
 	}
 	# pos on $t->{line} is guaranteed to be set at this point.
