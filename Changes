@@ -32,6 +32,8 @@ Revision history for Perl extension PPI
 	  remove
 	- higher accuracy when deciding whether certain characters are operators
 	  or variable type casts (*&% etc.) (MOREGAN)
+	- parse x as the first element of code as a word, not an operator
+	  (MOREGAN)
 
 1.220 Tue 11 Nov 2014
 	Summary:

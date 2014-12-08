@@ -127,7 +127,7 @@ OPERATOR_CAST: {
 }
 
 	my @plus = ( '+', [ 'PPI::Token::Operator' => '+', ] );
-	my @ex = ( 'x', [ 'PPI::Token::Operator' => 'x', ] );
+	my @ex = ( 'x', [ 'PPI::Token::Word' => 'x', ] );
 {
 	local %known_bad_seps = map { $_ => 1 } qw( space );
 	test_varying_whitespace( @plus, @asterisk_cast, @scalar );

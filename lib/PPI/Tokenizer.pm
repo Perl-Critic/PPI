@@ -681,9 +681,7 @@ sub _last_significant_token {
 		my $token = $self->{tokens}->[$cursor--];
 		return $token if $token->significant;
 	}
-
-	# Nothing...
-	PPI::Token::Whitespace->null;
+	return;
 }
 
 # Get an array ref of previous significant tokens.
