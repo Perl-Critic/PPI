@@ -798,14 +798,10 @@ sub _current_x_is_operator {
 	my ($prev, $prevprev) = @{ $self->_previous_significant_tokens(2) };
 	return if !$prev;
 
-	return 1 if $prevprev
-		and $prevprev->isa('PPI::Token::Operator')
-		and $prevprev->content eq "->"
-		and $prev->isa('PPI::Token::Word');
+	return !$self->__current_token_is_forced_word if $prev->isa('PPI::Token::Word');
 	
 	return (!$prev->isa('PPI::Token::Operator') || $X_CAN_FOLLOW_OPERATOR{$prev})
 		&& (!$prev->isa('PPI::Token::Structure') || $X_CAN_FOLLOW_STRUCTURE{$prev})
-		&& (!$prev->isa('PPI::Token::Word') || $X_CAN_FOLLOW_WORD{$prev})
 		&& !$prev->isa('PPI::Token::Label')
 	;
 }

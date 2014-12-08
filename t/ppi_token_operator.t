@@ -3,7 +3,7 @@
 # Unit testing for PPI::Token::Operator
 
 use t::lib::PPI::Test::pragmas;
-use Test::More tests => 1144;
+use Test::More tests => 1147;
 
 use PPI;
 
@@ -38,6 +38,39 @@ PARSE_ALL_OPERATORS: {
 
 OPERATOR_X: {
 	my @tests = (
+		{
+			desc => 'generic bareword with integer',  # github #133
+			code => 'bareword x 3',
+			expected => [
+				'PPI::Token::Word' => 'bareword',
+				'PPI::Token::Whitespace' => ' ',
+				'PPI::Token::Operator' => 'x',
+				'PPI::Token::Whitespace' => ' ',
+				'PPI::Token::Number' => '3',
+			],
+		},
+		{
+			desc => 'generic bareword with integer run together',  # github #133
+			code => 'bareword x3',
+			expected => [
+				'PPI::Token::Word' => 'bareword',
+				'PPI::Token::Whitespace' => ' ',
+				'PPI::Token::Operator' => 'x',
+				'PPI::Token::Number' => '3',
+			],
+		},
+		{
+			desc => 'preceding word looks like a force but is not',  # github #133
+			code => '$a->package x3',
+			expected => [
+				'PPI::Token::Symbol' => '$a',
+				'PPI::Token::Operator' => '->',
+				'PPI::Token::Word' => 'package',
+				'PPI::Token::Whitespace' => ' ',
+				'PPI::Token::Operator' => 'x',
+				'PPI::Token::Number' => '3',
+			],
+		},
 		{
 			desc => 'method with integer',
 			code => 'sort { $a->package cmp $b->package } ();',
