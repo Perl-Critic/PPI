@@ -13,7 +13,7 @@ BEGIN {
 	$PPI::XS_DISABLE = 1;
 	$PPI::Lexer::X_TOKENIZER ||= $ENV{X_TOKENIZER};
 }
-use Test::More tests => 393;
+use Test::More tests => 1147;
 use Test::NoWarnings;
 use PPI;
 
@@ -48,6 +48,80 @@ PARSE_ALL_OPERATORS: {
 
 OPERATOR_X: {
 	my @tests = (
+		{
+			desc => 'generic bareword with integer',  # github #133
+			code => 'bareword x 3',
+			expected => [
+				'PPI::Token::Word' => 'bareword',
+				'PPI::Token::Whitespace' => ' ',
+				'PPI::Token::Operator' => 'x',
+				'PPI::Token::Whitespace' => ' ',
+				'PPI::Token::Number' => '3',
+			],
+		},
+		{
+			desc => 'generic bareword with integer run together',  # github #133
+			code => 'bareword x3',
+			expected => [
+				'PPI::Token::Word' => 'bareword',
+				'PPI::Token::Whitespace' => ' ',
+				'PPI::Token::Operator' => 'x',
+				'PPI::Token::Number' => '3',
+			],
+		},
+		{
+			desc => 'preceding word looks like a force but is not',  # github #133
+			code => '$a->package x3',
+			expected => [
+				'PPI::Token::Symbol' => '$a',
+				'PPI::Token::Operator' => '->',
+				'PPI::Token::Word' => 'package',
+				'PPI::Token::Whitespace' => ' ',
+				'PPI::Token::Operator' => 'x',
+				'PPI::Token::Number' => '3',
+			],
+		},
+		{
+			desc => 'method with integer',
+			code => 'sort { $a->package cmp $b->package } ();',
+			expected => [
+				'PPI::Token::Word' => 'sort',
+				'PPI::Token::Whitespace' => ' ',
+				'PPI::Structure::Block'=> '{ $a->package cmp $b->package }',
+				'PPI::Token::Structure'=> '{',
+				'PPI::Token::Whitespace'=> ' ',
+				'PPI::Statement'=> '$a->package cmp $b->package',
+				'PPI::Token::Symbol'=> '$a',
+				'PPI::Token::Operator'=> '->',
+				'PPI::Token::Word'=> 'package',
+				'PPI::Token::Whitespace'=> ' ',
+				'PPI::Token::Operator'=> 'cmp',
+				'PPI::Token::Whitespace'=> ' ',
+				'PPI::Token::Symbol'=> '$b',
+				'PPI::Token::Operator'=> '->',
+				'PPI::Token::Word'=> 'package',
+				'PPI::Token::Whitespace'=> ' ',
+				'PPI::Token::Structure'=> '}',
+				'PPI::Token::Whitespace'=> ' ',
+				'PPI::Structure::List'=> '()',
+				'PPI::Token::Structure'=> '(',
+				'PPI::Token::Structure'=> ')',
+				'PPI::Token::Structure'=> ';'
+			],
+		},
+		{
+			desc => 'method with integer',
+			code => 'c->d x 3',
+			expected => [
+				'PPI::Token::Word' => 'c',
+				'PPI::Token::Operator' => '->',
+				'PPI::Token::Word' => 'd',
+				'PPI::Token::Whitespace' => ' ',
+				'PPI::Token::Operator' => 'x',
+				'PPI::Token::Whitespace' => ' ',
+				'PPI::Token::Number' => '3',
+			],
+		},
 		{
 			desc => 'integer with integer',
 			code => '1 x 3',
@@ -409,6 +483,17 @@ OPERATOR_X: {
 				'PPI::Token::Structure' => '}',
 			]
 		},
+		{
+			desc => 'label plus x',
+			code => 'LABEL: x64',
+			expected => [
+				'PPI::Statement::Compound' => 'LABEL:',
+				'PPI::Token::Label' => 'LABEL:',
+				'PPI::Token::Whitespace' => ' ',
+				'PPI::Statement' => 'x64',
+				'PPI::Token::Word' => 'x64',
+			]
+		},
 	);
 
 	# Exhaustively test when a preceding operator implies following
@@ -464,6 +549,45 @@ OPERATOR_X: {
 		push @tests, { desc => $desc, code => $code, expected => \@expected };
 	}
 
+
+	# Test that Perl builtins known to have a null prototype do not
+	# force a following 'x' to be a word.
+	my %noprotos = map { $_ => 1 } qw(
+		endgrent
+		endhostent
+		endnetent
+		endprotoent
+		endpwent
+		endservent
+		fork
+		getgrent
+		gethostent
+		getlogin
+		getnetent
+		getppid
+		getprotoent
+		getpwent
+		getservent
+		setgrent
+		setpwent
+		time
+		times
+		wait
+		wantarray
+		__SUB__
+	);
+	foreach my $noproto ( keys %noprotos ) {
+		my $code = "$noproto x3";
+		my @expected = (
+			'PPI::Token::Word' => $noproto,
+			'PPI::Token::Whitespace' => ' ',
+			'PPI::Token::Operator' => 'x',
+			'PPI::Token::Number' => '3',
+		);
+		my $desc = "builtin $noproto does not force following x to be a word";
+		push @tests, { desc => "builtin $noproto does not force following x to be a word", code => $code, expected => \@expected };
+	}
+
 	foreach my $test ( @tests ) {
 		my $d = PPI::Document->new( \$test->{code} );
 		my $tokens = $d->find( sub { 1; } );
@@ -472,12 +596,111 @@ OPERATOR_X: {
 		if ( $expected->[0] !~ /^PPI::Statement/ ) {
 			unshift @$expected, 'PPI::Statement', $test->{code};
 		}
+TODO: {
+		local $TODO = $test->{code} eq "LABEL: x64" ? "known bug" : undef;
 		my $ok = is_deeply( $tokens, $expected, $test->{desc} );
 		if ( !$ok ) {
 			diag "$test->{code} ($test->{desc})\n";
 			diag explain $tokens;
 			diag explain $test->{expected};
 		}
+}
+	}
+}
+
+
+OPERATOR_FAT_COMMA: {
+	my %known_bad = map { $_ => 1 } map { "$_=>2" } qw( default  for  foreach  given  goto  if  last  local  my  next  no  our  package  redo  require  return  state  unless  until  use  when  while );
+	my @tests = (
+		{
+			desc => 'integer with integer',
+			code => '1 => 2',
+			expected => [
+				'PPI::Token::Number' => '1',
+				'PPI::Token::Whitespace' => ' ',
+				'PPI::Token::Operator' => '=>',
+				'PPI::Token::Whitespace' => ' ',
+				'PPI::Token::Number' => '2',
+			],
+		},
+		{
+			desc => 'word with integer',
+			code => 'foo => 2',
+			expected => [
+				'PPI::Token::Word' => 'foo',
+				'PPI::Token::Whitespace' => ' ',
+				'PPI::Token::Operator' => '=>',
+				'PPI::Token::Whitespace' => ' ',
+				'PPI::Token::Number' => '2',
+			],
+		},
+		{
+			desc => 'dashed word with integer',
+			code => '-foo => 2',
+			expected => [
+				'PPI::Token::Word' => '-foo',
+				'PPI::Token::Whitespace' => ' ',
+				'PPI::Token::Operator' => '=>',
+				'PPI::Token::Whitespace' => ' ',
+				'PPI::Token::Number' => '2',
+			],
+		},
+		( map { {
+			desc=>$_,
+			code=>"$_=>2",
+			expected=>[
+				'PPI::Token::Word' => $_,
+				'PPI::Token::Operator' => '=>',
+				'PPI::Token::Number' => '2',
+			]
+		} } keys %PPI::Token::Word::KEYWORDS ),
+		( map { {
+			desc=>$_,
+			code=>"($_=>2)",
+			expected=>[
+				'PPI::Structure::List' => "($_=>2)",
+				'PPI::Token::Structure' => '(',
+				'PPI::Statement::Expression' => "$_=>2",
+				'PPI::Token::Word' => $_,
+				'PPI::Token::Operator' => '=>',
+				'PPI::Token::Number' => '2',
+				'PPI::Token::Structure' => ')',
+			]
+		} } keys %PPI::Token::Word::KEYWORDS ),
+		( map { {
+			desc=>$_,
+			code=>"{$_=>2}",
+			expected=>[
+				'PPI::Structure::Constructor' => "{$_=>2}",
+				'PPI::Token::Structure' => '{',
+				'PPI::Statement::Expression' => "$_=>2",
+				'PPI::Token::Word' => $_,
+				'PPI::Token::Operator' => '=>',
+				'PPI::Token::Number' => '2',
+				'PPI::Token::Structure' => '}',
+			]
+		} } keys %PPI::Token::Word::KEYWORDS ),
+	);
+
+	for my $test ( @tests ) {
+		my $code = $test->{code};
+
+		my $d = PPI::Document->new( \$test->{code} );
+		my $tokens = $d->find( sub { 1; } );
+		$tokens = [ map { ref($_), $_->content() } @$tokens ];
+		my $expected = $test->{expected};
+		if ( $expected->[0] !~ /^PPI::Statement/ ) {
+			unshift @$expected, 'PPI::Statement', $test->{code};
+		}
+TODO: {
+		local $TODO = $known_bad{$test->{code}} ? "known bug" : undef;
+		my $ok = is_deeply( $tokens, $expected, $test->{desc} );
+		if ( !$ok ) {
+			diag "$test->{code} ($test->{desc})\n";
+			diag explain $tokens;
+			diag explain $test->{expected};
+		}
+}
 	}
 }
 
