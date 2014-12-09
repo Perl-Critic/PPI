@@ -3,7 +3,7 @@
 # Test the PPI::Util package
 
 use t::lib::PPI::Test::pragmas;
-use Test::More tests => 13;
+use Test::More tests => 11;
 
 use File::Spec::Functions ':ALL';
 use PPI;
@@ -62,9 +62,6 @@ is_deeply( $source, \$slurpcode, '_slurp loads file as expected' );
 #####################################################################
 # Check the capability flags
 
-my $have_alarm   = PPI::Util::HAVE_ALARM();
 my $have_unicode = PPI::Util::HAVE_UNICODE();
-ok( defined $have_alarm,   'HAVE_ALARM defined'   );
 ok( defined $have_unicode, 'HAVE_UNICODE defined' );
-is( $have_alarm,   !! $have_alarm,   'HAVE_ALARM is a boolean'   );
 is( $have_unicode, !! $have_unicode, 'HAVE_UNICODE is a boolean' );

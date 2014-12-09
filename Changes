@@ -2,8 +2,12 @@ Revision history for Perl extension PPI
 
 1.221_01
 	Summary:
+	- remove unused PPI::Document->new timeout feature.
 
 	Details:
+	- Remove undocumented, non-working 'timeout' attribute to
+	  Document->new, including HAVE_ALARM and
+	  PPI::Exception::ParserTimeout.  (GitHub #140) (MOREGAN)
 
 1.220 Tue 11 Nov 2014
 	Summary:
