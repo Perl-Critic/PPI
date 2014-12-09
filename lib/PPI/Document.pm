@@ -71,7 +71,6 @@ use Digest::MD5                   ();
 use PPI::Util                     ();
 use PPI                           ();
 use PPI::Node                     ();
-use PPI::Exception::ParserTimeout ();
 
 use overload 'bool' => \&PPI::Util::TRUE;
 use overload '""'   => 'content';
@@ -159,10 +158,6 @@ sub new {
 	# Check constructor attributes
 	my $source  = shift;
 	my %attr    = @_;
-	my $timeout = delete $attr{timeout};
-	if ( $timeout and ! PPI::Util::HAVE_ALARM() ) {
-		Carp::croak("This platform does not support PPI parser timeouts");
-	}
 
 	# Check the data source
 	if ( ! defined $source ) {
@@ -185,64 +180,25 @@ sub new {
 			my $document = $CACHE->get_document($file_contents);
 			return $class->_setattr( $document, %attr ) if $document;
 
-			if ( $timeout ) {
-				eval {
-					local $SIG{ALRM} = sub { die "alarm\n" };
-					alarm( $timeout );
-					$document = PPI::Lexer->lex_source( $$file_contents );
-					alarm( 0 );
-				};
-			} else {
-				$document = PPI::Lexer->lex_source( $$file_contents );
-			}
+			$document = PPI::Lexer->lex_source( $$file_contents );
 			if ( $document ) {
 				# Save in the cache
 				$CACHE->store_document( $document );
 				return $class->_setattr( $document, %attr );
 			}
 		} else {
-			if ( $timeout ) {
-				eval {
-					local $SIG{ALRM} = sub { die "alarm\n" };
-					alarm( $timeout );
-					my $document = PPI::Lexer->lex_file( $source );
-					return $class->_setattr( $document, %attr ) if $document;
-					alarm( 0 );
-				};
-			} else {
-				my $document = PPI::Lexer->lex_file( $source );
-				return $class->_setattr( $document, %attr ) if $document;
-			}
+			my $document = PPI::Lexer->lex_file( $source );
+			return $class->_setattr( $document, %attr ) if $document;
 		}
 
 	} elsif ( _SCALAR0($source) ) {
-		if ( $timeout ) {
-			eval {
-				local $SIG{ALRM} = sub { die "alarm\n" };
-				alarm( $timeout );
-				my $document = PPI::Lexer->lex_source( $$source );
-				return $class->_setattr( $document, %attr ) if $document;
-				alarm( 0 );
-			};
-		} else {
-			my $document = PPI::Lexer->lex_source( $$source );
-			return $class->_setattr( $document, %attr ) if $document;
-		}
+		my $document = PPI::Lexer->lex_source( $$source );
+		return $class->_setattr( $document, %attr ) if $document;
 
 	} elsif ( _ARRAY0($source) ) {
 		$source = join '', map { "$_\n" } @$source;
-		if ( $timeout ) {
-			eval {
-				local $SIG{ALRM} = sub { die "alarm\n" };
-				alarm( $timeout );
-				my $document = PPI::Lexer->lex_source( $source );
-				return $class->_setattr( $document, %attr ) if $document;
-				alarm( 0 );
-			};
-		} else {
-			my $document = PPI::Lexer->lex_source( $source );
-			return $class->_setattr( $document, %attr ) if $document;
-		}
+		my $document = PPI::Lexer->lex_source( $source );
+		return $class->_setattr( $document, %attr ) if $document;
 
 	} else {
 		$class->_error("Unknown object or reference was passed to PPI::Document::new");
@@ -250,9 +206,7 @@ sub new {
 
 	# Pull and store the error from the lexer
 	my $errstr;
-	if ( _INSTANCE($@, 'PPI::Exception::Timeout') ) {
-		$errstr = 'Timed out while parsing document';
-	} elsif ( _INSTANCE($@, 'PPI::Exception') ) {
+	if ( _INSTANCE($@, 'PPI::Exception') ) {
 		$errstr = $@->message;
 	} elsif ( $@ ) {
 		$errstr = $@;
