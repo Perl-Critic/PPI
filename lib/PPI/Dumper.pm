@@ -183,7 +183,7 @@ sub string {
 The C<list> method generates the dump and provides it as a raw
 list, without trailing newlines.
 
-Returns a list or the null list if there is an error while generation
+Returns a list or the null list if there is an error while generating
 the dump.
 
 =cut
