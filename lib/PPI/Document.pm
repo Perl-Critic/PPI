@@ -142,6 +142,7 @@ optimisation flag, it is off by default and you will need to explicitly
 enable it.
 
 Returns a C<PPI::Document> object, or C<undef> if parsing fails.
+L<PPI::Exception> objects can also be thrown if there are parsing problems.
 
 =cut
 
