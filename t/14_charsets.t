@@ -4,7 +4,7 @@ use t::lib::PPI::Test::pragmas;
 use Test::More;
 BEGIN {
 	if ($] < 5.008007) {
-		Test::More->import( skip_all => "Unicode support requires perl 5.8.7" );
+		Test::More->import( tests => 1, skip_all => "Unicode support requires perl 5.8.7" );
 		exit(0);
 	}
 	plan( tests => 17 );
