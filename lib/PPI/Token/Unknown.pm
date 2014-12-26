@@ -52,11 +52,17 @@ sub __TOKENIZER__on_char {
 
 	# Now, we split on the different values of the current content
 	if ( $c eq '*' ) {
-		if ( $char =~ /(?:(?!\d)\w|\:)/ ) {
+		# Is it a number?
+		if ( $char =~ /\d/ ) {
+			# bitwise operator
+			$t->{class} = $t->{token}->set_class( 'Operator' );
+			return $t->_finalize_token->__TOKENIZER__on_char( $t );
+		}
+
+		if ( $char =~ /[\w:]/ ) {
 			# Symbol (unless the thing before it is a number
-			my $tokens = $t->_previous_significant_tokens(1);
-			my $p0     = $tokens->[0];
-			if ( $p0 and ! $p0->isa('PPI::Token::Number') ) {
+			my ( $prev ) = @{ $t->_previous_significant_tokens(1) };
+			if ( $prev and ! $prev->isa('PPI::Token::Number') ) {
 				$t->{class} = $t->{token}->set_class( 'Symbol' );
 				return 1;
 			}
@@ -69,10 +75,6 @@ sub __TOKENIZER__on_char {
 				# control-character symbol (e.g. *{^_Foo})
 				$t->{class} = $t->{token}->set_class( 'Magic' );
 				return 1;
-			} else {
-				# Obvious GLOB cast
-				$t->{class} = $t->{token}->set_class( 'Cast' );
-				return $t->_finalize_token->__TOKENIZER__on_char( $t );
 			}
 		}
 
@@ -150,7 +152,7 @@ sub __TOKENIZER__on_char {
 	} elsif ( $c eq '%' ) {
 		# Is it a number?
 		if ( $char =~ /\d/ ) {
-			# This is %2 (modulus number)
+			# bitwise operator
 			$t->{class} = $t->{token}->set_class( 'Operator' );
 			return $t->_finalize_token->__TOKENIZER__on_char( $t );
 		}
@@ -161,10 +163,13 @@ sub __TOKENIZER__on_char {
 			return 1;
 		}
 
-		# Is it a symbol?
 		if ( $char =~ /[\w:]/ ) {
-			$t->{class} = $t->{token}->set_class( 'Symbol' );
-			return 1;
+			# Symbol (unless the thing before it is a number
+			my ( $prev ) = @{ $t->_previous_significant_tokens(1) };
+			if ( $prev and ! $prev->isa('PPI::Token::Number') ) {
+				$t->{class} = $t->{token}->set_class( 'Symbol' );
+				return 1;
+			}
 		}
 
 		if ( $char eq '{' ) {
@@ -188,15 +193,18 @@ sub __TOKENIZER__on_char {
 	} elsif ( $c eq '&' ) {
 		# Is it a number?
 		if ( $char =~ /\d/ ) {
-			# This is &2 (bitwise-and number)
+			# bitwise operator
 			$t->{class} = $t->{token}->set_class( 'Operator' );
 			return $t->_finalize_token->__TOKENIZER__on_char( $t );
 		}
 
-		# Is it a symbol
 		if ( $char =~ /[\w:]/ ) {
-			$t->{class} = $t->{token}->set_class( 'Symbol' );
-			return 1;
+			# Symbol (unless the thing before it is a number
+			my ( $prev ) = @{ $t->_previous_significant_tokens(1) };
+			if ( $prev and ! $prev->isa('PPI::Token::Number') ) {
+				$t->{class} = $t->{token}->set_class( 'Symbol' );
+				return 1;
+			}
 		}
 
 		return $self->_as_cast_or_op($t) if __is_cast_or_op($char);
@@ -346,7 +354,7 @@ sub _cast_or_op {
 			last if $token->significant;
 		}
 		return 'Cast'
-                        if !$token || $token->content ne '->';
+			if !$token || $token->content ne '->';
 	}
 
 	return 'Operator';

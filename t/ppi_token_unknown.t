@@ -3,7 +3,7 @@
 # Unit testing for PPI::Token::Unknown
 
 use t::lib::PPI::Test::pragmas;
-use Test::More tests => 73;
+use Test::More tests => 70;
 
 use PPI;
 
@@ -11,17 +11,12 @@ sub o { test_cast_or_op( @_ ) }
 sub c { test_cast_or_op( @_, 1 ) }
 
 OPERATOR_CAST: {
-	o '$c{d}*$e;';
-	o '$c{d} *$e';
-	o '1%$a';
-	
-#	# * % &
-#	# $ @ % * {
 	o '1*$a';
 	o '1*@a';
 	o '1*%a';
 	o '1**a';
 	o '1**{$a}';
+	o '1*={$a}';  # doesn't compile, but make sure *= is operator
 	o '1*{2}';
 	o '1*{2=>2}';  # same as '1*{2}'
 
