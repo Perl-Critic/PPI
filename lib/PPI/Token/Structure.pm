@@ -15,7 +15,7 @@ PPI::Token::Structure - Token class for characters that define code structure
 =head1 DESCRIPTION
 
 The C<PPI::Token::Structure> class is used for tokens that control the
-generally tree structure or code.
+general tree structure or code.
 
 This consists of seven characters. These are the six brace characters from
 the "round", "curly" and "square" pairs, plus the semi-colon statement
