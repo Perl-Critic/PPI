@@ -18,12 +18,12 @@ PPI::Token::Magic - Tokens representing magic variables
   # When we say magic variables, we mean these...
   $1   $2   $3   $4   $5   $6   $7   $8   $9
   $_   $&   $`   $'   $+   @+   %+   $*   $.    $/    $|
-  $\\  $"   $;   $%   $=   $-   @-   %-   $)    $#
+  $\   $"   $;   $%   $=   $-   @-   %-   $)    $#
   $~   $^   $:   $?   $!   %!   $@   $$   $<    $>
   $(   $0   $[   $]   @_   @*   $}   $,   $#+   $#-
   $^L  $^A  $^E  $^C  $^D  $^F  $^H
   $^I  $^M  $^N  $^O  $^P  $^R  $^S
-  $^T  $^V  $^W  $^X
+  $^T  $^V  $^W  $^X  %^H
 
 =head1 DESCRIPTION
 
@@ -36,7 +36,7 @@ probably never encounter in your Perl career.
 
 =head1 METHODS
 
-The class provides no additional methods, beyond those provided by it's
+The class provides no additional methods, beyond those provided by
 L<PPI::Token::Symbol>, L<PPI::Token> and L<PPI::Element>.
 
 =cut
