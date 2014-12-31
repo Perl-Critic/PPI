@@ -5,7 +5,7 @@
 # Some other regressions tests are included here for simplicity.
 
 use t::lib::PPI::Test::pragmas;
-use Test::More tests => 932;
+use Test::More tests => 926;
 
 use PPI;
 use t::lib::PPI::Test 'pause';
@@ -200,36 +200,6 @@ SCOPE: {
 	my $doc = PPI::Document->new( \'[]' );
 	isa_ok( $doc, 'PPI::Document' );
 	isa_ok( $doc->child(0), 'PPI::Statement' );
-}
-
-
-
-
-
-#####################################################################
-# Bug 21571: PPI::Token::Symbol::symbol does not properly handle
-#            variables with adjacent braces
-
-SCOPE: {
-	my $doc = PPI::Document->new( \'$foo{bar}' );
-	my $symbol = $doc->child(0)->child(0);
-	isa_ok( $symbol, 'PPI::Token::Symbol' );
-	is( $symbol->symbol, '%foo', 'symbol() for $foo{bar}' );
-}
-
-SCOPE: {
-	my $doc = PPI::Document->new( \'$foo[0]' );
-	my $symbol = $doc->child(0)->child(0);
-	isa_ok( $symbol, 'PPI::Token::Symbol' );
-	is( $symbol->symbol, '@foo', 'symbol() for $foo[0]' );
-}
-
-
-SCOPE: {
-	my $doc = PPI::Document->new( \'@foo{bar}' );
-	my $symbol = $doc->child(0)->child(0);
-	isa_ok( $symbol, 'PPI::Token::Symbol' );
-	is( $symbol->symbol, '%foo', 'symbol() for @foo{bar}' );
 }
 
 

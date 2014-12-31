@@ -3,7 +3,7 @@
 # Formal unit tests for specific PPI::Token classes
 
 use t::lib::PPI::Test::pragmas;
-use Test::More tests => 593;
+use Test::More tests => 571;
 
 use File::Spec::Functions ':ALL';
 use PPI;
@@ -25,35 +25,6 @@ t::lib::PPI::Test::Run->run_testdir( catdir( 't', 'data', '07_token_todo' ) );
 
 
 
-
-
-#####################################################################
-# PPI::Token::Symbol Unit Tests
-# Note: braces and the symbol() method are tested in 08_regression.t
-
-SCOPE: {
-	# Test both creation methods
-	my $Token = PPI::Token::Symbol->new( '$foo' );
-	isa_ok( $Token, 'PPI::Token::Symbol' );
-	
-	# Check the creation of a number of different values
-	my @symbols = (
-		'$foo'       => '$foo',
-		'@foo'       => '@foo',
-		'$ foo'      => '$foo',
-		'$::foo'     => '$main::foo',
-		'@::foo'     => '@main::foo',
-		'$foo::bar'  => '$foo::bar',
-		'$ foo\'bar' => '$foo::bar',
-		);
-	while ( @symbols ) {
-		my ($value, $canon) = ( shift(@symbols), shift(@symbols) );
-		my $Symbol = PPI::Token::Symbol->new( $value );
-		isa_ok( $Symbol, 'PPI::Token::Symbol' );
-		is( $Symbol->content,   $value, "Symbol '$value' returns ->content   '$value'" );
-		is( $Symbol->canonical, $canon, "Symbol '$value' returns ->canonical '$canon'" );
-	}
-}
 
 
 #####################################################################

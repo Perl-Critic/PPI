@@ -8,6 +8,7 @@ Revision history for Perl extension PPI
 	- Remove undocumented, non-working 'timeout' attribute to
 	  Document->new, including HAVE_ALARM and
 	  PPI::Exception::ParserTimeout.  (GitHub #140) (MOREGAN)
+	- Unit tests for PPI::Token::Symbol (GitHub #148) (MOREGAN)
 
 1.220 Tue 11 Nov 2014
 	Summary:
