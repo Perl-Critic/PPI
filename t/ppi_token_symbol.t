@@ -17,10 +17,7 @@ TOKEN_FROM_PARSE: {
 	parse_and_test( '$x[0]', { content => '$x',   canonical => '$x',       raw_type => '$', symbol_type => '@', symbol => '@x' } );
 	parse_and_test( '$x{0}', { content => '$x',   canonical => '$x',       raw_type => '$', symbol_type => '%', symbol => '%x' } );
 	parse_and_test( '$::x',  { content => '$::x', canonical => '$main::x', raw_type => '$', symbol_type => '$', symbol => '$main::x' } );
-	{
-		local $TODO = 'bug in canonical';
-		parse_and_test( q{$'x}, { content => q{$'x}, canonical => '$main::x', raw_type => '$', symbol_type => '$', symbol => '$main::x' } );
-	}
+	parse_and_test( q{$'x}, { content => q{$'x}, canonical => '$main::x', raw_type => '$', symbol_type => '$', symbol => '$main::x' } );
 
 	parse_and_test( '@x',      { content => '@x',   canonical => '@x',       raw_type => '@', symbol_type => '@', symbol => '@x' } );
 	parse_and_test( '@x[0]',   { content => '@x',   canonical => '@x',       raw_type => '@', symbol_type => '@', symbol => '@x' } );
