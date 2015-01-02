@@ -25,6 +25,8 @@ Revision history for Perl extension PPI
 	  (MOREGAN)
 	- removal of Test::NoWarnings
 	- less uses of List::MoreUtils in favor of List::Util
+	- expand $'x to $::main::x in Symbol->canonical as with $::x
+	  (MOREGAN)
 
 1.220 Tue 11 Nov 2014
 	Summary:

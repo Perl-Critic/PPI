@@ -61,8 +61,8 @@ variations.
 sub canonical {
 	my $symbol = shift->content;
 	$symbol =~ s/\s+//;
-	$symbol =~ s/(?<=[\$\@\%\&\*])::/main::/;
 	$symbol =~ s/\'/::/g;
+	$symbol =~ s/(?<=[\$\@\%\&\*])::/main::/;
 	$symbol;
 }
 
