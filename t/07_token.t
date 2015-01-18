@@ -2,9 +2,11 @@
 
 # Formal unit tests for specific PPI::Token classes
 
+sub warns_on_misplaced_underscore { $] >= 5.006 and $] < 5.008 }
+
 use lib 't/lib';
 use PPI::Test::pragmas;
-use Test::More tests => 570 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+use Test::More tests => (warns_on_misplaced_underscore() ? 572 : 570) + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use File::Spec::Functions ':ALL';
 use PPI;
@@ -100,7 +102,13 @@ SCOPE: {
 
 		if ($base != 256) {
 			$^W = 0;
-			my $literal = eval $code;
+			my $literal;
+			if ( warns_on_misplaced_underscore() and $code =~ /^1_0[.]?$/ ) {
+				warning_is { $literal = eval $code } "Misplaced _ in number",
+					"$] warns about misplaced underscore";
+			} else {
+				$literal = eval $code;
+			}
 			if ($@) {
 				is($token->literal, undef, "literal('$code'), $@");
 			} else {
