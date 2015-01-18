@@ -1,15 +1,16 @@
 ﻿#!/usr/bin/perl
 
-use t::lib::PPI::Test::pragmas;
+use strict;
+use warnings;
 use Test::More;
 BEGIN {
 	if ($] < 5.008007) {
-		Test::More->import( skip_all => "Unicode support requires perl 5.8.7" );
-		exit(0);
+		plan( skip_all => "Unicode support requires perl 5.8.7" );
 	}
 	plan( tests => 17 );
 }
 
+use t::lib::PPI::Test::pragmas;
 use utf8;  # perl version check above says this is okay
 use Params::Util qw{_INSTANCE};
 use PPI;
