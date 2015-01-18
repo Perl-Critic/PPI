@@ -56,9 +56,9 @@ LITERAL: {
 	permute_test ["$bs)"],   '(', ')', [')'];
 	permute_test ["$bs("],   '(', ')', ['('];
 	permute_test ["$bs}"],   '{', '}', ['}'];
-	permute_test ["${bs}{"], '{', '}', ['{'];
+	permute_test [$bs."{"],  '{', '}', ['{'];
 	permute_test ["$bs]"],   '[', ']', [']'];
-	permute_test ["${bs}["], '[', ']', ['['];
+	permute_test [$bs."["],  '[', ']', ['['];
 	permute_test ["$bs<"],   '<', '>', ['<'];
 	permute_test ["$bs>"],   '<', '>', ['>'];
 	permute_test ["$bs/"],   '/', '/', ['/'];
