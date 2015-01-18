@@ -3,7 +3,8 @@
 # Formal unit tests for specific PPI::Token classes
 
 use t::lib::PPI::Test::pragmas;
-use Test::More tests => 447;
+use Test::More tests => ($] >= 5.006 and $] < 5.008 ? 449 : 447);
+use Test::Warn;
 
 use File::Spec::Functions ':ALL';
 use PPI;
@@ -123,7 +124,13 @@ SCOPE: {
 
 		if ($base != 256) {
 			$^W = 0;
-			my $literal = eval $code;
+			my $literal;
+			if ( $] >= 5.006 and $] < 5.008 and $code =~ /^1_0[.]?$/ ) {
+				warning_is { $literal = eval $code } "Misplaced _ in number",
+					"$] warns about misplaced underscore";
+			} else {
+				$literal = eval $code;
+			}
 			if ($@) {
 				is($token->literal, undef, "literal('$code'), $@");
 			} else {

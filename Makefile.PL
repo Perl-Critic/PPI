@@ -38,6 +38,7 @@ test_requires 'Class::Inspector' => '1.22';
 test_requires 'File::Remove'     => '1.42';
 test_requires 'Test::More'       => '0.86';
 test_requires 'Test::NoWarnings' => '0.084';
+test_requires 'Test::Warn'       => '0.30';
 test_requires 'Test::Object'     => '0.07';
 test_requires 'Test::SubCalls'   => '1.07';
 test_requires 'Test::Deep';
