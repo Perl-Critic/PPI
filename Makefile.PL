@@ -12,7 +12,7 @@ eval {
 	eval "use Pod::Markdown 2.002";
 
 	my $pod = 'lib/PPI.pm';
-	readme_from $pod, { clean => 1 };    # Module::Install::ReadmeFromPod
+	readme_from( $pod, { clean => 1 } );    # Module::Install::ReadmeFromPod
 
 	my $parser = Pod::Markdown->new;
 	open my $in,  "<", $pod;
