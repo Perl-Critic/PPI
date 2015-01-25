@@ -1,0 +1,14 @@
+language: perl
+perl:
+  - "5.21"
+  - "5.20"
+  - "5.18"
+  - "5.16"
+  - "5.14"
+  - "5.12"
+  - "5.10"
+  - "5.8"
+before_install:
+  cpanm -n Devel::Cover::Report::Coveralls Test::ClassAPI
+script:
+  perl Makefile.PL && make && cover -test -report coveralls
