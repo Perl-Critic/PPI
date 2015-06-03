@@ -80,7 +80,7 @@ in private methods.
 # we don't have to go and load all of PPI.
 use strict;
 use Params::Util    qw{_INSTANCE _SCALAR0 _ARRAY0};
-use List::MoreUtils ();
+use List::Util 1.33 ();
 use PPI::Util       ();
 use PPI::Element    ();
 use PPI::Token      ();
@@ -209,7 +209,7 @@ sub new {
 	# once the tokenizer hits end of file, it examines the last token to
 	# manually either remove the ' ' token, or chop it off the end of
 	# a longer one in which the space would be valid.
-	if ( List::MoreUtils::any { /^__(?:DATA|END)__\s*$/ } @{$self->{source}} ) {
+	if ( List::Util::any { /^__(?:DATA|END)__\s*$/ } @{$self->{source}} ) {
 		$self->{source_eof_chop} = '';
 	} elsif ( ! defined $self->{source}->[0] ) {
 		$self->{source_eof_chop} = '';

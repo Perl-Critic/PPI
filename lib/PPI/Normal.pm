@@ -36,7 +36,7 @@ process to be.
 
 use strict;
 use Carp                      ();
-use List::MoreUtils           ();
+use List::Util 1.33           ();
 use PPI::Util                 '_Document';
 use PPI::Document::Normalized ();
 
@@ -86,7 +86,7 @@ sub register {
 		}
 
 		# Has it already been added?
-		if ( List::MoreUtils::any { $_ eq $function } ) {
+		if ( List::Util::any { $_ eq $function } ) {
 			return 1;
 		}
 

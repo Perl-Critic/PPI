@@ -7,7 +7,7 @@ use File::Spec::Functions ':ALL';
 use Test::More;
 use Test::Object;
 use Params::Util qw{_STRING _INSTANCE};
-use List::MoreUtils 'any';
+use List::Util 1.33 'any';
 use PPI::Dumper;
 
 use vars qw{$VERSION};

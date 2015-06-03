@@ -65,7 +65,7 @@ Document-specific.
 
 use strict;
 use Carp                          ();
-use List::MoreUtils               ();
+use List::Util 1.33               ();
 use Params::Util                  qw{_SCALAR0 _ARRAY0 _INSTANCE};
 use Digest::MD5                   ();
 use PPI::Util                     ();
@@ -484,7 +484,7 @@ sub serialize {
 			# This is a two part test.
 			# First, are we on the last line of the
 			# content part of the file
-			my $last_line = List::MoreUtils::none {
+			my $last_line = List::Util::none {
 				$tokens[$_] and $tokens[$_]->{content} =~ /\n/
 				} (($i + 1) .. $last_index);
 			if ( ! defined $last_line ) {
@@ -494,7 +494,7 @@ sub serialize {
 
 			# Secondly, are their any more here-docs after us,
 			# (with content or a terminator)
-			my $any_after = List::MoreUtils::any {
+			my $any_after = List::Util::any {
 				$tokens[$_]->isa('PPI::Token::HereDoc')
 				and (
 					scalar(@{$tokens[$_]->{_heredoc}})
