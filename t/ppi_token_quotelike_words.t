@@ -3,7 +3,7 @@
 # Unit testing for PPI::Token::QuoteLike::Words
 
 use t::lib::PPI::Test::pragmas;
-use Test::More tests => 1941;
+use Test::More tests => 1940 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 use Test::Deep;
 
 use PPI;

@@ -3,7 +3,7 @@
 # PPI::Document tests
 
 use t::lib::PPI::Test::pragmas;
-use Test::More tests => 14;
+use Test::More tests => 13 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use File::Spec::Functions ':ALL';
 use PPI;

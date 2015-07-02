@@ -3,7 +3,7 @@
 # Unit testing for PPI::Token::_QuoteEngine::Full
 
 use t::lib::PPI::Test::pragmas;
-use Test::More tests => 94;
+use Test::More tests => 93 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use PPI;
 

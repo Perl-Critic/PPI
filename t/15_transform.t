@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 
 use t::lib::PPI::Test::pragmas;
-use Test::More 0.86 tests => 24;
+use Test::More 0.86 tests => 23 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use File::Spec::Functions ':ALL';
 use File::Remove;

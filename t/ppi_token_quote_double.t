@@ -3,7 +3,7 @@
 # Unit testing for PPI::Token::Quote::Double
 
 use t::lib::PPI::Test::pragmas;
-use Test::More tests => 20;
+use Test::More tests => 19 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use PPI;
 

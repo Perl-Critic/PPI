@@ -3,7 +3,7 @@
 # Tests the accuracy and features for location functionality
 
 use t::lib::PPI::Test::pragmas;
-use Test::More tests => 683;
+use Test::More tests => 682 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use PPI;
 

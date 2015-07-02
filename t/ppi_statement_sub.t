@@ -3,7 +3,7 @@
 # Test PPI::Statement::Sub
 
 use t::lib::PPI::Test::pragmas;
-use Test::More tests => 6208;
+use Test::More tests => 6207 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use PPI;
 

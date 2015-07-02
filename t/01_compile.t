@@ -3,7 +3,7 @@
 # This test script only tests that the tree compiles
 
 use t::lib::PPI::Test::pragmas;
-use Test::More tests => 18;
+use Test::More tests => 17 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 
 # Do the modules load

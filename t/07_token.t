@@ -3,7 +3,7 @@
 # Formal unit tests for specific PPI::Token classes
 
 use t::lib::PPI::Test::pragmas;
-use Test::More tests => 447;
+use Test::More tests => 446 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use File::Spec::Functions ':ALL';
 use PPI;

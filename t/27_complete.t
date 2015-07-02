@@ -12,7 +12,7 @@ use PPI;
 # The letter after the number acts as a boolean yes/no answer to
 # "Is this code complete"
 my @files = find_files( catdir( 't', 'data', '27_complete' ) );
-my $tests = (scalar(@files) * 2) + 2;
+my $tests = (scalar(@files) * 2) + 1 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 plan( tests => $tests );
 
 

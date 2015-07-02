@@ -3,7 +3,7 @@
 # Unit testing for PPI::Token::HereDoc
 
 use t::lib::PPI::Test::pragmas;
-use Test::More tests => 12;
+use Test::More tests => 11 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use PPI;
 use Test::Deep;

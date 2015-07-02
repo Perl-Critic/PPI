@@ -32,7 +32,7 @@ BEGIN {
 	#	);
 }
 
-use Test::More tests => ($MAX_CHARS + $ITERATIONS + 3);
+use Test::More tests => ($MAX_CHARS + $ITERATIONS + 2 + ($ENV{AUTHOR_TESTING} ? 1 : 0));
 
 
 

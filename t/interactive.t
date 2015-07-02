@@ -5,7 +5,7 @@
 # down through the entire set of regression tests.
 
 use t::lib::PPI::Test::pragmas;
-use Test::More tests => 3;
+use Test::More tests => 2 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use PPI;
 

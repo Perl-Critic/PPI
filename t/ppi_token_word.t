@@ -3,7 +3,7 @@
 # Unit testing for PPI::Token::Word
 
 use t::lib::PPI::Test::pragmas;
-use Test::More tests => 1756;
+use Test::More tests => 1755 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use PPI;
 

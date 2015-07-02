@@ -5,7 +5,7 @@
 # Some other regressions tests are included here for simplicity.
 
 use t::lib::PPI::Test::pragmas;
-use Test::More tests => 932;
+use Test::More tests => 931 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use PPI;
 use t::lib::PPI;

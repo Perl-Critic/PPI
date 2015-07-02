@@ -3,7 +3,7 @@
 # Unit testing for PPI::Statement::Package
 
 use t::lib::PPI::Test::pragmas;
-use Test::More tests => 14949;
+use Test::More tests => 14948 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use PPI;
 

@@ -43,7 +43,7 @@ BEGIN {
 		);
 }
 
-Test::More::plan( tests => 1 + scalar(@FAILURES) * 3 );
+Test::More::plan( tests => ($ENV{AUTHOR_TESTING} ? 1 : 0) + scalar(@FAILURES) * 3 );
 
 
 
