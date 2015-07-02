@@ -3,7 +3,7 @@
 # Unit testing for PPI::Token::Magic
 
 use t::lib::PPI::Test::pragmas;
-use Test::More tests => 39;
+use Test::More tests => 38 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use PPI;
 

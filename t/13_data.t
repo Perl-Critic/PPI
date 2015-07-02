@@ -3,7 +3,7 @@
 # Tests functionality relating to __DATA__ sections of files
 
 use t::lib::PPI::Test::pragmas;
-use Test::More tests => 8;
+use Test::More tests => 7 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use File::Spec::Functions ':ALL';
 use PPI;

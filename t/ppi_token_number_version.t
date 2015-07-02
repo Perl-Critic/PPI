@@ -3,7 +3,7 @@
 # Unit testing for PPI::Token::Number::Version
 
 use t::lib::PPI::Test::pragmas;
-use Test::More tests => 736;
+use Test::More tests => 735 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use PPI;
 

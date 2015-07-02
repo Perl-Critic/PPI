@@ -7,7 +7,7 @@ BEGIN {
 		Test::More->import( tests => 1, skip_all => "Unicode support requires perl 5.8.7" );
 		exit(0);
 	}
-	plan( tests => 17 );
+	plan( tests => 16 + ($ENV{AUTHOR_TESTING} ? 1 : 0) );
 }
 
 use utf8;  # perl version check above says this is okay

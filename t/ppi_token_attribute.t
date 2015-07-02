@@ -3,7 +3,7 @@
 # Unit testing for PPI::Token::Attribute
 
 use t::lib::PPI::Test::pragmas;
-use Test::More tests => 1789;
+use Test::More tests => 1788 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use PPI;
 use Test::Deep;

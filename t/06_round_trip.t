@@ -19,7 +19,7 @@ use t::lib::PPI::Test 'find_files';
 my %tests = map { $_ => $INC{$_} } grep { ! /\bXS\.pm/ } grep { /^PPI\b/ } keys %INC;
 my @files = sort values %tests;
 unless ( @files ) {
-	Test::More::plan( tests => 2 );
+	Test::More::plan( tests => ($ENV{AUTHOR_TESTING} ? 1 : 0) + 1 );
 	ok( undef, "Failed to find any files to test" );
 	exit();
 }
@@ -41,7 +41,7 @@ foreach my $dir (
 push @files, find_files( 't' );
 
 # Declare our plan
-Test::More::plan( tests => 1 + scalar(@files) * 9 );
+Test::More::plan( tests => ($ENV{AUTHOR_TESTING} ? 1 : 0) + scalar(@files) * 9 );
 
 
 

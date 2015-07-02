@@ -6,7 +6,7 @@
 # something ( anything ) comes out the other side.
 
 use t::lib::PPI::Test::pragmas;
-use Test::More tests => 221;
+use Test::More tests => 220 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use File::Spec::Functions ':ALL';
 use PPI;

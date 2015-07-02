@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 
 use t::lib::PPI::Test::pragmas;
-use Test::More tests => 21;
+use Test::More tests => 20 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use t::lib::PPI::Test::Run;
 

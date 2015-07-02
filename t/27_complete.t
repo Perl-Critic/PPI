@@ -3,7 +3,7 @@
 # Testing for the PPI::Document ->complete method
 
 use t::lib::PPI::Test::pragmas;
-use Test::More;
+use Test::More; # Plan comes later
 
 use File::Spec::Functions ':ALL';
 use PPI;
@@ -13,7 +13,7 @@ use t::lib::PPI::Test 'find_files';
 # The letter after the number acts as a boolean yes/no answer to
 # "Is this code complete"
 my @files = find_files( catdir( 't', 'data', '27_complete' ) );
-my $tests = (scalar(@files) * 2) + 2;
+my $tests = (scalar(@files) * 2) + 1 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 plan( tests => $tests );
 
 

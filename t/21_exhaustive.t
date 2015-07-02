@@ -62,7 +62,7 @@ BEGIN {
 	);
 }
 
-use Test::More tests => ($MAX_CHARS + $ITERATIONS + @FAILURES + 1);
+use Test::More tests => ($MAX_CHARS + $ITERATIONS + @FAILURES + ($ENV{AUTHOR_TESTING} ? 1 : 0));
 
 
 

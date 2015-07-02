@@ -6,7 +6,7 @@
 # all of them parse as legal documents and don't crash the parser.
 
 use t::lib::PPI::Test::pragmas;
-use Test::More tests => 3876;
+use Test::More tests => 3875 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use PPI;
 use t::lib::PPI::Test::Run;

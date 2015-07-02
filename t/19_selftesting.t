@@ -28,7 +28,7 @@ use constant CI => 'Class::Inspector';
 # Find all of the files to be checked
 my %tests = map { $_ => $INC{$_} } grep { ! /\bXS\.pm/ } grep { /^PPI\b/ } keys %INC;
 unless ( %tests ) {
-	Test::More::plan( tests => 2 );
+	Test::More::plan( tests => 1 + ($ENV{AUTHOR_TESTING} ? 1 : 0) );
 	ok( undef, "Failed to find any files to test" );
 	exit();
 }
@@ -41,7 +41,7 @@ foreach my $dir ( '05_lexer', '08_regression', '11_util', '13_data', '15_transfo
 }
 
 # Declare our plan
-Test::More::plan( tests => scalar(@files) * 14 + 4 );
+Test::More::plan( tests => scalar(@files) * 14 + 3 + ($ENV{AUTHOR_TESTING} ? 1 : 0) );
 
 
 

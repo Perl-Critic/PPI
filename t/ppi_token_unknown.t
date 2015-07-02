@@ -3,7 +3,7 @@
 # Unit testing for PPI::Token::Unknown
 
 use t::lib::PPI::Test::pragmas;
-use Test::More tests => 133;
+use Test::More tests => 132 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use PPI;
 

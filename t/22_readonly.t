@@ -3,7 +3,7 @@
 # Testing of readonly functionality
 
 use t::lib::PPI::Test::pragmas;
-use Test::More tests => 9;
+use Test::More tests => 8 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use PPI::Document;
 

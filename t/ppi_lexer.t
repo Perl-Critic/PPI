@@ -3,7 +3,7 @@
 # Unit testing for PPI::Lexer
 
 use t::lib::PPI::Test::pragmas;
-use Test::More tests => 44;
+use Test::More tests => 43 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use PPI;
 

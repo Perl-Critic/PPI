@@ -5,10 +5,11 @@
 use t::lib::PPI::Test::pragmas;
 use Test::More;
 BEGIN {
+        my $tests = 2930 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 	if ( $ENV{RELEASE_TESTING} ) {
-		plan( tests => 2931 );
+		plan( tests => $tests );
 	} else {
-		plan( tests => 2931, skip_all => 'Author tests not required for installation' );
+		plan( tests => $tests, skip_all => 'Author tests not required for installation' );
 	}
 }
 

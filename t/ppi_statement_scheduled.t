@@ -3,7 +3,7 @@
 # Test PPI::Statement::Scheduled
 
 use t::lib::PPI::Test::pragmas;
-use Test::More tests => 241;
+use Test::More tests => 240 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use PPI;
 

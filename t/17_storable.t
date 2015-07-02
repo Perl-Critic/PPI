@@ -7,7 +7,7 @@ use Test::More;
 BEGIN {
 	# Is Storable installed?
 	if ( eval { require Storable; 1 } ) {
-		plan( tests => 10 );
+		plan( tests => 9 + ($ENV{AUTHOR_TESTING} ? 1 : 0) );
 	} else {
 		plan( 'skip_all' );
 		exit(0);
