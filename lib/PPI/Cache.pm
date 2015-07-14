@@ -225,7 +225,7 @@ sub _store {
 	my ($dir, $file) = $self->_paths($md5hex);
 
 	# Save the file
-	File::Path::mkpath( $dir, 0, 0755 ) unless -d $dir;
+	File::Path::mkpath( $dir, 0, 0777 ) unless -d $dir;
 	if ( VMS ) {
 		Storable::lock_nstore( $object, $file );
 	} else {
