@@ -27,6 +27,7 @@ Revision history for Perl extension PPI
 	- less uses of List::MoreUtils in favor of List::Util
 	- expand $'x to $::main::x in Symbol->canonical as with $::x
 	  (MOREGAN)
+	- fixed parsing of large numbers in Number::Exp on Solaris 80 (JMASLAK)
 
 1.220 Tue 11 Nov 2014
 	Summary:
