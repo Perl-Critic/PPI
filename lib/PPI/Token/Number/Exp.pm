@@ -52,8 +52,28 @@ sub literal {
 	my $neg = $mantissa =~ s/^\-//;
 	$mantissa =~ s/^\./0./;
 	$exponent =~ s/^\+//;
-	my $val = $mantissa * 10 ** $exponent;
-	return $neg ? -$val : $val;
+
+	# This algorithm is reasonably close to the S_mulexp10()
+	# algorithm from the Perl source code, so it should arrive
+	# at the same answer as Perl most of the time.
+	my $negpow = 0;
+	if ($exponent < 0) {
+		$negpow = 1;
+		$exponent *= -1;
+	}
+
+	my $result = 1;
+	my $power = 10;
+	for (my $bit = 1; $exponent; $bit = $bit << 1) {
+		if ($exponent & $bit) {
+			$exponent = $exponent ^ $bit;
+			$result *= $power;
+		}
+		$power *= $power;
+	}
+
+	my $val = $neg ? 0 - $mantissa : $mantissa;
+	return $negpow ? $val / $result : $val * $result;
 }
 
 
