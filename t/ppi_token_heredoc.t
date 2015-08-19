@@ -16,16 +16,19 @@ use Test::More;
 use Test::NoWarnings;
 use PPI;
 
+sub h;
+
+plan tests => 1 + 5;
+
 # List of tests to perform. Each test requires the following information:
 #     - 'name': the name of the test in the output.
 #     - 'content': the Perl string to parse using PPI.
 #     - 'expected': a hashref with the keys being property names on the
 #       PPI::Token::HereDoc object, and the values being the expected value of
 #       that property after the heredoc block has been parsed.
-my @tests = (
 
 	# Tests with a carriage return after the termination marker.
-	{
+h	{
 		name     => 'Bareword terminator.',
 		content  => "my \$heredoc = <<HERE;\nLine 1\nLine 2\nHERE\n",
 		expected => {
@@ -34,8 +37,8 @@ my @tests = (
 			_terminator      => 'HERE',
 			_mode            => 'interpolate',
 		},
-	},
-	{
+	};
+h	{
 		name     => 'Single-quoted bareword terminator.',
 		content  => "my \$heredoc = <<'HERE';\nLine 1\nLine 2\nHERE\n",
 		expected => {
@@ -44,8 +47,8 @@ my @tests = (
 			_terminator      => 'HERE',
 			_mode            => 'literal',
 		},
-	},
-	{
+	};
+h	{
 		name     => 'Double-quoted bareword terminator.',
 		content  => "my \$heredoc = <<\"HERE\";\nLine 1\nLine 2\nHERE\n",
 		expected => {
@@ -54,8 +57,8 @@ my @tests = (
 			_terminator      => 'HERE',
 			_mode            => 'interpolate',
 		},
-	},
-	{
+	};
+h	{
 		name     => 'Command-quoted terminator.',
 		content  => "my \$heredoc = <<`HERE`;\nLine 1\nLine 2\nHERE\n",
 		expected => {
@@ -64,8 +67,8 @@ my @tests = (
 			_terminator      => 'HERE',
 			_mode            => 'command',
 		},
-	},
-	{
+	};
+h	{
 		name     => 'Legacy escaped bareword terminator.',
 		content  => "my \$heredoc = <<\\HERE;\nLine 1\nLine 2\nHERE\n",
 		expected => {
@@ -74,13 +77,10 @@ my @tests = (
 			_terminator      => 'HERE',
 			_mode            => 'literal',
 		},
-	},
+	};
 
-);
-
-plan tests => 1 + @tests;
-
-for my $test ( @tests ) {
+sub h {
+    my ( $test ) = @_;
 	subtest(
 		$test->{name},
 		sub {
