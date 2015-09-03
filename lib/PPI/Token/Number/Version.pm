@@ -104,7 +104,7 @@ sub __TOKENIZER__commit {
 
 	# Get the rest of the line
 	pos $t->{line} = $t->{line_cursor};
-	if ( $t->{line} !~ m/\G(v\d+(?:\.\d+)*)/gc ) {
+	if ( $t->{line} !~ m/\G(v\d[\d_]*(?:\.\d[\d_]*)*)/gc ) {
 		# This was not a v-string after all (it's a word)
 		return PPI::Token::Word->__TOKENIZER__commit($t);
 	}
