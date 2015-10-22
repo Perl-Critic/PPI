@@ -175,6 +175,9 @@ sub new {
 			Carp::croak("API CHANGE: Source code should only be passed to PPI::Document->new as a SCALAR reference");
 		}
 
+		# Save the filename
+		$attr{filename} ||= $source;
+
 		# When loading from a filename, use the caching layer if it exists.
 		if ( $CACHE ) {
 			my $file_contents = PPI::Util::_slurp( $source );
@@ -274,6 +277,7 @@ sub load {
 sub _setattr {
 	my ($class, $document, %attr) = @_;
 	$document->{readonly} = !! $attr{readonly};
+	$document->{filename} = $attr{filename};
 	return $document;
 }
 
@@ -336,6 +340,19 @@ sub get_cache {
 
 #####################################################################
 # PPI::Document Instance Methods
+
+=pod
+
+=head2 filename
+
+The C<filename> accessor returns the name of the file in which the document
+is stored.
+
+=cut
+
+sub filename {
+	$_[0]->{filename};
+}
 
 =pod
 
