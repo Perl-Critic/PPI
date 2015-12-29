@@ -10,7 +10,7 @@ BEGIN {
 	$PPI::XS_DISABLE = 1;
 	$PPI::Lexer::X_TOKENIZER ||= $ENV{X_TOKENIZER};
 }
-use Test::More tests => 3;
+use Test::More tests => 6;
 use Test::NoWarnings;
 use PPI;
 
@@ -34,4 +34,28 @@ END_PERL
 		diag 'Package statements found:';
 		diag $_->parent()->parent()->content() foreach @{$packages};
 	}
+}
+
+PACKAGE_VERSION: {
+	my $Document = PPI::Document->new(\'package Foo 1.0; sub baz { }');
+
+	my $package = $Document->find_first('PPI::Statement::Package');
+	my $sibling = $package && $package->snext_sibling;
+	ok eval { $sibling->isa('PPI::Statement::Sub') }, 'Package statement with version ends at semicolon';
+}
+
+PACKAGE_BLOCK: {
+	my $Document = PPI::Document->new(\'package Foo { sub bar { } } sub baz { }');
+
+	my $package = $Document->find_first('PPI::Statement::Package');
+	my $sibling = $package && $package->snext_sibling;
+	ok eval { $sibling->isa('PPI::Statement::Sub') }, 'Block package statement ends at closing brace';
+}
+
+PACKAGE_VERSION_BLOCK: {
+	my $Document = PPI::Document->new(\'package Foo 1.0 { sub bar { } } sub baz { }');
+
+	my $package = $Document->find_first('PPI::Statement::Package');
+	my $sibling = $package && $package->snext_sibling;
+	ok eval { $sibling->isa('PPI::Statement::Sub') }, 'Block package with version statement ends at closing brace';
 }
