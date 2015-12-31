@@ -97,6 +97,9 @@ sub file_scoped {
 	and ! $Document->isa('PPI::Document::Fragment');
 }
 
+
+sub __LEXER__normal() { '' }
+
 1;
 
 =pod
