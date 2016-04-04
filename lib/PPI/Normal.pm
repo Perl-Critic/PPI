@@ -194,6 +194,11 @@ sub process {
 		&{"$function"}( $self->{Document} );
 	}
 
+	# Reset token offsets as they are not valid anymore
+	for my $token ($self->{Document}->tokens) {
+		$token->{_byte_start} = -1;
+	}
+
 	# Create the normalized Document object
 	my $Normalized = PPI::Document::Normalized->new(
 		Document  => $self->{Document},

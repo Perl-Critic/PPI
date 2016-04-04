@@ -92,6 +92,8 @@ BEGIN {
 	$VERSION = '1.220';
 }
 
+require bytes;
+
 # The x operator cannot follow most Perl operators, implying that
 # anything beginning with x following an operator is a word.
 # These are the exceptions.
@@ -145,6 +147,11 @@ sub new {
 		token        => undef,
 		class        => 'PPI::Token::BOM',
 		zone         => 'PPI::Token::Whitespace',
+
+		# Bookkeeping needed to track byte offsets
+		file_byte_cursor => 0,
+		__total_heredoc_byte_length   => 0,
+		__current_heredoc_byte_length => 0,
 
 		# Output token buffer
 		tokens       => [],
@@ -464,6 +471,8 @@ sub _fill_line {
 	$self->{line_length} = length $line;
 	$self->{line_count}++;
 
+	$self->{__total_heredoc_byte_length} += $self->{__current_heredoc_byte_length};
+
 	1;
 }
 
@@ -600,10 +609,16 @@ sub _process_next_char {
 # Returns the resulting parse class as a convenience.
 sub _finalize_token {
 	my $self = shift;
-	return $self->{class} unless defined $self->{token};
+
+	defined(my $tok = $self->{token}) or return $self->{class};
+
+	# Include heredoc content and terminators
+	$tok->{_byte_start} = $self->{file_byte_cursor} + $self->{__total_heredoc_byte_length};
+
+	$self->{file_byte_cursor} += bytes::length($tok->{content});
 
 	# Add the token to the token buffer
-	push @{ $self->{tokens} }, $self->{token};
+	push @{ $self->{tokens} }, $tok;
 	$self->{token} = undef;
 
 	# Return the parse class to that of the zone we are in
