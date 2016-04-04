@@ -69,6 +69,7 @@ SCOPE: {
 	# Check the regexp matches what we would expect (specifically
 	# the fine details about the sections.
 	my $expected = {
+		_byte_start => 0,
 		_sections => 2,
 		braced    => 1,
 		content   => 's {foo} <bar>i',
@@ -99,6 +100,7 @@ SCOPE: {
 
 	# Check the internal details as before
 	my $expected = {
+		_byte_start => 0,
 		_sections => 2,
 		_error    => "No second section of regexp, or does not start with a balanced character",
 		braced    => 1,
