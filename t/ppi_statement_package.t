@@ -56,15 +56,10 @@ END_PERL
 	is( $packages->[1]->file_scoped, '', '->file_scoped returns false for package 2' );
 	is( $packages->[2]->file_scoped, 1, '->file_scoped returns true for package 3' );
 	is( $packages->[3]->file_scoped, 1, '->file_scoped returns true for package 4' );
-
-	TODO: {
-		local $TODO = "version functionality";
-
-		is( eval { $packages->[0]->version} , '', 'Package 1 has no version' );
-		is( eval { $packages->[1]->version}, '', 'Package 2 has no version' );
-		is( eval { $packages->[2]->version}, 'v1.23', 'Package 3 returns correct version' );
-		is( eval { $packages->[3]->version}, '0.09', 'Package 4 returns correct version' );
-	};
+	is( $packages->[0]->version, '', 'Package 1 has no version' );
+	is( $packages->[1]->version, '', 'Package 2 has no version' );
+	is( $packages->[2]->version, 'v1.23', 'Package 3 returns correct version' );
+	is( $packages->[3]->version, '0.09', 'Package 4 returns correct version' );
 }
 
 my %known_bad = map { ( "package $_" => 1 ) }
