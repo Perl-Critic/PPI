@@ -3,7 +3,7 @@
 # Unit testing for PPI::Statement::Package
 
 use t::lib::PPI::Test::pragmas;
-use Test::More tests => 2498 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+use Test::More tests => 2506 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use PPI;
 
@@ -39,17 +39,32 @@ SCOPE: {
 	Bar::Baz;
 	1;
 }
+package Other v1.23;
+package Again 0.09;
 1;
 END_PERL
 	isa_ok( $Document, 'PPI::Document' );
 
 	# Check that both of the package statements are detected
 	my $packages = $Document->find('Statement::Package');
-	is( scalar(@$packages), 2, 'Found 2 package statements' );
+	is( scalar(@$packages), 4, 'Found 2 package statements' );
 	is( $packages->[0]->namespace, 'Foo', 'Package 1 returns correct namespace' );
 	is( $packages->[1]->namespace, 'Bar::Baz', 'Package 2 returns correct namespace' );
+	is( $packages->[2]->namespace, 'Other', 'Package 3 returns correct namespace' );
+	is( $packages->[3]->namespace, 'Again', 'Package 4 returns correct namespace' );
 	is( $packages->[0]->file_scoped, 1,  '->file_scoped returns true for package 1' );
 	is( $packages->[1]->file_scoped, '', '->file_scoped returns false for package 2' );
+	is( $packages->[2]->file_scoped, 1, '->file_scoped returns true for package 3' );
+	is( $packages->[3]->file_scoped, 1, '->file_scoped returns true for package 4' );
+
+	TODO: {
+		local $TODO = "version functionality";
+
+		is( eval { $packages->[0]->version} , '', 'Package 1 has no version' );
+		is( eval { $packages->[1]->version}, '', 'Package 2 has no version' );
+		is( eval { $packages->[2]->version}, 'v1.23', 'Package 3 returns correct version' );
+		is( eval { $packages->[3]->version}, '0.09', 'Package 4 returns correct version' );
+	};
 }
 
 my %known_bad = map { ( "package $_" => 1 ) }
