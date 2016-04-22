@@ -73,6 +73,28 @@ sub namespace {
 
 =pod
 
+=head2 version
+
+Some package declarations may include a version:
+
+  package Foo::Bar 1.23;
+  package Baz v1.23;
+
+The C<version> method returns the stringified version as seen in the
+document (if any), otherwise the empty string.
+
+=cut
+
+sub version {
+	my $self = shift;
+	my $version = $self->schild(2) or return '';
+	$version->isa('PPI::Token::Structure')
+		? ''
+		: $version->content;
+}
+
+=pod
+
 =head2 file_scoped
 
 Regardless of whether it is named or not, the C<file_scoped> method will
