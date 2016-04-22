@@ -3,10 +3,18 @@
 # Unit testing for PPI::Token::Word
 
 use t::lib::PPI::Test::pragmas;
-use Test::More tests => 1756;
+use Test::More tests => 1762;
 
 use PPI;
 
+
+sub check_with {
+	my ( $code, $checker ) = @_;
+	my $Document = PPI::Document->new( \$code );
+	is( PPI::Document->errstr, undef ) if PPI::Document->errstr;
+	local $_ = $Document;
+	$checker->();
+}
 
 LITERAL: {
 	my @pairs = (
@@ -466,3 +474,32 @@ sub _compare_child {
 
 	return;
 }
+check_with "__DATA__", sub {
+	is $_->child( 1 ), undef, 'DATA segment without following newline does not get one added';
+};
+
+check_with "__DATA__ a", sub {
+	is $_->child( 1 )->content, ' a',
+	  'DATA segment without following newline, but text, has text added as comment in following token';
+};
+
+check_with "__END__", sub {
+	is $_->child( 1 ), undef, 'END segment without following newline does not get one added';
+};
+
+check_with "__END__ a", sub {
+	is $_->child( 0 )->child( 1 )->content, ' a',
+	  'END segment without following newline, but text, has text added as comment in children list';
+};
+
+check_with "__END__ a\n", sub {
+	is $_->child( 0 )->child( 1 )->content, ' a',
+	  'END segment, followed by text and newline, has text added as comment in children list';
+};
+
+check_with "__DATA__ a\n", sub {
+	is $_->child( 1 )->content, ' a',
+	  'DATA segment, followed by text and newline, has text added as comment in following token';
+};
+
+1;
