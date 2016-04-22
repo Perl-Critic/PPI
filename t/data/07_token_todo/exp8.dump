@@ -1,0 +1,11 @@
+PPI::Document
+  PPI::Statement
+    PPI::Token::Number::Float  	'1.'
+    PPI::Token::Word  	'exp'
+    PPI::Structure::List  	( ... )
+      PPI::Statement::Expression
+        PPI::Token::Number  	'1'
+    PPI::Token::Structure  	';'
+  PPI::Token::Whitespace  	' '
+  PPI::Token::Comment  	'# don't really care, keyword here is a syntax error'
+  PPI::Token::Whitespace  	'\n'

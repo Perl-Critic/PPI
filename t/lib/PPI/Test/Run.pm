@@ -70,7 +70,10 @@ sub run_testdir {
 			chomp @content;
 
 			# Compare the two
+			{
+			local $TODO = $ENV{TODO} if $ENV{TODO};
 			is_deeply( \@dump_list, \@content, "$codename: Generated dump matches stored dump" );
+			}
 
 			# Also, do a round-trip check
 			$rv = open( CODEFILE, '<', $codefile );

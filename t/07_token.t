@@ -3,7 +3,7 @@
 # Formal unit tests for specific PPI::Token classes
 
 use t::lib::PPI::Test::pragmas;
-use Test::More tests => 447;
+use Test::More tests => 593;
 
 use File::Spec::Functions ':ALL';
 use PPI;
@@ -17,6 +17,11 @@ use t::lib::PPI::Test::Run;
 # Code/Dump Testing
 
 t::lib::PPI::Test::Run->run_testdir( catdir( 't', 'data', '07_token' ) );
+
+{
+local $ENV{TODO} = "known bug";
+t::lib::PPI::Test::Run->run_testdir( catdir( 't', 'data', '07_token_todo' ) );
+}
 
 
 

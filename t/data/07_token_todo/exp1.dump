@@ -1,0 +1,7 @@
+PPI::Document
+  PPI::Statement
+    PPI::Token::Number::Float  	'1.'
+    PPI::Token::Word  	'e'
+    PPI::Structure::List  	( ... )
+    PPI::Token::Structure  	';'
+  PPI::Token::Whitespace  	'\n'
