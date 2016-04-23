@@ -346,6 +346,7 @@ sub save {
 	my $self = shift;
 	local *FILE;
 	open( FILE, '>', $_[0] )    or return undef;
+	binmode FILE;
 	print FILE $self->serialize or return undef;
 	close FILE                  or return undef;
 	return 1;
