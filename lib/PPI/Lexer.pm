@@ -62,7 +62,7 @@ use PPI::Exception  ();
 
 use vars qw{$VERSION $errstr *_PARENT %ROUND %RESOLVE};
 BEGIN {
-	$VERSION = '1.220';
+	$VERSION = '1.221_01';
 	$errstr  = '';
 
 	# Faster than having another method call just
