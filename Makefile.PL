@@ -15,7 +15,9 @@ eval {
 
 	my $parser = Pod::Markdown->new;
 	open my $in,  "<", $pod;
+	binmode $in;
 	open my $out, ">", "README.md";
+	binmode $out;
 	if ($parser and $in and $out) {
 		$parser->parse_from_filehandle($in);
 		print $out $parser->as_markdown;
