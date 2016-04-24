@@ -2,6 +2,11 @@ package Helper;
 
 use base 'Exporter';
 
+use vars qw{$VERSION};
+BEGIN {
+	$VERSION = '1.221_02';
+}
+
 @EXPORT_OK = qw( check_with );
 
 sub check_with {
