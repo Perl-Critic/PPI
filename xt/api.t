@@ -5,7 +5,7 @@
 use t::lib::PPI::Test::pragmas;
 use Test::More;
 BEGIN {
-        my $tests = 2930 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+        my $tests = 2931 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 	if ( $ENV{RELEASE_TESTING} ) {
 		plan( tests => $tests );
 	} else {
@@ -289,6 +289,7 @@ PPI::Statement=isa
 [PPI::Statement::Package]
 PPI::Statement=isa
 namespace=method
+version=method
 file_scoped=method
 
 [PPI::Statement::Include]
