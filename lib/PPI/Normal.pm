@@ -86,7 +86,7 @@ sub register {
 		}
 
 		# Has it already been added?
-		if ( List::Util::any { $_ eq $function } ) {
+		if ( List::Util::any { $_ eq $function } map @{$_}, values %LAYER ) {
 			return 1;
 		}
 
