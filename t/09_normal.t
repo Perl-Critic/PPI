@@ -4,7 +4,7 @@
 # (only very basic at this point)
 
 use t::lib::PPI::Test::pragmas;
-use Test::More tests => 13 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+use Test::More tests => 17 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use File::Spec::Functions ':ALL';
 use PPI;
@@ -50,4 +50,14 @@ SCOPE: {
 	isa_ok( $Normal3, 'PPI::Document::Normalized' );
 	is( $Normal1->equal( $Normal2 ), 1, '->equal returns true for equivalent code' );
 	is( $Normal1->equal( $Normal3 ), '', '->equal returns false for different code' );
+}
+
+NO_DOUBLE_REG: {
+	sub just_a_test_sub { "meep" }
+	ok( PPI::Normal->register( "main::just_a_test_sub", 2 ), "can add subs" );
+	is $PPI::Normal::LAYER{2}[-1], "main::just_a_test_sub", "and find subs at right layer";
+	my $size = @{ $PPI::Normal::LAYER{2} };
+	ok( PPI::Normal->register( "main::just_a_test_sub", 2 ), "can add subs again" );
+	local $TODO = 'prevent duplicate registrations of normals';
+	is scalar @{ $PPI::Normal::LAYER{2} }, $size, "but sub isn't added twice";
 }
