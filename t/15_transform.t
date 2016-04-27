@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 
 use t::lib::PPI::Test::pragmas;
-use Test::More 0.86 tests => 23 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+use Test::More 0.86 tests => 24 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use File::Spec::Functions ':ALL';
 use File::Remove;
@@ -99,6 +99,11 @@ foreach my $input ( @files ) {
 	$Copy = new_ok( 'PPI::Document' => [ $copy ] );
 	is_deeply( $Copy, $Output, 'In-place transform works as expected' );
 }
+
+
+eval { PPI::Transform->document };
+like $@, qr/PPI::Transform does not implement the required ->document method/,
+  "transform classes need to implement ->document";
 
 
 
