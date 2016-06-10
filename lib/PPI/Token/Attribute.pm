@@ -79,7 +79,7 @@ Returns C<undef> if the attribute does not have parameters.
 
 sub parameters {
 	my $self = shift;
-	$self->{content} =~ /\((.+)\)$/ ? $1 : undef;
+	$self->{content} =~ /\((.+)\)$/s ? $1 : undef;
 }
 
 
