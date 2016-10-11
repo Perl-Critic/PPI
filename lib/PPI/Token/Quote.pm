@@ -18,7 +18,7 @@ The C<PPI::Token::Quote> class is never instantiated, and simply
 provides a common abstract base class for the four quote classes.
 In PPI, a "quote" is limited to only the quote-like things that
 themselves directly represent a string. (although this includes
-double quotes with interpolated elements inside them).
+double quotes with interpolated elements inside them, note that [String::InterpolatedVariables](https://metacpan.org/pod/String::InterpolatedVariables) allows to extract them).
 
 The subclasses of C<PPI::Token::Quote> are:
 
