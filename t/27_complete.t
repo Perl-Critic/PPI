@@ -2,12 +2,13 @@
 
 # Testing for the PPI::Document ->complete method
 
-use t::lib::PPI::Test::pragmas;
+use lib 't/lib';
+use PPI::Test::pragmas;
 use Test::More; # Plan comes later
 
 use File::Spec::Functions ':ALL';
 use PPI;
-use t::lib::PPI::Test 'find_files';
+use PPI::Test 'find_files';
 
 # This test uses a series of ordered files, containing test code.
 # The letter after the number acts as a boolean yes/no answer to

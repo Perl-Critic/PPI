@@ -2,7 +2,8 @@
 
 # Test compatibility with Storable
 
-use t::lib::PPI::Test::pragmas;
+use lib 't/lib';
+use PPI::Test::pragmas;
 use Test::More;
 BEGIN {
 	# Is Storable installed?

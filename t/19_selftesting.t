@@ -5,7 +5,8 @@
 
 # Using PPI to analyse its own code at install-time? Fuck yeah! :)
 
-use t::lib::PPI::Test::pragmas;
+use lib 't/lib';
+use PPI::Test::pragmas;
 use Test::More; # Plan comes later
 
 use Test::Object;
@@ -13,8 +14,8 @@ use File::Spec::Functions ':ALL';
 use Params::Util qw{_CLASS _ARRAY _INSTANCE _IDENTIFIER};
 use Class::Inspector;
 use PPI;
-use t::lib::PPI::Test 'find_files';
-use t::lib::PPI::Test::Object;
+use PPI::Test 'find_files';
+use PPI::Test::Object;
 
 use constant CI => 'Class::Inspector';
 

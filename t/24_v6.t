@@ -3,7 +3,8 @@
 # Regression test of a Perl 5 grammar that exploded
 # with a "98 subroutine recursion" error in 1.201
 
-use t::lib::PPI::Test::pragmas;
+use lib 't/lib';
+use PPI::Test::pragmas;
 use Test::More tests => 8 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use File::Spec::Functions ':ALL';
