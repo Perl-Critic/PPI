@@ -3,7 +3,8 @@
 use strict;
 use File::Spec::Functions ':ALL';
 
-use t::lib::PPI::Test::pragmas;
+use lib 't/lib';
+use PPI::Test::pragmas;
 use PPI;
 
 # Execute the tests

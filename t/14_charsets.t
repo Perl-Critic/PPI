@@ -1,6 +1,7 @@
 ﻿#!/usr/bin/perl
 
-use t::lib::PPI::Test::pragmas;
+use lib 't/lib';
+use PPI::Test::pragmas;
 use Test::More;
 BEGIN {
 	if ($] < 5.008007) {

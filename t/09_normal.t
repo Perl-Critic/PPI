@@ -3,7 +3,8 @@
 # Testing of the normalization functions.
 # (only very basic at this point)
 
-use t::lib::PPI::Test::pragmas;
+use lib 't/lib';
+use PPI::Test::pragmas;
 use Test::More tests => 13 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use File::Spec::Functions ':ALL';

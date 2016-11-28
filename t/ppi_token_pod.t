@@ -2,7 +2,8 @@
 
 # Unit testing for PPI::Token::Pod
 
-use t::lib::PPI::Test::pragmas;
+use lib 't/lib';
+use PPI::Test::pragmas;
 use Test::More tests => 8 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use PPI;

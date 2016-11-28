@@ -1,4 +1,4 @@
-package t::lib::PPI::Test::pragmas;
+package PPI::Test::pragmas;
 
 =head1 NAME
 

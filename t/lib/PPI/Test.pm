@@ -1,4 +1,4 @@
-package t::lib::PPI::Test;
+package PPI::Test;
 
 use warnings;
 use strict;

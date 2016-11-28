@@ -4,19 +4,20 @@
 
 # Some other regressions tests are included here for simplicity.
 
-use t::lib::PPI::Test::pragmas;
+use lib 't/lib';
+use PPI::Test::pragmas;
 use Test::More tests => 925 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use PPI;
-use t::lib::PPI::Test 'pause';
-use t::lib::PPI::Test::Run;
+use PPI::Test 'pause';
+use PPI::Test::Run;
 
 
 
 #####################################################################
 # Code/Dump Testing
 
-t::lib::PPI::Test::Run->run_testdir(qw{ t data 08_regression });
+PPI::Test::Run->run_testdir(qw{ t data 08_regression });
 
 
 
