@@ -2,7 +2,8 @@
 
 # Basic first pass API testing for PPI
 
-use t::lib::PPI::Test::pragmas;
+use lib 't/lib';
+use PPI::Test::pragmas;
 use Test::More;
 BEGIN {
         my $tests = 2931 + ($ENV{AUTHOR_TESTING} ? 1 : 0);

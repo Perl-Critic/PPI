@@ -2,12 +2,13 @@
 
 # Exhaustively test all possible Perl programs to a particular length
 
-use t::lib::PPI::Test::pragmas;
+use lib 't/lib';
+use PPI::Test::pragmas;
 use Test::More; # Plan comes later
 
 use Params::Util qw{_INSTANCE};
 use PPI;
-use t::lib::PPI::Test 'quotable';
+use PPI::Test 'quotable';
 
 use vars qw{$MAX_CHARS $ITERATIONS $LENGTH @ALL_CHARS @FAILURES};
 BEGIN {
