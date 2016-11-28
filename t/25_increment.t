@@ -5,11 +5,12 @@
 # state between an empty document and the entire file to make sure
 # all of them parse as legal documents and don't crash the parser.
 
-use t::lib::PPI::Test::pragmas;
+use lib 't/lib';
+use PPI::Test::pragmas;
 use Test::More tests => 3875 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use PPI;
-use t::lib::PPI::Test::Run;
+use PPI::Test::Run;
 
 
 
@@ -18,4 +19,4 @@ use t::lib::PPI::Test::Run;
 #####################################################################
 # Code/Dump Testing
 
-t::lib::PPI::Test::Run->increment_testdir(qw{ t data 08_regression });
+PPI::Test::Run->increment_testdir(qw{ t data 08_regression });

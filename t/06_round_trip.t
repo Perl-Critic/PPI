@@ -3,12 +3,13 @@
 # Load ALL of the PPI files, lex them in, dump them
 # out, and verify that the code goes in and out cleanly.
 
-use t::lib::PPI::Test::pragmas;
+use lib 't/lib';
+use PPI::Test::pragmas;
 use Test::More; # Plan comes later
 
 use File::Spec::Functions ':ALL';
 use PPI;
-use t::lib::PPI::Test 'find_files';
+use PPI::Test 'find_files';
 
 
 

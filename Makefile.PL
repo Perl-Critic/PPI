@@ -1,6 +1,7 @@
 use strict;
 use warnings;
 
+use lib '.';
 use inc::Module::Install 1.10;
 
 all_from 'lib/PPI.pm';

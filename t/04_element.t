@@ -5,13 +5,14 @@
 # This does an empiric test that when we try to parse something,
 # something ( anything ) comes out the other side.
 
-use t::lib::PPI::Test::pragmas;
+use lib 't/lib';
+use PPI::Test::pragmas;
 use Test::More tests => 220 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use File::Spec::Functions ':ALL';
 use PPI;
 use Scalar::Util 'refaddr';
-use t::lib::PPI::Test 'pause';
+use PPI::Test 'pause';
 
 
 sub is_object {
