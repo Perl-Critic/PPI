@@ -3,7 +3,7 @@
 # Unit testing for PPI::Node
 
 use t::lib::PPI::Test::pragmas;
-use Test::More tests => 2 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+use Test::More tests => 4 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use PPI;
 
@@ -33,4 +33,14 @@ END_PERL
 	isa_ok( $document, 'PPI::Document' );
 	ok( defined($document->prune ('PPI::Statement::Sub')),
 		'Pruned multiple subs ok' );
+}
+
+REMOVE_CHILD: {
+	my $document = PPI::Document->new( \"1, 2, 3," );
+	my $node = $document->child;
+	my $del1 = $node->child(7);
+	is $node->remove_child($del1), $del1;
+	my $fake = bless { content => 3 }, "PPI::Token::Number";
+	local $TODO = "firstidx is mis-used here";
+	is $node->remove_child($fake), undef;
 }
