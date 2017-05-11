@@ -4,7 +4,7 @@
 
 use lib 't/lib';
 use PPI::Test::pragmas;
-use Test::More tests => 762 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+use Test::More tests => 765 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use PPI;
 use B 'perlstring';
@@ -496,6 +496,43 @@ TODO: {
 			'PPI::Token::Symbol' => '$f',
 		]
 	);
+}
+
+{   # these need to be fixed in PPI::Lexer->_statement, fixing these will break other tests that need to be changed
+	local $TODO = "clarify type of statement in constructor";
+	test_statement(
+		'[$args]',
+		[
+			'PPI::Structure::Constructor' => '[$args]',
+			'PPI::Token::Structure' => '[',
+			'PPI::Statement::Expression' => '$args',
+			'PPI::Token::Symbol' => '$args',
+			'PPI::Token::Structure' => ']',
+		]
+	);
+	test_statement(
+		'{$args}',
+		[
+			'PPI::Structure::Constructor' => '{$args}',
+			'PPI::Token::Structure' => '{',
+			'PPI::Statement::Expression' => '$args',
+			'PPI::Token::Symbol' => '$args',
+			'PPI::Token::Structure' => '}',
+		]
+	);
+	local $TODO = "hash constructors are currently mistaken for blocks";
+	test_statement(
+		'1 * {2}',
+		[
+			'PPI::Token::Number' => '1' ,
+			'PPI::Token::Operator' => '*',
+			'PPI::Structure::Constructor' => '{2}',
+			'PPI::Token::Structure' => '{',
+			'PPI::Statement' => '2',
+			'PPI::Token::Number' => '2',
+			'PPI::Token::Structure' => '}',
+		]
+	)
 }
 }
 
