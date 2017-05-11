@@ -4,10 +4,11 @@
 
 use lib 't/lib';
 use PPI::Test::pragmas;
-use Test::More tests => 132 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+use Test::More tests => 762 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use PPI;
-
+use B 'perlstring';
+our %known_bad_seps;
 
 OPERATOR_CAST: {
 	my @nothing = ( '',  [] );
@@ -74,8 +75,8 @@ OPERATOR_CAST: {
 	test_varying_whitespace( @number, @asterisk_op, @scalar );
 	test_varying_whitespace( @number, @asterisk_op, @list );
 	test_varying_whitespace( @number, @asterisk_op, @hash );
-TODO: {
-    local $TODO = "known bug";
+{
+	local %known_bad_seps = map { $_ => 1 } qw( null );
 	test_varying_whitespace( @number, @asterisk_op, @hashctor1 );
 	test_varying_whitespace( @number, @asterisk_op, @hashctor2 );
 	test_varying_whitespace( @number, @asterisk_op, @hashctor3 );
@@ -84,10 +85,13 @@ TODO: {
 	test_varying_whitespace( @number, @exp_op, @hashctor3 );  # doesn't compile, but make sure ** is operator
 	test_varying_whitespace( @number, @asteriskeq_op, @bareword );
 	test_varying_whitespace( @number, @asteriskeq_op, @hashctor3 );  # doesn't compile, but make sure it's an operator
+{
+	local %known_bad_seps = map { $_ => 1 } qw( space );
 	test_varying_whitespace( @nothing, @asterisk_cast, @scalar );
+}
 
-TODO: {
-    local $TODO = "known bug";
+{
+	local %known_bad_seps = map { $_ => 1 } qw( null );
 	test_varying_whitespace( @number, @percent_op, @scalar );
 	test_varying_whitespace( @number, @percent_op, @list );
 	test_varying_whitespace( @number, @percent_op, @hash );
@@ -98,27 +102,35 @@ TODO: {
 }
 	test_varying_whitespace( @number, @percenteq_op, @bareword );
 	test_varying_whitespace( @number, @percenteq_op, @hashctor3 );  # doesn't compile, but make sure it's an operator
+{
+	local %known_bad_seps = map { $_ => 1 } qw( space );
 	test_varying_whitespace( @nothing, @percent_cast, @scalar );
+}
 
-TODO: {
-    local $TODO = "known bug";
+{
+	local %known_bad_seps = map { $_ => 1 } qw( null );
 	test_varying_whitespace( @number, @ampersand_op, @scalar );
 	test_varying_whitespace( @number, @ampersand_op, @list );
 	test_varying_whitespace( @number, @ampersand_op, @hash );
 }
 	test_varying_whitespace( @number, @ampersand_op, @glob );
-TODO: {
-    local $TODO = "known bug";
+{
+	local %known_bad_seps = map { $_ => 1 } qw( null );
 	test_varying_whitespace( @number, @ampersand_op, @hashctor1 );
 	test_varying_whitespace( @number, @ampersand_op, @hashctor2 );
 	test_varying_whitespace( @number, @ampersand_op, @hashctor3 );
 }
 	test_varying_whitespace( @number, @ampersandeq_op, @bareword );
 	test_varying_whitespace( @number, @ampersandeq_op, @hashctor3 );  # doesn't compile, but make sure it's an operator
+{
+	local %known_bad_seps = map { $_ => 1 } qw( space );
 	test_varying_whitespace( @nothing, @ampersand_cast, @scalar );
+}
 
 	my @plus = ( '+', [ 'PPI::Token::Operator' => '+', ] );
 	my @ex = ( 'x', [ 'PPI::Token::Operator' => 'x', ] );
+{
+	local %known_bad_seps = map { $_ => 1 } qw( space );
 	test_varying_whitespace( @plus, @asterisk_cast, @scalar );
 	test_varying_whitespace( @plus, @asterisk_cast, @hashctor3 );
 	test_varying_whitespace( @plus, @percent_cast, @scalar );
@@ -131,10 +143,11 @@ TODO: {
 	test_varying_whitespace( @ex, @percent_cast, @hashctor3 );
 	test_varying_whitespace( @ex, @ampersand_cast, @scalar );
 	test_varying_whitespace( @ex, @ampersand_cast, @hashctor3 );
+}
 
 	my @single = ( "'3'", [ 'PPI::Token::Quote::Single' => "'3'", ] );
-TODO: {
-    local $TODO = "known bug";
+{
+	local %known_bad_seps = map { $_ => 1 } qw( null );
 	test_varying_whitespace( @single, @asterisk_op, @scalar );
 	test_varying_whitespace( @single, @asterisk_op, @hashctor3 );
 	test_varying_whitespace( @single, @percent_op, @scalar );
@@ -152,8 +165,8 @@ TODO: {
 }
 
 	test_varying_whitespace( @scalar, @asterisk_op, @scalar );
-TODO: {
-    local $TODO = "known bug";
+{
+	local %known_bad_seps = map { $_ => 1 } qw( null );
 	test_varying_whitespace( @scalar, @percent_op, @scalar );
 	test_varying_whitespace( @scalar, @ampersand_op, @scalar );
 
@@ -168,6 +181,8 @@ TODO: {
 			'PPI::Token::Structure' => '}',
 		]
 	);
+{
+	local %known_bad_seps = ( %known_bad_seps, map { $_ => 1 } qw( space ) );
 	test_varying_whitespace( @package, @asterisk_cast, @scalar, 1 );
 	test_varying_whitespace( @package, @asterisk_cast, @hashctor3, 1 );
 	test_varying_whitespace( @package, @percent_cast, @scalar, 1 );
@@ -176,6 +191,7 @@ TODO: {
 	test_varying_whitespace( @package, @ampersand_cast, @hashctor3, 1 );
 	test_varying_whitespace( @package, @at_cast, @scalar, 1 );
 	test_varying_whitespace( @package, @at_cast, @listctor, 1 );
+}
 }
 
 	my @sub = (
@@ -189,12 +205,15 @@ TODO: {
 			'PPI::Token::Structure' => '}',
 		]
 	);
+{
+	local %known_bad_seps = map { $_ => 1 } qw( space );
 	test_varying_whitespace( @sub, @asterisk_cast, @scalar, 1 );
 	test_varying_whitespace( @sub, @asterisk_cast, @hashctor3, 1 );
 	test_varying_whitespace( @sub, @percent_cast, @scalar, 1 );
 	test_varying_whitespace( @sub, @percent_cast, @hashctor3, 1 );
 	test_varying_whitespace( @sub, @ampersand_cast, @scalar, 1 );
 	test_varying_whitespace( @sub, @ampersand_cast, @hashctor3, 1 );
+}
 	test_varying_whitespace( @sub, @at_cast, @scalar, 1 );
 	test_varying_whitespace( @sub, @at_cast, @listctor, 1 );
 
@@ -206,12 +225,15 @@ TODO: {
 			'PPI::Token::Structure' => ';',
 		]
 	);
+{
+	local %known_bad_seps = map { $_ => 1 } qw( space );
 	test_varying_whitespace( @statement, @asterisk_cast, @scalar, 1 );
 	test_varying_whitespace( @statement, @asterisk_cast, @hashctor3, 1 );
 	test_varying_whitespace( @statement, @percent_cast, @scalar, 1 );
 	test_varying_whitespace( @statement, @percent_cast, @hashctor3, 1 );
 	test_varying_whitespace( @statement, @ampersand_cast, @scalar, 1 );
 	test_varying_whitespace( @statement, @ampersand_cast, @hashctor3, 1 );
+}
 	test_varying_whitespace( @statement, @at_cast, @scalar, 1 );
 	test_varying_whitespace( @statement, @at_cast, @listctor, 1 );
 
@@ -222,12 +244,15 @@ TODO: {
 			'PPI::Token::Label' => 'LABEL:',
 		]
 	);
+{
+	local %known_bad_seps = map { $_ => 1 } qw( space );
 	test_varying_whitespace( @label, @asterisk_cast, @scalar, 1 );
 	test_varying_whitespace( @label, @asterisk_cast, @hashctor3, 1 );
 	test_varying_whitespace( @label, @percent_cast, @scalar, 1 );
 	test_varying_whitespace( @label, @percent_cast, @hashctor3, 1 );
 	test_varying_whitespace( @label, @ampersand_cast, @scalar, 1 );
 	test_varying_whitespace( @label, @ampersand_cast, @hashctor3, 1 );
+}
 	test_varying_whitespace( @label, @at_cast, @scalar, 1 );
 	test_varying_whitespace( @label, @at_cast, @listctor, 1 );
 
@@ -242,12 +267,15 @@ TODO: {
 			'PPI::Token::Structure' => '}',
 		]
 	);
+{
+	local %known_bad_seps = map { $_ => 1 } qw( space );
 	test_varying_whitespace( @map, @asterisk_cast, @scalar );
 	test_varying_whitespace( @map, @asterisk_cast, @hashctor3 );
 	test_varying_whitespace( @map, @percent_cast, @scalar );
 	test_varying_whitespace( @map, @percent_cast, @hashctor3 );
 	test_varying_whitespace( @map, @ampersand_cast, @scalar );
 	test_varying_whitespace( @map, @ampersand_cast, @hashctor3 );
+}
 	test_varying_whitespace( @map, @at_cast, @scalar );
 	test_varying_whitespace( @map, @at_cast, @listctor );
 
@@ -262,8 +290,8 @@ TODO: {
 			'PPI::Token::Structure' => '}',
 		]
 	);
-TODO: {
-    local $TODO = "known bug";
+{
+	local %known_bad_seps = map { $_ => 1 } qw( null );
 	test_varying_whitespace( @evalblock, @asterisk_op, @scalar );
 	test_varying_whitespace( @evalblock, @asterisk_op, @hashctor3 );
 	test_varying_whitespace( @evalblock, @percent_op, @scalar );
@@ -345,8 +373,8 @@ TODO: {
 		]
 	);
 
-TODO: {
-    local $TODO = "known bug";
+{
+	local %known_bad_seps = map { $_ => 1 } qw( null );
 	test_varying_whitespace( @curly_subscript1, @asterisk_op, @scalar );
 	test_varying_whitespace( @curly_subscript1, @percent_op, @scalar );
 	test_varying_whitespace( @curly_subscript1, @ampersand_op, @scalar );
@@ -358,20 +386,23 @@ TODO: {
 	test_varying_whitespace( @curly_subscript3, @ampersand_op, @scalar );
 }
 	test_varying_whitespace( @square_subscript1, @asterisk_op, @scalar );
-TODO: {
-    local $TODO = "known bug";
+{
+	local %known_bad_seps = map { $_ => 1 } qw( null );
 	test_varying_whitespace( @square_subscript1, @percent_op, @scalar );
 	test_varying_whitespace( @square_subscript1, @ampersand_op, @scalar );
 }
 
+{
+	local %known_bad_seps = map { $_ => 1 } qw( space );
 	test_varying_whitespace( 'keys', [ 'PPI::Token::Word' => 'keys' ],     @percent_cast, @scalar );
 	test_varying_whitespace( 'values', [ 'PPI::Token::Word' => 'values' ], @percent_cast, @scalar );
 
 	test_varying_whitespace( 'keys', [ 'PPI::Token::Word' => 'keys' ],     @percent_cast, @hashctor3 );
 	test_varying_whitespace( 'values', [ 'PPI::Token::Word' => 'values' ], @percent_cast, @hashctor3 );
+}
 
 TODO: {
-    local $TODO = "known bug";
+	local $TODO = "known bug";
 	test_statement(
 		'} *$a', # unbalanced '}' before '*', arbitrary decision
 		[
@@ -397,7 +428,7 @@ TODO: {
 	);
 
 TODO: {
-    local $TODO = "known bug";
+	local $TODO = "known bug";
 	test_statement(
 		'$#tmp*$#tmp2',
 		[
@@ -444,7 +475,7 @@ TODO: {
 	);
 
 TODO: {
-    local $TODO = "known bug";
+	local $TODO = "known bug";
 	test_statement(
 		'++$i%$f',  # '%' wrongly a cast through 1.220.
 		[
@@ -458,18 +489,14 @@ TODO: {
 }
 }
 
-
-exit 0;
-
-
 sub test_statement {
 	local $Test::Builder::Level = $Test::Builder::Level+1;
 	my ( $code, $expected, $msg ) = @_;
-	$msg = $code if !defined $msg;
+	$msg = perlstring $code if !defined $msg;
 
 	my $d = PPI::Document->new( \$code );
 	my $tokens = $d->find( sub { $_[1]->significant } );
-	$tokens = [ map { ref($_), $_->content() } @$tokens ];
+	$tokens = [ map { ref($_), $_->content } @$tokens ];
 
 	if ( $expected->[0] !~ /^PPI::Statement/ ) {
 		$expected = [ 'PPI::Statement', $code, @$expected ];
@@ -484,17 +511,23 @@ sub test_statement {
 	return;
 }
 
-
 sub test_varying_whitespace {
 	local $Test::Builder::Level = $Test::Builder::Level+1;
 	my( $left, $left_expected, $cast_or_op, $cast_or_op_expected, $right, $right_expected, $right_is_statement ) = @_;
 
+{
+	local $TODO = "known bug" if $known_bad_seps{null};
 	assemble_and_test( "",  $left, $left_expected, $cast_or_op, $cast_or_op_expected, $right, $right_expected, $right_is_statement );
-#	assemble_and_test( " ", $left, $left_expected, $cast_or_op, $cast_or_op_expected, $right, $right_expected, $right_is_statement );
-#	assemble_and_test( "\t", $left, $left_expected, $cast_or_op, $cast_or_op_expected, $right, $right_expected, $right_is_statement );
-#	assemble_and_test( "\n", $left, $left_expected, $cast_or_op, $cast_or_op_expected, $right, $right_expected, $right_is_statement );
-#	assemble_and_test( "\f", $left, $left_expected, $cast_or_op, $cast_or_op_expected, $right, $right_expected, $right_is_statement );
-#	assemble_and_test( "\r", $left, $left_expected, $cast_or_op, $cast_or_op_expected, $right, $right_expected, $right_is_statement );  # fix this -- different breakage from \n, \t, etc.
+}
+{
+	local $TODO = "known bug" if $known_bad_seps{space};
+	assemble_and_test( " ", $left, $left_expected, $cast_or_op, $cast_or_op_expected, $right, $right_expected, $right_is_statement );
+	assemble_and_test( "\t", $left, $left_expected, $cast_or_op, $cast_or_op_expected, $right, $right_expected, $right_is_statement );
+	assemble_and_test( "\n", $left, $left_expected, $cast_or_op, $cast_or_op_expected, $right, $right_expected, $right_is_statement );
+	assemble_and_test( "\f", $left, $left_expected, $cast_or_op, $cast_or_op_expected, $right, $right_expected, $right_is_statement );
+}
+	local $TODO = "\\r is being nuked to \\n, need to fix that first";
+	assemble_and_test( "\r", $left, $left_expected, $cast_or_op, $cast_or_op_expected, $right, $right_expected, $right_is_statement );  # fix this -- different breakage from \n, \t, etc.
 
 	return;
 }
