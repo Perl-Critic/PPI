@@ -70,7 +70,17 @@ OPERATOR_CAST: {
 			'PPI::Token::Structure' => '}',
 		]
 	);
-	my @listctor = @hashctor3;
+	my @listctor = (
+		'[$args]',
+		[
+			'PPI::Structure::Constructor' => '[$args]',
+			'PPI::Token::Structure' => '[',
+#			'PPI::Statement::Expression' => '$args',
+			'PPI::Statement' => '$args',  # should be expression
+			'PPI::Token::Symbol' => '$args',
+			'PPI::Token::Structure' => ']',
+		]
+	);
 
 	test_varying_whitespace( @number, @asterisk_op, @scalar );
 	test_varying_whitespace( @number, @asterisk_op, @list );
