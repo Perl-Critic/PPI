@@ -543,6 +543,16 @@ sub one_line_explain {
 	return join "", @explain;
 }
 
+sub main_level_line {
+	return "" if not $TODO;
+	my @outer_final;
+	my $level = 0;
+	while ( my @outer = caller($level++) ) {
+		@outer_final = @outer;
+	}
+	return "l $outer_final[2] - ";
+}
+
 sub test_statement {
 	local $Test::Builder::Level = $Test::Builder::Level+1;
 	my ( $code, $expected, $msg ) = @_;
@@ -555,7 +565,7 @@ sub test_statement {
 	if ( $expected->[0] !~ /^PPI::Statement/ ) {
 		$expected = [ 'PPI::Statement', $code, @$expected ];
 	}
-	my $ok = is_deeply( $tokens, $expected, $msg );
+	my $ok = is_deeply( $tokens, $expected, main_level_line.$msg );
 	if ( !$ok ) {
 		diag ">>> $code -- $msg\n";
 		diag one_line_explain $tokens;
