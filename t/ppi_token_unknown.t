@@ -489,6 +489,13 @@ TODO: {
 }
 }
 
+sub one_line_explain {
+	my ($data) = @_;
+	my @explain = explain $data;
+	s/\n//g for @explain;
+	return join "", @explain;
+}
+
 sub test_statement {
 	local $Test::Builder::Level = $Test::Builder::Level+1;
 	my ( $code, $expected, $msg ) = @_;
@@ -504,8 +511,8 @@ sub test_statement {
 	my $ok = is_deeply( $tokens, $expected, $msg );
 	if ( !$ok ) {
 		diag ">>> $code -- $msg\n";
-		diag explain $tokens;
-		diag explain $expected;
+		diag one_line_explain $tokens;
+		diag one_line_explain $expected;
 	}
 
 	return;
