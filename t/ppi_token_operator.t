@@ -73,7 +73,7 @@ OPERATOR_X: {
 			],
 		},
 		{
-			desc => 'method with integer',
+			desc => 'method with method',
 			code => 'sort { $a->package cmp $b->package } ();',
 			expected => [
 				'PPI::Token::Word' => 'sort',
