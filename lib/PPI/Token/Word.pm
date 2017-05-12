@@ -182,21 +182,21 @@ sub __TOKENIZER__on_char {
 	}
 
 	# We might be a subroutine attribute.
-	my $tokens = $t->_previous_significant_tokens(1);
-	if ( $tokens->[0]->{_attribute} ) {
+	my @tokens = $t->_previous_significant_tokens(1);
+	if ( $tokens[0] and $tokens[0]->{_attribute} ) {
 		$t->{class} = $t->{token}->set_class( 'Attribute' );
 		return $t->{class}->__TOKENIZER__commit( $t );
 	}
 
 	# Check for a quote like operator
 	my $word = $t->{token}->{content};
-	if ( $QUOTELIKE{$word} and ! $class->__TOKENIZER__literal($t, $word, $tokens) ) {
+	if ( $QUOTELIKE{$word} and ! $class->__TOKENIZER__literal($t, $word, \@tokens) ) {
 		$t->{class} = $t->{token}->set_class( $QUOTELIKE{$word} );
 		return $t->{class}->__TOKENIZER__on_char( $t );
 	}
 
 	# Or one of the word operators
-	if ( $OPERATOR{$word} and ! $class->__TOKENIZER__literal($t, $word, $tokens) ) {
+	if ( $OPERATOR{$word} and ! $class->__TOKENIZER__literal($t, $word, \@tokens) ) {
 	 	$t->{class} = $t->{token}->set_class( 'Operator' );
  		return $t->_finalize_token->__TOKENIZER__on_char( $t );
 	}
@@ -251,8 +251,8 @@ sub __TOKENIZER__commit {
 	$t->{line_cursor} += length $word;
 
 	# We might be a subroutine attribute.
-	my $tokens = $t->_previous_significant_tokens(1);
-	if ( $tokens->[0]->{_attribute} ) {
+	my @tokens = $t->_previous_significant_tokens(1);
+	if ( $tokens[0] and $tokens[0]->{_attribute} ) {
 		$t->_new_token( 'Attribute', $word );
 		return ($t->{line_cursor} >= $t->{line_length}) ? 0
 			: $t->{class}->__TOKENIZER__on_char($t);
@@ -313,7 +313,7 @@ sub __TOKENIZER__commit {
 		# Since it's not a simple identifier...
 		$token_class = 'Word';
 
-	} elsif ( $class->__TOKENIZER__literal($t, $word, $tokens) ) {
+	} elsif ( $class->__TOKENIZER__literal($t, $word, \@tokens) ) {
 		$token_class = 'Word';
 
 	} elsif ( $QUOTELIKE{$word} ) {
@@ -330,7 +330,7 @@ sub __TOKENIZER__commit {
 		# If the next character is a ':' then it's a label...
 		pos $t->{line} = $t->{line_cursor};
 		if ( $t->{line} =~ m/\G(\s*:)(?!:)/gc ) {
-			if ( $tokens->[0]->{content} eq 'sub' ) {
+			if ( $tokens[0] and $tokens[0]->{content} eq 'sub' ) {
 				# ... UNLESS it's after 'sub' in which
 				# case it is a sub name and an attribute
 				# operator.
@@ -377,7 +377,15 @@ sub __TOKENIZER__literal {
 
 	# Check the cases when we have previous tokens
 	pos $t->{line} = $t->{line_cursor};
-	my $token = $tokens->[0] or return '';
+	my $token = $tokens->[0];
+
+	# In addition, if the word is followed by => it is probably
+	# also actually a word and not a regex.
+	if ( $t->{line} =~ /\G\s*=>/gc ) {
+		return 1;
+	}
+
+	return '' if not $token;
 
 	# We are forced if we are a method name
 	return 1 if $token->{content} eq '->';
@@ -388,12 +396,6 @@ sub __TOKENIZER__literal {
 	# If we are contained in a pair of curly braces,
 	# we are probably a bareword hash key
 	if ( $token->{content} eq '{' and $t->{line} =~ /\G\s*\}/gc ) {
-		return 1;
-	}
-
-	# In addition, if the word is followed by => it is probably
-	# also actually a word and not a regex.
-	if ( $t->{line} =~ /\G\s*=>/gc ) {
 		return 1;
 	}
 

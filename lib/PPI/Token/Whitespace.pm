@@ -222,18 +222,24 @@ sub __TOKENIZER__on_char {
 		# 3. The one before that is a 'structure'
 
 		# Get the three previous significant tokens
-		my $tokens = $t->_previous_significant_tokens(3);
+		my @tokens = $t->_previous_significant_tokens(3);
 
 		# A normal subroutine declaration
-		my $p1 = $tokens->[1];
-		my $p2 = $tokens->[2];
+		my $p1 = $tokens[1];
+		my $p2 = $tokens[2];
 		if (
-			$tokens->[0]->isa('PPI::Token::Word')
+			$tokens[0]
+			and
+			$tokens[0]->isa('PPI::Token::Word')
+			and
+			$p1
 			and
 			$p1->isa('PPI::Token::Word')
 			and
 			$p1->content eq 'sub'
 			and (
+				not $p2
+				or
 				$p2->isa('PPI::Token::Structure')
 				or (
 					$p2->isa('PPI::Token::Whitespace')
@@ -247,8 +253,8 @@ sub __TOKENIZER__on_char {
 		}
 
 		# A prototyped anonymous subroutine
-		my $p0 = $tokens->[0];
-		if ( $p0->isa('PPI::Token::Word') and $p0->content eq 'sub'
+		my $p0 = $tokens[0];
+		if ( $p0 and $p0->isa('PPI::Token::Word') and $p0->content eq 'sub'
 			# Maybe it's invoking a method named 'sub'
 			and not ( $p1 and $p1->isa('PPI::Token::Operator') and $p1->content eq '->')
 		) {
@@ -270,16 +276,18 @@ sub __TOKENIZER__on_char {
 		# $foo < $bar
 		# 1 < $bar
 		# $#foo < $bar
-		return 'Operator' if $prev->isa('PPI::Token::Symbol');
-		return 'Operator' if $prev->isa('PPI::Token::Magic');
-		return 'Operator' if $prev->isa('PPI::Token::Number');
-		return 'Operator' if $prev->isa('PPI::Token::ArrayIndex');
+		return 'Operator' if $prev and $prev->isa('PPI::Token::Symbol');
+		return 'Operator' if $prev and $prev->isa('PPI::Token::Magic');
+		return 'Operator' if $prev and $prev->isa('PPI::Token::Number');
+		return 'Operator' if $prev and $prev->isa('PPI::Token::ArrayIndex');
 
 		# If it is <<... it's a here-doc instead
 		my $next_char = substr( $t->{line}, $t->{line_cursor} + 1, 1 );
 		if ( $next_char eq '<' ) {
 			return 'Operator';
 		}
+
+		return 'Operator' if not $prev;
 
 		# The most common group of readlines are used like
 		# while ( <...> )
@@ -321,6 +329,10 @@ sub __TOKENIZER__on_char {
 		# Do some context stuff to guess ( ack ) which.
 		# Hopefully the guess will be good enough.
 		my $prev = $t->_last_significant_token;
+
+		# Or as the very first thing in a file
+		return 'Regexp::Match' if not $prev;
+
 		my $prec = $prev->content;
 
 		# Most times following an operator, we are a regex.
@@ -362,9 +374,6 @@ sub __TOKENIZER__on_char {
 		) {
 			return 'Regexp::Match';
 		}
-
-		# Or as the very first thing in a file
-		return 'Regexp::Match' if $prec eq '';
 
 		# What about the char after the slash? There's some things
 		# that would be highly illogical to see if it's an operator.

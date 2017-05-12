@@ -61,8 +61,8 @@ sub __TOKENIZER__on_char {
 
 		if ( $char =~ /[\w:]/ ) {
 			# Symbol (unless the thing before it is a number
-			my ( $prev ) = @{ $t->_previous_significant_tokens(1) };
-			if ( $prev and ! $prev->isa('PPI::Token::Number') ) {
+			my ( $prev ) = $t->_previous_significant_tokens(1);
+			if ( not $prev or not $prev->isa('PPI::Token::Number') ) {
 				$t->{class} = $t->{token}->set_class( 'Symbol' );
 				return 1;
 			}
@@ -165,8 +165,8 @@ sub __TOKENIZER__on_char {
 
 		if ( $char =~ /[\w:]/ ) {
 			# Symbol (unless the thing before it is a number
-			my ( $prev ) = @{ $t->_previous_significant_tokens(1) };
-			if ( $prev and ! $prev->isa('PPI::Token::Number') ) {
+			my ( $prev ) = $t->_previous_significant_tokens(1);
+			if ( not $prev or not $prev->isa('PPI::Token::Number') ) {
 				$t->{class} = $t->{token}->set_class( 'Symbol' );
 				return 1;
 			}
@@ -200,8 +200,8 @@ sub __TOKENIZER__on_char {
 
 		if ( $char =~ /[\w:]/ ) {
 			# Symbol (unless the thing before it is a number
-			my ( $prev ) = @{ $t->_previous_significant_tokens(1) };
-			if ( $prev and ! $prev->isa('PPI::Token::Number') ) {
+			my ( $prev ) = $t->_previous_significant_tokens(1);
+			if ( not $prev or not $prev->isa('PPI::Token::Number') ) {
 				$t->{class} = $t->{token}->set_class( 'Symbol' );
 				return 1;
 			}
@@ -359,8 +359,9 @@ sub _cast_or_op {
 # Are we at a location where a ':' would indicate a subroutine attribute
 sub __TOKENIZER__is_an_attribute {
 	my $t      = $_[1]; # Tokenizer object
-	my $tokens = $t->_previous_significant_tokens(3);
-	my $p0     = $tokens->[0];
+	my @tokens = $t->_previous_significant_tokens(3);
+	my $p0     = $tokens[0];
+	return '' if not $p0;
 
 	# If we just had another attribute, we are also an attribute
 	return 1 if $p0->isa('PPI::Token::Attribute');
@@ -377,13 +378,17 @@ sub __TOKENIZER__is_an_attribute {
 	}
 
 	# Or, we could be a named subroutine
-	my $p1 = $tokens->[1];
-	my $p2 = $tokens->[2];
+	my $p1 = $tokens[1];
+	my $p2 = $tokens[2];
 	if (
+		$p1
+		and
 		$p1->isa('PPI::Token::Word')
 		and
 		$p1->content eq 'sub'
 		and (
+			not $p2
+			or
 			$p2->isa('PPI::Token::Structure')
 			or (
 				$p2->isa('PPI::Token::Whitespace')

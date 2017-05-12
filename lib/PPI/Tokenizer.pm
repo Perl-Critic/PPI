@@ -686,28 +686,21 @@ sub _last_significant_token {
 
 # Get an array ref of previous significant tokens.
 # Like _last_significant_token except it gets more than just one token
-# Returns array ref
-# Pads with zero-length whitespace tokens if there are less than requested
+# Returns array with 0 to x entries
 sub _previous_significant_tokens {
 	my $self   = shift;
 	my $count  = shift || 1;
 	my $cursor = $#{ $self->{tokens} };
 
-	my ($token, @tokens);
+	my @tokens;
 	while ( $cursor >= 0 ) {
-		$token = $self->{tokens}->[$cursor--];
-		if ( $token->significant ) {
-			push @tokens, $token;
-			return \@tokens if scalar @tokens >= $count;
-		}
+		my $token = $self->{tokens}->[$cursor--];
+		next if not $token->significant;
+		push @tokens, $token;
+		last if @tokens >= $count;
 	}
 
-	# Pad with empties
-	foreach ( 1 .. ($count - scalar @tokens) ) {
-		push @tokens, PPI::Token::Whitespace->null;
-	}
-
-	\@tokens;
+	return @tokens;
 }
 
 my %OBVIOUS_CLASS = (
@@ -738,8 +731,9 @@ my %OBVIOUS_CONTENT = (
 # Returns "operator", "operand", or "" if unknown.
 sub _opcontext {
 	my $self   = shift;
-	my $tokens = $self->_previous_significant_tokens(1);
-	my $p0     = $tokens->[0];
+	my @tokens = $self->_previous_significant_tokens(1);
+	my $p0     = $tokens[0];
+	return '' if not $p0;
 	my $c0     = ref $p0;
 
 	# Map the obvious cases
