@@ -9,4 +9,5 @@ Makefile$
 Makefile.old
 PPI-.*\.tar\.gz
 blib
+dev_notes.txt
 pm_to_blib

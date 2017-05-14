@@ -1,0 +1,36 @@
+prove -l -v t | grep '^^[ \t]*ok.*TODO'
+prove -l -v t | grep '^^not ok'
+
+prove -vl t\ppi_token_unknown.t | grep '^^[ \t]*ok.*TODO'
+
+prove -vl t\ppi_token_unknown.t | grep '^^not ok'
+
+
+prove -l -j 9 t
+
+https://github.com/wolfsage/p5-distribution-smoke
+
+D:\cpan\p5-distribution-smoke>perl -Ilib bin\p5-distribution-smoke -b new -a Perl::Critic ../PPI
+
+D:\cpan\p5-distribution-smoke>perl -Ilib bin\p5-distribution-smoke -b new -r ../PPI
+
+
+perl -Ilib bin/p5-distribution-smoke -r -b new -n PPI -s MooseX::amine -s ^Task:: -s Apache2::PPI::HTML ../PPI
+
+perl -Ilib bin/p5-distribution-smoke -r -b old -n PPI -s MooseX::amine -s ^Task:: -s Apache2::PPI::HTML ../PPI
+
+
+perl -Ilib bin/p5-distribution-smoke -r -a Perl::Critic::* -b new -n PPI -s MooseX::amine -s ^Task:: -s Apache2::PPI::HTML ../PPI
+
+perl -Ilib bin/p5-distribution-smoke -r -a Perl::Critic::* -b old -n PPI -s MooseX::amine -s ^Task:: -s Apache2::PPI::HTML ../PPI
+
+
+perl -Ilib bin/p5-distribution-smoke -r -d 2 -b new -n PPI -s MooseX::amine -s ^Task:: -s Apache2::PPI::HTML ../PPI
+
+perl -Ilib bin/p5-distribution-smoke -r -d 2 -b old -n PPI -s MooseX::amine -s ^Task:: -s Apache2::PPI::HTML ../PPI
+
+
+ppi_version change 1.221_02 1.222
+
+dmake clean
+perl Makefile.PL && dmake && dmake manifest && dmake dist
