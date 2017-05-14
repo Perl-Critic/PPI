@@ -6,11 +6,10 @@ Revision history for Perl extension PPI
 	- many documentation fixes
 	- add ->version method to PPI::Statement::Package (WOLFSAGE)
 	- remove unused PPI::Document->new timeout feature
-	- removal of Test::NoWarnings
-	- less uses of List::MoreUtils in favor of List::Util
 	- do not expect '.' in @INC (PLICEASE)
 	- many parsing fixes
 	- various fixes to the behaviors of methods
+	- removal of problematic dependencies
 
 	Details:
 	- Remove undocumented, non-working 'timeout' attribute to
@@ -24,6 +23,8 @@ Revision history for Perl extension PPI
 	  op (MOREGAN)
 	- remove source code escapes in the output of QuoteLike::Words->literal
 	  (MOREGAN)
+	- removal of Test::NoWarnings
+	- less uses of List::MoreUtils in favor of List::Util
 
 1.220 Tue 11 Nov 2014
 	Summary:
