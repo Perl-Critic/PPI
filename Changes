@@ -1,6 +1,6 @@
 Revision history for Perl extension PPI
 
-1.222
+1.222 Sun 14 May 2017
 	Summary:
 	- unit tests for many parts, both passing and TODO
 	- many documentation fixes

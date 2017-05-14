@@ -11,7 +11,7 @@ use PPI::Test::Object;
 
 use vars qw{$VERSION};
 BEGIN {
-	$VERSION = '1.221_02';
+	$VERSION = '1.222';
 }
 
 
