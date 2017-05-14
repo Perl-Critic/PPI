@@ -1,11 +1,6 @@
 Revision history for Perl extension PPI
 
-1.221_02
-	Summary:
-    - fix 014 test being broken below 5.8.7
-    - house-keeping
-
-1.221_01
+1.222
 	Summary:
 	- unit tests for many parts, both passing and TODO
 	- many documentation fixes
