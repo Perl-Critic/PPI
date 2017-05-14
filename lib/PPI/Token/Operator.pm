@@ -42,9 +42,10 @@ L<PPI::Token> and L<PPI::Element> classes.
 use strict;
 use PPI::Token ();
 
-use vars qw{$VERSION @ISA %OPERATOR};
+our $VERSION = '1.236';
+
+use vars qw{@ISA %OPERATOR};
 BEGIN {
-	$VERSION = '1.236';
 	@ISA     = 'PPI::Token';
 
 	# Build the operator index

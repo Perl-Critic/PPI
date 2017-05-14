@@ -35,10 +35,7 @@ generate the dump content itself.
 use strict;
 use Params::Util qw{_INSTANCE};
 
-use vars qw{$VERSION};
-BEGIN {
-	$VERSION = '1.236';
-}
+our $VERSION = '1.236';
 
 
 

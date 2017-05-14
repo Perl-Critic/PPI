@@ -21,9 +21,10 @@ within it, and it does not represent a scope.
 use strict;
 use PPI::Document ();
 
-use vars qw{$VERSION @ISA};
+our $VERSION = '1.236';
+
+use vars qw{@ISA};
 BEGIN {
-	$VERSION = '1.236';
 	@ISA     = 'PPI::Document';
 }
 

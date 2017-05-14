@@ -7,9 +7,10 @@ use Clone                    ();
 use Carp                     ();
 use PPI::Token::_QuoteEngine ();
 
-use vars qw{$VERSION @ISA %quotes %sections};
+our $VERSION = '1.236';
+
+use vars qw{@ISA %quotes %sections};
 BEGIN {
-	$VERSION = '1.236';
 	@ISA     = 'PPI::Token::_QuoteEngine';
 
 	# Prototypes for the different braced sections

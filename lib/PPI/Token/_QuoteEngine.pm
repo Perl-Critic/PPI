@@ -33,10 +33,7 @@ If -E<gt>fill returns true, finalise the token.
 use strict;
 use Carp ();
 
-use vars qw{$VERSION};
-BEGIN {
-	$VERSION = '1.236';
-}
+our $VERSION = '1.236';
 
 
 

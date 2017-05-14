@@ -31,9 +31,10 @@ use strict;
 use PPI::Token     ();
 use PPI::Exception ();
 
-use vars qw{$VERSION @ISA $CURLY_SYMBOL};
+our $VERSION = '1.236';
+
+use vars qw{@ISA $CURLY_SYMBOL};
 BEGIN {
-	$VERSION = '1.236';
 	@ISA     = 'PPI::Token';
 	$CURLY_SYMBOL = qr{\G\^[[:upper:]_]\w+\}};
 }

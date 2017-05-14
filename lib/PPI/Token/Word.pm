@@ -38,9 +38,10 @@ now, look at L<Perl::Critic::Utils>.
 use strict;
 use PPI::Token ();
 
-use vars qw{$VERSION @ISA %OPERATOR %QUOTELIKE %KEYWORDS};
+our $VERSION = '1.236';
+
+use vars qw{@ISA %OPERATOR %QUOTELIKE %KEYWORDS};
 BEGIN {
-	$VERSION = '1.236';
 	@ISA     = 'PPI::Token';
 
 	# Copy in OPERATOR from PPI::Token::Operator

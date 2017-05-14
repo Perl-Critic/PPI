@@ -5,9 +5,10 @@ package PPI::Token::_QuoteEngine::Simple;
 use strict;
 use PPI::Token::_QuoteEngine ();
 
-use vars qw{$VERSION @ISA};
+our $VERSION = '1.236';
+
+use vars qw{@ISA};
 BEGIN {
-	$VERSION = '1.236';
 	@ISA     = 'PPI::Token::_QuoteEngine';
 }
 

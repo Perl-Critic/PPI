@@ -152,9 +152,10 @@ use Params::Util   qw{_INSTANCE};
 use PPI::Node      ();
 use PPI::Exception ();
 
-use vars qw{$VERSION @ISA *_PARENT};
+our $VERSION = '1.236';
+
+use vars qw{@ISA *_PARENT};
 BEGIN {
-	$VERSION = '1.236';
 	@ISA     = 'PPI::Node';
 	*_PARENT = *PPI::Element::_PARENT;
 }

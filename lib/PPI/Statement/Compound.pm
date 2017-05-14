@@ -53,9 +53,10 @@ standard L<PPI::Statement>, L<PPI::Node> and L<PPI::Element> methods.
 use strict;
 use PPI::Statement ();
 
-use vars qw{$VERSION @ISA %TYPES};
+our $VERSION = '1.236';
+
+use vars qw{@ISA %TYPES};
 BEGIN {
-	$VERSION = '1.236';
 	@ISA     = 'PPI::Statement';
 
 	# Keyword type map

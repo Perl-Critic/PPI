@@ -55,9 +55,10 @@ use List::MoreUtils ();
 use Params::Util    qw{_INSTANCE _CLASS _CODELIKE _NUMBER};
 use PPI::Element    ();
 
-use vars qw{$VERSION @ISA *_PARENT};
+our $VERSION = '1.236';
+
+use vars qw{@ISA *_PARENT};
 BEGIN {
-	$VERSION = '1.236';
 	@ISA     = 'PPI::Element';
 	*_PARENT = *PPI::Element::_PARENT;
 }

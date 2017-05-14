@@ -6,9 +6,10 @@ use 5.006;
 use strict;
 
 # Set the version for CPAN
-use vars qw{$VERSION $XS_COMPATIBLE @XS_EXCLUDE};
+our $VERSION = '1.236';
+
+use vars qw{$XS_COMPATIBLE @XS_EXCLUDE};
 BEGIN {
-	$VERSION       = '1.236';
 	$XS_COMPATIBLE = '0.845';
 	@XS_EXCLUDE    = ();
 }

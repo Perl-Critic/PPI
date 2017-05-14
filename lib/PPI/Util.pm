@@ -7,9 +7,10 @@ use Exporter     ();
 use Digest::MD5  ();
 use Params::Util qw{_INSTANCE _SCALAR0 _ARRAY0};
 
-use vars qw{$VERSION @ISA @EXPORT_OK};
+our $VERSION = '1.236';
+
+use vars qw{@ISA @EXPORT_OK};
 BEGIN {
-	$VERSION   = '1.236';
 	@ISA       = 'Exporter';
 	@EXPORT_OK = qw{_Document _slurp};
 }

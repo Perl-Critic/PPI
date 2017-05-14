@@ -40,9 +40,10 @@ use List::Util 1.33           ();
 use PPI::Util                 '_Document';
 use PPI::Document::Normalized ();
 
-use vars qw{$VERSION %LAYER};
+our $VERSION = '1.236';
+
+use vars qw{%LAYER};
 BEGIN {
-	$VERSION = '1.236';
 
 	# Registered function store
 	%LAYER = (

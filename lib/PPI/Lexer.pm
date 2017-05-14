@@ -60,9 +60,10 @@ use List::MoreUtils ();
 use PPI             ();
 use PPI::Exception  ();
 
-use vars qw{$VERSION $errstr *_PARENT %ROUND %RESOLVE};
+our $VERSION = '1.236';
+
+use vars qw{$errstr *_PARENT %ROUND %RESOLVE};
 BEGIN {
-	$VERSION = '1.236';
 	$errstr  = '';
 
 	# Faster than having another method call just

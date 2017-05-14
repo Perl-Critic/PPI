@@ -29,9 +29,10 @@ use List::MoreUtils ();
 use PPI::Util       ();
 use PPI::Node       ();
 
-use vars qw{$VERSION $errstr %_PARENT};
+our $VERSION = '1.236';
+
+use vars qw{$errstr %_PARENT};
 BEGIN {
-	$VERSION = '1.236';
 	$errstr  = '';
 
 	# Master Child -> Parent index

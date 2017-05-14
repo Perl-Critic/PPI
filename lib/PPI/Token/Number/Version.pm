@@ -33,9 +33,10 @@ at all by Perl, but they look like numbers to a parser.
 use strict;
 use PPI::Token::Number ();
 
-use vars qw{$VERSION @ISA};
+our $VERSION = '1.236';
+
+use vars qw{@ISA};
 BEGIN {
-	$VERSION = '1.236';
 	@ISA     = 'PPI::Token::Number';
 }
 

@@ -2,10 +2,7 @@ package Helper;
 
 use base 'Exporter';
 
-use vars qw{$VERSION};
-BEGIN {
-	$VERSION = '1.236';
-}
+our $VERSION = '1.236';
 
 @EXPORT_OK = qw( check_with );
 

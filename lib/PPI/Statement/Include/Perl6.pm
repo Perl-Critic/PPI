@@ -41,9 +41,10 @@ string and will not be parsed by PPI.
 use strict;
 use PPI::Statement::Include ();
 
-use vars qw{$VERSION @ISA};
+our $VERSION = '1.236';
+
+use vars qw{@ISA};
 BEGIN {
-	$VERSION = '1.236';
 	@ISA     = 'PPI::Statement::Include';
 }
 
