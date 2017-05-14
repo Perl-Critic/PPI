@@ -1,5 +1,9 @@
 Revision history for Perl extension PPI
 
+1.224 Sun 14 May 2017
+	Summary:
+	- updating an out-of-date meta.yml caused by Module::Install
+
 1.222 Sun 14 May 2017
 	Summary:
 	- unit tests for many parts, both passing and TODO

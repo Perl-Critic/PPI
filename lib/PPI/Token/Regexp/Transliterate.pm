@@ -40,7 +40,7 @@ use PPI::Token::_QuoteEngine::Full ();
 
 use vars qw{$VERSION @ISA};
 BEGIN {
-	$VERSION = '1.222';
+	$VERSION = '1.224';
 	@ISA     = qw{
 		PPI::Token::_QuoteEngine::Full
 		PPI::Token::Regexp

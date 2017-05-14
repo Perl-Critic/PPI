@@ -42,7 +42,7 @@ use PPI::Document::Normalized ();
 
 use vars qw{$VERSION %LAYER};
 BEGIN {
-	$VERSION = '1.222';
+	$VERSION = '1.224';
 
 	# Registered function store
 	%LAYER = (

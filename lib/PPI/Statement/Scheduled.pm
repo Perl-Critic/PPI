@@ -58,7 +58,7 @@ use PPI::Statement::Sub ();
 
 use vars qw{$VERSION @ISA};
 BEGIN {
-	$VERSION = '1.222';
+	$VERSION = '1.224';
 	@ISA     = 'PPI::Statement::Sub';
 }
 
