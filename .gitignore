@@ -2,10 +2,13 @@
 /MYMETA.yml
 /MYMETA.json
 /Makefile
+/Makefile.old
 /README
 /blib
 /inc
 /pm_to_blib
 /MANIFEST
+/MANIFEST.bak
 /nytprof*
 /cover_db
+/PPI-*.tar.gz
