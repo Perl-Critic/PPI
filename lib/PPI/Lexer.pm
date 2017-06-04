@@ -56,7 +56,6 @@ For more unusual tasks, by all means forge onwards.
 use strict;
 use Scalar::Util    ();
 use Params::Util    qw{_STRING _INSTANCE};
-use List::MoreUtils ();
 use PPI             ();
 use PPI::Exception  ();
 
