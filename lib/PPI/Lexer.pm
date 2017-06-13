@@ -1058,6 +1058,13 @@ sub _square {
 			# $foo[], @foo[]
 			return 'PPI::Structure::Subscript';
 		}
+		if ( $Element->isa('PPI::Token::Cast') and $Element->content =~ /^(?:\@|\%)/ ) {
+			my $prior = $Parent->schild(-2);
+			if ( $prior and $prior->isa('PPI::Token::Operator') and $prior->content eq '->' ) {
+				# Postfix dereference: ->@[...] ->%[...]
+				return 'PPI::Structure::Subscript';
+			}
+		}
 		# FIXME - More cases to catch
 	}
 
@@ -1136,6 +1143,13 @@ sub _curly {
 		if ( $content =~ /^(?:\$|\@)/ and $Element->isa('PPI::Token::Symbol') ) {
 			# $foo{}, @foo{}
 			return 'PPI::Structure::Subscript';
+		}
+		if ( $Element->isa('PPI::Token::Cast') and $Element->content =~ /^(?:\@|\%|\*)/ ) {
+			my $prior = $Parent->schild(-2);
+			if ( $prior and $prior->isa('PPI::Token::Operator') and $prior->content eq '->' ) {
+				# Postfix dereference: ->@{...} ->%{...} ->*{...}
+				return 'PPI::Structure::Subscript';
+			}
 		}
 		if ( $Element->isa('PPI::Structure::Block') ) {
 			# deference - ${$hash_ref}{foo}
