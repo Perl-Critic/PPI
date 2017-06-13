@@ -463,8 +463,6 @@ OPERATOR_CAST: {
 		]
 	);
 
-{
-	local $TODO = "implement postfix dereference recognition";
 	# Postfix dereference
 
 	test_statement(
@@ -601,7 +599,6 @@ OPERATOR_CAST: {
 			'PPI::Token::Structure' => '}',
 		]
 	);
-}
 
 {   # these need to be fixed in PPI::Lexer->_statement, fixing these will break other tests that need to be changed
 	local $TODO = "clarify type of statement in constructor";

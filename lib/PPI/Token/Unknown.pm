@@ -77,6 +77,15 @@ sub __TOKENIZER__on_char {
 			}
 		}
 
+		# Postfix dereference: ->**
+		if ( $char eq '*' ) {
+			my ( $prev ) = $t->_previous_significant_tokens(1);
+			if ( $prev and $prev->isa('PPI::Token::Operator') and $prev->content eq '->' ) {
+				$t->{class} = $t->{token}->set_class( 'Cast' );
+				return 1;
+			}
+		}
+
 		if ( $char eq '*' || $char eq '=' ) {
 			# Power operator '**' or mult-assign '*='
 			$t->{class} = $t->{token}->set_class( 'Operator' );
@@ -91,6 +100,15 @@ sub __TOKENIZER__on_char {
 
 
 	} elsif ( $c eq '$' ) {
+		# Postfix dereference: ->$* ->$#*
+		if ( $char eq '*' || $char eq '#' ) {
+			my ( $prev ) = $t->_previous_significant_tokens(1);
+			if ( $prev and $prev->isa('PPI::Token::Operator') and $prev->content eq '->' ) {
+				$t->{class} = $t->{token}->set_class( 'Cast' );
+				return 1;
+			}
+		}
+
 		if ( $char =~ /[a-z_]/i ) {
 			# Symbol
 			$t->{class} = $t->{token}->set_class( 'Symbol' );
@@ -120,6 +138,15 @@ sub __TOKENIZER__on_char {
 
 
 	} elsif ( $c eq '@' ) {
+		# Postfix dereference: ->@*
+		if ( $char eq '*' ) {
+			my ( $prev ) = $t->_previous_significant_tokens(1);
+			if ( $prev and $prev->isa('PPI::Token::Operator') and $prev->content eq '->' ) {
+				$t->{class} = $t->{token}->set_class( 'Cast' );
+				return 1;
+			}
+		}
+
 		if ( $char =~ /[\w:]/ ) {
 			# Symbol
 			$t->{class} = $t->{token}->set_class( 'Symbol' );
@@ -149,6 +176,21 @@ sub __TOKENIZER__on_char {
 
 
 	} elsif ( $c eq '%' ) {
+		# Postfix dereference: ->%* ->%[...]
+		if ( $char eq '*' || $char eq '[' ) {
+			my ( $prev ) = $t->_previous_significant_tokens(1);
+			if ( $prev and $prev->isa('PPI::Token::Operator') and $prev->content eq '->' ) {
+				if ( $char eq '*' ) {
+					$t->{class} = $t->{token}->set_class( 'Cast' );
+					return 1;
+				}
+				if ( $char eq '[' ) {
+					$t->{class} = $t->{token}->set_class( 'Cast' );
+					return $t->_finalize_token->__TOKENIZER__on_char( $t );
+				}
+			}
+		}
+
 		# Is it a number?
 		if ( $char =~ /\d/ ) {
 			# bitwise operator
@@ -190,6 +232,15 @@ sub __TOKENIZER__on_char {
 
 
 	} elsif ( $c eq '&' ) {
+		# Postfix dereference: ->&*
+		if ( $char eq '*' ) {
+			my ( $prev ) = $t->_previous_significant_tokens(1);
+			if ( $prev and $prev->isa('PPI::Token::Operator') and $prev->content eq '->' ) {
+				$t->{class} = $t->{token}->set_class( 'Cast' );
+				return 1;
+			}
+		}
+
 		# Is it a number?
 		if ( $char =~ /\d/ ) {
 			# bitwise operator

@@ -36,6 +36,13 @@ our $VERSION = '1.236';
 
 our @ISA = "PPI::Token";
 
+our %POSTFIX = map { $_ => 1 } (
+	qw{
+	%* @* $*
+	},
+	'$#*' # throws warnings if it's inside a qw
+);
+
 
 
 
@@ -43,8 +50,16 @@ our @ISA = "PPI::Token";
 # Tokenizer Methods
 
 # A cast is either % @ $ or $#
+# and also postfix dereference are %* @* $* $#*
 sub __TOKENIZER__on_char {
-	$_[1]->_finalize_token->__TOKENIZER__on_char( $_[1] );
+	my $t    = $_[1];
+	my $char = substr( $t->{line}, $t->{line_cursor}, 1 );
+
+	# Are we still an operator if we add the next character
+	my $content = $t->{token}->{content};
+	return 1 if $POSTFIX{ $content . $char };
+
+	$t->_finalize_token->__TOKENIZER__on_char( $t );
 }
 
 1;
