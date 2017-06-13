@@ -4,7 +4,7 @@
 
 use lib 't/lib';
 use PPI::Test::pragmas;
-use Test::More tests => 765 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+use Test::More tests => 776 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use PPI;
 use B 'perlstring';
@@ -460,6 +460,143 @@ OPERATOR_CAST: {
 			'PPI::Token::Symbol' => '$i',
 			'PPI::Token::Operator' => '%',
 			'PPI::Token::Symbol' => '$f',
+		]
+	);
+
+	# Postfix dereference
+
+	test_statement(
+		'$foo->$*',
+		[
+			'PPI::Statement' => '$foo->$*',
+			'PPI::Token::Symbol' => '$foo',
+			'PPI::Token::Operator' => '->',
+			'PPI::Token::Cast' => '$*',
+		]
+	);
+
+	test_statement(
+		'$foo->@*',
+		[
+			'PPI::Statement' => '$foo->@*',
+			'PPI::Token::Symbol' => '$foo',
+			'PPI::Token::Operator' => '->',
+			'PPI::Token::Cast' => '@*',
+		]
+	);
+
+	test_statement(
+		'$foo->$#*',
+		[
+			'PPI::Statement' => '$foo->$#*',
+			'PPI::Token::Symbol' => '$foo',
+			'PPI::Token::Operator' => '->',
+			'PPI::Token::Cast' => '$#*',
+		]
+	);
+
+	test_statement(
+		'$foo->%*',
+		[
+			'PPI::Statement' => '$foo->%*',
+			'PPI::Token::Symbol' => '$foo',
+			'PPI::Token::Operator' => '->',
+			'PPI::Token::Cast' => '%*',
+		]
+	);
+
+	test_statement(
+		'$foo->&*',
+		[
+			'PPI::Statement' => '$foo->&*',
+			'PPI::Token::Symbol' => '$foo',
+			'PPI::Token::Operator' => '->',
+			'PPI::Token::Cast' => '&*',
+		]
+	);
+
+	test_statement(
+		'$foo->**',
+		[
+			'PPI::Statement' => '$foo->**',
+			'PPI::Token::Symbol' => '$foo',
+			'PPI::Token::Operator' => '->',
+			'PPI::Token::Cast' => '**',
+		]
+	);
+
+	test_statement(
+		'$foo->@[0]',
+		[
+			'PPI::Statement' => '$foo->@[0]',
+			'PPI::Token::Symbol' => '$foo',
+			'PPI::Token::Operator' => '->',
+			'PPI::Token::Cast' => '@',
+			'PPI::Structure::Subscript' => '[0]',
+			'PPI::Token::Structure' => '[',
+			'PPI::Statement::Expression' => '0',
+			'PPI::Token::Number' => '0',
+			'PPI::Token::Structure' => ']',
+		]
+	);
+
+	test_statement(
+		'$foo->@{0}',
+		[
+			'PPI::Statement' => '$foo->@{0}',
+			'PPI::Token::Symbol' => '$foo',
+			'PPI::Token::Operator' => '->',
+			'PPI::Token::Cast' => '@',
+			'PPI::Structure::Subscript' => '{0}',
+			'PPI::Token::Structure' => '{',
+			'PPI::Statement::Expression' => '0',
+			'PPI::Token::Number' => '0',
+			'PPI::Token::Structure' => '}',
+		]
+	);
+
+	test_statement(
+		'$foo->%["bar"]',
+		[
+			'PPI::Statement' => '$foo->%["bar"]',
+			'PPI::Token::Symbol' => '$foo',
+			'PPI::Token::Operator' => '->',
+			'PPI::Token::Cast' => '%',
+			'PPI::Structure::Subscript' => '["bar"]',
+			'PPI::Token::Structure' => '[',
+			'PPI::Statement::Expression' => '"bar"',
+			'PPI::Token::Quote::Double' => '"bar"',
+			'PPI::Token::Structure' => ']',
+		]
+	);
+
+	test_statement(
+		'$foo->%{bar}',
+		[
+			'PPI::Statement' => '$foo->%{bar}',
+			'PPI::Token::Symbol' => '$foo',
+			'PPI::Token::Operator' => '->',
+			'PPI::Token::Cast' => '%',
+			'PPI::Structure::Subscript' => '{bar}',
+			'PPI::Token::Structure' => '{',
+			'PPI::Statement::Expression' => 'bar',
+			'PPI::Token::Word' => 'bar',
+			'PPI::Token::Structure' => '}',
+		]
+	);
+
+	test_statement(
+		'$foo->*{CODE}',
+		[
+			'PPI::Statement' => '$foo->*{CODE}',
+			'PPI::Token::Symbol' => '$foo',
+			'PPI::Token::Operator' => '->',
+			'PPI::Token::Cast' => '*',
+			'PPI::Structure::Subscript' => '{CODE}',
+			'PPI::Token::Structure' => '{',
+			'PPI::Statement::Expression' => 'CODE',
+			'PPI::Token::Word' => 'CODE',
+			'PPI::Token::Structure' => '}',
 		]
 	);
 
