@@ -4,7 +4,7 @@
 
 use lib 't/lib';
 use PPI::Test::pragmas;
-use Test::More tests => 1208 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+use Test::More tests => 1240 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use PPI;
 
@@ -40,6 +40,27 @@ NAME: {
 
 		};
 
+	}
+}
+
+LEXSUB: {
+	for my $test (
+		{ code => 'sub foo {}', type => undef },
+		{ code => 'my sub foo {}', type => 'my' },
+		{ code => 'our sub foo {}', type => 'our' },
+		{ code => 'state sub foo {}', type => 'state' },
+		{ code => 'my sub foo ($) {}', type => 'my' },
+	) {
+		my $code = $test->{code};
+		my $type = $test->{type};
+
+		my $Document = PPI::Document->new( \$code );
+		isa_ok( $Document, 'PPI::Document', "$code: got document" );
+
+		my ( $sub_statement, $dummy ) = $Document->schildren();
+		isa_ok( $sub_statement, 'PPI::Statement::Sub', "$code: document child is a sub" );
+		is( $dummy, undef, "$code: document has exactly one child" );
+		is( $sub_statement->type, $type, "$code: type matches" );
 	}
 }
 
@@ -88,6 +109,27 @@ PROTOTYPE: {
 		my ( $proto_text, $expected ) = @$test;
 
 		my $Document = PPI::Document->new( \"sub foo $proto_text {}" );
+		isa_ok( $Document, 'PPI::Document', "$proto_text got document" );
+
+		my ( $sub_statement, $dummy ) = $Document->schildren();
+		isa_ok( $sub_statement, 'PPI::Statement::Sub', "$proto_text document child is a sub" );
+		is( $dummy, undef, "$proto_text document has exactly one child" );
+		is( $sub_statement->prototype, $expected, "$proto_text: prototype matches" );
+	}
+}
+
+PROTOTYPE_LEXSUB: {
+	# Doesn't have to be as thorough as ppi_token_prototype.t, since
+	# we're just making sure PPI::Token::Prototype->prototype gets
+	# passed through correctly.
+	for my $test (
+		[ '',         undef ],
+		[ '()',       '' ],
+		[ '( $*Z@ )', '$*Z@' ],
+	) {
+		my ( $proto_text, $expected ) = @$test;
+
+		my $Document = PPI::Document->new( \"my sub foo $proto_text {}" );
 		isa_ok( $Document, 'PPI::Document', "$proto_text got document" );
 
 		my ( $sub_statement, $dummy ) = $Document->schildren();
