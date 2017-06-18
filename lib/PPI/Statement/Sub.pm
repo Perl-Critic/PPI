@@ -170,6 +170,32 @@ sub reserved {
 	$name eq uc $name;
 }
 
+=pod
+
+=head2 type
+
+The C<type> method checks and returns the declaration type of the statement,
+which will be one of 'my', 'our', or 'state'.
+
+Returns a string of the type, or C<undef> if the type is not declared.
+
+=cut
+
+sub type {
+	my $self = shift;
+
+	# Get the first significant child
+	my @schild = grep { $_->significant } $self->children;
+
+	# Ignore labels
+	shift @schild if _INSTANCE($schild[0], 'PPI::Token::Label');
+
+	# Get the type
+	(_INSTANCE($schild[0], 'PPI::Token::Word') and $schild[0]->content =~ /^(my|our|state)$/)
+		? $schild[0]->content
+		: undef;
+}
+
 1;
 
 =pod
