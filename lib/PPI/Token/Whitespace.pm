@@ -247,6 +247,12 @@ sub __TOKENIZER__on_char {
 					and
 					$p2->content eq ''
 				)
+				or (
+					# Lexical subroutine
+					$p2->isa('PPI::Token::Word')
+					and
+					$p2->content =~ /^(?:my|our|state)$/
+				)
 			)
 		) {
 			# This is a sub prototype

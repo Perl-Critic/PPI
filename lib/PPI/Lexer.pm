@@ -438,6 +438,8 @@ sub _statement {
 		}
 	}
 
+	my $is_lexsub = 0;
+
 	# Is it a token in our known classes list
 	my $class = $STATEMENT_CLASSES{$Token->content};
 	if ( $class ) {
@@ -448,6 +450,17 @@ sub _statement {
 			if ( !$Next->significant ) {
 				push @{$self->{delayed}}, $Next;
 				next;
+			}
+
+			# Lexical subroutine
+			if (
+				$Token->content =~ /^(?:my|our|state)$/
+				and $Next->isa( 'PPI::Token::Word' ) and $Next->content eq 'sub'
+			) {
+				# This should be PPI::Statement::Sub rather than PPI::Statement::Variable
+				$class = undef;
+				$is_lexsub = 1;
+				last;
 			}
 
 			last if
@@ -502,7 +515,7 @@ sub _statement {
 	return $class if $class;
 
 	# Handle the more in-depth sub detection
-	if ( $Token->content eq 'sub' ) {
+	if ( $is_lexsub || $Token->content eq 'sub' ) {
 		# Read ahead to the next significant token
 		my $Next;
 		while ( $Next = $self->_get_token ) {
