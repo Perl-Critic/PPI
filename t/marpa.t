@@ -2,7 +2,8 @@
 
 # Unit testing for PPI::Token::Unknown
 
-use t::lib::PPI::Test::pragmas;
+use lib 't/lib';
+use PPI::Test::pragmas;
 use Test::More tests => 23 + ( $ENV{AUTHOR_TESTING} ? 1 : 0 );
 use B 'perlstring';
 
