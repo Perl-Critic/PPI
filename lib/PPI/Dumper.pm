@@ -123,7 +123,8 @@ sub new {
 		}, $class;
 
 	# Handle the options
-	my %options = map { lc $_ } @_;
+	my @options = map { lc $_ } @_; # strict hashpairs
+        my %options = @options;
 	foreach ( keys %{$self->{display}} ) {
 		if ( exists $options{$_} ) {
 			if ( $_ eq 'indent' ) {
