@@ -55,7 +55,7 @@ use PPI::Statement ();
 
 use vars qw{$VERSION @ISA %TYPES};
 BEGIN {
-	$VERSION = '1.224';
+	$VERSION = '1.226';
 	@ISA     = 'PPI::Statement';
 
 	# Keyword type map

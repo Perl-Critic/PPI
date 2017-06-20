@@ -1,5 +1,11 @@
 Revision history for Perl extension PPI
 
+1.226 Sun 20 June 2017
+	Summary:
+	- Fix test reliance on '.' in @INC (KENTNL)
+	- temporary fix to keep an untested combination from blocking
+	  Perl::Critic
+
 1.224 Sun 14 May 2017
 	Summary:
 	- updating an out-of-date meta.yml caused by Module::Install

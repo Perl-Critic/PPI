@@ -77,7 +77,7 @@ use overload '""'   => 'content';
 
 use vars qw{$VERSION @ISA $errstr};
 BEGIN {
-	$VERSION = '1.224';
+	$VERSION = '1.226';
 	@ISA     = 'PPI::Node';
 	$errstr  = '';
 }
