@@ -833,7 +833,7 @@ sub __current_token_is_forced_word {
 		# We also have to make sure that the sub/package/etc doing the forcing
 		# is not a method call.
 		if( $USUALLY_FORCES{$content}) {
-			return 1 if not defined $word;
+			return 1 if not defined $word; # TODO this is a quick fix to unblock Perl::Critic users, needs to be verified
 			return if $word =~ /^v[0-9]+$/ and ( $content eq "use" or $content eq "no" );
 			return 1 if not $prevprev;
 			return 1 if not $USUALLY_FORCES{$prevprev->content} and $prevprev->content ne '->';
