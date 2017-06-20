@@ -1,10 +1,15 @@
 Revision history for Perl extension PPI
 
+1.228 Sun 20 June 2017
+	Summary:
+	- keep PPI::Dumper from breaking Perl::Critic under cperl 5.27
+      (RURBAN)
+
 1.226 Sun 20 June 2017
 	Summary:
 	- Fix test reliance on '.' in @INC (KENTNL)
 	- temporary fix to keep an untested combination from blocking
-	  Perl::Critic
+	  Perl::Critic (https://github.com/chriscapaci)
 
 1.224 Sun 14 May 2017
 	Summary:

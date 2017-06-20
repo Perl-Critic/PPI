@@ -4,7 +4,7 @@ use base 'Exporter';
 
 use vars qw{$VERSION};
 BEGIN {
-	$VERSION = '1.226';
+	$VERSION = '1.228';
 }
 
 @EXPORT_OK = qw( check_with );

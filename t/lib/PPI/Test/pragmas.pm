@@ -22,7 +22,7 @@ use if $ENV{AUTHOR_TESTING}, 'Test::Warnings', ':no_end_test';
 
 use vars qw{$VERSION};
 BEGIN {
-	$VERSION = '1.226';
+	$VERSION = '1.228';
 }
 
 BEGIN {
