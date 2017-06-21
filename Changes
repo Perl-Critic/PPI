@@ -1,5 +1,10 @@
 Revision history for Perl extension PPI
 
+1.234 Sun 21 June 2017
+	Summary:
+	- Prevent sub names like v10 from being version strings
+	  (GitHub #65) (MOREGAN)
+
 1.232 Sun 21 June 2017
 	Summary:
 	- add Changes entries forgotten in 1.230
