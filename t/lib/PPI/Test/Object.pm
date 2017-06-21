@@ -11,7 +11,7 @@ use Test::Object;
 
 use vars qw{$VERSION};
 BEGIN {
-	$VERSION = '1.228';
+	$VERSION = '1.232';
 }
 
 

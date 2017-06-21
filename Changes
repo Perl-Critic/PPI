@@ -1,9 +1,19 @@
 Revision history for Perl extension PPI
 
+1.232 Sun 21 June 2017
+	Summary:
+	- add Changes entries forgotten in 1.230
+
+1.230 Sun 21 June 2017
+	Summary:
+	- remove temporary fix introduced in 1.226
+	- prevent possible regex on undefined scalar in
+	  __current_token_is_forced_word
+
 1.228 Sun 20 June 2017
 	Summary:
 	- keep PPI::Dumper from breaking Perl::Critic under cperl 5.27
-      (RURBAN)
+	  (RURBAN)
 
 1.226 Sun 20 June 2017
 	Summary:
