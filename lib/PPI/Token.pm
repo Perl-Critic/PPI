@@ -25,6 +25,8 @@ use Params::Util   qw{_INSTANCE};
 use PPI::Element   ();
 use PPI::Exception ();
 
+require bytes;
+
 use vars qw{$VERSION @ISA};
 BEGIN {
 	$VERSION = '1.236';
@@ -83,7 +85,10 @@ use PPI::Token::Unknown               ();
 # Constructor and Related
 
 sub new {
-	bless { content => (defined $_[1] ? "$_[1]" : '') }, $_[0];
+	bless {
+		content     => (defined $_[1] ? "$_[1]" : ''),
+		_byte_start => (defined $_[2] ? $_[2] : -1),
+	}, $_[0];
 }
 
 sub set_class {
@@ -158,6 +163,56 @@ The C<length> method returns the length of the string in a Token.
 sub length { CORE::length($_[0]->{content}) }
 
 
+=pod
+
+=head2 byte_span
+
+Returns an arrayref with zero-based offsets of the first and last bytes of that
+Token.
+
+Offsets are absolute byte positions within a Document, meaning the very first
+byte of the first token is always at position zero and the last byte of the
+last token is always at position I<document size in bytes - 1>.
+
+Example:
+
+	my $Document = PPI::Document->new( \'my $var = 42;' );
+	[ map($_->byte_span, $Document->tokens) ];
+
+will produce the following:
+
+	[
+		[0, 2],   # my
+		[3, 3],   # whitespace
+		[4, 7],   # $var
+		[8, 8],   # whitespace
+		[9, 9],   # =
+		[10, 10], # whitespace
+		[11, 12], # 42
+		[13, 13], # ;
+	]
+
+Returns C<undef> for tokens with unknown position (e.g. tokens not attached to
+a Document).
+
+For some token types computing a byte span is not supported. Currently there's
+only one unsupported type: L<PPI::Token::HereDoc>.
+Tokens of that type still contribute to the total size of the Document but do
+not have a span of their own (meaning this method will return C<undef>).
+
+Normalising a Document invalidates offsets of all tokens, making this method
+return C<undef>.
+
+B<NOTE>: as the method name suggests, offsets are caclulated in bytes, not
+characters.
+
+=cut
+
+sub byte_span {
+	my $start = $_[0]->{_byte_start};
+	return undef if $start < 0;
+	[ $start, $start + bytes::length($_[0]->{content}) - 1 ];
+}
 
 
 

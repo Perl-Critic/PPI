@@ -93,7 +93,7 @@ BEGIN {
 	@ISA     = 'PPI::Token';
 }
 
-
+require bytes;
 
 
 
@@ -210,6 +210,16 @@ sub __TOKENIZER__on_char {
 			# when we are re-assembling the file
 			$token->{_terminator_line} = $line;
 
+			# Actual content and terminator are not included when
+			# computing a HereDoc's byte length so we need to stash
+			# it so that we can manually fixup offsets later
+			#
+			# A line may contain multiple heredocs and we need them
+			# all so we're adding the length, not overwriting it
+			$t->{__current_heredoc_byte_length} +=
+				bytes::length(join("", @heredoc)) +
+				bytes::length($line);
+
 			# The HereDoc is now fully parsed
 			return $t->_finalize_token->__TOKENIZER__on_char( $t );
 		}
@@ -247,6 +257,12 @@ sub __TOKENIZER__on_char {
 
 	# The HereDoc is not fully parsed
 	$t->_finalize_token->__TOKENIZER__on_char( $t );
+}
+
+# override byte_span() from the parent class because
+# for heredocs byte offsets are undefined
+sub byte_span {
+    return undef;
 }
 
 1;
