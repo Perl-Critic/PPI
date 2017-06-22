@@ -30,6 +30,8 @@ BEGIN {
 	$| = 1;
 	select STDOUT;  ## no critic ( InputOutput::ProhibitOneArgSelect )
 
+	$^W++; # throw -w at runtime to try and catch warnings in un-warning-ed modules
+
 	no warnings 'once';  ## no critic ( TestingAndDebugging::ProhibitNoWarnings )
 	$PPI::XS_DISABLE = 1;
 	$PPI::Lexer::X_TOKENIZER ||= $ENV{X_TOKENIZER};
