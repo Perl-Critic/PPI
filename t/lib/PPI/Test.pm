@@ -7,7 +7,7 @@ use File::Spec::Functions ();
 
 use vars qw{$VERSION @ISA @EXPORT_OK %EXPORT_TAGS};
 BEGIN {
-	$VERSION = '1.234';
+	$VERSION = '1.236';
 	@ISA = 'Exporter';
 	@EXPORT_OK = qw( find_files quotable pause );
 }

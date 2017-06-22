@@ -9,7 +9,7 @@ use PPI::Token::_QuoteEngine ();
 
 use vars qw{$VERSION @ISA %quotes %sections};
 BEGIN {
-	$VERSION = '1.234';
+	$VERSION = '1.236';
 	@ISA     = 'PPI::Token::_QuoteEngine';
 
 	# Prototypes for the different braced sections

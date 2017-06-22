@@ -1,26 +1,31 @@
 Revision history for Perl extension PPI
 
-1.234 Sun 21 June 2017
+1.236 Thu 22 June 2017
+	Summary:
+	- prevent Node->child from proceeding without a valid argument
+	- make test pragma warning code enable -w to match warnings policy
+
+1.234 Wed 21 June 2017
 	Summary:
 	- Prevent sub names like v10 from being version strings
 	  (GitHub #65) (MOREGAN)
 
-1.232 Sun 21 June 2017
+1.232 Wed 21 June 2017
 	Summary:
 	- add Changes entries forgotten in 1.230
 
-1.230 Sun 21 June 2017
+1.230 Wed 21 June 2017
 	Summary:
 	- remove temporary fix introduced in 1.226
 	- prevent possible regex on undefined scalar in
 	  __current_token_is_forced_word
 
-1.228 Sun 20 June 2017
+1.228 Tue 20 June 2017
 	Summary:
 	- keep PPI::Dumper from breaking Perl::Critic under cperl 5.27
 	  (RURBAN)
 
-1.226 Sun 20 June 2017
+1.226 Tue 20 June 2017
 	Summary:
 	- Fix test reliance on '.' in @INC (KENTNL)
 	- temporary fix to keep an untested combination from blocking
