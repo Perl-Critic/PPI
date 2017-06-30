@@ -57,9 +57,12 @@ use PPI::Element    ();
 
 our $VERSION = '1.236';
 
-use vars qw{@ISA *_PARENT};
+our @ISA = "PPI::Element";
+
+our %_PARENT;
 BEGIN {
-	@ISA     = 'PPI::Element';
+	# Faster than having another method call just
+	# to set the structure finish token.
 	*_PARENT = *PPI::Element::_PARENT;
 }
 

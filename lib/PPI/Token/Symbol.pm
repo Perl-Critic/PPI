@@ -33,10 +33,7 @@ use PPI::Token   ();
 
 our $VERSION = '1.236';
 
-use vars qw{@ISA};
-BEGIN {
-	@ISA     = 'PPI::Token';
-}
+our @ISA = "PPI::Token";
 
 
 
@@ -200,7 +197,7 @@ sub __TOKENIZER__on_char {
 	# Trim off anything we oversucked...
 	$content =~ /^(
 		[\$@%&*]
-		(?: : (?!:) | # Allow single-colon non-magic vars
+		(?: : (?!:) | # Allow single-colon non-magic variables
 			(?: \w+ | \' (?!\d) \w+ | \:: \w+ )
 			(?:
 				# Allow both :: and ' in namespace separators

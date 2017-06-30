@@ -119,9 +119,9 @@ package MyCleaner;
 use Params::Util   qw{_INSTANCE};
 use PPI::Transform ();
 
-use vars qw{@ISA};
+our @ISA;
 BEGIN {
-	@ISA = 'PPI::Transform';
+	@ISA = 'PPI::Transform'; # in a BEGIN block due to being an inline package
 }
 
 sub document {
@@ -137,10 +137,7 @@ sub new {
 	bless { }, 'Foo';
 }
 
-use vars qw{$VALUE};
-BEGIN {
-	$VALUE = '';
-}
+our $VALUE = '';
 
 sub get {
 	PPI::Document->new( \$VALUE );

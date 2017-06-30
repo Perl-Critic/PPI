@@ -27,10 +27,7 @@ use PPI::Exception ();
 
 our $VERSION = '1.236';
 
-use vars qw{@ISA};
-BEGIN {
-	@ISA     = 'PPI::Element';
-}
+our @ISA = 'PPI::Element';
 
 # We don't load the abstracts, they are loaded
 # as part of the inheritance process.

@@ -49,10 +49,7 @@ use PPI::Statement ();
 
 our $VERSION = '1.236';
 
-use vars qw{@ISA};
-BEGIN {
-	@ISA     = 'PPI::Statement';
-}
+our @ISA = "PPI::Statement";
 
 # Once we've hit a naked unmatched brace we can never truly be complete.
 # So instead we always just call it a day...

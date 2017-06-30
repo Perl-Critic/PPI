@@ -14,6 +14,7 @@ use PPI;
 use Scalar::Util 'refaddr';
 use PPI::Test 'pause';
 
+our $RE_IDENTIFIER = qr/[^\W\d]\w*/;
 
 sub is_object {
 	my ($left, $right, $message) = @_;
@@ -26,11 +27,6 @@ sub is_object {
 		and refaddr($left) == refaddr($right)
 		);
 	ok( $condition, $message );
-}
-
-use vars qw{$RE_IDENTIFIER};
-BEGIN {
-	$RE_IDENTIFIER = qr/[^\W\d]\w*/;
 }
 
 sub omethod_fails {

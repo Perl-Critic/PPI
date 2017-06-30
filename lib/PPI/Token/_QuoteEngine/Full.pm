@@ -9,44 +9,41 @@ use PPI::Token::_QuoteEngine ();
 
 our $VERSION = '1.236';
 
-use vars qw{@ISA %quotes %sections};
-BEGIN {
-	@ISA     = 'PPI::Token::_QuoteEngine';
+our @ISA = 'PPI::Token::_QuoteEngine';
 
-	# Prototypes for the different braced sections
-	%sections = (
-		'(' => { type => '()', _close => ')' },
-		'<' => { type => '<>', _close => '>' },
-		'[' => { type => '[]', _close => ']' },
-		'{' => { type => '{}', _close => '}' },
-	);
+# Prototypes for the different braced sections
+our %sections = (
+	'(' => { type => '()', _close => ')' },
+	'<' => { type => '<>', _close => '>' },
+	'[' => { type => '[]', _close => ']' },
+	'{' => { type => '{}', _close => '}' },
+);
 
-	# For each quote type, the extra fields that should be set.
-	# This should give us faster initialization.
-	%quotes = (
-		'q'   => { operator => 'q',   braced => undef, separator => undef, _sections => 1 },
-		'qq'  => { operator => 'qq',  braced => undef, separator => undef, _sections => 1 },
-		'qx'  => { operator => 'qx',  braced => undef, separator => undef, _sections => 1 },
-		'qw'  => { operator => 'qw',  braced => undef, separator => undef, _sections => 1 },
-		'qr'  => { operator => 'qr',  braced => undef, separator => undef, _sections => 1, modifiers => 1 },
-		'm'   => { operator => 'm',   braced => undef, separator => undef, _sections => 1, modifiers => 1 },
-		's'   => { operator => 's',   braced => undef, separator => undef, _sections => 2, modifiers => 1 },
-		'tr'  => { operator => 'tr',  braced => undef, separator => undef, _sections => 2, modifiers => 1 },
+# For each quote type, the extra fields that should be set.
+# This should give us faster initialization.
+our %quotes = (
+	'q'   => { operator => 'q',   braced => undef, separator => undef, _sections => 1 },
+	'qq'  => { operator => 'qq',  braced => undef, separator => undef, _sections => 1 },
+	'qx'  => { operator => 'qx',  braced => undef, separator => undef, _sections => 1 },
+	'qw'  => { operator => 'qw',  braced => undef, separator => undef, _sections => 1 },
+	'qr'  => { operator => 'qr',  braced => undef, separator => undef, _sections => 1, modifiers => 1 },
+	'm'   => { operator => 'm',   braced => undef, separator => undef, _sections => 1, modifiers => 1 },
+	's'   => { operator => 's',   braced => undef, separator => undef, _sections => 2, modifiers => 1 },
+	'tr'  => { operator => 'tr',  braced => undef, separator => undef, _sections => 2, modifiers => 1 },
 
-		# Y is the little-used variant of tr
-		'y'   => { operator => 'y',   braced => undef, separator => undef, _sections => 2, modifiers => 1 },
+	# Y is the little-used variant of tr
+	'y'   => { operator => 'y',   braced => undef, separator => undef, _sections => 2, modifiers => 1 },
 
-		'/'   => { operator => undef, braced => 0,     separator => '/',   _sections => 1, modifiers => 1 },
+	'/'   => { operator => undef, braced => 0,     separator => '/',   _sections => 1, modifiers => 1 },
 
-		# Angle brackets quotes mean "readline(*FILEHANDLE)"
-		'<'   => { operator => undef, braced => 1,     separator => undef, _sections => 1, },
+	# Angle brackets quotes mean "readline(*FILEHANDLE)"
+	'<'   => { operator => undef, braced => 1,     separator => undef, _sections => 1, },
 
-		# The final ( and kind of depreciated ) "first match only" one is not
-		# used yet, since I'm not sure on the context differences between
-		# this and the trinary operator, but it's here for completeness.
-		'?'   => { operator => undef, braced => 0,     separator => '?',   _sections => 1, modifiers => 1 },
-	);
-}
+	# The final ( and kind of depreciated ) "first match only" one is not
+	# used yet, since I'm not sure on the context differences between
+	# this and the trinary operator, but it's here for completeness.
+	'?'   => { operator => undef, braced => 0,     separator => '?',   _sections => 1, modifiers => 1 },
+);
 
 
 sub new {

@@ -77,11 +77,7 @@ use overload '""'   => 'content';
 
 our $VERSION = '1.236';
 
-use vars qw{@ISA $errstr};
-BEGIN {
-	@ISA     = 'PPI::Node';
-	$errstr  = '';
-}
+our ( $errstr, @ISA ) = ( "", "PPI::Node" );
 
 use PPI::Document::Fragment ();
 

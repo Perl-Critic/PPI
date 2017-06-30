@@ -8,11 +8,7 @@ use strict;
 # Set the version for CPAN
 our $VERSION = '1.236';
 
-use vars qw{$XS_COMPATIBLE @XS_EXCLUDE};
-BEGIN {
-	$XS_COMPATIBLE = '0.845';
-	@XS_EXCLUDE    = ();
-}
+our ( $XS_COMPATIBLE, @XS_EXCLUDE ) = ( '0.845' );
 
 # Load everything
 use PPI::Util                 ();

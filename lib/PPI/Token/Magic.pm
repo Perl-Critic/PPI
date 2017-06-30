@@ -47,28 +47,23 @@ use PPI::Token::Unknown ();
 
 our $VERSION = '1.236';
 
-use vars qw{@ISA %magic};
-BEGIN {
-	@ISA     = 'PPI::Token::Symbol';
+our @ISA = "PPI::Token::Symbol";
 
-	# Magic variables taken from perlvar.
-	# Several things added separately to avoid warnings.
-	foreach ( qw{
-		$1 $2 $3 $4 $5 $6 $7 $8 $9
-		$_ $& $` $' $+ @+ %+ $* $. $/ $|
-		$\\ $" $; $% $= $- @- %- $)
-		$~ $^ $: $? $! %! $@ $$ $< $>
-		$( $0 $[ $] @_ @*
+# Magic variables taken from perlvar.
+# Several things added separately to avoid warnings.
+our %magic = map { $_ => 1 } qw{
+	$1 $2 $3 $4 $5 $6 $7 $8 $9
+	$_ $& $` $' $+ @+ %+ $* $. $/ $|
+	$\\ $" $; $% $= $- @- %- $)
+	$~ $^ $: $? $! %! $@ $$ $< $>
+	$( $0 $[ $] @_ @*
 
-		$^L $^A $^E $^C $^D $^F $^H
-		$^I $^M $^N $^O $^P $^R $^S
-		$^T $^V $^W $^X %^H
+	$^L $^A $^E $^C $^D $^F $^H
+	$^I $^M $^N $^O $^P $^R $^S
+	$^T $^V $^W $^X %^H
 
-		$::|
-	}, '$}', '$,', '$#', '$#+', '$#-' ) {
-		$magic{$_} = 1;
-	}
-}
+	$::|
+}, '$}', '$,', '$#', '$#+', '$#-';
 
 
 sub __TOKENIZER__on_char {

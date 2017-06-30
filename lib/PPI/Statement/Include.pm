@@ -50,10 +50,7 @@ use PPI::Statement::Include::Perl6 ();
 
 our $VERSION = '1.236';
 
-use vars qw{@ISA};
-BEGIN {
-	@ISA     = 'PPI::Statement';
-}
+our @ISA = "PPI::Statement";
 
 =pod
 

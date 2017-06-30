@@ -49,10 +49,7 @@ use PPI::Statement ();
 
 our $VERSION = '1.236';
 
-use vars qw{@ISA};
-BEGIN {
-	@ISA     = 'PPI::Statement';
-}
+our @ISA = "PPI::Statement";
 
 # Once we have an __END__ we're done
 sub _complete () { 1 }

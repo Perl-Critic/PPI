@@ -58,10 +58,7 @@ use PPI::Statement::Sub ();
 
 our $VERSION = '1.236';
 
-use vars qw{@ISA};
-BEGIN {
-	@ISA     = 'PPI::Statement::Sub';
-}
+our @ISA = "PPI::Statement::Sub";
 
 sub __LEXER__normal() { '' }
 

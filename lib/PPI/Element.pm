@@ -31,13 +31,7 @@ use PPI::Node       ();
 
 our $VERSION = '1.236';
 
-use vars qw{$errstr %_PARENT};
-BEGIN {
-	$errstr  = '';
-
-	# Master Child -> Parent index
-	%_PARENT = ();
-}
+our ( $errstr, %_PARENT ) = ( "" );    # Master Child -> Parent index
 
 use overload 'bool' => \&PPI::Util::TRUE;
 use overload '""'   => 'content';

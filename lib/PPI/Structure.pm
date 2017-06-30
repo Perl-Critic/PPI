@@ -96,9 +96,12 @@ use PPI::Exception ();
 
 our $VERSION = '1.236';
 
-use vars qw{@ISA *_PARENT};
+our @ISA = "PPI::Node";
+
+our %_PARENT;
 BEGIN {
-	@ISA     = 'PPI::Node';
+	# Faster than having another method call just
+	# to set the structure finish token.
 	*_PARENT = *PPI::Element::_PARENT;
 }
 

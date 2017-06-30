@@ -33,11 +33,8 @@ use PPI::Exception ();
 
 our $VERSION = '1.236';
 
-use vars qw{@ISA $CURLY_SYMBOL};
-BEGIN {
-	@ISA     = 'PPI::Token';
-	$CURLY_SYMBOL = qr{\G\^[[:upper:]_]\w+\}};
-}
+our ( $CURLY_SYMBOL, @ISA ) = ( qr{\G\^[[:upper:]_]\w+\}}, "PPI::Token" );
+
 
 
 

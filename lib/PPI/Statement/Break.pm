@@ -42,10 +42,7 @@ use PPI::Statement ();
 
 our $VERSION = '1.236';
 
-use vars qw{@ISA};
-BEGIN {
-	@ISA     = 'PPI::Statement';
-}
+our @ISA = "PPI::Statement";
 
 1;
 
