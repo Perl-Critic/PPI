@@ -40,10 +40,7 @@ use PPI::Structure ();
 
 our $VERSION = '1.236';
 
-use vars qw{@ISA};
-BEGIN {
-	@ISA     = 'PPI::Structure';
-}
+our @ISA = "PPI::Structure";
 
 1;
 

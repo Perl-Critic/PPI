@@ -36,13 +36,10 @@ use PPI::Token::_QuoteEngine::Simple ();
 
 our $VERSION = '1.236';
 
-use vars qw{@ISA};
-BEGIN {
-	@ISA     = qw{
-		PPI::Token::_QuoteEngine::Simple
-		PPI::Token::Quote
-	};
-}
+our @ISA = qw{
+	PPI::Token::_QuoteEngine::Simple
+	PPI::Token::Quote
+};
 
 
 

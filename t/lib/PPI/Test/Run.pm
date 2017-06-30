@@ -9,10 +9,7 @@ use Test::Object;
 use lib 't/lib';
 use PPI::Test::Object;
 
-use vars qw{$VERSION};
-BEGIN {
-	$VERSION = '1.236';
-}
+our $VERSION = '1.236';
 
 
 #####################################################################

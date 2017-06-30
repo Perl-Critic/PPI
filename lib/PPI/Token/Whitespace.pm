@@ -47,10 +47,7 @@ use PPI::Token ();
 
 our $VERSION = '1.236';
 
-use vars qw{@ISA};
-BEGIN {
-	@ISA     = 'PPI::Token';
-}
+our @ISA = "PPI::Token";
 
 =pod
 
@@ -111,47 +108,39 @@ sub tidy {
 # Parsing Methods
 
 # Build the class and commit maps
-use vars qw{ @CLASSMAP @COMMITMAP %MATCHWORD };
-BEGIN {
-	@CLASSMAP  = ();
-	@COMMITMAP = ();
-	foreach (
-		'a' .. 'u', 'w', 'y', 'z', 'A' .. 'Z', '_'
-	) {
-		$COMMITMAP[ord $_] = 'PPI::Token::Word';
-	}
-	foreach ( qw!; [ ] { } )! )       { $COMMITMAP[ord $_] = 'PPI::Token::Structure' }
-	foreach ( 0 .. 9 )                { $CLASSMAP[ord $_]  = 'Number'   }
-	foreach ( qw{= ? | + > . ! ~ ^} ) { $CLASSMAP[ord $_]  = 'Operator' }
-	foreach ( qw{* $ @ & : %} )       { $CLASSMAP[ord $_]  = 'Unknown'  }
+my %COMMITMAP = (
+	map( { ord $_ => 'PPI::Token::Word' } 'a' .. 'u', 'A' .. 'Z', qw" w y z _ " ),    # no v or x
+	map( { ord $_ => 'PPI::Token::Structure' } qw" ; [ ] { } ) " ),
+	ord '#' => 'PPI::Token::Comment',
+	ord 'v' => 'PPI::Token::Number::Version',
+);
+our %CLASSMAP = (
+	map( { ord $_ => 'Number' } 0 .. 9 ),
+	map( { ord $_ => 'Operator' } qw" = ? | + > . ! ~ ^ " ),
+	map( { ord $_ => 'Unknown' } qw" * $ @ & : % " ),
+	ord ','  => 'PPI::Token::Operator',
+	ord "'"  => 'Quote::Single',
+	ord '"'  => 'Quote::Double',
+	ord '`'  => 'QuoteLike::Backtick',
+	ord '\\' => 'Cast',
+	ord '_'  => 'Word',
+	9        => 'Whitespace',             # A horizontal tab
+	10       => 'Whitespace',             # A newline
+	12       => 'Whitespace',             # A form feed
+	13       => 'Whitespace',             # A carriage return
+	32       => 'Whitespace',             # A normal space
+);
 
-	# Miscellaneous remainder
-	$COMMITMAP[ord '#'] = 'PPI::Token::Comment';
-	$COMMITMAP[ord 'v'] = 'PPI::Token::Number::Version';
-	$CLASSMAP[ord ',']  = 'PPI::Token::Operator';
-	$CLASSMAP[ord "'"]  = 'Quote::Single';
-	$CLASSMAP[ord '"']  = 'Quote::Double';
-	$CLASSMAP[ord '`']  = 'QuoteLike::Backtick';
-	$CLASSMAP[ord '\\'] = 'Cast';
-	$CLASSMAP[ord '_']  = 'Word';
-	$CLASSMAP[9]        = 'Whitespace'; # A horizontal tab
-	$CLASSMAP[10]       = 'Whitespace'; # A newline
-	$CLASSMAP[12]       = 'Whitespace'; # A form feed
-	$CLASSMAP[13]       = 'Whitespace'; # A carriage return
-	$CLASSMAP[32]       = 'Whitespace'; # A normal space
-
-	# Words (functions and keywords) after which a following / is
-	# almost certainly going to be a regex
-	%MATCHWORD = map { $_ => 1 } qw{
-		return
-		split
-		if
-		unless
-		grep
-		map
-	};
-}
-
+# Words (functions and keywords) after which a following / is
+# almost certainly going to be a regex
+our %MATCHWORD = map { $_ => 1 } qw{
+  return
+  split
+  if
+  unless
+  grep
+  map
+};
 
 sub __TOKENIZER__on_line_start {
 	my $t    = $_[1];
@@ -208,10 +197,10 @@ sub __TOKENIZER__on_char {
 	my $char = ord $c;
 
 	# Do we definitely know what something is?
-	return $COMMITMAP[$char]->__TOKENIZER__commit($t) if $COMMITMAP[$char];
+	return $COMMITMAP{$char}->__TOKENIZER__commit($t) if $COMMITMAP{$char};
 
 	# Handle the simple option first
-	return $CLASSMAP[$char] if $CLASSMAP[$char];
+	return $CLASSMAP{$char} if $CLASSMAP{$char};
 
 	if ( $char == 40 ) {  # $char eq '('
 		# Finalise any whitespace token...

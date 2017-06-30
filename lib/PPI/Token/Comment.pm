@@ -63,10 +63,7 @@ use PPI::Token ();
 
 our $VERSION = '1.236';
 
-use vars qw{@ISA};
-BEGIN {
-	@ISA     = 'PPI::Token';
-}
+our @ISA = "PPI::Token";
 
 ### XS -> PPI/XS.xs:_PPI_Token_Comment__significant 0.900+
 sub significant() { '' }

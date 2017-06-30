@@ -37,10 +37,7 @@ use PPI::Token::Word ();
 
 our $VERSION = '1.236';
 
-use vars qw{@ISA};
-BEGIN {
-	@ISA     = 'PPI::Token::Word';
-}
+our @ISA = "PPI::Token::Word";
 
 1;
 

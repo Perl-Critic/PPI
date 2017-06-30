@@ -9,11 +9,8 @@ use Params::Util qw{_INSTANCE _SCALAR0 _ARRAY0};
 
 our $VERSION = '1.236';
 
-use vars qw{@ISA @EXPORT_OK};
-BEGIN {
-	@ISA       = 'Exporter';
-	@EXPORT_OK = qw{_Document _slurp};
-}
+our @ISA       = 'Exporter';
+our @EXPORT_OK = qw{ _Document _slurp };
 
 # 5.8.7 was the first version to resolve the notorious
 # "unicode length caching" bug.

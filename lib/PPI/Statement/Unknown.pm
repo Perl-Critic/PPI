@@ -37,10 +37,7 @@ use PPI::Statement ();
 
 our $VERSION = '1.236';
 
-use vars qw{@ISA};
-BEGIN {
-	@ISA     = 'PPI::Statement';
-}
+our @ISA = "PPI::Statement";
 
 # If one of these ends up in the final document,
 # we're pretty much screwed. Just call it a day.

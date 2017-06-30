@@ -9,10 +9,7 @@ use PPI::Dumper;
 use Test::More;
 use Test::Object;
 
-use vars qw{$VERSION};
-BEGIN {
-	$VERSION = '1.236';
-}
+our $VERSION = '1.236';
 
 
 

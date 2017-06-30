@@ -55,20 +55,17 @@ use PPI::Statement ();
 
 our $VERSION = '1.236';
 
-use vars qw{@ISA %TYPES};
-BEGIN {
-	@ISA     = 'PPI::Statement';
+our @ISA = "PPI::Statement";
 
-	# Keyword type map
-	%TYPES = (
-		'if'      => 'if',
-		'unless'  => 'if',
-		'while'   => 'while',
-		'until'   => 'while',
-		'for'     => 'for',
-		'foreach' => 'foreach',
-	);
-}
+# Keyword type map
+our %TYPES = (
+	'if'      => 'if',
+	'unless'  => 'if',
+	'while'   => 'while',
+	'until'   => 'while',
+	'for'     => 'for',
+	'foreach' => 'foreach',
+);
 
 # Lexer clues
 sub __LEXER__normal() { '' }

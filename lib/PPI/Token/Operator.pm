@@ -44,28 +44,25 @@ use PPI::Token ();
 
 our $VERSION = '1.236';
 
-use vars qw{@ISA %OPERATOR};
-BEGIN {
-	@ISA     = 'PPI::Token';
+our @ISA = "PPI::Token";
 
-	# Build the operator index
-	### NOTE - This is accessed several times explicitly
-	###        in PPI::Token::Word. Do not rename this
-	###        without also correcting them.
-	%OPERATOR = map { $_ => 1 } (
-		qw{
-		-> ++ -- ** ! ~ + -
-		=~ !~ * / % x . << >>
-		< > <= >= lt gt le ge
-		== != <=> eq ne cmp ~~
-		& | ^ && || // .. ...
-		? :
-		= **= += -= .= *= /= %= x= &= |= ^= <<= >>= &&= ||= //=
-		=> <>
-		and or xor not
-		}, ',' 	# Avoids "comma in qw{}" warning
-		);
-}
+# Build the operator index
+### NOTE - This is accessed several times explicitly
+###        in PPI::Token::Word. Do not rename this
+###        without also correcting them.
+our %OPERATOR = map { $_ => 1 } (
+	qw{
+	-> ++ -- ** ! ~ + -
+	=~ !~ * / % x . << >>
+	< > <= >= lt gt le ge
+	== != <=> eq ne cmp ~~
+	& | ^ && || // .. ...
+	? :
+	= **= += -= .= *= /= %= x= &= |= ^= <<= >>= &&= ||= //=
+	=> <>
+	and or xor not
+	}, ',' 	# Avoids "comma in qw{}" warning
+);
 
 
 

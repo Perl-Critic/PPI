@@ -33,30 +33,28 @@ use PPI::Token ();
 
 our $VERSION = '1.236';
 
-use vars qw{@ISA};
-BEGIN {
-	@ISA     = 'PPI::Token';
-}
+our @ISA = "PPI::Token";
 
 # Set the matching braces, done as an array
 # for slightly faster lookups.
-use vars qw{@MATCH @OPENS @CLOSES};
-BEGIN {
-	$MATCH[ord '{']  = '}';
-	$MATCH[ord '}']  = '{';
-	$MATCH[ord '[']  = ']';
-	$MATCH[ord ']']  = '[';
-	$MATCH[ord '(']  = ')';
-	$MATCH[ord ')']  = '(';
-
-	$OPENS[ord '{']  = 1;
-	$OPENS[ord '[']  = 1;
-	$OPENS[ord '(']  = 1;
-
-	$CLOSES[ord '}'] = 1;
-	$CLOSES[ord ']'] = 1;
-	$CLOSES[ord ')'] = 1;
-}
+our %MATCH = (
+	ord '{' => '}',
+	ord '}' => '{',
+	ord '[' => ']',
+	ord ']' => '[',
+	ord '(' => ')',
+	ord ')' => '(',
+);
+our %OPENS = (
+	ord '{' => 1,
+	ord '[' => 1,
+	ord '(' => 1,
+);
+our %CLOSES = (
+	ord '}' => 1,
+	ord ']' => 1,
+	ord ')' => 1,
+);
 
 
 
@@ -87,7 +85,7 @@ sub __TOKENIZER__commit {
 
 # For a given brace, find its opposing pair
 sub __LEXER__opposite {
-	$MATCH[ord $_[0]->{content} ];
+	$MATCH{ord $_[0]->{content}};
 }
 
 
@@ -137,7 +135,7 @@ sub next_token {
 
 	# If this is an opening brace, descend down into our parent
 	# structure, if it has children.
-	if ( $OPENS[ ord $self->{content} ] ) {
+	if ( $OPENS{ ord $self->{content} } ) {
 		my $child = $structure->child(0);
 		if ( $child ) {
 			# Decend deeper, or return if it is a token
@@ -165,7 +163,7 @@ sub previous_token {
 
 	# If this is a closing brace, descend down into our parent
 	# structure, if it has children.
-	if ( $CLOSES[ ord $self->{content} ] ) {
+	if ( $CLOSES{ ord $self->{content} } ) {
 		my $child = $structure->child(-1);
 		if ( $child ) {
 			# Decend deeper, or return if it is a token

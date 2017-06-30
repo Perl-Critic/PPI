@@ -44,10 +44,7 @@ use PPI::Statement::Expression ();
 
 our $VERSION = '1.236';
 
-use vars qw{@ISA};
-BEGIN {
-	@ISA     = 'PPI::Statement::Expression';
-}
+our @ISA = "PPI::Statement::Expression";
 
 =pod
 

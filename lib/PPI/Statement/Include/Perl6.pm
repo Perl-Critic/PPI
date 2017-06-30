@@ -43,10 +43,7 @@ use PPI::Statement::Include ();
 
 our $VERSION = '1.236';
 
-use vars qw{@ISA};
-BEGIN {
-	@ISA     = 'PPI::Statement::Include';
-}
+our @ISA = "PPI::Statement::Include";
 
 =pod
 
