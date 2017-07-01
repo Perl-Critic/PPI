@@ -58,7 +58,7 @@ our $VERSION = '1.236';
 our @ISA = "PPI::Statement";
 
 # Keyword type map
-our %TYPES = (
+my %TYPES = (
 	'if'      => 'if',
 	'unless'  => 'if',
 	'while'   => 'while',

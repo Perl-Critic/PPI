@@ -15,7 +15,7 @@ use Scalar::Util 'refaddr';
 use PPI::Test 'pause';
 use PPI::Singletons '%_PARENT';
 
-our $RE_IDENTIFIER = qr/[^\W\d]\w*/;
+my $RE_IDENTIFIER = qr/[^\W\d]\w*/;
 
 sub is_object {
 	my ($left, $right, $message) = @_;

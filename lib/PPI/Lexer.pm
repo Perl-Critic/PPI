@@ -66,7 +66,7 @@ our $VERSION = '1.236';
 our $errstr = "";
 
 # Keyword -> Structure class maps
-our %ROUND = (
+my %ROUND = (
 	# Conditions
 	'if'     => 'PPI::Structure::Condition',
 	'elsif'  => 'PPI::Structure::Condition',
@@ -80,7 +80,7 @@ our %ROUND = (
 );
 
 # Opening brace to refining method
-our %RESOLVE = (
+my %RESOLVE = (
 	'(' => '_round',
 	'[' => '_square',
 	'{' => '_curly',
@@ -331,7 +331,7 @@ sub _lex_document {
 # Lex Methods - Statement Object
 
 # Keyword -> Statement Subclass
-our %STATEMENT_CLASSES = (
+my %STATEMENT_CLASSES = (
 	# Things that affect the timing of execution
 	'BEGIN'     => 'PPI::Statement::Scheduled',
 	'CHECK'     => 'PPI::Statement::Scheduled',
@@ -1054,7 +1054,7 @@ sub _square {
 }
 
 # Keyword -> Structure class maps
-our %CURLY_CLASSES = (
+my %CURLY_CLASSES = (
 	# Blocks
 	'sub'  => 'PPI::Structure::Block',
 	'grep' => 'PPI::Structure::Block',
@@ -1084,7 +1084,7 @@ our %CURLY_CLASSES = (
 			# bless {; ... } fails to compile.
 );
 
-our @CURLY_LOOKAHEAD_CLASSES = (
+my @CURLY_LOOKAHEAD_CLASSES = (
 	{},	# not used
 	{
 	';'    => 'PPI::Structure::Block', # per perlref

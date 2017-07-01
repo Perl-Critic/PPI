@@ -114,7 +114,7 @@ my %COMMITMAP = (
 	ord '#' => 'PPI::Token::Comment',
 	ord 'v' => 'PPI::Token::Number::Version',
 );
-our %CLASSMAP = (
+my %CLASSMAP = (
 	map( { ord $_ => 'Number' } 0 .. 9 ),
 	map( { ord $_ => 'Operator' } qw" = ? | + > . ! ~ ^ " ),
 	map( { ord $_ => 'Unknown' } qw" * $ @ & : % " ),
@@ -133,7 +133,7 @@ our %CLASSMAP = (
 
 # Words (functions and keywords) after which a following / is
 # almost certainly going to be a regex
-our %MATCHWORD = map { $_ => 1 } qw{
+my %MATCHWORD = map { $_ => 1 } qw{
   return
   split
   if

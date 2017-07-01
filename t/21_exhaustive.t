@@ -13,8 +13,8 @@ use PPI::Test 'quotable';
 # When distributing, keep this in to verify the test script
 # is working correctly, but limit to 2 (maaaaybe 3) so we
 # don't slow the install process down too much.
-our ( $MAX_CHARS, $ITERATIONS, $LENGTH )  = ( 2, 1000, 190 );
-our @ALL_CHARS = (
+my ( $MAX_CHARS, $ITERATIONS, $LENGTH )  = ( 2, 1000, 190 );
+my @ALL_CHARS = (
 	qw{a b c f g m q r s t w x y z V W X 0 1 8 9},
 	';', '[', ']', '{', '}', '(', ')', '=', '?', '|', '+', '<',
 	'>', '.', '!', '~', '^', '*', '$', '@', '&', ':', '%', ',',
@@ -23,7 +23,7 @@ our @ALL_CHARS = (
 );
 
 # Cases known to have failed in the past.
-our @FAILURES = (
+my @FAILURES = (
 	# Failed cases 3 chars or less
 	'!%:', '!%:',  '!%:',  '!%:',  '!*:', '!@:',  '%:',  '%:,',
 	'%:;', '*:',   '*:,',  '*::',  '*:;', '+%:',  '+*:', '+@:',

@@ -37,7 +37,7 @@ our @ISA = "PPI::Token";
 
 # Set the matching braces, done as an array
 # for slightly faster lookups.
-our %MATCH = (
+my %MATCH = (
 	ord '{' => '}',
 	ord '}' => '{',
 	ord '[' => ']',
@@ -45,12 +45,12 @@ our %MATCH = (
 	ord '(' => ')',
 	ord ')' => '(',
 );
-our %OPENS = (
+my %OPENS = (
 	ord '{' => 1,
 	ord '[' => 1,
 	ord '(' => 1,
 );
-our %CLOSES = (
+my %CLOSES = (
 	ord '}' => 1,
 	ord ']' => 1,
 	ord ')' => 1,
