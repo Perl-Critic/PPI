@@ -12,7 +12,7 @@ our $VERSION = '1.236';
 our @ISA = 'PPI::Token::_QuoteEngine';
 
 # Prototypes for the different braced sections
-our %sections = (
+my %SECTIONS = (
 	'(' => { type => '()', _close => ')' },
 	'<' => { type => '<>', _close => '>' },
 	'[' => { type => '[]', _close => ']' },
@@ -21,7 +21,7 @@ our %sections = (
 
 # For each quote type, the extra fields that should be set.
 # This should give us faster initialization.
-our %quotes = (
+my %QUOTES = (
 	'q'   => { operator => 'q',   braced => undef, separator => undef, _sections => 1 },
 	'qq'  => { operator => 'qq',  braced => undef, separator => undef, _sections => 1 },
 	'qx'  => { operator => 'qx',  braced => undef, separator => undef, _sections => 1 },
@@ -59,7 +59,7 @@ sub new {
 	my $self = PPI::Token::new( $class, $init ) or return undef;
 
 	# Do we have a prototype for the initializer? If so, add the extra fields
-	my $options = $quotes{$init} or return $self->_error(
+	my $options = $QUOTES{$init} or return $self->_error(
 		"Unknown quote type '$init'"
 	);
 	foreach ( keys %$options ) {
@@ -71,7 +71,7 @@ sub new {
 
 	# Handle the special < base
 	if ( $init eq '<' ) {
-		$self->{sections}->[0] = Clone::clone( $sections{'<'} );
+		$self->{sections}->[0] = Clone::clone( $SECTIONS{'<'} );
 	}
 
 	$self;
@@ -105,7 +105,7 @@ sub _fill {
 		$self->{content} .= $sep;
 
 		# Determine if these are normal or braced type sections
-		if ( my $section = $sections{$sep} ) {
+		if ( my $section = $SECTIONS{$sep} ) {
 			$self->{braced}        = 1;
 			$self->{sections}->[0] = Clone::clone($section);
 		} else {
@@ -267,7 +267,7 @@ sub _fill_braced {
 		$char = substr( $t->{line}, $t->{line_cursor}, 1 );
 	}
 
-	$section = $sections{$char};
+	$section = $SECTIONS{$char};
 
 	if ( $section ) {
 		# It's a brace
