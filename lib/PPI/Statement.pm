@@ -151,17 +151,11 @@ use Scalar::Util   ();
 use Params::Util   qw{_INSTANCE};
 use PPI::Node      ();
 use PPI::Exception ();
+use PPI::Singletons '%_PARENT';
 
 our $VERSION = '1.236';
 
 our @ISA = "PPI::Node";
-
-our %_PARENT;
-BEGIN {
-	# Faster than having another method call just
-	# to set the structure finish token.
-	*_PARENT = *PPI::Element::_PARENT;
-}
 
 use PPI::Statement::Break          ();
 use PPI::Statement::Compound       ();

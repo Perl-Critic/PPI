@@ -59,6 +59,7 @@ use Params::Util    qw{_STRING _INSTANCE};
 use List::MoreUtils ();
 use PPI             ();
 use PPI::Exception  ();
+use PPI::Singletons '%_PARENT';
 
 our $VERSION = '1.236';
 
@@ -84,13 +85,6 @@ our %RESOLVE = (
 	'[' => '_square',
 	'{' => '_curly',
 );
-
-our %_PARENT;
-BEGIN {
-	# Faster than having another method call just
-	# to set the structure finish token.
-	*_PARENT = *PPI::Element::_PARENT;
-}
 
 # Allows for experimental overriding of the tokenizer
 our $X_TOKENIZER = "PPI::Tokenizer";

@@ -13,6 +13,7 @@ use File::Spec::Functions ':ALL';
 use PPI;
 use Scalar::Util 'refaddr';
 use PPI::Test 'pause';
+use PPI::Singletons '%_PARENT';
 
 our $RE_IDENTIFIER = qr/[^\W\d]\w*/;
 
@@ -409,60 +410,60 @@ ok( ! defined $Braces->parent, "Braces are detached from parent" );
 # Start with DESTROY for an element that never has a parent
 SCOPE: {
 	my $Token = PPI::Token::Whitespace->new( ' ' );
-	my $k1 = scalar keys %PPI::Element::_PARENT;
+	my $k1 = scalar keys %_PARENT;
 	$Token->DESTROY;
-	my $k2 = scalar keys %PPI::Element::_PARENT;
+	my $k2 = scalar keys %_PARENT;
 	is( $k1, $k2, '_PARENT key count remains unchanged after naked Element DESTROY' );
 }
 
 # Next, a single element within a parent
 SCOPE: {
-	my $k1 = scalar keys %PPI::Element::_PARENT;
+	my $k1 = scalar keys %_PARENT;
 	my $k2;
 	my $k3;
 	SCOPE: {
 		my $Token     = PPI::Token::Number->new( '1' );
 		my $Statement = PPI::Statement->new;
 		$Statement->add_element( $Token );
-		$k2 = scalar keys %PPI::Element::_PARENT;
+		$k2 = scalar keys %_PARENT;
 		is( $k2, $k1 + 1, 'PARENT keys increases after adding element' );
 		$Statement->DESTROY;
 	}
 	pause();
-	$k3 = scalar keys %PPI::Element::_PARENT;
+	$k3 = scalar keys %_PARENT;
 	is( $k3, $k1, 'PARENT keys returns to original on DESTROY' );
 }
 
 # Repeat for an entire (large) file
 SCOPE: {
-	my $k1 = scalar keys %PPI::Element::_PARENT;
+	my $k1 = scalar keys %_PARENT;
 	my $k2;
 	my $k3;
 	SCOPE: {
 		my $NodeDocument = PPI::Document->new( $INC{"PPI/Node.pm"} );
 		isa_ok( $NodeDocument, 'PPI::Document' );
-		$k2 = scalar keys %PPI::Element::_PARENT;
+		$k2 = scalar keys %_PARENT;
 		ok( $k2 > ($k1 + 3000), 'PARENT keys increases after loading document' );
 		$NodeDocument->DESTROY;
 	}
 	pause();
-	$k3 = scalar keys %PPI::Element::_PARENT;
+	$k3 = scalar keys %_PARENT;
 	is( $k3, $k1, 'PARENT keys returns to original on explicit Document DESTROY' );
 }
 
 # Repeat again, but with an implicit DESTROY
 SCOPE: {
-	my $k1 = scalar keys %PPI::Element::_PARENT;
+	my $k1 = scalar keys %_PARENT;
 	my $k2;
 	my $k3;
 	SCOPE: {
 		my $NodeDocument = PPI::Document->new( $INC{"PPI/Node.pm"} );
 		isa_ok( $NodeDocument, 'PPI::Document' );
-		$k2 = scalar keys %PPI::Element::_PARENT;
+		$k2 = scalar keys %_PARENT;
 		ok( $k2 > ($k1 + 3000), 'PARENT keys increases after loading document' );
 	}
 	pause();
-	$k3 = scalar keys %PPI::Element::_PARENT;
+	$k3 = scalar keys %_PARENT;
 	is( $k3, $k1, 'PARENT keys returns to original on implicit Document DESTROY' );
 }
 
