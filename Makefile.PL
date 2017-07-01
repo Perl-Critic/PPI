@@ -28,7 +28,6 @@ eval {
 requires 'Clone'           => '0.30';
 requires 'File::Spec'      => win32() ? '3.2701' : '0.84';
 requires 'IO::String'      => '1.07';
-requires 'List::MoreUtils' => '0.16';
 requires 'List::Util'      => '1.33';
 requires 'Params::Util'    => '1.00';
 

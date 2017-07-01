@@ -25,7 +25,7 @@ use strict;
 use Clone           ();
 use Scalar::Util    qw{refaddr};
 use Params::Util    qw{_INSTANCE _ARRAY};
-use List::MoreUtils ();
+use List::Util      ();
 use PPI::Util       ();
 use PPI::Node       ();
 use PPI::Singletons '%_PARENT';
@@ -259,9 +259,9 @@ sub next_sibling {
 	my $parent   = $_PARENT{refaddr $self} or return '';
 	my $key      = refaddr $self;
 	my $elements = $parent->{children};
-	my $position = List::MoreUtils::firstidx {
-		refaddr $_ == $key
-		} @$elements;
+	my $position = List::Util::first {
+		refaddr $elements->[$_] == $key
+		} 0..$#$elements;
 	$elements->[$position + 1] || '';
 }
 
@@ -282,9 +282,9 @@ sub snext_sibling {
 	my $parent   = $_PARENT{refaddr $self} or return '';
 	my $key      = refaddr $self;
 	my $elements = $parent->{children};
-	my $position = List::MoreUtils::firstidx {
-		refaddr $_ == $key
-		} @$elements;
+	my $position = List::Util::first {
+		refaddr $elements->[$_] == $key
+		} 0..$#$elements;
 	while ( defined(my $it = $elements->[++$position]) ) {
 		return $it if $it->significant;
 	}
@@ -307,9 +307,9 @@ sub previous_sibling {
 	my $parent   = $_PARENT{refaddr $self} or return '';
 	my $key      = refaddr $self;
 	my $elements = $parent->{children};
-	my $position = List::MoreUtils::firstidx {
-		refaddr $_ == $key
-		} @$elements;
+	my $position = List::Util::first {
+		refaddr $elements->[$_] == $key
+		} 0..$#$elements;
 	$position and $elements->[$position - 1] or '';
 }
 
@@ -330,9 +330,9 @@ sub sprevious_sibling {
 	my $parent   = $_PARENT{refaddr $self} or return '';
 	my $key      = refaddr $self;
 	my $elements = $parent->{children};
-	my $position = List::MoreUtils::firstidx {
-		refaddr $_ == $key
-		} @$elements;
+	my $position = List::Util::first {
+		refaddr $elements->[$_] == $key
+		} 0..$#$elements;
 	while ( $position-- and defined(my $it = $elements->[$position]) ) {
 		return $it if $it->significant;
 	}
