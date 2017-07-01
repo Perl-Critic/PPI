@@ -44,27 +44,11 @@ L<PPI::Token::Symbol>, L<PPI::Token> and L<PPI::Element>.
 use strict;
 use PPI::Token::Symbol ();
 use PPI::Token::Unknown ();
+use PPI::Singletons qw' %MAGIC $CURLY_SYMBOL ';
 
 our $VERSION = '1.236';
 
 our @ISA = "PPI::Token::Symbol";
-
-# Magic variables taken from perlvar.
-# Several things added separately to avoid warnings.
-our %magic = map { $_ => 1 } qw{
-	$1 $2 $3 $4 $5 $6 $7 $8 $9
-	$_ $& $` $' $+ @+ %+ $* $. $/ $|
-	$\\ $" $; $% $= $- @- %- $)
-	$~ $^ $: $? $! %! $@ $$ $< $>
-	$( $0 $[ $] @_ @*
-
-	$^L $^A $^E $^C $^D $^F $^H
-	$^I $^M $^N $^O $^P $^R $^S
-	$^T $^V $^W $^X %^H
-
-	$::|
-}, '$}', '$,', '$#', '$#+', '$#-';
-
 
 sub __TOKENIZER__on_char {
 	my $t = $_[1];
@@ -108,7 +92,7 @@ sub __TOKENIZER__on_char {
 			# This _might_ be a dereference of one of the
 			# control-character symbols.
 			pos $t->{line} = $t->{line_cursor} + 1;
-			if ( $t->{line} =~ m/$PPI::Token::Unknown::CURLY_SYMBOL/gc ) {
+			if ( $t->{line} =~ m/$CURLY_SYMBOL/gc ) {
 				# This is really a dereference. ( $${^_foo} )
 				# Add the current token as the cast...
 				$t->{token} = PPI::Token::Cast->new( '$' );
@@ -135,7 +119,7 @@ sub __TOKENIZER__on_char {
 		if ( $c =~ /^\$\^\w+$/o ) {
 			# It's an escaped char magic... maybe ( like $^M )
 			my $next = substr( $t->{line}, $t->{line_cursor}+1, 1 ); # Peek ahead
-			if ($magic{$c} && (!$next || $next !~ /\w/)) {
+			if ($MAGIC{$c} && (!$next || $next !~ /\w/)) {
 				$t->{token}->{content} = $c;
 				$t->{line_cursor}++;
 			} else {
@@ -156,7 +140,7 @@ sub __TOKENIZER__on_char {
 	} elsif ($c =~ /^%\^/) {
 		return 1 if $c eq '%^';
 		# It's an escaped char magic... maybe ( like %^H )
-		if ($magic{$c}) {
+		if ($MAGIC{$c}) {
 			$t->{token}->{content} = $c;
 			$t->{line_cursor}++;
 		} else {
@@ -167,13 +151,13 @@ sub __TOKENIZER__on_char {
 		}
 	}
 
-	if ( $magic{$c} ) {
+	if ( $MAGIC{$c} ) {
 		# $#+ and $#-
 		$t->{line_cursor} += length( $c ) - length( $t->{token}->{content} );
 		$t->{token}->{content} = $c;
 	} else {
 		pos $t->{line} = $t->{line_cursor};
-		if ( $t->{line} =~ m/($PPI::Token::Unknown::CURLY_SYMBOL)/gc ) {
+		if ( $t->{line} =~ m/($CURLY_SYMBOL)/gc ) {
 			# control character symbol (e.g. ${^MATCH})
 			$t->{token}->{content} .= $1;
 			$t->{line_cursor}      += length $1;

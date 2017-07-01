@@ -41,28 +41,11 @@ L<PPI::Token> and L<PPI::Element> classes.
 
 use strict;
 use PPI::Token ();
+use PPI::Singletons '%OPERATOR';
 
 our $VERSION = '1.236';
 
 our @ISA = "PPI::Token";
-
-# Build the operator index
-### NOTE - This is accessed several times explicitly
-###        in PPI::Token::Word. Do not rename this
-###        without also correcting them.
-our %OPERATOR = map { $_ => 1 } (
-	qw{
-	-> ++ -- ** ! ~ + -
-	=~ !~ * / % x . << >>
-	< > <= >= lt gt le ge
-	== != <=> eq ne cmp ~~
-	& | ^ && || // .. ...
-	? :
-	= **= += -= .= *= /= %= x= &= |= ^= <<= >>= &&= ||= //=
-	=> <>
-	and or xor not
-	}, ',' 	# Avoids "comma in qw{}" warning
-);
 
 
 

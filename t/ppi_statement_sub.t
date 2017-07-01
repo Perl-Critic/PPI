@@ -7,6 +7,7 @@ use PPI::Test::pragmas;
 use Test::More tests => 1208 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use PPI;
+use PPI::Singletons '%KEYWORDS';
 
 NAME: {
 	for my $test (
@@ -178,7 +179,7 @@ KEYWORDS_AS_SUB_NAMES: {
 		'foo',
 		# Keywords must parse as Word and not influence lexing
 		# of subsequent curly braces.
-		keys %PPI::Token::Word::KEYWORDS,
+		keys %KEYWORDS,
 		# regression: misparsed as version string
 		'v10',
 		# Other weird and/or special words, just in case

@@ -28,10 +28,11 @@ use Params::Util    qw{_INSTANCE _ARRAY};
 use List::MoreUtils ();
 use PPI::Util       ();
 use PPI::Node       ();
+use PPI::Singletons '%_PARENT';
 
 our $VERSION = '1.236';
 
-our ( $errstr, %_PARENT ) = ( "" );    # Master Child -> Parent index
+our $errstr = "";
 
 use overload 'bool' => \&PPI::Util::TRUE;
 use overload '""'   => 'content';

@@ -54,17 +54,11 @@ use Scalar::Util    qw{refaddr};
 use List::MoreUtils ();
 use Params::Util    qw{_INSTANCE _CLASS _CODELIKE _NUMBER};
 use PPI::Element    ();
+use PPI::Singletons '%_PARENT';
 
 our $VERSION = '1.236';
 
 our @ISA = "PPI::Element";
-
-our %_PARENT;
-BEGIN {
-	# Faster than having another method call just
-	# to set the structure finish token.
-	*_PARENT = *PPI::Element::_PARENT;
-}
 
 
 

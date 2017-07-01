@@ -40,10 +40,9 @@ use List::Util 1.33           ();
 use PPI::Util                 '_Document';
 use PPI::Document::Normalized ();
 use PPI::Normal::Standard     ();
+use PPI::Singletons           '%LAYER';
 
 our $VERSION = '1.236';
-
-our %LAYER = ( 1 => [], 2 => [] );    # Registered function store
 
 # With the registration mechanism in place, load in the main set of
 # normalization methods to initialize the store.

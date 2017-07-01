@@ -11,6 +11,7 @@ use Test::More tests => 925 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 use PPI;
 use PPI::Test 'pause';
 use PPI::Test::Run;
+use PPI::Singletons '%_PARENT';
 
 
 
@@ -29,10 +30,10 @@ PPI::Test::Run->run_testdir(qw{ t data 08_regression });
 # Check that objects created in a foreach don't leak circulars.
 foreach ( 1 .. 3 ) {
 	pause();
-	is( scalar(keys(%PPI::Element::_PARENT)), 0, "No parent links at start of loop $_" );
+	is( scalar(keys(%_PARENT)), 0, "No parent links at start of loop $_" );
 	# Keep the document from going out of scope before the _PARENT test below.
 	my $Document = PPI::Document->new(\q[print "Foo!"]);  ## no critic ( Variables::ProhibitUnusedVarsStricter )
-	is( scalar(keys(%PPI::Element::_PARENT)), 4, 'Correct number of keys created' );
+	is( scalar(keys(%_PARENT)), 4, 'Correct number of keys created' );
 }
 
 

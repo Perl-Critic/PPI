@@ -7,6 +7,7 @@ use PPI::Test::pragmas;
 use Test::More tests => 735 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use PPI;
+use PPI::Singletons qw' %OPERATOR %QUOTELIKE %KEYWORDS ';
 
 
 LITERAL: {
@@ -37,7 +38,7 @@ VSTRING_ENDS_CORRECTLY: {
 			} (
 				'x3', # not fooled by faux x operator with operand
 				'e10', # not fooled by faux scientific notation
-				keys %PPI::Token::Word::KEYWORDS,
+				keys %KEYWORDS,
 			),
 		),
 		(
@@ -51,7 +52,7 @@ VSTRING_ENDS_CORRECTLY: {
 					],
 				},
 			} (
-				keys %PPI::Token::Word::KEYWORDS,
+				keys %KEYWORDS,
 			),
 		),
 		(
@@ -65,7 +66,7 @@ VSTRING_ENDS_CORRECTLY: {
 					],
 				},
 			} (
-				keys %PPI::Token::Word::KEYWORDS,
+				keys %KEYWORDS,
 			),
 		),
 		{
@@ -97,8 +98,8 @@ VSTRING_ENDS_CORRECTLY: {
 
 sub get_class {
 	my ( $t ) = @_;
-	my $ql = $PPI::Token::Word::QUOTELIKE{$t};
+	my $ql = $QUOTELIKE{$t};
 	return "PPI::Token::$ql" if $ql;
-	return 'PPI::Token::Operator' if $PPI::Token::Word::OPERATOR{$t};
+	return 'PPI::Token::Operator' if $OPERATOR{$t};
 	return 'PPI::Token::Word';
 }

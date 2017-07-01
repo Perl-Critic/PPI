@@ -7,6 +7,7 @@ use PPI::Test::pragmas;
 use Test::More tests => 2065 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use PPI;
+use PPI::Singletons '%KEYWORDS';
 
 
 TYPE: {
@@ -246,7 +247,7 @@ KEYWORDS_AS_MODULE_NAMES: {
 		'version',
 		# Keywords must parse as Word and not influence lexing
 		# of subsequent curly braces.
-		keys %PPI::Token::Word::KEYWORDS,
+		keys %KEYWORDS,
 		# Other weird and/or special words, just in case
 		'__PACKAGE__',
 		'__FILE__',

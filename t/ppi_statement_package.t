@@ -7,6 +7,7 @@ use PPI::Test::pragmas;
 use Test::More tests => 2506 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use PPI;
+use PPI::Singletons '%KEYWORDS';
 
 
 HASH_CONSTRUCTORS_DONT_CONTAIN_PACKAGES_RT52259: {
@@ -69,7 +70,7 @@ PERL_5_12_SYNTAX: {
 		'Foo',
 		# Keywords must parse as Word and not influence lexing
 		# of subsequent curly braces.
-		keys %PPI::Token::Word::KEYWORDS,
+		keys %KEYWORDS,
 		# regression: misparsed as version string
 		'v10',
 		# regression GitHub #122: 'x' parsed as x operator
