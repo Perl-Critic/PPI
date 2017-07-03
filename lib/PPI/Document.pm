@@ -75,12 +75,9 @@ use PPI::Node                     ();
 use overload 'bool' => \&PPI::Util::TRUE;
 use overload '""'   => 'content';
 
-use vars qw{$VERSION @ISA $errstr};
-BEGIN {
-	$VERSION = '1.224';
-	@ISA     = 'PPI::Node';
-	$errstr  = '';
-}
+our $VERSION = '1.236';
+
+our ( $errstr, @ISA ) = ( "", "PPI::Node" );
 
 use PPI::Document::Fragment ();
 

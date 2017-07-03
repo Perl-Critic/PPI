@@ -7,45 +7,43 @@ use Clone                    ();
 use Carp                     ();
 use PPI::Token::_QuoteEngine ();
 
-use vars qw{$VERSION @ISA %quotes %sections};
-BEGIN {
-	$VERSION = '1.224';
-	@ISA     = 'PPI::Token::_QuoteEngine';
+our $VERSION = '1.236';
 
-	# Prototypes for the different braced sections
-	%sections = (
-		'(' => { type => '()', _close => ')' },
-		'<' => { type => '<>', _close => '>' },
-		'[' => { type => '[]', _close => ']' },
-		'{' => { type => '{}', _close => '}' },
-	);
+our @ISA = 'PPI::Token::_QuoteEngine';
 
-	# For each quote type, the extra fields that should be set.
-	# This should give us faster initialization.
-	%quotes = (
-		'q'   => { operator => 'q',   braced => undef, separator => undef, _sections => 1 },
-		'qq'  => { operator => 'qq',  braced => undef, separator => undef, _sections => 1 },
-		'qx'  => { operator => 'qx',  braced => undef, separator => undef, _sections => 1 },
-		'qw'  => { operator => 'qw',  braced => undef, separator => undef, _sections => 1 },
-		'qr'  => { operator => 'qr',  braced => undef, separator => undef, _sections => 1, modifiers => 1 },
-		'm'   => { operator => 'm',   braced => undef, separator => undef, _sections => 1, modifiers => 1 },
-		's'   => { operator => 's',   braced => undef, separator => undef, _sections => 2, modifiers => 1 },
-		'tr'  => { operator => 'tr',  braced => undef, separator => undef, _sections => 2, modifiers => 1 },
+# Prototypes for the different braced sections
+my %SECTIONS = (
+	'(' => { type => '()', _close => ')' },
+	'<' => { type => '<>', _close => '>' },
+	'[' => { type => '[]', _close => ']' },
+	'{' => { type => '{}', _close => '}' },
+);
 
-		# Y is the little-used variant of tr
-		'y'   => { operator => 'y',   braced => undef, separator => undef, _sections => 2, modifiers => 1 },
+# For each quote type, the extra fields that should be set.
+# This should give us faster initialization.
+my %QUOTES = (
+	'q'   => { operator => 'q',   braced => undef, separator => undef, _sections => 1 },
+	'qq'  => { operator => 'qq',  braced => undef, separator => undef, _sections => 1 },
+	'qx'  => { operator => 'qx',  braced => undef, separator => undef, _sections => 1 },
+	'qw'  => { operator => 'qw',  braced => undef, separator => undef, _sections => 1 },
+	'qr'  => { operator => 'qr',  braced => undef, separator => undef, _sections => 1, modifiers => 1 },
+	'm'   => { operator => 'm',   braced => undef, separator => undef, _sections => 1, modifiers => 1 },
+	's'   => { operator => 's',   braced => undef, separator => undef, _sections => 2, modifiers => 1 },
+	'tr'  => { operator => 'tr',  braced => undef, separator => undef, _sections => 2, modifiers => 1 },
 
-		'/'   => { operator => undef, braced => 0,     separator => '/',   _sections => 1, modifiers => 1 },
+	# Y is the little-used variant of tr
+	'y'   => { operator => 'y',   braced => undef, separator => undef, _sections => 2, modifiers => 1 },
 
-		# Angle brackets quotes mean "readline(*FILEHANDLE)"
-		'<'   => { operator => undef, braced => 1,     separator => undef, _sections => 1, },
+	'/'   => { operator => undef, braced => 0,     separator => '/',   _sections => 1, modifiers => 1 },
 
-		# The final ( and kind of depreciated ) "first match only" one is not
-		# used yet, since I'm not sure on the context differences between
-		# this and the trinary operator, but it's here for completeness.
-		'?'   => { operator => undef, braced => 0,     separator => '?',   _sections => 1, modifiers => 1 },
-	);
-}
+	# Angle brackets quotes mean "readline(*FILEHANDLE)"
+	'<'   => { operator => undef, braced => 1,     separator => undef, _sections => 1, },
+
+	# The final ( and kind of depreciated ) "first match only" one is not
+	# used yet, since I'm not sure on the context differences between
+	# this and the trinary operator, but it's here for completeness.
+	'?'   => { operator => undef, braced => 0,     separator => '?',   _sections => 1, modifiers => 1 },
+);
 
 
 sub new {
@@ -61,7 +59,7 @@ sub new {
 	my $self = PPI::Token::new( $class, $init ) or return undef;
 
 	# Do we have a prototype for the initializer? If so, add the extra fields
-	my $options = $quotes{$init} or return $self->_error(
+	my $options = $QUOTES{$init} or return $self->_error(
 		"Unknown quote type '$init'"
 	);
 	foreach ( keys %$options ) {
@@ -73,7 +71,7 @@ sub new {
 
 	# Handle the special < base
 	if ( $init eq '<' ) {
-		$self->{sections}->[0] = Clone::clone( $sections{'<'} );
+		$self->{sections}->[0] = Clone::clone( $SECTIONS{'<'} );
 	}
 
 	$self;
@@ -107,7 +105,7 @@ sub _fill {
 		$self->{content} .= $sep;
 
 		# Determine if these are normal or braced type sections
-		if ( my $section = $sections{$sep} ) {
+		if ( my $section = $SECTIONS{$sep} ) {
 			$self->{braced}        = 1;
 			$self->{sections}->[0] = Clone::clone($section);
 		} else {
@@ -269,7 +267,7 @@ sub _fill_braced {
 		$char = substr( $t->{line}, $t->{line_cursor}, 1 );
 	}
 
-	$section = $sections{$char};
+	$section = $SECTIONS{$char};
 
 	if ( $section ) {
 		# It's a brace

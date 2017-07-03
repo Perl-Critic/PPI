@@ -34,11 +34,9 @@ standard L<PPI::Structure>, L<PPI::Node> and L<PPI::Element> methods.
 use strict;
 use PPI::Statement ();
 
-use vars qw{$VERSION @ISA};
-BEGIN {
-	$VERSION = '1.224';
-	@ISA     = 'PPI::Statement';
-}
+our $VERSION = '1.236';
+
+our @ISA = "PPI::Statement";
 
 # Lexer clues
 sub __LEXER__normal() { '' }

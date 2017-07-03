@@ -3,16 +3,13 @@ package PPI::Test::Object;
 use warnings;
 use strict;
 
-use List::MoreUtils 'any';
+use List::Util 1.33 'any';
 use Params::Util qw{_INSTANCE};
 use PPI::Dumper;
 use Test::More;
 use Test::Object;
 
-use vars qw{$VERSION};
-BEGIN {
-	$VERSION = '1.224';
-}
+our $VERSION = '1.236';
 
 
 

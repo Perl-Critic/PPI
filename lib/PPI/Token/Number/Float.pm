@@ -31,11 +31,9 @@ PPI::Token::Number::Exp class.
 use strict;
 use PPI::Token::Number ();
 
-use vars qw{$VERSION @ISA};
-BEGIN {
-	$VERSION = '1.224';
-	@ISA     = 'PPI::Token::Number';
-}
+our $VERSION = '1.236';
+
+our @ISA = "PPI::Token::Number";
 
 =pod
 

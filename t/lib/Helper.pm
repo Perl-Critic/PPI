@@ -1,13 +1,13 @@
 package Helper;
 
-use base 'Exporter';
+use strict;
+use warnings;
+use Exporter ();
 
-use vars qw{$VERSION};
-BEGIN {
-	$VERSION = '1.224';
-}
+our $VERSION = '1.236';
 
-@EXPORT_OK = qw( check_with );
+our @ISA = "Exporter";
+our @EXPORT_OK = qw( check_with );
 
 sub check_with {
     my ( $code, $checker ) = @_;

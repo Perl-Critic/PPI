@@ -4,7 +4,7 @@
 
 use lib 't/lib';
 use PPI::Test::pragmas;
-use Test::More tests => 4 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+use Test::More tests => 6 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use PPI;
 
@@ -38,7 +38,12 @@ END_PERL
 
 REMOVE_CHILD: {
 	my $document = PPI::Document->new( \"1, 2, 3," );
-	my $node = $document->child;
+	eval { $document->child };
+	like $@->message, qr/method child\(\) needs an index/;
+	undef $@;
+	eval { $document->child("a") };
+	like $@->message, qr/method child\(\) needs an index/;
+	my $node = $document->child(0);
 	my $del1 = $node->child(7);
 	is $node->remove_child($del1), $del1;
 	my $fake = bless { content => 3 }, "PPI::Token::Number";

@@ -42,11 +42,9 @@ use strict;
 use Params::Util               qw{_INSTANCE};
 use PPI::Statement::Expression ();
 
-use vars qw{$VERSION @ISA};
-BEGIN {
-	$VERSION = '1.224';
-	@ISA     = 'PPI::Statement::Expression';
-}
+our $VERSION = '1.236';
+
+our @ISA = "PPI::Statement";
 
 =pod
 

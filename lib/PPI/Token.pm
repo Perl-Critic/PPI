@@ -25,11 +25,9 @@ use Params::Util   qw{_INSTANCE};
 use PPI::Element   ();
 use PPI::Exception ();
 
-use vars qw{$VERSION @ISA};
-BEGIN {
-	$VERSION = '1.224';
-	@ISA     = 'PPI::Element';
-}
+our $VERSION = '1.236';
+
+our @ISA = 'PPI::Element';
 
 # We don't load the abstracts, they are loaded
 # as part of the inheritance process.

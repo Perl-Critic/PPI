@@ -34,11 +34,9 @@ standard L<PPI::Structure>, L<PPI::Node> and L<PPI::Element> methods.
 use strict;
 use PPI::Structure ();
 
-use vars qw{$VERSION @ISA};
-BEGIN {
-	$VERSION = '1.224';
-	@ISA     = 'PPI::Structure';
-}
+our $VERSION = '1.236';
+
+our @ISA = "PPI::Structure";
 
 # Highly special custom isa method that will continue to respond
 # positively to ->isa('PPI::Structure::ForLoop') but warns.

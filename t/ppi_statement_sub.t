@@ -7,6 +7,7 @@ use PPI::Test::pragmas;
 use Test::More tests => 1208 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use PPI;
+use PPI::Singletons '%KEYWORDS';
 
 NAME: {
 	for my $test (
@@ -172,15 +173,13 @@ sub test_sub_as {
 	return;
 }
 
-my %known_bad = map { ( "sub $_" => 1 ) } 'scalar { 1 }', 'scalar  { 1 }', 'bless { 1 }', 'bless  { 1 }', 'return { 1 }', 'return  { 1 }';
-
 KEYWORDS_AS_SUB_NAMES: {
 	my @names = (
 		# normal name
 		'foo',
 		# Keywords must parse as Word and not influence lexing
 		# of subsequent curly braces.
-		keys %PPI::Token::Word::KEYWORDS,
+		keys %KEYWORDS,
 		# regression: misparsed as version string
 		'v10',
 		# Other weird and/or special words, just in case
@@ -231,8 +230,6 @@ sub prepare_sub_test {
 sub test_subs {
 	my ( $code, $expected_sub_tokens ) = @_;
 
-TODO:   {
-	local $TODO = $known_bad{$code} ? "known bug" : undef;
 	subtest "'$code'", => sub {
 
 	my $Document = PPI::Document->new( \"$code 999;" );
@@ -248,7 +245,6 @@ TODO:   {
 	is(     eval { $Document->schild(1)->schild(0) }, '999', "number correct"  );
 
 	};
-}
 
 	return;
 }

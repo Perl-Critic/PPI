@@ -43,26 +43,23 @@ test_statement(
 	]
 );
 
-{
-	local $TODO = "this literal quote is not actually one";
-	test_statement(
-		"use q{OtherModule.pm};",
-		[
-			'PPI::Statement::Include'     => 'use q{OtherModule.pm};',
-			'PPI::Token::Word'            => 'use',
-			'PPI::Token::Word'            => 'q',
-			'PPI::Structure::Constructor' => '{OtherModule.pm}',
-			'PPI::Token::Structure'       => '{',
-			'PPI::Statement'              => 'OtherModule.pm',
-			'PPI::Token::Word'            => 'OtherModule',
-			'PPI::Token::Operator'        => '.',
-			'PPI::Token::Word'            => 'pm',
-			'PPI::Token::Structure'       => '}',
-			'PPI::Token::Structure'       => ';',
-		],
-		"invalid syntax is identified correctly",
-	);
-}
+test_statement(
+	"use q{OtherModule.pm};",
+	[
+		'PPI::Statement::Include'     => 'use q{OtherModule.pm};',
+		'PPI::Token::Word'            => 'use',
+		'PPI::Token::Word'            => 'q',
+		'PPI::Structure::Constructor' => '{OtherModule.pm}',
+		'PPI::Token::Structure'       => '{',
+		'PPI::Statement'              => 'OtherModule.pm',
+		'PPI::Token::Word'            => 'OtherModule',
+		'PPI::Token::Operator'        => '.',
+		'PPI::Token::Word'            => 'pm',
+		'PPI::Token::Structure'       => '}',
+		'PPI::Token::Structure'       => ';',
+	],
+	"invalid syntax is identified correctly",
+);
 
 sub one_line_explain {
 	my ( $data ) = @_;

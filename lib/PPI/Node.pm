@@ -51,16 +51,14 @@ L<PPI::Element> objects also apply to C<PPI::Node> objects.
 use strict;
 use Carp            ();
 use Scalar::Util    qw{refaddr};
-use List::MoreUtils ();
-use Params::Util    qw{_INSTANCE _CLASS _CODELIKE};
+use List::Util      ();
+use Params::Util    qw{_INSTANCE _CLASS _CODELIKE _NUMBER};
 use PPI::Element    ();
+use PPI::Singletons '%_PARENT';
 
-use vars qw{$VERSION @ISA *_PARENT};
-BEGIN {
-	$VERSION = '1.224';
-	@ISA     = 'PPI::Element';
-	*_PARENT = *PPI::Element::_PARENT;
-}
+our $VERSION = '1.236';
+
+our @ISA = "PPI::Element";
 
 
 
@@ -247,7 +245,10 @@ element at that node.
 =cut
 
 sub child {
-	$_[0]->{children}->[$_[1]];
+	my ( $self, $index ) = @_;
+	PPI::Exception->throw( "method child() needs an index" )
+	  if not defined _NUMBER $index;
+	$self->{children}->[$index];
 }
 
 =pod
@@ -509,10 +510,10 @@ sub remove_child {
 
 	# Find the position of the child
 	my $key = refaddr $child;
-	my $p   = List::MoreUtils::firstidx {
-		refaddr $_ == $key
-	} @{$self->{children}};
-	return undef if $p == -1;
+	my $p   = List::Util::first {
+		refaddr $self->{children}[$_] == $key
+	} 0..$#{$self->{children}};
+	return undef unless defined $p;
 
 	# Splice it out, and remove the child's parent entry
 	splice( @{$self->{children}}, $p, 1 );
@@ -691,16 +692,16 @@ sub DESTROY {
 # Find the position of a child
 sub __position {
 	my $key = refaddr $_[1];
-	List::MoreUtils::firstidx { refaddr $_ == $key } @{$_[0]->{children}};
+	List::Util::first { refaddr $_[0]{children}[$_] == $key } 0..$#{$_[0]{children}};
 }
 
 # Insert one or more elements before a child
 sub __insert_before_child {
 	my $self = shift;
 	my $key  = refaddr shift;
-	my $p    = List::MoreUtils::firstidx {
-	         refaddr $_ == $key
-	         } @{$self->{children}};
+	my $p    = List::Util::first {
+	         refaddr $self->{children}[$_] == $key
+	         } 0..$#{$self->{children}};
 	foreach ( @_ ) {
 		Scalar::Util::weaken(
 			$_PARENT{refaddr $_} = $self
@@ -714,9 +715,9 @@ sub __insert_before_child {
 sub __insert_after_child {
 	my $self = shift;
 	my $key  = refaddr shift;
-	my $p    = List::MoreUtils::firstidx {
-	         refaddr $_ == $key
-	         } @{$self->{children}};
+	my $p    = List::Util::first {
+	         refaddr $self->{children}[$_] == $key
+	         } 0..$#{$self->{children}};
 	foreach ( @_ ) {
 		Scalar::Util::weaken(
 			$_PARENT{refaddr $_} = $self
@@ -730,9 +731,9 @@ sub __insert_after_child {
 sub __replace_child {
 	my $self = shift;
 	my $key  = refaddr shift;
-	my $p    = List::MoreUtils::firstidx {
-	         refaddr $_ == $key
-	         } @{$self->{children}};
+	my $p    = List::Util::first {
+	         refaddr $self->{children}[$_] == $key
+	         } 0..$#{$self->{children}};
 	foreach ( @_ ) {
 		Scalar::Util::weaken(
 			$_PARENT{refaddr $_} = $self

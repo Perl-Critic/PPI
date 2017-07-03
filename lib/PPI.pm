@@ -6,12 +6,9 @@ use 5.006;
 use strict;
 
 # Set the version for CPAN
-use vars qw{$VERSION $XS_COMPATIBLE @XS_EXCLUDE};
-BEGIN {
-	$VERSION       = '1.224';
-	$XS_COMPATIBLE = '0.845';
-	@XS_EXCLUDE    = ();
-}
+our $VERSION = '1.236';
+
+our ( $XS_COMPATIBLE, @XS_EXCLUDE ) = ( '0.845' );
 
 # Load everything
 use PPI::Util                 ();

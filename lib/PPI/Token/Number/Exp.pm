@@ -31,11 +31,9 @@ represent floating point numbers with exponential notation.
 use strict;
 use PPI::Token::Number::Float ();
 
-use vars qw{$VERSION @ISA};
-BEGIN {
-	$VERSION = '1.224';
-	@ISA     = 'PPI::Token::Number::Float';
-}
+our $VERSION = '1.236';
+
+our @ISA = "PPI::Token::Number::Float";
 
 =pod
 

@@ -93,13 +93,11 @@ use Scalar::Util   ();
 use Params::Util   qw{_INSTANCE};
 use PPI::Node      ();
 use PPI::Exception ();
+use PPI::Singletons '%_PARENT';
 
-use vars qw{$VERSION @ISA *_PARENT};
-BEGIN {
-	$VERSION = '1.224';
-	@ISA     = 'PPI::Node';
-	*_PARENT = *PPI::Element::_PARENT;
-}
+our $VERSION = '1.236';
+
+our @ISA = "PPI::Node";
 
 use PPI::Structure::Block       ();
 use PPI::Structure::Condition   ();

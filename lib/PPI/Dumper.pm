@@ -35,10 +35,7 @@ generate the dump content itself.
 use strict;
 use Params::Util qw{_INSTANCE};
 
-use vars qw{$VERSION};
-BEGIN {
-	$VERSION = '1.224';
-}
+our $VERSION = '1.236';
 
 
 
@@ -123,7 +120,8 @@ sub new {
 		}, $class;
 
 	# Handle the options
-	my %options = map { lc $_ } @_;
+	my @options = map { lc $_ } @_; # strict hashpairs # https://github.com/adamkennedy/PPI/issues/201
+	my %options = @options;
 	foreach ( keys %{$self->{display}} ) {
 		if ( exists $options{$_} ) {
 			if ( $_ eq 'indent' ) {

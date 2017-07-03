@@ -53,21 +53,19 @@ standard L<PPI::Statement>, L<PPI::Node> and L<PPI::Element> methods.
 use strict;
 use PPI::Statement ();
 
-use vars qw{$VERSION @ISA %TYPES};
-BEGIN {
-	$VERSION = '1.224';
-	@ISA     = 'PPI::Statement';
+our $VERSION = '1.236';
 
-	# Keyword type map
-	%TYPES = (
-		'if'      => 'if',
-		'unless'  => 'if',
-		'while'   => 'while',
-		'until'   => 'while',
-		'for'     => 'for',
-		'foreach' => 'foreach',
-	);
-}
+our @ISA = "PPI::Statement";
+
+# Keyword type map
+my %TYPES = (
+	'if'      => 'if',
+	'unless'  => 'if',
+	'while'   => 'while',
+	'until'   => 'while',
+	'for'     => 'for',
+	'foreach' => 'foreach',
+);
 
 # Lexer clues
 sub __LEXER__normal() { '' }

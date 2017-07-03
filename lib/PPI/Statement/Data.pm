@@ -43,11 +43,9 @@ Perl code itself.
 use strict;
 use PPI::Statement ();
 
-use vars qw{$VERSION @ISA};
-BEGIN {
-	$VERSION = '1.224';
-	@ISA     = 'PPI::Statement';
-}
+our $VERSION = '1.236';
+
+our @ISA = "PPI::Statement";
 
 # Data is never complete
 sub _complete () { '' }

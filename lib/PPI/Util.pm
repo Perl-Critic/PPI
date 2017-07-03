@@ -7,12 +7,10 @@ use Exporter     ();
 use Digest::MD5  ();
 use Params::Util qw{_INSTANCE _SCALAR0 _ARRAY0};
 
-use vars qw{$VERSION @ISA @EXPORT_OK};
-BEGIN {
-	$VERSION   = '1.224';
-	@ISA       = 'Exporter';
-	@EXPORT_OK = qw{_Document _slurp};
-}
+our $VERSION = '1.236';
+
+our @ISA       = 'Exporter';
+our @EXPORT_OK = qw{ _Document _slurp };
 
 # 5.8.7 was the first version to resolve the notorious
 # "unicode length caching" bug.

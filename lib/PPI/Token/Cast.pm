@@ -32,17 +32,15 @@ L<PPI::Token> and L<PPI::Element> classes.
 use strict;
 use PPI::Token ();
 
-use vars qw{$VERSION @ISA %POSTFIX};
-BEGIN {
-	$VERSION = '1.224';
-	@ISA     = 'PPI::Token';
+our $VERSION = '1.236';
 
-	%POSTFIX = map { $_ => 1 } (
-		qw{
-		%* @* $* $#*
-		}
-		);
-}
+our @ISA = "PPI::Token";
+
+our %POSTFIX = map { $_ => 1 } (
+	qw{
+	%* @* $* $#*
+	}
+);
 
 
 

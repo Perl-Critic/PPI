@@ -12,8 +12,6 @@ use Test::Deep;
 sub execute_test;
 sub permute_test;
 
-my %known_fails_sblock = map { $_ => 1 } 'sub foo:{}', 'sub foo : {}';
-
 PARSING_AND_METHODS: {
 	# no attribute
 	execute_test 'sub foo {}', [];
@@ -83,7 +81,6 @@ sub execute_test {
 
 	my $blocks = $Document->find( 'PPI::Structure::Block') || [];
 	my $blocks_expected = $code =~ m/{}$/ ? [ '{}' ] : [];
-	local $TODO = "known bug" if $known_fails_sblock{$code};
 	is_deeply(
 		[ map { $_->content } @$blocks ],
 		$blocks_expected,

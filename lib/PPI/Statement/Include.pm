@@ -48,11 +48,9 @@ use strict;
 use PPI::Statement                 ();
 use PPI::Statement::Include::Perl6 ();
 
-use vars qw{$VERSION @ISA};
-BEGIN {
-	$VERSION = '1.224';
-	@ISA     = 'PPI::Statement';
-}
+our $VERSION = '1.236';
+
+our @ISA = "PPI::Statement";
 
 =pod
 

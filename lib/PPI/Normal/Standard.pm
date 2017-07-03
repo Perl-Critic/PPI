@@ -18,10 +18,7 @@ B<Move along, nothing to see here>.
 
 use strict;
 
-use vars qw{$VERSION};
-BEGIN {
-	$VERSION = '1.224';
-}
+our $VERSION = '1.236';
 
 
 

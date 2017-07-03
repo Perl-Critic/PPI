@@ -34,14 +34,12 @@ use Params::Util                     qw{_INSTANCE};
 use PPI::Token::Quote                ();
 use PPI::Token::_QuoteEngine::Simple ();
 
-use vars qw{$VERSION @ISA};
-BEGIN {
-	$VERSION = '1.224';
-	@ISA     = qw{
-		PPI::Token::_QuoteEngine::Simple
-		PPI::Token::Quote
-	};
-}
+our $VERSION = '1.236';
+
+our @ISA = qw{
+	PPI::Token::_QuoteEngine::Simple
+	PPI::Token::Quote
+};
 
 
 

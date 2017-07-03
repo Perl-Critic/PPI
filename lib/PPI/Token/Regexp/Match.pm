@@ -44,14 +44,12 @@ use strict;
 use PPI::Token::Regexp             ();
 use PPI::Token::_QuoteEngine::Full ();
 
-use vars qw{$VERSION @ISA};
-BEGIN {
-	$VERSION = '1.224';
-	@ISA     = qw{
-		PPI::Token::_QuoteEngine::Full
-		PPI::Token::Regexp
-	};
-}
+our $VERSION = '1.236';
+
+our @ISA = qw{
+	PPI::Token::_QuoteEngine::Full
+	PPI::Token::Regexp
+};
 
 1;
 

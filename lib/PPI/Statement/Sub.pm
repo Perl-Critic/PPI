@@ -35,11 +35,9 @@ use List::Util     ();
 use Params::Util   qw{_INSTANCE};
 use PPI::Statement ();
 
-use vars qw{$VERSION @ISA};
-BEGIN {
-	$VERSION = '1.224';
-	@ISA     = 'PPI::Statement';
-}
+our $VERSION = '1.236';
+
+our @ISA = "PPI::Statement";
 
 # Lexer clue
 sub __LEXER__normal() { '' }

@@ -9,6 +9,7 @@ use Test::More tests => 17 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use File::Spec::Functions ':ALL';
 use PPI;
+use PPI::Singletons           '%LAYER';
 
 
 
@@ -56,8 +57,8 @@ SCOPE: {
 NO_DOUBLE_REG: {
 	sub just_a_test_sub { "meep" }
 	ok( PPI::Normal->register( "main::just_a_test_sub", 2 ), "can add subs" );
-	is $PPI::Normal::LAYER{2}[-1], "main::just_a_test_sub", "and find subs at right layer";
-	my $size = @{ $PPI::Normal::LAYER{2} };
+	is $LAYER{2}[-1], "main::just_a_test_sub", "and find subs at right layer";
+	my $size = @{ $LAYER{2} };
 	ok( PPI::Normal->register( "main::just_a_test_sub", 2 ), "can add subs again" );
-	is scalar @{ $PPI::Normal::LAYER{2} }, $size, "but sub isn't added twice";
+	is scalar @{ $LAYER{2} }, $size, "but sub isn't added twice";
 }

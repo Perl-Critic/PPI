@@ -30,13 +30,12 @@ object as a bug.
 use strict;
 use PPI::Token     ();
 use PPI::Exception ();
+use PPI::Singletons qw' %MAGIC $CURLY_SYMBOL ';
 
-use vars qw{$VERSION @ISA $CURLY_SYMBOL};
-BEGIN {
-	$VERSION = '1.224';
-	@ISA     = 'PPI::Token';
-	$CURLY_SYMBOL = qr{\G\^[[:upper:]_]\w+\}};
-}
+our $VERSION = '1.236';
+
+our @ISA = "PPI::Token";
+
 
 
 
@@ -116,7 +115,7 @@ sub __TOKENIZER__on_char {
 			return 1;
 		}
 
-		if ( $PPI::Token::Magic::magic{ $c . $char } ) {
+		if ( $MAGIC{ $c . $char } ) {
 			# Magic variable
 			$t->{class} = $t->{token}->set_class( 'Magic' );
 			return 1;
@@ -154,7 +153,7 @@ sub __TOKENIZER__on_char {
 			return 1;
 		}
 
-		if ( $PPI::Token::Magic::magic{ $c . $char } ) {
+		if ( $MAGIC{ $c . $char } ) {
 			# Magic variable
 			$t->{class} = $t->{token}->set_class( 'Magic' );
 			return 1;
@@ -200,7 +199,7 @@ sub __TOKENIZER__on_char {
 		}
 
 		# Is it a magic variable?
-		if ( $char eq '^' || $PPI::Token::Magic::magic{ $c . $char } ) {
+		if ( $char eq '^' || $MAGIC{ $c . $char } ) {
 			$t->{class} = $t->{token}->set_class( 'Magic' );
 			return 1;
 		}

@@ -5,12 +5,11 @@ use strict;
 
 use File::Spec::Functions ();
 
-use vars qw{$VERSION @ISA @EXPORT_OK %EXPORT_TAGS};
-BEGIN {
-	$VERSION = '1.224';
-	@ISA = 'Exporter';
-	@EXPORT_OK = qw( find_files quotable pause );
-}
+our $VERSION = '1.236';
+
+our @ISA = 'Exporter';
+our @EXPORT_OK = qw( find_files quotable pause );
+our %EXPORT_TAGS;
 
 
 # Find file names in named t/data dirs
