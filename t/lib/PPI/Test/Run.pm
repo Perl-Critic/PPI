@@ -9,9 +9,6 @@ use Test::Object;
 use lib 't/lib';
 use PPI::Test::Object;
 
-our $VERSION = '1.237_001';
-
-
 #####################################################################
 # Process a .code/.dump file pair
 # plan: 2 + 14 * npairs
