@@ -9,8 +9,6 @@ use Test::Object;
 use lib 't/lib';
 use PPI::Test::Object;
 
-our $VERSION = '1.236';
-
 
 #####################################################################
 # Process a .code/.dump file pair

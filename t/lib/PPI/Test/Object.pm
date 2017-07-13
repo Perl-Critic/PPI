@@ -9,11 +9,6 @@ use PPI::Dumper;
 use Test::More;
 use Test::Object;
 
-our $VERSION = '1.236';
-
-
-
-
 
 #####################################################################
 # PPI::Document Testing
