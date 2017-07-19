@@ -4,7 +4,7 @@
 
 use lib 't/lib';
 use PPI::Test::pragmas;
-use Test::More tests => 1146 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+use Test::More tests => 1174 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use PPI;
 use PPI::Singletons qw' %OPERATOR %KEYWORDS ';
@@ -688,3 +688,45 @@ OPERATOR_FAT_COMMA: {
 	}
 }
 
+OPERATORS_PLUS_MINUS: {
+    my @operands = (
+         '1',   '2',
+         '1',  '(2)',
+        '(1)', '(2)'
+    );
+
+    for my $op (qw/- +/) {
+        for ( my $i = 0; $i < @operands; $i += 2 ) {
+            my ( $a, $b ) = @operands[ $i, $i + 1 ];
+            my $code = "${a}${op}${b}";
+            my $doc  = PPI::Document->new( \$code );
+            isa_ok( $doc, 'PPI::Document', "parsed '$code'" );
+            my $ops = $doc->find('Token::Operator');
+            is( ref $ops, 'ARRAY', "found operator $op" );
+            is( @$ops, 1, "operator $op found exactly once" );
+            is( $ops->[0]->content(), $op, "operator $op text matches" );
+        }
+    }
+
+    # Add "'(1)', '2'" into operands once TODO is resolved.
+    {
+        my ( $a, $b ) = ( '(1)', '2' );
+        my $op = '+';
+        my $code = "${a}${op}${b}";
+        my $doc  = PPI::Document->new( \$code );
+        isa_ok( $doc, 'PPI::Document', "parsed '$code'" );
+        my $ops = $doc->find('Token::Operator');
+        is( ref $ops, 'ARRAY', "found operator $op" );
+    }
+
+    TODO: {
+        local $TODO = "(1)-2 not parsed correctly";
+        my ( $a, $b ) = ( '(1)', '2' );
+        my $op = '-';
+        my $code = "${a}${op}${b}";
+        my $doc  = PPI::Document->new( \$code );
+        isa_ok( $doc, 'PPI::Document', "parsed '$code'" );
+        my $ops = $doc->find('Token::Operator');
+        is( ref $ops, 'ARRAY', "found operator $op" );
+    }
+}
