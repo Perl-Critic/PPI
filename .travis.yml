@@ -1,5 +1,6 @@
 language: perl
 perl:
+  - "dev"
   - "5.21"
   - "5.20"
   - "5.18"
@@ -9,6 +10,7 @@ perl:
   - "5.10"
   - "5.8"
 before_install:
-  cpanm -n Devel::Cover::Report::Coveralls Test::ClassAPI
+  - eval $(curl https://travis-perl.github.io/init) --auto
+  - cpanm -n Devel::Cover::Report::Coveralls Test::ClassAPI Test::Warnings
 script:
   perl Makefile.PL && make && cover -test -report coveralls
