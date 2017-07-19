@@ -22,7 +22,7 @@ our %OPERATOR = map { $_ => 1 } (
 	& | ^ && || // .. ...
 	? :
 	= **= += -= .= *= /= %= x= &= |= ^= <<= >>= &&= ||= //=
-	=> <>
+	=> <> <<>>
 	and or xor not
 	}, ',' 	# Avoids "comma in qw{}" warning
 );

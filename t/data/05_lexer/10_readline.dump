@@ -52,3 +52,11 @@ PPI::Document
     PPI::Token::QuoteLike::Readline  	'<$up../*.v>'
     PPI::Token::Structure  	';'
   PPI::Token::Whitespace  	'\n'
+  PPI::Statement
+    PPI::Token::Word  	'print'
+    PPI::Token::Whitespace  	' '
+    PPI::Token::Word  	'while'
+    PPI::Token::Whitespace  	' '
+    PPI::Token::QuoteLike::Readline  	'<<>>'
+    PPI::Token::Structure  	';'
+  PPI::Token::Whitespace  	'\n'

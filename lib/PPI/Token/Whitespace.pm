@@ -279,10 +279,8 @@ sub __TOKENIZER__on_char {
 		return 'Operator' if $prev and $prev->isa('PPI::Token::ArrayIndex');
 
 		# If it is <<... it's a here-doc instead
-		my $next_char = substr( $t->{line}, $t->{line_cursor} + 1, 1 );
-		if ( $next_char eq '<' ) {
-			return 'Operator';
-		}
+		my $next_char = substr( $t->{line}, $t->{line_cursor} + 1, 2 );
+		return 'Operator' if $next_char =~ /<[^>]/;
 
 		return 'Operator' if not $prev;
 
