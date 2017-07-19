@@ -23,7 +23,7 @@ PPI::Token::Operator - Token class for operators
   ?    :    **=  +=   -=   .=   *=   /=
   %=   x=   &=   |=   ^=   <<=  >>=  &&=
   ||=  //=  <    >    <=   >=   <>   =>   ->
-  and  or   xor  not  eq   ne
+  and  or   xor  not  eq   ne   <<>>
 
 
 =head1 DESCRIPTION
@@ -60,6 +60,11 @@ sub __TOKENIZER__on_char {
 
 	# Are we still an operator if we add the next character
 	my $content = $t->{token}->{content};
+	# special case for <<>> operator
+	if(length($content) < 4 &&
+		$content . substr( $t->{line}, $t->{line_cursor}, 4 - length($content) ) eq '<<>>') {
+		return 1;
+	}
 	return 1 if $OPERATOR{ $content . $char };
 
 	# Handle the special case of a .1234 decimal number
@@ -86,6 +91,10 @@ sub __TOKENIZER__on_char {
 	}
 
 	# Handle the special case of the null Readline
+	if ( $content eq '<<>>' ) {
+		$t->{class} = $t->{token}->set_class('QuoteLike::Readline');
+	}
+
 	if ( $content eq '<>' ) {
 		$t->{class} = $t->{token}->set_class('QuoteLike::Readline');
 	}

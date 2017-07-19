@@ -4,7 +4,7 @@
 
 use lib 't/lib';
 use PPI::Test::pragmas;
-use Test::More tests => 1146 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+use Test::More tests => 1151 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use PPI;
 use PPI::Singletons qw' %OPERATOR %KEYWORDS ';
@@ -26,10 +26,11 @@ FIND_ONE_OP: {
 
 PARSE_ALL_OPERATORS: {
 	foreach my $op ( sort keys %OPERATOR ) {
-		my $source = $op eq '<>' ? '<>;' : "\$foo $op 2;";
+		my $source = $op eq '<>' || $op eq '<<>>' ? $op . ';' : "\$foo $op 2;";
 		my $doc = PPI::Document->new( \$source );
 		isa_ok( $doc, 'PPI::Document', "operator $op parsed '$source'" );
-		my $ops = $doc->find( $op eq '<>' ? 'Token::QuoteLike::Readline' : 'Token::Operator' );
+		my $ops = $doc->find( $op eq '<<>>' || $op eq '<>'
+            ? 'Token::QuoteLike::Readline' : 'Token::Operator' );
 		is( ref $ops, 'ARRAY', "operator $op found operators" );
 		is( @$ops, 1, "operator $op found exactly once" );
 		is( $ops->[0]->content(), $op, "operator $op operator text matches" );
@@ -519,7 +520,8 @@ OPERATOR_X: {
 		}
 
 		$code .= $operator;
-		push @expected, ( ($operator eq '<>' ? 'PPI::Token::QuoteLike::Readline' : 'PPI::Token::Operator') => $operator );
+		push @expected, ( ($operator eq '<<>>' || $operator eq '<>' ?
+                'PPI::Token::QuoteLike::Readline' : 'PPI::Token::Operator') => $operator );
 
 		if ( $operator =~ /\w$/ || $operator eq '<<' ) {  # want << operator, not heredoc
 			$code .= ' ';
@@ -527,7 +529,7 @@ OPERATOR_X: {
 		}
 		$code .= 'x3';
 		my $desc;
-		if ( $operator eq '--' || $operator eq '++' || $operator eq '<>' ) {
+		if ( $operator eq '--' || $operator eq '++' || $operator eq '<>' || $operator eq '<<>>' ) {
 			push @expected, ( 'PPI::Token::Operator' => 'x' );
 			push @expected, ( 'PPI::Token::Number' => '3' );
 			$desc = "operator $operator does not imply following 'x' is a word";
