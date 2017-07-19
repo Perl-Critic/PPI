@@ -4,12 +4,12 @@
 
 use lib 't/lib';
 use PPI::Test::pragmas;
-use Test::More tests => 42 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+use Test::More tests => 40 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use File::Spec::Unix;
 use File::Spec::Functions ':ALL';
+use File::Temp 'tempdir';
 use Scalar::Util  'refaddr';
-use File::Remove  ();
 use PPI::Document ();
 use PPI::Cache    ();
 use Test::SubCalls;
@@ -18,13 +18,7 @@ use constant VMS  => !! ( $^O eq 'VMS' );
 use constant FILE => VMS ? 'File::Spec::Unix' : 'File::Spec';
 
 my $this_file  = FILE->catdir( 't', 'data', '03_document', 'test.dat' );
-my $cache_dir  = FILE->catdir( 't', 'data', '18_cache' );
-
-# Define, create and clear the test cache
-File::Remove::remove( \1, $cache_dir ) if -e $cache_dir;
-ok( ! -e $cache_dir, 'The cache path does not exist' );
-END { File::Remove::remove( \1, $cache_dir ) if -e $cache_dir }
-ok( scalar(mkdir $cache_dir), 'mkdir $cache_dir returns true' );
+my $cache_dir  = tempdir(CLEANUP => 1);
 ok( -d $cache_dir, 'Verified the cache path exists' );
 ok( -w $cache_dir, 'Can write to the cache path'    );
 
