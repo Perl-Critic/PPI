@@ -36,7 +36,7 @@ use strict;
 use PPI::Token::Quote ();
 use PPI::Token::_QuoteEngine::Simple ();
 
-our $VERSION = '1.237_001';
+# VERSION
 
 our @ISA = qw{
 	PPI::Token::_QuoteEngine::Simple

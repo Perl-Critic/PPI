@@ -87,7 +87,7 @@ use PPI::Token      ();
 use PPI::Exception  ();
 use PPI::Exception::ParserRejection ();
 
-our $VERSION = '1.237_001';
+# VERSION
 
 # The x operator cannot follow most Perl operators, implying that
 # anything beginning with x following an operator is a word.

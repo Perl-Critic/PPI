@@ -54,7 +54,7 @@ use Digest::MD5   ();
 use Params::Util  qw{_INSTANCE _SCALAR};
 use PPI::Document ();
 
-our $VERSION = '1.237_001';
+# VERSION
 
 use constant VMS => !! ( $^O eq 'VMS' );
 
