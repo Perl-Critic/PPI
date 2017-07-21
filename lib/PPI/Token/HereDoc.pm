@@ -87,7 +87,7 @@ have a relatively large number of unique methods all of their own.
 use strict;
 use PPI::Token ();
 
-our $VERSION = '1.236';
+# VERSION
 
 our @ISA = "PPI::Token";
 

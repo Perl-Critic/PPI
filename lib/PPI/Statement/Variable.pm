@@ -42,7 +42,7 @@ use strict;
 use Params::Util               qw{_INSTANCE};
 use PPI::Statement::Expression ();
 
-our $VERSION = '1.236';
+# VERSION
 
 our @ISA = "PPI::Statement";
 

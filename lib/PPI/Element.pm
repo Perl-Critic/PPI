@@ -30,7 +30,7 @@ use PPI::Util       ();
 use PPI::Node       ();
 use PPI::Singletons '%_PARENT';
 
-our $VERSION = '1.236';
+# VERSION
 
 our $errstr = "";
 

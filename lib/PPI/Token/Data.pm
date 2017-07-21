@@ -31,7 +31,7 @@ use strict;
 use IO::String ();
 use PPI::Token ();
 
-our $VERSION = '1.236';
+# VERSION
 
 our @ISA = "PPI::Token";
 
