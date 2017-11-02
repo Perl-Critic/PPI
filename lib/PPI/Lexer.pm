@@ -1184,17 +1184,20 @@ sub _curly {
 	### FIXME This is possibly a bad choice, but will have to do for now.
 	return 'PPI::Structure::Block' if $Element;
 
-	# Special case: Are we the param of a core function
-	# i.e. map({ $_ => 1 } @foo)
 	if (
 		$Parent->isa('PPI::Statement')
 		and
 		_INSTANCE($Parent->parent, 'PPI::Structure::List')
 	) {
+		# Special case: Are we the param of a core function
+		# i.e. map({ $_ => 1 } @foo)
 		my $function = $Parent->parent->parent->schild(-2);
-		if ( $function and $function->content =~ /^(?:map|grep|sort)$/ ) {
+		if ( $function and $function->content =~ /^(?:map|grep|sort|eval|do)$/ ) {
 			return 'PPI::Structure::Block';
 		}
+
+		# Other cases of list-embedded curlies are constructors
+		return 'PPI::Structure::Constructor';
 	}
 
 	# We need to scan ahead.
