@@ -2,7 +2,7 @@ PPI::Document
   PPI::Statement
     PPI::Token::Word  	'eval'
     PPI::Structure::List  	( ... )
-      PPI::Statement::Compound
+      PPI::Statement
         PPI::Token::Whitespace  	' '
         PPI::Structure::Block  	{ ... }
           PPI::Statement
