@@ -1202,15 +1202,16 @@ sub _curly {
 		and
 		_INSTANCE($Parent->parent, 'PPI::Structure::List')
 	) {
+		my $function = $Parent->parent->parent->schild(-2);
+
 		# Special case: Are we the param of a core function
 		# i.e. map({ $_ => 1 } @foo)
-		my $function = $Parent->parent->parent->schild(-2);
-		if ( $function and $function->content =~ /^(?:map|grep|sort|eval|do)$/ ) {
-			return 'PPI::Structure::Block';
-		}
+		return 'PPI::Structure::Block'
+			if $function and $function->content =~ /^(?:map|grep|sort|eval|do)$/;
 
-		# Other cases of list-embedded curlies are constructors
-		return 'PPI::Structure::Constructor';
+		# If not part of a block print, list-embedded curlies are most likely constructors
+		return 'PPI::Structure::Constructor'
+			if not $function or $function->content !~ /^(?:print|say)$/;
 	}
 
 	# We need to scan ahead.
