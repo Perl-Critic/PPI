@@ -1196,10 +1196,12 @@ sub _curly {
 			return 'PPI::Structure::Block';
 		}
 
-		# Other cases of list-embedded curlies are constructors
-		return 'PPI::Structure::Constructor';
+		# If not part of a block print, list-embedded curlies are most likely constructors
+		if ( not $function or $function->content !~ /^(?:print|say)$/ ) {
+		    return 'PPI::Structure::Constructor';
+		}
 	}
-
+		
 	# We need to scan ahead.
 	my $Next;
 	my $position = 0;
