@@ -1,5 +1,16 @@
 Revision history for Perl extension PPI
 
+1.237_001 Wed 15 Nov 2017
+	Summary:
+    - support postfix dereference
+    - remove dependencies on vars, base and List::MoreUtils
+    - reduce globals and cross-package variables
+    - make xt/api.t skip/run properly
+
+	Details:
+    - convert many cross-package var accesses to var imports
+    - convert several unnecessary globals to local variables
+
 1.236 Thu 22 June 2017
 	Summary:
 	- prevent Node->child from proceeding without a valid argument

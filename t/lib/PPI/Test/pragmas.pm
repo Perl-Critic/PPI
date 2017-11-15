@@ -20,7 +20,7 @@ use warnings;
 use Test::More 0.88;
 use if $ENV{AUTHOR_TESTING}, 'Test::Warnings', ':no_end_test';
 
-our $VERSION = '1.236';
+our $VERSION = '1.237_001';
 
 BEGIN {
 	select STDERR;  ## no critic ( InputOutput::ProhibitOneArgSelect )

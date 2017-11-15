@@ -5,7 +5,7 @@ use strict;
 
 use File::Spec::Functions ();
 
-our $VERSION = '1.236';
+our $VERSION = '1.237_001';
 
 our @ISA = 'Exporter';
 our @EXPORT_OK = qw( find_files quotable pause );

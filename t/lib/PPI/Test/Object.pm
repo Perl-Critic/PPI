@@ -9,7 +9,7 @@ use PPI::Dumper;
 use Test::More;
 use Test::Object;
 
-our $VERSION = '1.236';
+our $VERSION = '1.237_001';
 
 
 

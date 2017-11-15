@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Exporter ();
 
-our $VERSION = '1.236';
+our $VERSION = '1.237_001';
 
 our @ISA = "Exporter";
 our @EXPORT_OK = qw( check_with );
