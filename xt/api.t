@@ -7,10 +7,10 @@ use PPI::Test::pragmas;
 use Test::More;
 BEGIN {
         my $tests = 2931 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
-	if ( $ENV{RELEASE_TESTING} ) {
+	if ( $ENV{AUTOMATED_TESTING} or $ENV{RELEASE_TESTING} ) {
 		plan( tests => $tests );
 	} else {
-		plan( tests => $tests, skip_all => 'Author tests not required for installation' );
+		plan( skip_all => 'Author tests not required for installation' );
 	}
 }
 
