@@ -6,7 +6,7 @@ sub warns_on_misplaced_underscore { $] >= 5.006 and $] < 5.008 }
 
 use lib 't/lib';
 use PPI::Test::pragmas;
-use Test::More tests => 568 + (warns_on_misplaced_underscore() ? 2 : 0 ) + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+use Test::More tests => 588 + (warns_on_misplaced_underscore() ? 2 : 0 ) + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use File::Spec::Functions ':ALL';
 use PPI;
@@ -51,6 +51,10 @@ SCOPE: {
 		'0.0e+10'     => '10e',
 		'0.0e100'     => '10e',
 		'1_0e1_0'     => '10e',
+		'1e00'        => '10e',
+		'1e+00'       => '10e',
+		'1e-00'       => '10e',
+		'1e00000'     => '10e',
 		'0b'          => 2,
 		'0b0'         => 2,
 		'0b10'        => 2,
