@@ -2,14 +2,14 @@ Revision history for Perl extension PPI
 
 1.237_001 Wed 15 Nov 2017
 	Summary:
-    - support postfix dereference
-    - remove dependencies on vars, base and List::MoreUtils
-    - reduce globals and cross-package variables
-    - make xt/api.t skip/run properly
+	- support postfix dereference
+	- remove dependencies on vars, base and List::MoreUtils
+	- reduce globals and cross-package variables
+	- make xt/api.t skip/run properly
 
 	Details:
-    - convert many cross-package var accesses to var imports
-    - convert several unnecessary globals to local variables
+	- convert many cross-package var accesses to var imports
+	- convert several unnecessary globals to local variables
 
 1.236 Thu 22 June 2017
 	Summary:
@@ -865,7 +865,7 @@ Revision history for Perl extension PPI
 	- Resolved Lexer bug CPAN #13425 ( $p{package} creates a PPI::Statement::Package )
 	  Added smarts to resolve word-started statements as ::Expression in subscripts
 	- Resolved PDOM bug CPAN #13326 ( problems in index_locations )
-	  Patch and comprehensive additional tests provided by johanl[ÄT]DarSerMan.com
+	  Patch and comprehensive additional tests provided by johanl[Ã„T]DarSerMan.com
 	- Removed dependency on Class::Autouse. Just load Tokenizer and Lexer up front.
 	- Removed dependency on File::Slurp. Only use it 3 times and it's not worth it
 	  when almost all the files we will read are under 50k.
