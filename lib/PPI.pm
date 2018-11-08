@@ -143,9 +143,9 @@ suffered from sufficiently bad corner cases that they were abandoned.
 =head2 What Does PPI Stand For?
 
 C<PPI> is an acronym for the longer original module name
-C<Parse::Perl::Isolated>. And in the spirit or the silly acronym games
+C<Parse::Perl::Isolated>. And in the spirit of the silly acronym games
 played by certain unnamed Open Source projects you may have I<hurd> of,
-it also a reverse backronym of "I Parse Perl".
+it is also a reverse backronym of "I Parse Perl".
 
 Of course, I could just be lying and have just made that second bit up
 10 minutes before the release of PPI 1.000. Besides, B<all> the cool
@@ -171,7 +171,7 @@ Once you can accept that we will never be able to parse Perl well enough
 to meet the standards of things that treat Perl as code, it is worth
 re-examining C<why> we want to "parse" Perl at all.
 
-What are the things that people might want a "Perl parser" for.
+What are the things that people might want a "Perl parser" for?
 
 =over 4
 
@@ -254,7 +254,7 @@ expect that it will handle your code just fine.
 
 PPI provides partial support for internationalisation and localisation.
 
-Specifically, it allows the use characters from the Latin-1 character
+Specifically, it allows the use of characters from the Latin-1 character
 set to be used in quotes, comments, and POD. Primarily, this covers
 languages from Europe and South America.
 
@@ -343,7 +343,7 @@ with multi-gigahertz processors, but can still be painful when working with
 very large files.
 
 The target parsing rate for PPI is about 5000 lines per gigacycle. It is
-currently believed to be at about 1500, and main avenue for making it to
+currently believed to be at about 1500, and the main avenue for making it to
 the target speed has now become L<PPI::XS>, a drop-in XS accelerator for
 PPI.
 
