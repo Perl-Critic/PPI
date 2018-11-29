@@ -80,7 +80,7 @@ Returns the symbol as a string.
 
 =cut
 
-my %cast_which_trumps_braces = map { $_ => 1 } qw{ $ @ };
+my %cast_which_trumps_braces = map { $_ => 1 } qw{ $ @ % };
 
 sub symbol {
 	my $self   = shift;
@@ -88,7 +88,6 @@ sub symbol {
 
 	# Immediately return the cases where it can't be anything else
 	my $type = substr( $symbol, 0, 1 );
-	return $symbol if $type eq '%';
 	return $symbol if $type eq '&';
 
 	# Unless the next significant Element is a structure, it's correct.
@@ -112,6 +111,9 @@ sub symbol {
 
 	} elsif ( $type eq '@' ) {
 		substr( $symbol, 0, 1, '%' ) if $braces eq '{}';
+
+	} elsif ( $type eq '%' ) {
+		substr( $symbol, 0, 1, '@' ) if $braces eq '[]';
 
 	}
 
