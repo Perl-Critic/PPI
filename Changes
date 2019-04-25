@@ -2,6 +2,11 @@ Revision history for Perl extension PPI
 
 {{$NEXT}}
 
+1.246   2019-04-25 15:33:48Z
+	Summary:
+	- support indented here-docs
+	- fixed some typos
+
 1.244   2019-04-25 15:21:51Z
 	Summary:
 	- support key-value and index-value slices in PPI::Token::Symbol symbol method
