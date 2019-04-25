@@ -189,7 +189,7 @@ sub process {
 	# Create the normalized Document object
 	my $Normalized = PPI::Document::Normalized->new(
 		Document  => $self->{Document},
-		version   => $VERSION,
+		version   => __PACKAGE__->VERSION,
 		functions => \@functions,
 	) or return undef;
 

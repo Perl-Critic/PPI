@@ -4,7 +4,7 @@
 
 use lib 't/lib';
 use PPI::Test::pragmas;
-use Test::More tests => 17 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+use Test::More tests => 9 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 
 # Do the modules load
@@ -19,22 +19,6 @@ use_all_ok( qw{
 	PPI::Cache
 	} );
 
-sub use_all_ok {
-	my @modules = @_;
-
-	# Load each of the classes
-	foreach my $module ( @modules ) {
-		use_ok( $module );
-	}
-
-	# Check that all of the versions match
-	my $main_module = shift(@modules);
-	my $expected    = $main_module->VERSION;
-	ok( $expected, "Found a version for the main module ($expected)" );
-
-	foreach my $module ( @modules ) {
-		is( $module->VERSION, $expected, "$main_module->VERSION matches $module->VERSION ($expected)" );
-	}
-}
+sub use_all_ok { use_ok $_ for @_ }
 
 ok( ! $PPI::XS::VERSION, 'PPI::XS is correctly NOT loaded' );

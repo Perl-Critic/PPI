@@ -2,7 +2,7 @@
 
 # Testing of the normalization functions.
 # (only very basic at this point)
-
+use Test::InDistDir;
 use lib 't/lib';
 use PPI::Test::pragmas;
 use Test::More tests => 17 + ($ENV{AUTHOR_TESTING} ? 1 : 0);

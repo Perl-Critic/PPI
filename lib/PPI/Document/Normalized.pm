@@ -75,7 +75,7 @@ sub new {
 
 	# Check the required params
 	my $Document  = _INSTANCE($args{Document}, 'PPI::Document') or return undef;
-	my $version   = $args{version} or return undef;
+	my $version   = $args{version};
 	my $functions = _ARRAY($args{functions}) or return undef;
 
 	# Create the object
@@ -150,7 +150,9 @@ sub equal {
 	return undef if $self->{processing};
 
 	# Check the version and function list first
-	return '' unless $self->version eq $other->version;
+	my $v1 = $self->version || "undef";
+	my $v2 = $other->version || "undef";
+	return '' if $v1 ne $v2;
 	$self->_equal_ARRAY( $self->functions, $other->functions ) or return '';
 
 	# Do the main comparison run
