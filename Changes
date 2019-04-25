@@ -2,6 +2,10 @@ Revision history for Perl extension PPI
 
 {{$NEXT}}
 
+1.240   2019-04-25 14:09:24Z
+	Summary:
+	- add support for lexical subroutines from perl-5.26
+
 1.238   2019-04-25 12:03:37Z
 	Summary:
 	- only release engineering, moved to Dist::Zilla, straightened out
