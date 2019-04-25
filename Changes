@@ -2,6 +2,10 @@ Revision history for Perl extension PPI
 
 {{$NEXT}}
 
+1.242   2019-04-25 14:33:56Z
+	Summary:
+	- keep exponents of 2 or more zeroes from trapping PPI in an endless loop
+
 1.240   2019-04-25 14:09:24Z
 	Summary:
 	- add support for lexical subroutines from perl-5.26
