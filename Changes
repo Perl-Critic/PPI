@@ -2,6 +2,17 @@ Revision history for Perl extension PPI
 
 {{$NEXT}}
 
+1.250   2019-04-25 16:43:32Z
+	Summary:
+	- various smaller releng changes
+
+	Details:
+	- removed dependency on File::Remove
+	- add some tests including a TODO test for misparse bug on '(1)-1'
+	- allow tests to run without pre-determined module versions
+	- add travis-perl helper to be run before install
+	- update versions of Perl Travis tests on
+
 1.248   2019-04-25 16:08:08Z
 	Summary:
 	- parse list-embedded curlies as hash constructors
