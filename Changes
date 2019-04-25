@@ -2,6 +2,10 @@ Revision history for Perl extension PPI
 
 {{$NEXT}}
 
+1.248   2019-04-25 16:08:08Z
+	Summary:
+	- parse list-embedded curlies as hash constructors
+
 1.246   2019-04-25 15:33:48Z
 	Summary:
 	- support indented here-docs
