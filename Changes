@@ -2,6 +2,10 @@ Revision history for Perl extension PPI
 
 {{$NEXT}}
 
+1.244   2019-04-25 15:21:51Z
+	Summary:
+	- support key-value and index-value slices in PPI::Token::Symbol symbol method
+
 1.242   2019-04-25 14:33:56Z
 	Summary:
 	- keep exponents of 2 or more zeroes from trapping PPI in an endless loop
