@@ -28,7 +28,7 @@ our parent L<PPI::Token> and L<PPI::Element> classes.
 =cut
 
 use strict;
-use IO::String ();
+use IO::String 1.07 ();
 use PPI::Token ();
 
 # VERSION

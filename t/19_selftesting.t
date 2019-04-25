@@ -12,7 +12,7 @@ use Test::More; # Plan comes later
 use Test::Object;
 use File::Spec::Functions ':ALL';
 use Params::Util qw{_CLASS _ARRAY _INSTANCE _IDENTIFIER};
-use Class::Inspector;
+use Class::Inspector 1.22;
 use PPI;
 use PPI::Test 'find_files';
 use PPI::Test::Object;

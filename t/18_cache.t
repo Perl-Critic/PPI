@@ -8,11 +8,11 @@ use Test::More tests => 42 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use File::Spec::Unix;
 use File::Spec::Functions ':ALL';
-use Scalar::Util  'refaddr';
-use File::Remove  ();
-use PPI::Document ();
-use PPI::Cache    ();
-use Test::SubCalls;
+use Scalar::Util        'refaddr';
+use File::Remove 1.42   ();
+use PPI::Document       ();
+use PPI::Cache          ();
+use Test::SubCalls 1.07 ();
 
 use constant VMS  => !! ( $^O eq 'VMS' );
 use constant FILE => VMS ? 'File::Spec::Unix' : 'File::Spec';
