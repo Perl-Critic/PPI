@@ -2,6 +2,11 @@ Revision history for Perl extension PPI
 
 {{$NEXT}}
 
+1.238   2019-04-25 12:03:37Z
+	Summary:
+	- only release engineering, moved to Dist::Zilla, straightened out
+	  dependencies and fixed some formatting in Changes
+
 1.237_001 Wed 15 Nov 2017
 	Summary:
 	- support postfix dereference
