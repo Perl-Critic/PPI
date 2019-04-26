@@ -2,6 +2,10 @@ Revision history for Perl extension PPI
 
 {{$NEXT}}
 
+1.256   2019-04-26 16:40:01Z
+	Summary:
+	- allow all PPI::Document instances to have a filename attribute
+
 1.254   2019-04-26 16:23:21Z
 	Summary:
 	- recognize `for (;<$foo>;) {}` as containing a readline operator
