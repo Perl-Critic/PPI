@@ -720,13 +720,13 @@ OPERATORS_PLUS_MINUS: {
     }
 
     TODO: {
-        local $TODO = "(1)-2 not parsed correctly";
         my ( $a, $b ) = ( '(1)', '2' );
         my $op = '-';
         my $code = "${a}${op}${b}";
         my $doc  = PPI::Document->new( \$code );
         isa_ok( $doc, 'PPI::Document', "parsed '$code'" );
         my $ops = $doc->find('Token::Operator');
+        local $TODO = "(1)-2 not parsed correctly";
         is( ref $ops, 'ARRAY', "found operator $op" );
     }
 }
