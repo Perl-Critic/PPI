@@ -288,18 +288,11 @@ sub __TOKENIZER__on_char {
 		# while ( <...> )
 		# while <>;
 		my $prec = $prev->content;
-		if ( $prev->isa('PPI::Token::Structure') and $prec eq '(' ) {
-			return 'QuoteLike::Readline';
-		}
-		if ( $prev->isa('PPI::Token::Word') and $prec eq 'while' ) {
-			return 'QuoteLike::Readline';
-		}
-		if ( $prev->isa('PPI::Token::Operator') and $prec eq '=' ) {
-			return 'QuoteLike::Readline';
-		}
-		if ( $prev->isa('PPI::Token::Operator') and $prec eq ',' ) {
-			return 'QuoteLike::Readline';
-		}
+		return 'QuoteLike::Readline'
+			if ( $prev->isa('PPI::Token::Structure') and $prec eq '(' )
+			or ( $prev->isa('PPI::Token::Word')      and $prec eq 'while' )
+			or ( $prev->isa('PPI::Token::Operator')  and $prec eq '=' )
+			or ( $prev->isa('PPI::Token::Operator')  and $prec eq ',' );
 
 		if ( $prev->isa('PPI::Token::Structure') and $prec eq '}' ) {
 			# Could go either way... do a regex check
