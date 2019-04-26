@@ -60,3 +60,15 @@ PPI::Document
     PPI::Token::QuoteLike::Readline  	'<<>>'
     PPI::Token::Structure  	';'
   PPI::Token::Whitespace  	'\n'
+  PPI::Statement::Compound
+    PPI::Token::Word  	'for'
+    PPI::Token::Whitespace  	' '
+    PPI::Structure::For  	( ... )
+      PPI::Statement::Null
+        PPI::Token::Structure  	';'
+      PPI::Statement
+        PPI::Token::QuoteLike::Readline  	'<$foo>'
+        PPI::Token::Structure  	';'
+    PPI::Token::Whitespace  	' '
+    PPI::Structure::Block  	{ ... }
+  PPI::Token::Whitespace  	'\n'

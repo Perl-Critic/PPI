@@ -290,6 +290,7 @@ sub __TOKENIZER__on_char {
 		my $prec = $prev->content;
 		return 'QuoteLike::Readline'
 			if ( $prev->isa('PPI::Token::Structure') and $prec eq '(' )
+			or ( $prev->isa('PPI::Token::Structure') and $prec eq ';' )
 			or ( $prev->isa('PPI::Token::Word')      and $prec eq 'while' )
 			or ( $prev->isa('PPI::Token::Operator')  and $prec eq '=' )
 			or ( $prev->isa('PPI::Token::Operator')  and $prec eq ',' );

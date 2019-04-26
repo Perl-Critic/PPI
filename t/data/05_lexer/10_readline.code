@@ -5,3 +5,4 @@ print while <>;
 grep { /foo/ } <FOO>;
 my @v=<$up../*.v>;
 print while <<>>;
+for (;<$foo>;) {}
