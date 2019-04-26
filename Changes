@@ -2,6 +2,11 @@ Revision history for Perl extension PPI
 
 {{$NEXT}}
 
+1.252   2019-04-26 14:21:36Z
+	Summary:
+	- add support for the double diamond (<<>>) input operator
+	- adjust position of a todo marker to not catch a passing test
+
 1.250   2019-04-25 16:43:32Z
 	Summary:
 	- various smaller releng changes
