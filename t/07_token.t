@@ -117,12 +117,15 @@ SCOPE: {
 	}
 }
 
-foreach my $code ( '1.0._0', '1.0.0.0_0' ) {
-	my $T = PPI::Tokenizer->new( \$code );
-	my $token = $T->get_token;
+for my $code ( '1.0._0' ) {
+	my $token = PPI::Tokenizer->new( \$code )->get_token;
 	isnt("$token", $code, 'tokenize bad version');
 }
 
+for my $code ( '1.0.0.0_0' ) {
+	my $token = PPI::Tokenizer->new( \$code )->get_token;
+	is("$token", $code, 'tokenize good version');
+}
 
 foreach my $code ( '08', '09', '0778', '0779' ) {
 	my $T = PPI::Tokenizer->new( \$code );

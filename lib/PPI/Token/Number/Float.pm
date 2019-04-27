@@ -80,18 +80,23 @@ sub __TOKENIZER__on_char {
 	# Allow digits
 	return 1 if $char =~ /\d/o;
 
-	# Is there a second decimal point?  Then version string or '..' operator
-	if ( $char eq '.' ) {
-		if ( $t->{token}->{content} =~ /\.$/ ) {
-			# We have a .., which is an operator.
-			# Take the . off the end of the token..
-			# and finish it, then make the .. operator.
-			chop $t->{token}->{content};
-                        $t->{class} = $t->{token}->set_class( 'Number' );
+	if ( $char eq '.' ) { # A second decimal point? That gets complicated.
+		if ( $t->{token}{content} =~ /\.$/ ) {
+			# We have a .., which is an operator. Take the . off the end of the
+			# token and finish it, then make the .. operator.
+			chop $t->{token}{content};
+			$t->{class} = $t->{token}->set_class( 'Number' );
 			$t->_new_token('Operator', '..');
 			return 0;
-		} elsif ( $t->{token}->{content} !~ /_/ ) {
-			# Underscore means not a Version, fall through to end token
+		} elsif ( $t->{token}{content} =~ /\._/ ) {
+			($t->{token}{content}, my $bareword)
+				= split /\./, $t->{token}{content};
+			$t->{class} = $t->{token}->set_class( 'Number' );
+			$t->_new_token('Operator', '.');
+			$t->_new_token('Word', $bareword);
+			$t->_new_token('Operator', '.');
+			return 0;
+		} else {
 			$t->{class} = $t->{token}->set_class( 'Number::Version' );
 			return 1;
 		}

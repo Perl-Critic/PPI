@@ -1,0 +1,35 @@
+PPI::Document
+  PPI::Statement
+    PPI::Token::Number::Version  	'10.10.10'
+    PPI::Token::Structure  	';'
+  PPI::Token::Whitespace  	'\n'
+  PPI::Statement
+    PPI::Token::Number::Version  	'1_0.1_0.1_0'
+    PPI::Token::Structure  	';'
+  PPI::Token::Whitespace  	'\n'
+  PPI::Statement
+    PPI::Token::Number  	'1_0'
+    PPI::Token::Operator  	'.'
+    PPI::Token::Word  	'_10'
+    PPI::Token::Number::Float  	'.1_0'
+    PPI::Token::Structure  	';'
+  PPI::Token::Whitespace  	' '
+  PPI::Token::Comment  	'# .1_0 is seen as a float due to the assumption of strict'
+  PPI::Token::Whitespace  	'\n'
+  PPI::Statement
+    PPI::Token::Number::Version  	'v10.10.10'
+    PPI::Token::Structure  	';'
+  PPI::Token::Whitespace  	'\n'
+  PPI::Statement
+    PPI::Token::Number::Version  	'v1_0.1_0.1_0'
+    PPI::Token::Structure  	';'
+  PPI::Token::Whitespace  	'\n'
+  PPI::Statement
+    PPI::Token::Number::Version  	'v1_0'
+    PPI::Token::Operator  	'.'
+    PPI::Token::Word  	'_10'
+    PPI::Token::Number::Float  	'.1_0'
+    PPI::Token::Structure  	';'
+  PPI::Token::Whitespace  	' '
+  PPI::Token::Comment  	'# .1_0 is seen as a float due to the assumption of strict'
+  PPI::Token::Whitespace  	'\n'

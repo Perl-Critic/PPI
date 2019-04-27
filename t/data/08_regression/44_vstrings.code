@@ -1,0 +1,6 @@
+10.10.10;
+1_0.1_0.1_0;
+1_0._10.1_0; # .1_0 is seen as a float due to the assumption of strict
+v10.10.10;
+v1_0.1_0.1_0;
+v1_0._10.1_0; # .1_0 is seen as a float due to the assumption of strict

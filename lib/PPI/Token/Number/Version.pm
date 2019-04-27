@@ -77,6 +77,8 @@ sub __TOKENIZER__on_char {
 	# Allow digits
 	return 1 if $char =~ /\d/o;
 
+	return $t->{token}->{content} =~ /\.$/ ? 0 : 1 if $char eq '_';
+
 	# Is this a second decimal point in a row?  Then the '..' operator
 	if ( $char eq '.' ) {
 		if ( $t->{token}->{content} =~ /\.$/ ) {
@@ -102,10 +104,9 @@ sub __TOKENIZER__commit {
 
 	# Capture the rest of the token
 	pos $t->{line} = $t->{line_cursor};
-	if ( $t->{line} !~ m/\G(v\d+(?:\.\d+)+|v\d+\b)/gc ) {
-		# This was not a v-string after all (it's a word)
-		return PPI::Token::Word->__TOKENIZER__commit($t);
-	}
+	# This was not a v-string after all (it's a word);
+	return PPI::Token::Word->__TOKENIZER__commit($t)
+		if $t->{line} !~ m/\G(v\d[_\d]*(?:\.\d[_\d]*)+|v\d[_\d]*\b)/gc;
 
 	my $content = $1;
 

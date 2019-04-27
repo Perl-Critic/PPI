@@ -7,7 +7,7 @@
 
 use lib 't/lib';
 use PPI::Test::pragmas;
-use Test::More tests => 3875 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+use Test::More tests => 4448 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use PPI;
 use PPI::Test::Run;
