@@ -2,6 +2,10 @@ Revision history for Perl extension PPI
 
 {{$NEXT}}
 
+1.258   2019-04-27 17:05:33Z
+	Summary:
+	- remove accidentally included Test::InDistDir
+
 1.256   2019-04-26 16:40:01Z
 	Summary:
 	- allow all PPI::Document instances to have a filename attribute
