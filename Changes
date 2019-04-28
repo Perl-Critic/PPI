@@ -2,6 +2,10 @@ Revision history for Perl extension PPI
 
 {{$NEXT}}
 
+1.260   2019-04-28 11:10:02Z
+	Summary:
+	- allow underscores in vstrings
+
 1.258   2019-04-27 17:05:33Z
 	Summary:
 	- remove accidentally included Test::InDistDir
