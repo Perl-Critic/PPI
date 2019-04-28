@@ -2,6 +2,10 @@ Revision history for Perl extension PPI
 
 {{$NEXT}}
 
+1.264   2019-04-28 14:56:28Z
+	Summary:
+	- keep vstring processing from swallowing underscores
+
 1.262   2019-04-28 11:41:54Z
 	Summary:
 	- convert newlines in some raw test files from win32 to unix
