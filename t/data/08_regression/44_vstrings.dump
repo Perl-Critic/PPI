@@ -33,3 +33,8 @@ PPI::Document
   PPI::Token::Whitespace  	' '
   PPI::Token::Comment  	'# .1_0 is seen as a float due to the assumption of strict'
   PPI::Token::Whitespace  	'\n'
+  PPI::Statement
+    PPI::Token::Number::Float  	'.1'
+    PPI::Token::Operator  	'.'
+    PPI::Token::Word  	'_wa'
+  PPI::Token::Whitespace  	'\n'

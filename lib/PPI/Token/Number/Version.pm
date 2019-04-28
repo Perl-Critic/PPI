@@ -77,7 +77,16 @@ sub __TOKENIZER__on_char {
 	# Allow digits
 	return 1 if $char =~ /\d/o;
 
-	return $t->{token}->{content} =~ /\.$/ ? 0 : 1 if $char eq '_';
+	if( $char eq '_' ) {
+		return 1 if $t->{token}{content} !~ /\.$/;
+
+		chop $t->{token}->{content};
+		$t->{class} = $t->{token}->set_class( 'Number::Float' )
+			if $t->{token}{content} !~ /\..+\./;
+		$t->_new_token('Operator', '.');
+		$t->_new_token('Word', '_');
+		return 0;
+	}
 
 	# Is this a second decimal point in a row?  Then the '..' operator
 	if ( $char eq '.' ) {
@@ -86,7 +95,8 @@ sub __TOKENIZER__on_char {
 			# Take the . off the end of the token..
 			# and finish it, then make the .. operator.
 			chop $t->{token}->{content};
-			$t->{class} = $t->{token}->set_class( 'Number::Float' );
+			$t->{class} = $t->{token}->set_class( 'Number::Float' )
+				if $t->{token}{content} !~ /\..+\./;
 			$t->_new_token('Operator', '..');
 			return 0;
 		} else {
