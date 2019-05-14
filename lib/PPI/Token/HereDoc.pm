@@ -72,7 +72,7 @@ but for the most part they should more or less DWYM.
 Although technically it can be considered a quote, for the time being
 C<HereDocs> are being treated as a completely separate C<Token> subclass,
 and will not be found in a search for L<PPI::Token::Quote> or
-L<PPI::Token::QuoteLike objects>.
+L<PPI::Token::QuoteLike> objects.
 
 This may change in the future, with it most likely to end up under
 QuoteLike.
