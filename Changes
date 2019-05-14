@@ -2,6 +2,10 @@ Revision history for Perl extension PPI
 
 {{$NEXT}}
 
+1.265   2019-05-14 12:39:51Z
+	Summary:
+	- simplified a code construct
+
 1.264   2019-04-28 14:56:28Z
 	Summary:
 	- keep vstring processing from swallowing underscores
