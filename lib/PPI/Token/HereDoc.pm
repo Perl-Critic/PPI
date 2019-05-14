@@ -111,11 +111,7 @@ the here-doc, B<excluding> the terminator line.
 
 =cut
 
-sub heredoc {
-	wantarray
-		? @{shift->{_heredoc}}
-		: scalar @{shift->{_heredoc}};
-}
+sub heredoc { @{shift->{_heredoc}} }
 
 =pod
 
