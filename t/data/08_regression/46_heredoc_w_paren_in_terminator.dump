@@ -1,0 +1,7 @@
+PPI::Document
+  PPI::Statement
+    PPI::Token::HereDoc  	'<<~` (y0<"wsxV?[\tV q`'
+    PPI::Token::Operator  	'+'
+    PPI::Token::Quote::Double  	'"<X)[/b&g+.{\`b/)z]\%=?s@ x,`@1q,^{Vs0)gtm_^0*;>{/*9's,\t!\*"'
+    PPI::Token::Word  	'r'
+  PPI::Token::Whitespace  	'\n'

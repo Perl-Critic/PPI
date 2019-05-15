@@ -4,9 +4,10 @@
 
 # Some other regressions tests are included here for simplicity.
 
+use if !(-e 'META.yml'), "Test::InDistDir";
 use lib 't/lib';
 use PPI::Test::pragmas;
-use Test::More tests => 991 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+use Test::More tests => 1067 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use PPI;
 use PPI::Test 'pause';

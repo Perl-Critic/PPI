@@ -131,7 +131,7 @@ sub terminator {
 sub _is_terminator {
 	my ( $self, $terminator, $line, $indented ) = @_;
 	if ( $indented ) {
-		return $line =~ /^\s*$terminator$/;
+		return $line =~ /^\s*\Q$terminator\E$/;
 	} else {
 		return $line eq $terminator;
 	}

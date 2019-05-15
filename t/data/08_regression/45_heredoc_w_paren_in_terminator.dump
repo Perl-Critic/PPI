@@ -1,0 +1,26 @@
+PPI::Document
+  PPI::Statement
+    PPI::Token::Magic  	'_'
+    PPI::Token::Operator  	'+'
+    PPI::Token::Comment  	'#8r\tt`-['
+    PPI::Token::Whitespace  	'\n'
+    PPI::Token::Operator  	'<'
+    PPI::Token::Operator  	'+'
+    PPI::Token::Number  	'0'
+    PPI::Token::Word  	'cXV'
+    PPI::Token::Operator  	'!='
+    PPI::Token::Operator  	'.'
+    PPI::Token::Operator  	'?'
+    PPI::Token::Word  	'c'
+    PPI::Token::Operator  	'!'
+    PPI::Token::Word  	'c0'
+    PPI::Token::Operator  	'='
+  PPI::Statement::UnmatchedBrace
+    PPI::Token::Structure  	')'
+  PPI::Statement
+    PPI::Token::HereDoc  	'<<~')19_-b+?WW''
+    PPI::Structure::Constructor  	[ ... ???
+      PPI::Statement
+        PPI::Token::Word  	'z'
+        PPI::Token::Whitespace  	' '
+        PPI::Token::Quote::Literal  	'q-y?#m@Wt>.'.xg=}|*w|:+[|9}"mW:Xf()?(cx9*<\t\n'

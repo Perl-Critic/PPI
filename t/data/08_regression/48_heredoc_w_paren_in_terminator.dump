@@ -1,0 +1,54 @@
+PPI::Document
+  PPI::Statement::Null
+    PPI::Token::Structure  	';'
+  PPI::Statement::UnmatchedBrace
+    PPI::Token::Structure  	')'
+  PPI::Statement
+    PPI::Token::Operator  	'&'
+    PPI::Token::Operator  	'>>'
+    PPI::Token::Word  	'qbc'
+    PPI::Structure::Block  	{ ... ???
+      PPI::Statement
+        PPI::Token::Symbol  	'$b'
+        PPI::Token::Operator  	'|'
+        PPI::Token::Structure  	';'
+      PPI::Statement
+        PPI::Token::Symbol  	'$XV'
+        PPI::Token::Whitespace  	' '
+        PPI::Token::Word  	'Xs'
+        PPI::Token::Magic  	'%-'
+        PPI::Token::Word  	't'
+        PPI::Token::Whitespace  	'\t'
+        PPI::Token::Word  	'g'
+        PPI::Token::Operator  	'*'
+        PPI::Token::Quote::Single  	''\n^Vs8g?|\}>,1wb[~f|bb{-<)gs:ft}=wy9<X''
+        PPI::Token::Word  	'r'
+        PPI::Token::Operator  	','
+        PPI::Token::QuoteLike::Backtick  	'`,\t,"\n}>:c0bb~sq}\f\n|{^_cmcm\+<0,){=:s?*%s`'
+        PPI::Token::Operator  	'-'
+        PPI::Token::Number  	'0'
+        PPI::Token::Word  	'mr'
+        PPI::Token::Operator  	'&&'
+        PPI::Token::Word  	'V'
+        PPI::Structure::Constructor  	[ ... ???
+          PPI::Statement
+            PPI::Token::Word  	'W'
+            PPI::Token::QuoteLike::Readline  	'<>'
+            PPI::Token::Word  	'r'
+            PPI::Token::Operator  	'|'
+            PPI::Token::QuoteLike::Backtick  	'`9<r%+-9(\t!\:r`'
+            PPI::Token::Operator  	'.'
+  PPI::Statement::UnmatchedBrace
+    PPI::Token::Structure  	')'
+  PPI::Statement
+    PPI::Token::Word  	'VW'
+    PPI::Token::Operator  	'?'
+    PPI::Token::Word  	'z'
+    PPI::Token::Operator  	'^'
+    PPI::Token::Word  	'c'
+    PPI::Token::HereDoc  	'<<~"\t'1V`%__;@9)^gc{s@ q#"'
+    PPI::Token::Word  	't'
+    PPI::Structure::Block  	{ ... ???
+      PPI::Token::Whitespace  	' '
+      PPI::Statement
+        PPI::Token::Regexp::Substitute  	's<@\n'
