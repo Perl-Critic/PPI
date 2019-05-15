@@ -21,10 +21,10 @@ sub run_testdir {
 	ok( (-e $testdir and -d $testdir and -r $testdir), "Test directory $testdir found" );
 
 	# Find the .code test files
-	local *TESTDIR;
-	opendir( TESTDIR, $testdir ) or die "opendir: $!";
-	my @code = map { catfile( $testdir, $_ ) } sort grep { /\.code$/ } readdir(TESTDIR);
-	closedir( TESTDIR ) or die "closedir: $!";
+	my @code = do {
+		opendir my $TESTDIR, $testdir or die "opendir: $!";
+		map { catfile $testdir, $_ } sort grep /\.code$/, readdir $TESTDIR;
+	};
 	ok( scalar @code, 'Found at least one code file' );
 
 	foreach my $codefile ( @code ) {
@@ -33,15 +33,17 @@ sub run_testdir {
 		$dumpfile =~ s/\.code$/\.dump/;
 		my $codename = $codefile;
 		$codename =~ s/\.code$//;
-		ok( (-f $dumpfile and -r $dumpfile), "$codename: Found matching .dump file" );
+		my $has_dumpfile = -f $dumpfile and -r $dumpfile;
+		ok( $has_dumpfile, "$codename: Found matching .dump file" );
 
 		# Create the lexer and get the Document object
 		my $document = PPI::Document->new( $codefile );
+		is( PPI::Document->errstr, "", "no error during document parsing" );
+		PPI::Document->_clear;
 		ok( $document, "$codename: Lexer->Document returns true" );
 		ok( _INSTANCE($document, 'PPI::Document'), "$codename: Object isa PPI::Document" );
 
-		my $rv;
-		local *CODEFILE;
+		my ($rv, $CODEFILE);
 		SKIP: {
 			skip "No Document to test", 12 unless $document;
 
@@ -58,16 +60,17 @@ sub run_testdir {
 			ok( scalar @dump_list, "$codename: Got dump content from dumper" );
 
 			# Try to get the .dump file array
-			local *DUMP;
-			open( DUMP, '<', $dumpfile ) or die "open: $!";
-			my @content = <DUMP>;
-			close( DUMP ) or die "close: $!";
+			my @content = !$has_dumpfile ? () : do {
+				open my $DUMP, '<', $dumpfile or die "open: $!";
+				<$DUMP>;
+			};
 			chomp @content;
 
 			# Compare the two
 			{
 			local $TODO = $ENV{TODO} if $ENV{TODO};
-			is_deeply( \@dump_list, \@content, "$codename: Generated dump matches stored dump" );
+			is_deeply( \@dump_list, \@content, "$codename: Generated dump matches stored dump" )
+			  or diag map "$_\n", @dump_list;
 			}
 
 			# Also, do a round-trip check
@@ -104,10 +107,10 @@ sub increment_testdir {
 	ok( (-e $testdir and -d $testdir and -r $testdir), "Test directory $testdir found" );
 
 	# Find the .code test files
-	local *TESTDIR;
-	opendir( TESTDIR, $testdir ) or die "opendir: $!";
-	my @code = map { catfile( $testdir, $_ ) } sort grep { /\.code$/ } readdir(TESTDIR);
-	closedir( TESTDIR ) or die "closedir: $!";
+	my @code = do {
+		opendir my $TESTDIR, $testdir or die "opendir: $!";
+		map { catfile $testdir, $_ } sort grep /\.code$/, readdir $TESTDIR;
+	};
 	ok( scalar @code, 'Found at least one code file' );
 
 	foreach my $codefile ( @code ) {
@@ -116,31 +119,24 @@ sub increment_testdir {
 		$codename =~ s/\.code$//;
 
 		# Load the file
-		local *CODEFILE;
-		local $/ = undef;
-		open( CODEFILE, '<', $codefile ) or die "open: $!";
-		my $buffer = <CODEFILE>;
-		close( CODEFILE ) or die "close: $!";
+		my $buffer = do {
+			local $/;
+			open my $CODEFILE, '<', $codefile or die "open: $!";
+			<$CODEFILE>;
+		};
 
 		# Cover every possible transitional state in
 		# the regression test code fragments.
-		foreach my $chars ( 1 .. length($buffer) ) {
-			my $string   = substr( $buffer, 0, $chars );
+		foreach my $chars ( 1 .. length $buffer ) {
+			my $string   = substr $buffer, 0, $chars;
 			my $document = eval {
 				PPI::Document->new( \$string );
 			};
-			is(
-				$@ => '',
-				"$codename: $chars chars ok",
-			);
-			is(
-				ref($document) => 'PPI::Document',
-				"$codename: $chars chars document",
-			);
-			is(
-				$document->serialize => $string,
-				"$codename: $chars char roundtrip",
-			);
+			is( PPI::Document->errstr, "", "no error during document parsing" );
+			PPI::Document->_clear;
+			is( $@ => '', "$codename: $chars chars ok" );
+			is( ref($document) => 'PPI::Document', "$codename: $chars chars document" );
+			is( $document->serialize => $string, "$codename: $chars char roundtrip" );
 		}
 	}
 }
