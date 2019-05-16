@@ -43,7 +43,6 @@ sub run_testdir {
 		ok( $document, "$codename: Lexer->Document returns true" );
 		ok( _INSTANCE($document, 'PPI::Document'), "$codename: Object isa PPI::Document" );
 
-		my ($rv, $CODEFILE);
 		SKIP: {
 			skip "No Document to test", 12 unless $document;
 
@@ -62,6 +61,7 @@ sub run_testdir {
 			# Try to get the .dump file array
 			my @content = !$has_dumpfile ? () : do {
 				open my $DUMP, '<', $dumpfile or die "open: $!";
+				binmode $DUMP;
 				<$DUMP>;
 			};
 			chomp @content;
@@ -72,17 +72,12 @@ sub run_testdir {
 			is_deeply( \@dump_list, \@content, "$codename: Generated dump matches stored dump" )
 			  or diag map "$_\n", @dump_list;
 			}
-
-			# Also, do a round-trip check
-			$rv = open( CODEFILE, '<', $codefile );
-			ok( $rv, "$codename: Opened file" );
 		}
 		SKIP: {
-			unless ( $document and $rv ) {
-				skip "Missing file", 1;
-			}
-			my $source = do { local $/ = undef; <CODEFILE> };
-			close CODEFILE;
+			# Also, do a round-trip check
+			skip "No roundtrip check: Couldn't parse code file before", 1 if !$document;
+			skip "No roundtrip check: Couldn't open code file '$codename', $!", 1 unless #
+			  my $source = do { open my $CODEFILE, '<', $codefile; binmode $CODEFILE; local $/; <$CODEFILE> };
 			$source =~ s/(?:\015{1,2}\012|\015|\012)/\n/g;
 
 			is( $document->serialize, $source, "$codename: Round-trip back to source was ok" );
@@ -113,7 +108,7 @@ sub increment_testdir {
 	};
 	ok( scalar @code, 'Found at least one code file' );
 
-	foreach my $codefile ( @code ) {
+	for my $codefile ( @code ) {
 		# Does the .code file have a matching .dump file
 		my $codename = $codefile;
 		$codename =~ s/\.code$//;
@@ -122,12 +117,13 @@ sub increment_testdir {
 		my $buffer = do {
 			local $/;
 			open my $CODEFILE, '<', $codefile or die "open: $!";
+			binmode $CODEFILE;
 			<$CODEFILE>;
 		};
 
 		# Cover every possible transitional state in
 		# the regression test code fragments.
-		foreach my $chars ( 1 .. length $buffer ) {
+		for my $chars ( 1 .. length $buffer ) {
 			my $string   = substr $buffer, 0, $chars;
 			my $document = eval {
 				PPI::Document->new( \$string );
