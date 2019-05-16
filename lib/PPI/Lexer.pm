@@ -247,7 +247,7 @@ sub _lex_document {
 		}
 
 		if ( $Token->content eq ';' ) {
-			# It's a semi-colon on it's own.
+			# It's a semi-colon on its own.
 			# We call this a null statement.
 			$self->_add_element(
 				$Document,
@@ -1324,7 +1324,7 @@ sub _lex_structure {
 			return $self->_rollback( $Token );
 		}
 
-		# It's a semi-colon on it's own, just inside the block.
+		# It's a semi-colon on its own, just inside the block.
 		# This is a null statement.
 		$self->_add_element(
 			$Structure,

@@ -55,7 +55,7 @@ my $loaded = $Cache->_load($bad_md5);
 isa_ok( $loaded, 'PPI::Document' );
 is_deeply( $doc, $loaded, '->_load loads the same document back in' );
 
-# Store the test document in the cache in it's proper place
+# Store the test document in the cache in its proper place
 is( scalar( $Cache->store_document($doc) ), 1,
 	'->store_document(Document) returns true' );
 ok( -f $doc_file, 'The document was stored in the expected location' );

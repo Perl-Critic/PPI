@@ -201,8 +201,8 @@ is_object( $Braces->parent,     $Statement, "Braces sees statement as parent" );
 is_object( $Token7->parent,     $Statement, "Token sees statement as parent" );
 
 # Test the special case of parents for the Braces opening and closing braces
-is_object( $Braces->start->parent, $Braces, "Start brace sees the PPI::Structure as it's parent" );
-is_object( $Braces->finish->parent, $Braces, "Finish brace sees the PPI::Structure as it's parent" );
+is_object( $Braces->start->parent, $Braces, "Start brace sees the PPI::Structure as its parent" );
+is_object( $Braces->finish->parent, $Braces, "Finish brace sees the PPI::Structure as its parent" );
 
 # Test the ->top method
 is_object( $Document->top,  $Document, "Document sees itself as top" );

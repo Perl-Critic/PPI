@@ -1153,7 +1153,7 @@ Revision history for Perl extension PPI
 	- Fixed some install problems
 
 	Details:
-	- PPI::Node::schild was copying the entire of it's child array each call.
+	- PPI::Node::schild was copying the entirety of its child array each call.
 	  This was causing massive slowdowns when ->{children} got large. Fixed.
 	- The core tests still expect Transform to be in the core. Fixed.
 
@@ -1417,7 +1417,7 @@ Revision history for Perl extension PPI
 
 0.817 Thu Jul  1 2004
 	- Fixed the misparsing of $#{ }
-	- Changed PPI::ParentElement to PPI::Node and moved it to it's own file
+	- Changed PPI::ParentElement to PPI::Node and moved it to its own file
 	- Changed PPI::Common to PPI::Base
 	- Fixed PPI::Node::find
 	- Added PPI::Node::prune
