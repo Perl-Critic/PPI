@@ -2,6 +2,10 @@ Revision history for Perl extension PPI
 
 {{$NEXT}}
 
+1.267   2019-05-16 09:22:34Z
+	Summary:
+	- make PPI::Test::Run more OS-agnostic
+
 1.266   2019-05-15 16:17:49Z
 	Summary:
 	- keep heredoc terminator detection from triggering regex errors
