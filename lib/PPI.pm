@@ -544,7 +544,7 @@ via the included L<PPI::Dumper>).
 
 Please note that in this example, strings are only listed for the
 B<actual> L<PPI::Token> that contains that string. Structures are listed
-with the type of brace characters it represents noted.
+with the type of brace characters they represent noted.
 
 The L<PPI::Dumper> module can be used to generate similar trees yourself.
 
@@ -647,7 +647,7 @@ some cases).
 
 The L<PPI::Token::Quote> and L<PPI::Token::QuoteLike> classes provide
 abstract base classes for the many and varied types of quote and
-quote-like things in Perl. However, much of the actual quote login is
+quote-like things in Perl. However, much of the actual quote logic is
 implemented in a separate quote engine, based at
 L<PPI::Token::_QuoteEngine>.
 
