@@ -294,7 +294,7 @@ anyone wanting to help out is encouraged to contact the author.
 =head2 General Layout
 
 PPI is built upon two primary "parsing" components, L<PPI::Tokenizer>
-and L<PPI::Lexer>, and a large tree of about 50 classes which implement
+and L<PPI::Lexer>, and a large tree of about 70 classes which implement
 the various the I<Perl Document Object Model> (PDOM).
 
 The PDOM is conceptually similar in style and intent to the regular DOM or
@@ -373,7 +373,7 @@ syntax.
 
 =head2 The PDOM Class Tree
 
-The following lists all of the 67 current PDOM classes, listing with indentation
+The following lists all of the 72 current PDOM classes, listing with indentation
 based on inheritance.
 
    PPI::Element
