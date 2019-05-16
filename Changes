@@ -468,14 +468,14 @@ Revision history for Perl extension PPI
 	- Much more comprehensive testing of compound statement detection.
 
 1.204_01 Sun 18 May 2008
-        Summary:
-        - Unicode cleanup and bug fixing
+	Summary:
+	- Unicode cleanup and bug fixing
 	- Taking the opportunity to do some house cleaning while the
 	  code base is relatively stable, before things get crazy again.
 
 	Details:
-        - For completeness sake, add support for empty documents
-        - Moved capability detection into PPI::Util
+	- For completeness sake, add support for empty documents
+	- Moved capability detection into PPI::Util
 	- POD test script now skips on install properly
 	- Removed 200 lines of old dead "rawinput" code from PPI::Tokenizer
 	- 100% of PPI::Tokenizer is now exception-driven
@@ -592,7 +592,7 @@ Revision history for Perl extension PPI
 	- Removed some superfluous parameter checks on private methods,
 	  for conditions that would cause explosions and be noticed anyway.
 	- Removed the fancy options from PPI::Token::new
-        - More consistent structure of incomplete quotes
+	- More consistent structure of incomplete quotes
 
 1.199_02 Mon  5 Mar 2007
 	Summary:
@@ -606,7 +606,7 @@ Revision history for Perl extension PPI
 	  The goal is to get rid of the "or return undef"s.
 	- Added the timeout param to the PPI::Document constructor
 	  which uses alarm to implement basic timeout support.
-          This should help when parsing a large corpus on Unix.
+	  This should help when parsing a large corpus on Unix.
 	  (Not available on Win32)
 	- Fixed incorrect location() for PPI::Structure instances.
 	- Adding better parsing of hash constructors.
@@ -623,7 +623,7 @@ Revision history for Perl extension PPI
 	Details:
 	- Split out PPI::Token::Number subclasses
 	- Implement numbers with exponential notation
-        - Implement literal() for ::Number classes (except ::Version)
+	- Implement literal() for ::Number classes (except ::Version)
 	- Implement literal() for ::Token::Quote::Single
 	- Added -T for inline tests
 	- Add tests for nested statements and nested structures
@@ -638,8 +638,8 @@ Revision history for Perl extension PPI
 	Details:
 	- Upgraded to Module::Install 0.64
 	- Improving support for dor and added //= operators
-        - Fixed parsing of binary, octal and hex numbers
-        - Fixed parsing of /= and *=
+	- Fixed parsing of binary, octal and hex numbers
+	- Fixed parsing of /= and *=
 	- Fixed #21571 symbol() returns just sigil with adjacent braces
 	- Fixed #21575 variables() chokes on list with whitespace
 	- Fixed #20480 (Misparse of some floating-point numbers.)
@@ -662,20 +662,20 @@ Revision history for Perl extension PPI
 	- { package => 1 } was treating package incorrectly
 	- Fixed bugs in test cases submitted by the Perl::Critic team
 	- Added a number of extra test cases, and introduced Test::Object
-          based testing for PPI::Document objects.
+	  based testing for PPI::Document objects.
 
 1.116   Thu 31 Aug 2006
 	Summary:
-        - PPI::Document::File first release
+	- PPI::Document::File first release
 	- Adding readonly attribute
 	- Fixed various accumulated bugs
 
 	Details:
 	- Upgraded to Module::Install 0.63
-        - Add a new file-only subclass of PPI::Document
+	- Add a new file-only subclass of PPI::Document
 	- Added the readonly attribute to the PPI::Document->new constructor
 	- Added method PPI::Document->readonly method
-        - 'goto' is a PPI::Statement::Break
+	- 'goto' is a PPI::Statement::Break
 	- Re-fixed #19629: End of list mistakenly seen as end of statement
 	- Applied #16892: [PATCH] docs and comments
 	- Fixed #16815 (location of Structure::List is not defined.)
@@ -1416,8 +1416,8 @@ Revision history for Perl extension PPI
 	- Replaced File::Flat with File::Slurp to reduce dependencies
 
 0.817 Thu Jul  1 2004
- 	- Fixed the misparsing of $#{ }
- 	- Changed PPI::ParentElement to PPI::Node and moved it to it's own file
+	- Fixed the misparsing of $#{ }
+	- Changed PPI::ParentElement to PPI::Node and moved it to it's own file
 	- Changed PPI::Common to PPI::Base
 	- Fixed PPI::Node::find
 	- Added PPI::Node::prune
@@ -1516,9 +1516,9 @@ Revision history for Perl extension PPI
 0.5  Missing
 
 0.4  Mon Dec 23 10:24:21
-        - Some more minor parsing fixes in Tokenizer
-        - Completely changed the API from doThis to do_this style
-        - Changed API to indicate private methods properly
+	- Some more minor parsing fixes in Tokenizer
+	- Completely changed the API from doThis to do_this style
+	- Changed API to indicate private methods properly
 
 0.3  Tue Dec 17 10:29:27
 	- Restructured a little bit
