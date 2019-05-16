@@ -113,7 +113,7 @@ the statement being parsed.
 The information might not just be elsewhere in the file, it might not even be
 in the same file at all. It might also not be able to determine this
 information without the prior execution of a C<BEGIN {}> block, or the
-loading and execution of one or more external modules. Or worse the &dothis
+loading and execution of one or more external modules. Or worse the C<&dothis>
 function may not even have been written yet.
 
 B<When parsing Perl as code, you must also execute it>
@@ -169,7 +169,7 @@ at once. For the academics, parsing Perl suffers from the "Halting Problem".
 
 Once you can accept that we will never be able to parse Perl well enough
 to meet the standards of things that treat Perl as code, it is worth
-re-examining C<why> we want to "parse" Perl at all.
+re-examining I<why> we want to "parse" Perl at all.
 
 What are the things that people might want a "Perl parser" for?
 
