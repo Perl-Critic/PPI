@@ -2,6 +2,10 @@ Revision history for Perl extension PPI
 
 {{$NEXT}}
 
+1.268   2019-05-16 10:00:39Z
+	Summary:
+	- fix a broken link in the pod
+
 1.267   2019-05-16 09:22:34Z
 	Summary:
 	- make PPI::Test::Run more OS-agnostic
