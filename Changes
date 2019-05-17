@@ -2,6 +2,10 @@ Revision history for Perl extension PPI
 
 {{$NEXT}}
 
+1.269   2019-05-17 18:36:46Z
+	Summary:
+	- many small documentation improvements
+
 1.268   2019-05-16 10:00:39Z
 	Summary:
 	- fix a broken link in the pod
