@@ -2,6 +2,10 @@ Revision history for Perl extension PPI
 
 {{$NEXT}}
 
+1.270   2019-07-09 15:14:57Z
+	Summary:
+	- attempt to handle new blead binary/hexadecimal parsing behavior in tests
+
 1.269   2019-05-17 18:36:46Z
 	Summary:
 	- many small documentation improvements
