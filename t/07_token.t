@@ -4,6 +4,7 @@
 
 sub warns_on_misplaced_underscore { $] >= 5.006 and $] < 5.008 }
 
+use if !(-e 'META.yml'), "Test::InDistDir";
 use lib 't/lib';
 use PPI::Test::pragmas;
 use Test::More tests => 588 + (warns_on_misplaced_underscore() ? 2 : 0 ) + ($ENV{AUTHOR_TESTING} ? 1 : 0);
@@ -76,44 +77,33 @@ SCOPE: {
 	while ( @examples ) {
 		my $code  = shift @examples;
 		my $base  = shift @examples;
-		if ( $] >= 5.006 and $] < 5.008 and ($code eq '1_0e1_0' or $code eq '1_0' or $code eq '1_0.') ) {
+		if ( warns_on_misplaced_underscore() and ($code eq '1_0e1_0' or $code eq '1_0' or $code eq '1_0.') ) {
 			SKIP: {
 				skip( 'Ignoring known-bad cases on Perl 5.6.2', 5 );
 			}
 			next;
 		}
-		my $exp   = $base =~ s/e//;
-		my $float = $exp || $base =~ s/f//;
+		my $is_exp   = $base =~ s/e//;
+		my $is_float = $is_exp || $base =~ s/f//;
 		my $T     = PPI::Tokenizer->new( \$code );
 		my $token = $T->get_token;
 		is("$token", $code, "'$code' is a single token");
 		is($token->base, $base, "base of '$code' is $base");
-		if ($float) {
-			ok($token->isa('PPI::Token::Number::Float'), "'$code' is ::Float");
-		} else {
-			ok(!$token->isa('PPI::Token::Number::Float'), "'$code' not ::Float");
-		}
-		if ($exp) {
-			ok($token->isa('PPI::Token::Number::Exp'), "'$code' is ::Exp");
-		} else {
-			ok(!$token->isa('PPI::Token::Number::Exp'), "'$code' not ::Exp");
-		}
+		is($token->isa('PPI::Token::Number::Float'), $is_float,
+		   "'$code' ".($is_float ? "is" : "not")." ::Float");
+		is($token->isa('PPI::Token::Number::Exp'), $is_exp,
+		   "'$code' ".($is_float ? "is" : "not")." ::Exp");
 
-		if ($base != 256) {
-			$^W = 0;
-			my $literal;
-			if ( warns_on_misplaced_underscore() and $code =~ /^1_0[.]?$/ ) {
-				warning_is { $literal = eval $code } "Misplaced _ in number",
-					"$] warns about misplaced underscore";
-			} else {
-				$literal = eval $code;
-			}
-			if ($@) {
-				is($token->literal, undef, "literal('$code'), $@");
-			} else {
-				cmp_ok($token->literal, '==', $literal, "literal('$code')");
-			}
-		}
+		next if $base == 256;
+
+		$^W = 0;
+		my $underscore_incompatible = warns_on_misplaced_underscore() && $code =~ /^1_0[.]?$/;
+		my $literal = $underscore_incompatible ? undef : eval $code;
+		warning_is { $literal = eval $code } "Misplaced _ in number",
+			"$] warns about misplaced underscore"
+			if $underscore_incompatible;
+		cmp_ok($token->literal, '==', $@ ? undef : $literal,
+			   "literal('$code'), eval error: " . ($@ || "none"));
 	}
 }
 
