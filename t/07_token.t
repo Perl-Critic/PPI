@@ -3,6 +3,7 @@
 # Formal unit tests for specific PPI::Token classes
 
 sub warns_on_misplaced_underscore { $] >= 5.006 and $] < 5.008 }
+sub dies_on_incomplete_bx { $] >= 5.031002 }
 
 use if !(-e 'META.yml'), "Test::InDistDir";
 use lib 't/lib';
@@ -98,12 +99,18 @@ SCOPE: {
 
 		$^W = 0;
 		my $underscore_incompatible = warns_on_misplaced_underscore() && $code =~ /^1_0[.]?$/;
-		my $literal = $underscore_incompatible ? undef : eval $code;
+		my $incomplete_incompatible = dies_on_incomplete_bx() && $code =~ /^0[bx]$/;
+		my $literal = eval $code;
+		my $err = $@;
+		$literal = undef if $underscore_incompatible || $incomplete_incompatible;
 		warning_is { $literal = eval $code } "Misplaced _ in number",
 			"$] warns about misplaced underscore"
 			if $underscore_incompatible;
-		cmp_ok($token->literal, '==', $@ ? undef : $literal,
-			   "literal('$code'), eval error: " . ($@ || "none"));
+		like($err, qr/No digits found for (binary|hexadecimal) literal/,
+			 "$] dies on incomplete binary/hexadecimal literals")
+			if $underscore_incompatible;
+		cmp_ok($token->literal, '==', $err ? undef : $literal,
+			   "literal('$code'), eval error: " . ($err || "none"));
 	}
 }
 
