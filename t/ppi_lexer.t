@@ -4,7 +4,7 @@
 
 use lib 't/lib';
 use PPI::Test::pragmas;
-use Test::More tests => 46 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+use Test::More tests => 48 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use PPI ();
 
@@ -51,6 +51,8 @@ undef // { One => 1 };
 $x ? {a=>1} : 1;
 $x ? 1 : {a=>1};
 $x ? {a=>1} : {b=>1};
+CHECK { foo() }
+open( CHECK, '/foo' );
 END_PERL
 
 	isa_ok( $document, 'PPI::Document' );
@@ -61,7 +63,7 @@ END_PERL
 		$statements[ $elem->line_number() - 1 ] ||= $elem;
 	}
 
-	is( scalar(@statements), 33, 'Found 33 statements' );
+	is( scalar(@statements), 35, 'Found 35 statements' );
 
 	isa_ok( $statements[0]->schild(2), 'PPI::Structure::Constructor',
 		'The curly in ' . $statements[0]);
@@ -134,6 +136,12 @@ END_PERL
 		'The curly in ' . $statements[32]);
 	isa_ok( $statements[32]->schild(4), 'PPI::Structure::Constructor',
 		'The curly in ' . $statements[32]);
+
+	# Scheduled block (or not)
+	isa_ok( $statements[33], 'PPI::Statement::Scheduled',
+		'Scheduled block in ' . $statements[33]);
+	isa_ok( $statements[34]->schild(1)->schild(0), 'PPI::Statement::Expression',
+		'Expression (not scheduled block) in ' . $statements[34]);
 }
 
 

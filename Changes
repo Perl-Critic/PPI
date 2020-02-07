@@ -1,6 +1,7 @@
 Revision history for Perl extension PPI
 
 {{$NEXT}}
+	- CHECK bareword handle parsed as scheduled block (GH#247) (trwyant)
 
 1.274   2022-05-02 18:21:56Z
 	Summary:

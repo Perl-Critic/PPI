@@ -439,6 +439,18 @@ sub _statement {
 				next;
 			}
 
+			# Scheduled block must be followed by left curly or
+			# semicolon.  Otherwise we have something else (e.g.
+			# open( CHECK, ... );
+			if (
+				'PPI::Statement::Scheduled' eq $class
+				and not ( $Next->isa( 'PPI::Token::Structure' )
+					and $Next->content =~ m/\A[{;]\z/ ) # }
+			) {
+				$class = undef;
+				last;
+			}
+
 			# Lexical subroutine
 			if (
 				$Token->content =~ /^(?:my|our|state)$/
