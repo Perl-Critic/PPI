@@ -56,8 +56,8 @@ more often stated now as a truism:
 
 B<"Only perl can parse Perl">
 
-One example of the sorts of things the prevent Perl being easily parsed are
-function signatures, as demonstrated by the following.
+One example of the sorts of things that prevent Perl from being easily parsed
+is function signatures, as demonstrated by the following:
 
   @result = (dothis $foo, $bar);
   
@@ -79,7 +79,7 @@ information without the prior execution of a C<BEGIN {}> block, or the
 loading and execution of one or more external modules. Or worse the &dothis
 function may not even have been written yet.
 
-B<When parsing Perl as code, you must also execute it>
+B<When parsing Perl as code, you must also execute it.>
 
 Even perl itself never really fully understands the structure of the source
 code after and indeed B<as> it processes it, and in that sense doesn't
