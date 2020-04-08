@@ -681,7 +681,7 @@ to PPI itself.
 
 The most recent version of PPI is available at the following address.
 
-L<http://search.cpan.org/~mithaldu/PPI/>
+L<https://metacpan.org/pod/PPI>
 
 PPI source is maintained in a GitHub repository at the following address.
 
