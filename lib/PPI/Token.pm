@@ -37,6 +37,7 @@ use PPI::Token::BOM                   ();
 use PPI::Token::Whitespace            ();
 use PPI::Token::Comment               ();
 use PPI::Token::Pod                   ();
+use PPI::Token::Format                ();
 use PPI::Token::Number                ();
 use PPI::Token::Number::Binary        ();
 use PPI::Token::Number::Octal         ();
