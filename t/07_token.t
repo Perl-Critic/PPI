@@ -109,6 +109,7 @@ SCOPE: {
 		like($err, qr/No digits found for (binary|hexadecimal) literal/,
 			 "$] dies on incomplete binary/hexadecimal literals")
 			if $underscore_incompatible;
+		no warnings qw{ uninitialized };
 		cmp_ok($token->literal, '==', $err ? undef : $literal,
 			   "literal('$code'), eval error: " . ($err || "none"));
 	}
