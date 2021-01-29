@@ -4,7 +4,7 @@
 
 use lib 't/lib';
 use PPI::Test::pragmas;
-use Test::More tests => 29 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+use Test::More tests => 30 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use PPI;
 use Test::Deep;
@@ -16,7 +16,9 @@ sub h;
 #     - 'content': the Perl string to parse using PPI.
 #     - 'expected': a hashref with the keys being property names on the
 #       PPI::Token::HereDoc object, and the values being the expected value of
-#       that property after the heredoc block has been parsed.
+#       that property after the heredoc block has been parsed. Key 'heredoc'
+#       is a special case, and is an array ref holding the expected value of
+#       heredoc(), and defaulting to [ "Line 1\n", "Line 2\n" ].
 
 	# Tests with a carriage return after the termination marker.
 h	{
@@ -28,6 +30,7 @@ h	{
 			_terminator      => 'HERE',
 			_mode            => 'interpolate',
 			_indented        => undef,
+			_indentation     => undef,
 		},
 	};
 h	{
@@ -39,6 +42,7 @@ h	{
 			_terminator      => 'HERE',
 			_mode            => 'literal',
 			_indented        => undef,
+			_indentation     => undef,
 		},
 	};
 h	{
@@ -50,6 +54,7 @@ h	{
 			_terminator      => 'HERE',
 			_mode            => 'literal',
 			_indented        => undef,
+			_indentation     => undef,
 		},
 	};
 h	{
@@ -61,6 +66,7 @@ h	{
 			_terminator      => 'HERE',
 			_mode            => 'interpolate',
 			_indented        => undef,
+			_indentation     => undef,
 		},
 	};
 h	{
@@ -72,6 +78,7 @@ h	{
 			_terminator      => 'HERE',
 			_mode            => 'interpolate',
 			_indented        => undef,
+			_indentation     => undef,
 		},
 	};
 h	{
@@ -83,6 +90,7 @@ h	{
 			_terminator      => 'HERE',
 			_mode            => 'command',
 			_indented        => undef,
+			_indentation     => undef,
 		},
 	};
 h	{
@@ -94,6 +102,7 @@ h	{
 			_terminator      => 'HERE',
 			_mode            => 'command',
 			_indented        => undef,
+			_indentation     => undef,
 		},
 	};
 h	{
@@ -105,6 +114,7 @@ h	{
 			_terminator      => 'HERE',
 			_mode            => 'literal',
 			_indented        => undef,
+			_indentation     => undef,
 		},
 	};
 
@@ -118,6 +128,7 @@ h	{
 			_terminator      => 'HERE',
 			_mode            => 'interpolate',
 			_indented        => undef,
+			_indentation     => undef,
 		},
 	};
 h	{
@@ -129,6 +140,7 @@ h	{
 			_terminator      => 'HERE',
 			_mode            => 'literal',
 			_indented        => undef,
+			_indentation     => undef,
 		},
 	};
 h	{
@@ -140,6 +152,7 @@ h	{
 			_terminator      => 'HERE',
 			_mode            => 'interpolate',
 			_indented        => undef,
+			_indentation     => undef,
 		},
 	};
 h	{
@@ -151,6 +164,7 @@ h	{
 			_terminator      => 'HERE',
 			_mode            => 'command',
 			_indented        => undef,
+			_indentation     => undef,
 		},
 	};
 h	{
@@ -162,6 +176,7 @@ h	{
 			_terminator      => 'HERE',
 			_mode            => 'literal',
 			_indented        => undef,
+			_indentation     => undef,
 		},
 	};
 
@@ -175,6 +190,7 @@ h	{
 			_terminator      => 'HERE',
 			_mode            => 'interpolate',
 			_indented        => undef,
+			_indentation     => undef,
 		},
 	};
 
@@ -188,6 +204,7 @@ h	{
 			_terminator      => 'HERE',
 			_mode            => 'interpolate',
 			_indented        => 1,
+			_indentation     => "\t \t",
 		},
 	};
 h	{
@@ -199,6 +216,7 @@ h	{
 			_terminator      => 'HERE',
 			_mode            => 'literal',
 			_indented        => 1,
+			_indentation     => "\t \t",
 		},
 	};
 h	{
@@ -210,6 +228,7 @@ h	{
 			_terminator      => 'HERE',
 			_mode            => 'literal',
 			_indented        => 1,
+			_indentation     => "\t \t",
 		},
 	};
 h	{
@@ -221,6 +240,7 @@ h	{
 			_terminator      => 'HERE',
 			_mode            => 'interpolate',
 			_indented        => 1,
+			_indentation     => "\t \t",
 		},
 	};
 h	{
@@ -232,6 +252,7 @@ h	{
 			_terminator      => 'HERE',
 			_mode            => 'interpolate',
 			_indented        => 1,
+			_indentation     => "\t \t",
 		},
 	};
 h	{
@@ -243,6 +264,7 @@ h	{
 			_terminator      => 'HERE',
 			_mode            => 'command',
 			_indented        => 1,
+			_indentation     => "\t \t",
 		},
 	};
 h	{
@@ -254,6 +276,7 @@ h	{
 			_terminator      => 'HERE',
 			_mode            => 'command',
 			_indented        => 1,
+			_indentation     => "\t \t",
 		},
 	};
 h	{
@@ -265,6 +288,7 @@ h	{
 			_terminator      => 'HERE',
 			_mode            => 'literal',
 			_indented        => 1,
+			_indentation     => "\t \t",
 		},
 	};
 
@@ -278,6 +302,7 @@ h	{
 			_terminator      => 'HERE',
 			_mode            => 'interpolate',
 			_indented        => 1,
+			_indentation     => "\t \t",
 		},
 	};
 h	{
@@ -289,6 +314,7 @@ h	{
 			_terminator      => 'HERE',
 			_mode            => 'literal',
 			_indented        => 1,
+			_indentation     => "\t \t",
 		},
 	};
 h	{
@@ -300,6 +326,7 @@ h	{
 			_terminator      => 'HERE',
 			_mode            => 'interpolate',
 			_indented        => 1,
+			_indentation     => "\t \t",
 		},
 	};
 h	{
@@ -311,6 +338,7 @@ h	{
 			_terminator      => 'HERE',
 			_mode            => 'command',
 			_indented        => 1,
+			_indentation     => "\t \t",
 		},
 	};
 h	{
@@ -322,6 +350,7 @@ h	{
 			_terminator      => 'HERE',
 			_mode            => 'literal',
 			_indented        => 1,
+			_indentation     => "\t \t",
 		},
 	};
 
@@ -335,6 +364,7 @@ h	{
 			_terminator      => 'HERE',
 			_mode            => 'interpolate',
 			_indented        => 1,
+			_indentation     => undef,
 		},
 	};
 
@@ -348,18 +378,42 @@ h	{
 			_terminator      => 'HERE',
 			_mode            => 'interpolate',
 			_indented        => 1,
+			_indentation     => "\t \t",
 		},
 	};
 
+	# Tests indented here-document with empty line
+h	{
+		name	=> 'Indented heredoc with empty line.',
+		content	=> "my \$heredoc = <<~HERE;\n\tLine 1\n\n\tLine 3\n\tHERE\n",
+		expected => {
+			_terminator_line => "HERE\n",
+			_damaged         => undef,
+			_terminator      => 'HERE',
+			_mode            => 'interpolate',
+			_indented        => 1,
+			heredoc          => [ "Line 1\n", "\n", "Line 3\n" ],
+			_indentation     => "\t",
+		},
+	};
+
+
 sub h {
     my ( $test ) = @_;
+    my %exception = map { $_ => 1 } qw{ heredoc };
 	subtest(
 		$test->{name},
 		sub {
-			plan tests => 6 + keys %{ $test->{expected} };
+			my $exceptions = grep { $exception{$_} } keys %{ $test->{expected} };
+			plan tests => 7 - $exceptions + keys %{ $test->{expected} };
 
 			my $document = PPI::Document->new( \$test->{content} );
 			isa_ok( $document, 'PPI::Document' );
+
+			SKIP: {
+				skip 'Damaged document', 1 if $test->{expected}{_damaged};
+				is( $document->serialize(), $test->{content}, 'Document serializes correctly' );
+			}
 
 			my $heredocs = $document->find( 'Token::HereDoc' );
 			is( ref $heredocs,     'ARRAY', 'Found heredocs.' );
@@ -370,13 +424,14 @@ sub h {
 			can_ok( $heredoc, 'heredoc' );
 
 			my @content = $heredoc->heredoc;
+			my @expected_heredoc = @{ $test->{expected}{heredoc} || [ "Line 1\n", "Line 2\n", ] };
 			is_deeply(
 				\@content,
-				[ "Line 1\n", "Line 2\n", ],
+				\@expected_heredoc,
 				'The returned content does not include the heredoc terminator.',
 			) or diag "heredoc() returned ", explain \@content;
 
-			is( $heredoc->{$_}, $test->{expected}{$_}, "property '$_'" ) for keys %{ $test->{expected} };
+			is( $heredoc->{$_}, $test->{expected}{$_}, "property '$_'" ) for grep { ! $exception{$_} } keys %{ $test->{expected} };
 		}
 	);
 }
