@@ -754,7 +754,7 @@ sub __replace_child {
 	         refaddr $self->{children}[$_] == $key
 	         } 0..$#{$self->{children}};
 
-    return if !$p;
+    return if !defined $p;
 
 	foreach ( @_ ) {
 		Scalar::Util::weaken(
