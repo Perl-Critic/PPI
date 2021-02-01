@@ -522,6 +522,25 @@ sub remove_child {
 	$child;
 }
 
+=head2 replace_child $Element, $Replacement
+
+If successful, returns the replace element.  Otherwise, returns C<undef>.
+
+=cut
+
+sub replace_child {
+	my $self = shift;
+
+	my $child       = _INSTANCE(shift, 'PPI::Element') or return undef;
+	my $replacement = _INSTANCE(shift, 'PPI::Element') or return undef;
+
+    my $success = $self->__replace_child( $child, $replacement );
+
+    return if !$success;
+    return $replacement;
+}
+
+
 =pod
 
 =head2 prune $class | \&wanted
@@ -734,12 +753,16 @@ sub __replace_child {
 	my $p    = List::Util::first {
 	         refaddr $self->{children}[$_] == $key
 	         } 0..$#{$self->{children}};
+
+    return if !$p;
+
 	foreach ( @_ ) {
 		Scalar::Util::weaken(
 			$_PARENT{refaddr $_} = $self
 			);
 	}
 	splice( @{$self->{children}}, $p, 1, @_ );
+    delete $_PARENT{$key};
 	1;
 }
 
