@@ -593,8 +593,8 @@ one being replaced.
 
 sub replace {
 	my $self    = ref $_[0] ? shift : return undef;
-	_INSTANCE(shift, ref $self) or return undef;
-	die "The ->replace method has not yet been implemented";
+	my $replace = _INSTANCE(shift, ref $self) or return undef;
+	$self->parent->replace_child( $self, $replace );
 }
 
 =pod
