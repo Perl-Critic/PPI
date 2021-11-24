@@ -4,7 +4,7 @@
 
 use lib 't/lib';
 use PPI::Test::pragmas;
-use Test::More tests => 1240 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+use Test::More tests => 1245 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use PPI;
 use PPI::Singletons '%KEYWORDS';
@@ -62,6 +62,10 @@ LEXSUB: {
 		isa_ok( $sub_statement, 'PPI::Statement::Sub', "$code: document child is a sub" );
 		is( $dummy, undef, "$code: document has exactly one child" );
 		is( $sub_statement->type, $type, "$code: type matches" );
+		TODO: {
+			local $TODO = 'Regression test for upcoming sub name patch';
+			is( $sub_statement->name, 'foo', "$code: name matches" );
+		};
 	}
 }
 
