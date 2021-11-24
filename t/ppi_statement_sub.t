@@ -62,10 +62,7 @@ LEXSUB: {
 		isa_ok( $sub_statement, 'PPI::Statement::Sub', "$code: document child is a sub" );
 		is( $dummy, undef, "$code: document has exactly one child" );
 		is( $sub_statement->type, $type, "$code: type matches" );
-		TODO: {
-			local $TODO = 'Regression test for upcoming sub name patch';
-			is( $sub_statement->name, 'foo', "$code: name matches" );
-		};
+		is( $sub_statement->name, 'foo', "$code: name matches" );
 	}
 }
 
