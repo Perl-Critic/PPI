@@ -98,7 +98,7 @@ jobs:
     needs: ubuntu-test-job
     runs-on: "macos-latest"
     strategy:
-      fail-fast: true
+      fail-fast: false
       matrix:
         perl-version:
           - "5.8"
@@ -128,7 +128,7 @@ jobs:
       - name: install deps using cpanm
         uses: perl-actions/install-with-cpanm@v1
         with:
-          args: " --installdeps ."
+          args: " --verbose --installdeps ."
       - run: prove -lr t
         env:
           AUTHOR_TESTING: 0
