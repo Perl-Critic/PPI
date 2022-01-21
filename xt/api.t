@@ -6,7 +6,7 @@ use lib 't/lib';
 use PPI::Test::pragmas;
 use Test::More;
 BEGIN {
-        my $tests = 2931 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+        my $tests = 2935 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 	if ( $ENV{AUTOMATED_TESTING} or $ENV{RELEASE_TESTING} ) {
 		plan( tests => $tests );
 	} else {
@@ -314,6 +314,7 @@ prototype=method
 block=method
 forward=method
 reserved=method
+type=method
 
 [PPI::Statement::Scheduled]
 PPI::Statement::Sub=isa
@@ -402,6 +403,7 @@ flush_locations=method
 normalized=method
 complete=method
 errstr=method
+filename=method
 STORABLE_freeze=method
 STORABLE_thaw=method
 
