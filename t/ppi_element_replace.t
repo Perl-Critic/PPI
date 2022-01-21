@@ -4,7 +4,7 @@
 
 use lib 't/lib';
 use PPI::Test::pragmas;
-use Test::More tests => 12;
+use Test::More tests => 14;
 
 use PPI;
 
