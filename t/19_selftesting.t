@@ -189,6 +189,10 @@ sub bad_static_method {
 	# Check the method exists
 	$class->can($method)                   and return '';
 
+	# special case IO::String as it will normally not be loaded, and the call
+	# to it is also conditional.
+	$class eq 'IO::String' && $method eq 'new' and return '';
+
 	return 1;
 }
 
