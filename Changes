@@ -1,6 +1,11 @@
 Revision history for Perl extension PPI
 
 {{$NEXT}}
+	Summary:
+	- return correct name for lexical subroutines
+	- silence uninitialized warning in t/07_token.t
+	- bump minimum Test::More version to 0.96
+	- fix some typos in Pod
 
 1.270   2019-07-09 15:14:57Z
 	Summary:
