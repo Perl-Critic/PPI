@@ -1,6 +1,8 @@
 Revision history for Perl extension PPI
 
 {{$NEXT}}
+
+1.271   2022-01-25 21:47:21Z
 	Summary:
 	- return correct name for lexical subroutines
 	- silence uninitialized warning in t/07_token.t
@@ -582,7 +584,7 @@ Revision history for Perl extension PPI
 	- Fixed parsing of @{$foo}-1
 	- Fixed parsing of <$fh1>, <$fh2>
 
-1.199_04 
+1.199_04
 	Summary:
 	- Build tweaks
 	- More regression changes
