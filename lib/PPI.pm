@@ -722,7 +722,7 @@ L<https://metacpan.org/pod/PPI>
 
 PPI source is maintained in a GitHub repository at the following address.
 
-L<https://github.com/adamkennedy/PPI>
+L<https://github.com/Perl-Critic/PPI>
 
 Contributions via GitHub pull request are welcome.
 
@@ -734,7 +734,7 @@ If you cannot provide a test or fix, or don't have time to do so,
 then regular bug reports are still accepted and appreciated via the
 GitHub bug tracker.
 
-L<https://github.com/adamkennedy/PPI/issues>
+L<https://github.com/Perl-Critic/PPI/issues>
 
 The C<ppidump> utility that is part of the L<Perl::Critic> distribution
 is a useful tool for demonstrating how PPI is parsing (or misparsing)

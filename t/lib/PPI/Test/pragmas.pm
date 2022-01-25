@@ -8,7 +8,7 @@ PPI modules do not enable warnings, but this module enables warnings
 in the tests, and it forces a test failure if any warnings occur.
 This gives full warnings coverage during the test suite without
 forcing PPI users to accept an unbounded number of warnings in code
-they don't control.  See L<https://github.com/adamkennedy/PPI/issues/142>
+they don't control.  See L<https://github.com/Perl-Critic/PPI/issues/142>
 for a  fuller explanation of this philosophy.
 
 =cut

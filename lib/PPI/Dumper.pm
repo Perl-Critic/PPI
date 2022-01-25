@@ -120,7 +120,7 @@ sub new {
 		}, $class;
 
 	# Handle the options
-	my @options = map { lc $_ } @_; # strict hashpairs # https://github.com/adamkennedy/PPI/issues/201
+	my @options = map { lc $_ } @_; # strict hashpairs # https://github.com/Perl-Critic/PPI/issues/201
 	my %options = @options;
 	foreach ( keys %{$self->{display}} ) {
 		if ( exists $options{$_} ) {

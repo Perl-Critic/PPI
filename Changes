@@ -6,6 +6,8 @@ Revision history for Perl extension PPI
 	- silence uninitialized warning in t/07_token.t
 	- bump minimum Test::More version to 0.96
 	- fix some typos in Pod
+	- moved repository to Perl-Critic GitHub org:
+		https://github.com/Perl-Critic/PPI
 
 1.270   2019-07-09 15:14:57Z
 	Summary:
