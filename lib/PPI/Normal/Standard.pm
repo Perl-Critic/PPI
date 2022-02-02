@@ -18,7 +18,7 @@ B<Move along, nothing to see here>.
 
 use strict;
 
-# VERSION
+our $VERSION = '1.273';
 
 
 

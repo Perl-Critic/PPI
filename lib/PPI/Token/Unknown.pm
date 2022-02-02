@@ -32,7 +32,7 @@ use PPI::Token     ();
 use PPI::Exception ();
 use PPI::Singletons qw' %MAGIC $CURLY_SYMBOL ';
 
-# VERSION
+our $VERSION = '1.273';
 
 our @ISA = "PPI::Token";
 

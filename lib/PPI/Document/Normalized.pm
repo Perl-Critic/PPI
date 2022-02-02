@@ -45,7 +45,7 @@ use Scalar::Util qw{refaddr reftype blessed};
 use Params::Util qw{_INSTANCE _ARRAY};
 use PPI::Util    ();
 
-# VERSION
+our $VERSION = '1.273';
 
 use overload 'bool' => \&PPI::Util::TRUE;
 use overload '=='   => 'equal';

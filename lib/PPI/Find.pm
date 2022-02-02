@@ -74,7 +74,7 @@ caught by the Find object and returned as an error.
 use strict;
 use Params::Util qw{_INSTANCE};
 
-# VERSION
+our $VERSION = '1.273';
 
 
 

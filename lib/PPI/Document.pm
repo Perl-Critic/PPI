@@ -75,7 +75,7 @@ use PPI::Node                     ();
 use overload 'bool' => \&PPI::Util::TRUE;
 use overload '""'   => 'content';
 
-# VERSION
+our $VERSION = '1.273';
 
 our ( $errstr, @ISA ) = ( "", "PPI::Node" );
 

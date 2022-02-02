@@ -21,7 +21,7 @@ within it, and it does not represent a scope.
 use strict;
 use PPI::Document ();
 
-# VERSION
+our $VERSION = '1.273';
 
 our @ISA = 'PPI::Document';
 

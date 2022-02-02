@@ -33,7 +33,7 @@ If -E<gt>fill returns true, finalise the token.
 use strict;
 use Carp ();
 
-# VERSION
+our $VERSION = '1.273';
 
 
 

@@ -34,7 +34,7 @@ standard L<PPI::Structure>, L<PPI::Node> and L<PPI::Element> methods.
 use strict;
 use PPI::Structure ();
 
-# VERSION
+our $VERSION = '1.273';
 
 our @ISA = "PPI::Structure";
 

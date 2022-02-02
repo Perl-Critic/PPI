@@ -49,7 +49,7 @@ honor of its own token class (L<PPI::Token::HereDoc>).
 use strict;
 use PPI::Token ();
 
-# VERSION
+our $VERSION = '1.273';
 
 our @ISA = "PPI::Token";
 
