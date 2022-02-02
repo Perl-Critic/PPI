@@ -1,6 +1,8 @@
 Revision history for Perl extension PPI
 
 {{$NEXT}}
+	Summary:
+	- Drop prerequisite for IO::String on perl 5.8+
 
 1.271   2022-01-25 21:47:21Z
 	Summary:
