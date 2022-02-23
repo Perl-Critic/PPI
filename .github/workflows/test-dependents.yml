@@ -19,7 +19,7 @@ jobs:
           AUTHOR_TESTING: 0
           AUTOMATED_TESTING: 1
           EXTENDED_TESTING: 1
-          RELEASE_TESTING: 0
+          RELEASE_TESTING: 1
         run: auto-build-and-test-dist
       - name: Test Dependents
         env:
