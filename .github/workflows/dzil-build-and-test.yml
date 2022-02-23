@@ -20,10 +20,6 @@ jobs:
       image: perldocker/perl-tester:5.34
     steps:
       - uses: actions/checkout@v2
-      - name: install authordeps
-        run: dzil authordeps --missing | cpanm
-      - name: install deps
-        run: dzil listdeps --missing --author | cpanm
       - name: Run Tests
         env:
           AUTHOR_TESTING: 0
