@@ -1,0 +1,57 @@
+#!/usr/bin/perl
+
+# PPI doesn't know about signatures, but we just want to ensure that it doesn't
+# lose newlines when it tracks the content of the token.
+
+use strict;
+use warnings;
+
+use PPI::Document ();
+use Test::More;
+
+my $sigs = <<'EOF';
+use strict;
+use warnings;
+
+use feature qw(signatures);
+no warnings qw(experimental::signatures);
+
+sub foo (
+    $self, $bar,
+    $thing_id = 12
+) {
+    1;
+}
+
+sub bar ($self,$bar,%) {
+    2;
+}
+
+sub baz (
+
+
+    $, $bar,
+
+    $thing_id = 12,
+
+    @
+
+
+) {
+    1;
+}
+
+sub other ( $= ) { }
+
+sub default ( $default = foo() ) { }
+
+EOF
+
+my $doc = PPI::Document->new( \$sigs );
+$doc->serialize;
+TODO: {
+    local $TODO = 'whitespace is not always preserved in signature';
+    is( $doc->content, $sigs, 'whitespace in signatures is preserved' );
+}
+
+done_testing();
