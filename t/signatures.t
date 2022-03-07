@@ -49,9 +49,6 @@ EOF
 
 my $doc = PPI::Document->new( \$sigs );
 $doc->serialize;
-TODO: {
-    local $TODO = 'whitespace is not always preserved in signature';
-    is( $doc->content, $sigs, 'whitespace in signatures is preserved' );
-}
+is( $doc->content, $sigs, 'whitespace in signatures is preserved' );
 
 done_testing();
