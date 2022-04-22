@@ -1,6 +1,6 @@
 Revision history for Perl extension PPI
 
-{{$NEXT}}
+1.273   2022-04-22 15:58:31Z
 	Summary:
     - Whitespace in signatures is now preserved (GH#257)
 
