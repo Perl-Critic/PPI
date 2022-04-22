@@ -1,17 +1,15 @@
 #!/usr/bin/perl
 
 use strict;
-use File::Spec::Functions ':ALL';
 
 use lib 't/lib';
 use PPI::Test::pragmas;
-use PPI;
 
 # Execute the tests
 use Test::More tests => 5 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use lib 't/lib';
-use Helper 'check_with';
+use Helper qw( check_with );
 
 run();
 

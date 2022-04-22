@@ -7,9 +7,8 @@ use lib 't/lib';
 use PPI::Test::pragmas;
 use Test::More tests => 17 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
-use File::Spec::Functions ':ALL';
-use PPI;
-use PPI::Singletons           '%LAYER';
+use PPI ();
+use PPI::Singletons qw( %LAYER );
 
 
 

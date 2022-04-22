@@ -6,8 +6,8 @@ use lib 't/lib';
 use PPI::Test::pragmas;
 use Test::More tests => 1179 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
-use PPI;
-use PPI::Singletons qw' %OPERATOR %KEYWORDS ';
+use PPI ();
+use PPI::Singletons qw( %KEYWORDS %OPERATOR );
 
 FIND_ONE_OP: {
 	my $source = '$a = .987;';

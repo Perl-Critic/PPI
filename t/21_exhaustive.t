@@ -6,9 +6,9 @@ use lib 't/lib';
 use PPI::Test::pragmas;
 use Test::More; # Plan comes later
 
-use Params::Util qw{_INSTANCE};
-use PPI;
-use PPI::Test 'quotable';
+use Params::Util qw( _INSTANCE );
+use PPI ();
+use PPI::Test qw( quotable );
 
 # When distributing, keep this in to verify the test script
 # is working correctly, but limit to 2 (maaaaybe 3) so we

@@ -7,7 +7,7 @@ use PPI::Test::pragmas;
 use Test::More tests => 12 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 #use File::Spec::Functions ':ALL';
-use PPI;
+use PPI ();
 
 
 

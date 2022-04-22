@@ -6,8 +6,8 @@ use lib 't/lib';
 use PPI::Test::pragmas;
 use Test::More tests => 7 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
-use File::Spec::Functions ':ALL';
-use PPI;
+use File::Spec::Functions qw( catfile );
+use PPI ();
 
 
 my $module = catfile('t', 'data', '13_data', 'Foo.pm');

@@ -4,13 +4,10 @@
 
 use lib 't/lib';
 use PPI::Test::pragmas;
+use Helper qw( check_with );
+
+use PPI ();
 use Test::More tests => 1762 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
-
-use PPI;
-
-
-use lib 't/lib';
-use Helper 'check_with';
 
 LITERAL: {
 	my @pairs = (

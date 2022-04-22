@@ -6,8 +6,8 @@ use lib 't/lib';
 use PPI::Test::pragmas;
 use Test::More tests => 13 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
-use File::Spec::Functions ':ALL';
-use PPI;
+use File::Spec::Functions qw( catfile );
+use PPI ();
 
 
 #####################################################################

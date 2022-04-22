@@ -7,8 +7,8 @@ use lib 't/lib';
 use PPI::Test::pragmas;
 use Test::More tests => 8 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
-use File::Spec::Functions ':ALL';
-use PPI;
+use File::Spec::Functions qw( catfile );
+use PPI ();
 
 foreach my $file ( qw{
 	Simple.pm

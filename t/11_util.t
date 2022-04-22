@@ -6,9 +6,9 @@ use lib 't/lib';
 use PPI::Test::pragmas;
 use Test::More tests => 10 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
-use File::Spec::Functions ':ALL';
-use PPI;
-use PPI::Util qw{_Document _slurp};
+use File::Spec::Functions qw( catfile );
+use PPI ();
+use PPI::Util qw( _Document _slurp );
 
 # Execute the tests
 my $testfile   = catfile( 't', 'data', '11_util', 'test.pm' );

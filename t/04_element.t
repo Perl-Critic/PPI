@@ -9,11 +9,10 @@ use lib 't/lib';
 use PPI::Test::pragmas;
 use Test::More tests => 220 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
-use File::Spec::Functions ':ALL';
-use PPI;
-use Scalar::Util 'refaddr';
-use PPI::Test 'pause';
-use PPI::Singletons '%_PARENT';
+use PPI ();
+use PPI::Singletons qw( %_PARENT );
+use PPI::Test qw( pause );
+use Scalar::Util qw( refaddr );
 
 my $RE_IDENTIFIER = qr/[^\W\d]\w*/;
 
@@ -47,7 +46,7 @@ sub omethod_fails {
 
 # Confirm that C< weaken( $hash{scalar} = $object ) > works as expected,
 # adding a weak reference to the has index.
-use Scalar::Util ();
+use Scalar::Util qw( refaddr );
 SCOPE: {
 	my %hash;
 	my $counter = 0;

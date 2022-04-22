@@ -5,9 +5,8 @@
 use lib 't/lib';
 use PPI::Test::pragmas;
 use Test::More tests => 1940 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
-use Test::Deep;
 
-use PPI;
+use PPI ();
 
 sub permute_test;
 sub assemble_and_run;

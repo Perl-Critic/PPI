@@ -4,7 +4,11 @@
 
 use lib 't/lib';
 use PPI::Test::pragmas;
+
+use PPI ();
+use Scalar::Util qw( refaddr );
 use Test::More;
+
 BEGIN {
 	# Is Storable installed?
 	if ( eval { require Storable; 1 } ) {
@@ -15,8 +19,6 @@ BEGIN {
 	}
 }
 
-use Scalar::Util  'refaddr';
-use PPI;
 
 
 

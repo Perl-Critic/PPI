@@ -6,8 +6,8 @@ use lib 't/lib';
 use PPI::Test::pragmas;
 use Test::More tests => 776 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
-use PPI;
-use B 'perlstring';
+use PPI ();
+use B qw( perlstring );
 our %known_bad_seps;
 
 OPERATOR_CAST: {

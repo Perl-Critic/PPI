@@ -3,6 +3,7 @@ package Helper;
 use strict;
 use warnings;
 use Exporter ();
+use PPI::Document ();
 
 our @ISA = "Exporter";
 our @EXPORT_OK = qw( check_with );

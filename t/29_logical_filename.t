@@ -10,15 +10,14 @@ BEGIN {
 	$PPI::Lexer::X_TOKENIZER ||= $ENV{X_TOKENIZER};
 }
 
-use Test::More tests => 21;
-use Test::NoWarnings;
-use File::Spec::Functions ':ALL';
-use PPI::Document;
-use PPI::Document::File;
+use File::Spec::Functions qw( catfile );
+use PPI::Document ();
+use PPI::Document::File ();
 use PPI::Util ();
+use Test::More tests => 20 + 1; # Test::NoWarnings
+use Test::NoWarnings; ## no perlimports
 
-
-for my $class ( qw{ PPI::Document PPI::Document::File } ) {
+for my $class ( ( PPI::Document::, PPI::Document::File:: ) ) {
 
 	#####################################################################
 	# Actual filename is used until #line directive
