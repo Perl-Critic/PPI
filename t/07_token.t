@@ -10,9 +10,9 @@ use lib 't/lib';
 use PPI::Test::pragmas;
 use Test::More tests => 588 + (warns_on_misplaced_underscore() ? 2 : 0 ) + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
-use File::Spec::Functions ':ALL';
-use PPI;
-use PPI::Test::Run;
+use File::Spec::Functions qw( catdir );
+use PPI ();
+use PPI::Test::Run ();
 
 
 

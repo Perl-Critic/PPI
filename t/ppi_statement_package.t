@@ -6,8 +6,8 @@ use lib 't/lib';
 use PPI::Test::pragmas;
 use Test::More tests => 2506 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
-use PPI;
-use PPI::Singletons '%KEYWORDS';
+use PPI ();
+use PPI::Singletons qw( %KEYWORDS );
 
 
 HASH_CONSTRUCTORS_DONT_CONTAIN_PACKAGES_RT52259: {

@@ -9,10 +9,10 @@ use lib 't/lib';
 use PPI::Test::pragmas;
 use Test::More tests => 1015 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
-use PPI;
-use PPI::Test 'pause';
-use PPI::Test::Run;
-use PPI::Singletons '%_PARENT';
+use PPI ();
+use PPI::Test qw( pause );
+use PPI::Test::Run ();
+use PPI::Singletons qw( %_PARENT );
 
 
 

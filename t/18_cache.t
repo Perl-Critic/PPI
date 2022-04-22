@@ -6,10 +6,9 @@ use lib 't/lib';
 use PPI::Test::pragmas;
 use Test::More tests => 40 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
-use File::Spec::Unix;
-use File::Spec::Functions ':ALL';
-use File::Temp 'tempdir';
-use Scalar::Util        'refaddr';
+use File::Spec::Functions qw( catfile );
+use File::Temp qw( tempdir );
+use Scalar::Util qw( refaddr );
 use PPI::Document       ();
 use PPI::Cache          ();
 use Test::SubCalls 1.07 ();

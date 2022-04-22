@@ -7,9 +7,8 @@ use lib 't/lib';
 use PPI::Test::pragmas;
 use Test::More tests => 236 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
-use File::Spec::Functions ':ALL';
-use PPI::Lexer;
-use PPI::Test::Run;
+use File::Spec::Functions qw( catdir );
+use PPI::Test::Run ();
 
 #####################################################################
 # Code/Dump Testing

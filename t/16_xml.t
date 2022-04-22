@@ -2,9 +2,9 @@
 
 use lib 't/lib';
 use PPI::Test::pragmas;
+use PPI::Document ();
 use Test::More 0.86 tests => 16 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
-use PPI;
 
 
 
@@ -14,7 +14,7 @@ use PPI;
 # Begin Tests
 
 my $code = 'print "Hello World";';
-my $document = new_ok( 'PPI::Document' => [ \$code ] );
+my $document = new_ok( PPI::Document:: => [ \$code ] );
 
 my @elements = $document->elements;
 push @elements, $elements[0]->elements;

@@ -7,17 +7,17 @@
 
 use lib 't/lib';
 use PPI::Test::pragmas;
+
+use Class::Inspector 1.22 ();
+use File::Spec::Functions qw( catdir );
+use Params::Util qw( _CLASS _ARRAY _INSTANCE _IDENTIFIER );
+use PPI ();
+use PPI::Test qw( find_files );
+use PPI::Test::Object (); ## no perlimports
 use Test::More; # Plan comes later
+use Test::Object qw( object_ok );
 
-use Test::Object;
-use File::Spec::Functions ':ALL';
-use Params::Util qw{_CLASS _ARRAY _INSTANCE _IDENTIFIER};
-use Class::Inspector 1.22;
-use PPI;
-use PPI::Test 'find_files';
-use PPI::Test::Object;
-
-use constant CI => 'Class::Inspector';
+use constant CI => Class::Inspector::;
 
 
 

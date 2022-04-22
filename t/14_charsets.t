@@ -12,8 +12,8 @@ BEGIN {
 }
 
 use utf8;  # perl version check above says this is okay
-use Params::Util qw{_INSTANCE};
-use PPI;
+use Params::Util qw( _INSTANCE );
+use PPI ();
 
 sub good_ok {
 	my $source  = shift;
@@ -70,7 +70,7 @@ END_CODE
 
 	ok(utf8::is_utf8('κλειδί'), "utf8 flag set on source string");
 	good_ok( 'my %h = ( κλειδί => "Clé" );', "Hash with greek key in character string"          );
-	use Encode;
+	use Encode ();
 	my $bytes = Encode::encode('utf8', 'use utf8; my %h = ( κλειδί => "Clé" );');
 	ok(!utf8::is_utf8($bytes), "utf8 flag not set on byte string");
 
