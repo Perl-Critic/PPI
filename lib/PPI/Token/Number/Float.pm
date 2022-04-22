@@ -31,7 +31,7 @@ PPI::Token::Number::Exp class.
 use strict;
 use PPI::Token::Number ();
 
-our $VERSION = '1.273';
+our $VERSION = '1.274';
 
 our @ISA = "PPI::Token::Number";
 
