@@ -1,10 +1,12 @@
 Revision history for Perl extension PPI
 
 {{$NEXT}}
+	Summary:
+	- Indentation in here-docs is now preserved (GH#252) (trwyant)
 
 1.273   2022-04-22 15:58:31Z
 	Summary:
-    - Whitespace in signatures is now preserved (GH#257)
+	- Whitespace in signatures is now preserved (GH#257)
 
 1.272   2022-02-02 16:10:50Z
 	Summary:
