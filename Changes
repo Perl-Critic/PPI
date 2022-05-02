@@ -1,5 +1,7 @@
 Revision history for Perl extension PPI
 
+{{$NEXT}}
+
 1.274   2022-05-02 18:21:56Z
 	Summary:
 	- Indentation in here-docs is now preserved (GH#252) (trwyant)

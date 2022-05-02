@@ -31,7 +31,7 @@ use strict;
 use Params::Util qw{_INSTANCE};
 use PPI::Token   ();
 
-our $VERSION = '1.274';
+our $VERSION = '1.275';
 
 our @ISA = "PPI::Token";
 

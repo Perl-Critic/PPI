@@ -29,7 +29,7 @@ represent base-8 numbers.
 use strict;
 use PPI::Token::Number ();
 
-our $VERSION = '1.274';
+our $VERSION = '1.275';
 
 our @ISA = "PPI::Token::Number";
 
