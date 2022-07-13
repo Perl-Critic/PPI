@@ -522,6 +522,23 @@ sub remove_child {
 	$child;
 }
 
+=head2 replace_child $Element, $Replacement
+
+If successful, returns the replace element.  Otherwise, returns C<undef>.
+
+=cut
+
+sub replace_child {
+	my $self = shift;
+
+	my $child       = _INSTANCE(shift, 'PPI::Element') or return undef;
+	my $replacement = _INSTANCE(shift, 'PPI::Element') or return undef;
+
+	my $success = $self->__replace_child( $child, $replacement );
+
+	return $success ? $replacement : undef;
+}
+
 =pod
 
 =head2 prune $class | \&wanted
@@ -730,16 +747,26 @@ sub __insert_after_child {
 # Replace a child
 sub __replace_child {
 	my $self = shift;
-	my $key  = refaddr shift;
-	my $p    = List::Util::first {
-	         refaddr $self->{children}[$_] == $key
+	my $old_child_addr  = refaddr shift;
+
+	# Cache parent of new children
+	my $old_child_index = List::Util::first {
+	         refaddr $self->{children}[$_] == $old_child_addr
 	         } 0..$#{$self->{children}};
+
+	return undef if !defined $old_child_index;
+
 	foreach ( @_ ) {
 		Scalar::Util::weaken(
 			$_PARENT{refaddr $_} = $self
 			);
 	}
-	splice( @{$self->{children}}, $p, 1, @_ );
+
+	# Replace old child with new children
+	splice( @{$self->{children}}, $old_child_index, 1, @_ );
+
+	# Uncache parent of old child
+	delete $_PARENT{$old_child_addr};
 	1;
 }
 
