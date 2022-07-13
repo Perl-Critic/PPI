@@ -589,12 +589,14 @@ To prevent accidental damage to code, in this initial implementation the
 replacement element B<must> be of the same class (or a subclass) as the
 one being replaced.
 
+If successful, returns the replace element.  Otherwise, returns C<undef>.
+
 =cut
 
 sub replace {
 	my $self    = ref $_[0] ? shift : return undef;
-	_INSTANCE(shift, ref $self) or return undef;
-	die "The ->replace method has not yet been implemented";
+	my $replace = _INSTANCE(shift, ref $self) or return undef;
+	return $self->parent->replace_child( $self, $replace );
 }
 
 =pod
