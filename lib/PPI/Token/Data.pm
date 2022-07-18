@@ -38,7 +38,7 @@ use if USE_IO_STRING, 'IO::String';
 # IO is loaded
 use if !USE_IO_STRING, 'IO::File';
 
-our $VERSION = '1.275';
+our $VERSION = '1.276';
 
 our @ISA = "PPI::Token";
 
