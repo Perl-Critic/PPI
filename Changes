@@ -1,5 +1,7 @@
 Revision history for Perl extension PPI
 
+{{$NEXT}}
+
 1.276   2022-07-19 21:43:50Z
 	Summary:
 	- Implement Replace Method (GH#274) (Renee and Olaf Alders)

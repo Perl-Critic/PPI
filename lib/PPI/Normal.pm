@@ -42,7 +42,7 @@ use PPI::Document::Normalized ();
 use PPI::Normal::Standard     ();
 use PPI::Singletons           '%LAYER';
 
-our $VERSION = '1.276';
+our $VERSION = '1.277';
 
 # With the registration mechanism in place, load in the main set of
 # normalization methods to initialize the store.

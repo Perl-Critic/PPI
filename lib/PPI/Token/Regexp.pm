@@ -45,7 +45,7 @@ The following methods are inherited by this class' offspring:
 use strict;
 use PPI::Token ();
 
-our $VERSION = '1.276';
+our $VERSION = '1.277';
 
 our @ISA = "PPI::Token";
 
