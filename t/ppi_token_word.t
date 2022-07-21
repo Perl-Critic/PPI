@@ -7,7 +7,8 @@ use PPI::Test::pragmas;
 use Helper qw( check_with );
 
 use PPI ();
-use Test::More tests => 1762 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+use Test::More tests => 2017 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+use Helper 'safe_new';
 
 LITERAL: {
 	my @pairs = (
@@ -18,8 +19,7 @@ LITERAL: {
 	while ( @pairs ) {
 		my $from  = shift @pairs;
 		my $to	= shift @pairs;
-		my $doc   = PPI::Document->new( \"$from;" );
-		isa_ok( $doc, 'PPI::Document' );
+		my $doc   = safe_new \"$from;";
 		my $word = $doc->find_first('Token::Word');
 		isa_ok( $word, 'PPI::Token::Word' );
 		is( $word->literal, $to, "The source $from becomes $to ok" );
@@ -28,7 +28,7 @@ LITERAL: {
 
 
 METHOD_CALL: {
-	my $Document = PPI::Document->new(\<<'END_PERL');
+	my $Document = safe_new \<<'END_PERL';
 indirect $foo;
 indirect_class_with_colon Foo::;
 $bar->method_with_parentheses;
@@ -43,8 +43,6 @@ single_bareword_statement;
 $buz{hash_key};
 fat_comma_left_side => $thingy;
 END_PERL
-
-	isa_ok( $Document, 'PPI::Document' );
 	my $words = $Document->find('Token::Word');
 	is( scalar @{$words}, 23, 'Found the 23 test words' );
 	my %words = map { $_ => $_ } @{$words};
@@ -444,8 +442,7 @@ sub _parse_to_statement {
 	my $code = shift;
 	my $type = shift;
 
-	my $Document = PPI::Document->new( \$code );
-	isa_ok( $Document, 'PPI::Document', "$code: got the document" );
+	my $Document = safe_new \$code;
 	my $statements = $Document->find( $type );
 	is( scalar(@$statements), 1, "$code: got one $type" );
 	isa_ok( $statements->[0], $type, "$code: got the statement" );

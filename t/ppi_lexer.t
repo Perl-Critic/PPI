@@ -4,9 +4,10 @@
 
 use lib 't/lib';
 use PPI::Test::pragmas;
-use Test::More tests => 48 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+use Test::More tests => 49 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use PPI ();
+use Helper 'safe_new';
 
 
 UNMATCHED_BRACE: {
@@ -17,7 +18,7 @@ UNMATCHED_BRACE: {
 
 
 _CURLY: {
-	my $document = PPI::Document->new(\<<'END_PERL');
+	my $document = safe_new \<<'END_PERL';
 use constant { One => 1 };
 use constant 1 { One => 1 };
 $foo->{bar};
@@ -54,8 +55,6 @@ $x ? {a=>1} : {b=>1};
 CHECK { foo() }
 open( CHECK, '/foo' );
 END_PERL
-
-	isa_ok( $document, 'PPI::Document' );
 	$document->index_locations();
 
 	my @statements;

@@ -4,13 +4,14 @@
 
 use lib 't/lib';
 use PPI::Test::pragmas;
-use Test::More tests => 22 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+use Test::More tests => 23 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use PPI ();
+use Helper 'safe_new';
 
 
 SPECIALIZED: {
-	my $Document = PPI::Document->new(\<<'END_PERL');
+	my $Document = safe_new \<<'END_PERL';
 package Foo;
 use strict;
 ;
@@ -20,8 +21,6 @@ sub foo { }
 state $x;
 $x = 5;
 END_PERL
-
-	isa_ok( $Document, 'PPI::Document' );
 
 	my $statements = $Document->find('Statement');
 	is( scalar @{$statements}, 10, 'Found the 10 test statements' );

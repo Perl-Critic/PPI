@@ -4,14 +4,14 @@
 
 use lib 't/lib';
 use PPI::Test::pragmas;
-use Test::More tests => 8 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+use Test::More tests => 9 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use PPI ();
+use Helper 'safe_new';
 
 
 STRING: {
-	my $Document = PPI::Document->new( \"print qq{foo}, qq!bar!, qq <foo>;" );
-	isa_ok( $Document, 'PPI::Document' );
+	my $Document = safe_new \"print qq{foo}, qq!bar!, qq <foo>;";
 	my $Interpolate = $Document->find('Token::Quote::Interpolate');
 	is( scalar(@$Interpolate), 3, '->find returns three objects' );
 	isa_ok( $Interpolate->[0], 'PPI::Token::Quote::Interpolate' );

@@ -4,10 +4,12 @@
 
 use lib 't/lib';
 use PPI::Test::pragmas;
-use Test::More tests => 776 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+use Test::More tests => 2328 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use PPI ();
 use B qw( perlstring );
+use Helper 'safe_new';
+
 our %known_bad_seps;
 
 OPERATOR_CAST: {
@@ -660,7 +662,7 @@ sub test_statement {
 	my ( $code, $expected, $msg ) = @_;
 	$msg = perlstring $code if !defined $msg;
 
-	my $d = PPI::Document->new( \$code );
+	my $d = safe_new \$code;
 	my $tokens = $d->find( sub { $_[1]->significant } );
 	$tokens = [ map { ref($_), $_->content } @$tokens ];
 

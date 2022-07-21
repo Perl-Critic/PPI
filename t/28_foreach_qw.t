@@ -4,10 +4,11 @@
 
 use lib 't/lib';
 use PPI::Test::pragmas;
-use Test::More tests => 12 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+use Test::More tests => 15 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 #use File::Spec::Functions ':ALL';
 use PPI ();
+use Helper 'safe_new';
 
 
 
@@ -18,8 +19,7 @@ use PPI ();
 
 SCOPE: {
 	my $string   = 'for qw{foo} {} foreach';
-	my $document = PPI::Document->new( \$string );
-	isa_ok( $document, 'PPI::Document' );
+	my $document = safe_new \$string;
 	my $statements = $document->find('Statement::Compound');
 	is( scalar(@$statements), 2, 'Found 2 statements' );
 	is( $statements->[0]->type, 'foreach', '->type ok' );
@@ -28,8 +28,7 @@ SCOPE: {
 
 SCOPE: {
 	my $string   = 'foreach qw{foo} {} foreach';
-	my $document = PPI::Document->new( \$string );
-	isa_ok( $document, 'PPI::Document' );
+	my $document = safe_new \$string;
 	my $statements = $document->find('Statement::Compound');
 	is( scalar(@$statements), 2, 'Found 2 statements' );
 	is( $statements->[0]->type, 'foreach', '->type ok' );
@@ -38,8 +37,7 @@ SCOPE: {
 
 SCOPE: {
 	my $string   = 'for my $foo qw{bar} {} foreach';
-	my $document = PPI::Document->new( \$string );
-	isa_ok( $document, 'PPI::Document' );
+	my $document = safe_new \$string;
 	my $statements = $document->find('Statement::Compound');
 	is( scalar(@$statements), 2, 'Found 2 statements' );
 	is( $statements->[0]->type, 'foreach', '->type ok' );

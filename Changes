@@ -1,6 +1,8 @@
 Revision history for Perl extension PPI
 
 {{$NEXT}}
+	Details:
+	- Wrapped most Document->new calls in tests with automatic checks
 
 1.276   2022-07-19 21:43:50Z
 	Summary:

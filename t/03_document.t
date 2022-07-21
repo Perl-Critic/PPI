@@ -4,10 +4,11 @@
 
 use lib 't/lib';
 use PPI::Test::pragmas;
-use Test::More tests => 13 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+use Test::More tests => 19 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use File::Spec::Functions qw( catfile );
 use PPI ();
+use Helper 'safe_new';
 
 
 #####################################################################
@@ -18,8 +19,7 @@ NEW: {
 	my $file  = catfile(qw{ t data 03_document test.dat  });
 	ok( -f $file,  'Found test.dat' );
 
-	my $doc1 = PPI::Document->new( $file );
-	isa_ok( $doc1, 'PPI::Document' );
+	my $doc1 = safe_new $file;
 
 	# Test script
 	my $script = <<'END_PERL';
@@ -29,17 +29,15 @@ NEW: {
 
 print "Hello World!\n";
 END_PERL
-	my $doc2 = PPI::Document->new( \$script );
-	isa_ok( $doc2, 'PPI::Document' );
+	my $doc2 = safe_new \$script;
 
-	my $doc3 = PPI::Document->new( [
+	my $doc3 = safe_new [
 		"#!/usr/bin/perl",
 		"",
 		"# A simple test script",
 		"",
 		"print \"Hello World!\\n\";",
-	] );
-	isa_ok( $doc3, 'PPI::Document' );
+	];
 
 	# Compare the three forms
 	is_deeply( $doc1, $doc2, 'Stringref form matches file form' );
@@ -51,14 +49,9 @@ NEW_EMPTY: {
 	my $empty = catfile(qw{ t data 03_document empty.dat });
 	ok( -f $empty, 'Found empty.dat' );
 
-	my $doc1 = PPI::Document->new( $empty );
-	isa_ok( $doc1, 'PPI::Document' );
-
-	my $doc2 = PPI::Document->new( \'' );
-	isa_ok( $doc2, 'PPI::Document' );
-
-	my $doc3 = PPI::Document->new( [ ] );
-	isa_ok( $doc3, 'PPI::Document' );
+	my $doc1 = safe_new $empty;
+	my $doc2 = safe_new \'';
+	my $doc3 = safe_new [ ];
 
 	# Compare the three forms
 	is_deeply( $doc1, $doc2, 'Stringref form matches file form' );

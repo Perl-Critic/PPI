@@ -5,10 +5,11 @@
 
 use lib 't/lib';
 use PPI::Test::pragmas;
-use Test::More tests => 8 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+use Test::More tests => 10 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use File::Spec::Functions qw( catfile );
 use PPI ();
+use Helper 'safe_new';
 
 foreach my $file ( qw{
 	Simple.pm
@@ -17,8 +18,7 @@ foreach my $file ( qw{
 	my $path = catfile( qw{ t data 24_v6 }, $file );
 	ok( -f $path, "Found test file $file" );
 
-	my $doc = PPI::Document->new( $path );
-	isa_ok( $doc, 'PPI::Document' );
+	my $doc = safe_new $path;
 
 	# Find the first Perl6 include
 	my $include = $doc->find_first( 'PPI::Statement::Include::Perl6' );

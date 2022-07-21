@@ -4,15 +4,15 @@
 
 use lib 't/lib';
 use PPI::Test::pragmas;
-use Test::More tests => 14 + ( $ENV{AUTHOR_TESTING} ? 1 : 0 );
+use Test::More tests => 20 + ( $ENV{AUTHOR_TESTING} ? 1 : 0 );
 use B qw( perlstring );
 
 use PPI ();
+use Helper 'safe_new';
 
 
 STRING: {
-	my $Document = PPI::Document->new( \"print q{foo}, q!bar!, q <foo>;" );
-	isa_ok( $Document, 'PPI::Document' );
+	my $Document = safe_new \"print q{foo}, q!bar!, q <foo>;";
 	my $literal = $Document->find('Token::Quote::Literal');
 	is( scalar(@$literal), 3, '->find returns three objects' );
 	isa_ok( $literal->[0], 'PPI::Token::Quote::Literal' );
@@ -25,8 +25,7 @@ STRING: {
 
 
 LITERAL: {
-	my $Document = PPI::Document->new( \"print q{foo}, q!bar!, q <foo>;" );
-	isa_ok( $Document, 'PPI::Document' );
+	my $Document = safe_new \"print q{foo}, q!bar!, q <foo>;";
 	my $literal = $Document->find('Token::Quote::Literal');
 	is( $literal->[0]->literal, 'foo', '->literal returns as expected' );
 	is( $literal->[1]->literal, 'bar', '->literal returns as expected' );
@@ -83,7 +82,7 @@ sub test_statement {
 	my ( $code, $expected, $msg ) = @_;
 	$msg = perlstring $code if !defined $msg;
 
-	my $d = PPI::Document->new( \$code );
+	my $d = safe_new \$code;
 	my $tokens = $d->find( sub { $_[1]->significant } );
 	$tokens = [ map { ref( $_ ), $_->content } @$tokens ];
 

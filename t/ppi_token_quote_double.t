@@ -4,14 +4,15 @@
 
 use lib 't/lib';
 use PPI::Test::pragmas;
-use Test::More tests => 19 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+use Test::More tests => 22 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use PPI ();
+use Helper 'safe_new';
 
 
 INTERPOLATIONS: {
 	# Get a set of objects
-	my $Document = PPI::Document->new(\<<'END_PERL');
+	my $Document = safe_new \<<'END_PERL';
 "no interpolations"
 "no \@interpolations"
 "has $interpolation"
@@ -19,7 +20,6 @@ INTERPOLATIONS: {
 "has \\@interpolation"
 "" # False content to test double-negation scoping
 END_PERL
-	isa_ok( $Document, 'PPI::Document' );
 	my $strings = $Document->find('Token::Quote::Double');
 	is( scalar @{$strings}, 6, 'Found the 6 test strings' );
 	is( $strings->[0]->interpolations, '', 'String 1: No interpolations'  );
@@ -32,7 +32,7 @@ END_PERL
 
 
 SIMPLIFY: {
-	my $Document = PPI::Document->new(\<<'END_PERL');
+	my $Document = safe_new \<<'END_PERL';
 "no special characters"
 "has \"double\" quotes"
 "has 'single' quotes"
@@ -40,7 +40,6 @@ SIMPLIFY: {
 "has @interpolation"
 ""
 END_PERL
-	isa_ok( $Document, 'PPI::Document' );
 	my $strings = $Document->find('Token::Quote::Double');
 	is( scalar @{$strings}, 6, 'Found the 6 test strings' );
 	is( $strings->[0]->simplify, q<'no special characters'>, 'String 1: No special characters' );
@@ -53,8 +52,7 @@ END_PERL
 
 
 STRING: {
-	my $Document = PPI::Document->new( \'print "foo";' );
-	isa_ok( $Document, 'PPI::Document' );
+	my $Document = safe_new \'print "foo";';
 	my $Double = $Document->find_first('Token::Quote::Double');
 	isa_ok( $Double, 'PPI::Token::Quote::Double' );
 	is( $Double->string, 'foo', '->string returns as expected' );

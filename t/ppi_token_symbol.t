@@ -4,9 +4,10 @@
 
 use lib 't/lib';
 use PPI::Test::pragmas;
-use Test::More tests => 191 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+use Test::More tests => 216 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use PPI ();
+use Helper 'safe_new';
 
 
 my $Token = PPI::Token::Symbol->new( '$foo' );
@@ -62,8 +63,7 @@ sub parse_and_test {
 	my ( $code, $symbol_expected, $msg ) = @_;
 	$msg = $code if !defined $msg;
 
-	my $Document = PPI::Document->new( \$code );
-	isa_ok( $Document, 'PPI::Document', "$msg got document" );
+	my $Document = safe_new \$code;
 
 	my $symbols = $Document->find( 'PPI::Token::Symbol') || [];
 	is( scalar(@$symbols), 1, "$msg got exactly one symbol" );

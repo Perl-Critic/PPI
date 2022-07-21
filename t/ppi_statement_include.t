@@ -4,14 +4,15 @@
 
 use lib 't/lib';
 use PPI::Test::pragmas;
-use Test::More tests => 2065 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+use Test::More tests => 6070 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use PPI ();
 use PPI::Singletons qw( %KEYWORDS );
+use Helper 'safe_new';
 
 
 TYPE: {
-	my $document = PPI::Document->new(\<<'END_PERL');
+	my $document = safe_new \<<'END_PERL';
 require 5.6;
 require Module;
 require 'Module.pm';
@@ -20,8 +21,6 @@ use Module;
 use Module 1.00;
 no Module;
 END_PERL
-
-	isa_ok( $document, 'PPI::Document' );
 	my $statements = $document->find('PPI::Statement::Include');
 	is( scalar(@$statements), 7, 'Found 7 include statements' );
 	my @expected = qw{ require require require use use use no };
@@ -32,7 +31,7 @@ END_PERL
 
 
 MODULE_VERSION: {
-	my $document = PPI::Document->new(\<<'END_PERL');
+	my $document = safe_new \<<'END_PERL';
 use Integer::Version 1;
 use Float::Version 1.5;
 use Version::With::Argument 1 2;
@@ -43,8 +42,6 @@ use 5.005;
 use VString::Version v10;
 use VString::Version::Decimal v1.5;
 END_PERL
-
-	isa_ok( $document, 'PPI::Document' );
 	my $statements = $document->find('PPI::Statement::Include');
 	is( scalar @{$statements}, 9, 'Found expected include statements.' );
 	is( $statements->[0]->module_version, 1, 'Integer version' );
@@ -60,7 +57,7 @@ END_PERL
 
 
 VERSION: {
-	my $document = PPI::Document->new(\<<'END_PERL');
+	my $document = safe_new \<<'END_PERL';
 # Examples from perlfunc in 5.10.
 use v5.6.1;
 use 5.6.1;
@@ -76,8 +73,6 @@ require 5.006; require 5.6.1;
 # Module.
 use Float::Version 1.5;
 END_PERL
-
-	isa_ok( $document, 'PPI::Document' );
 	my $statements = $document->find('PPI::Statement::Include');
 	is( scalar @{$statements}, 11, 'Found expected include statements.' );
 
@@ -98,7 +93,7 @@ END_PERL
 
 
 VERSION_LITERAL: {
-	my $document = PPI::Document->new(\<<'END_PERL');
+	my $document = safe_new \<<'END_PERL';
 # Examples from perlfunc in 5.10.
 use v5.6.1;
 use 5.6.1;
@@ -114,8 +109,6 @@ require 5.006; require 5.6.1;
 # Module.
 use Float::Version 1.5;
 END_PERL
-
-	isa_ok( $document, 'PPI::Document' );
 	my $statements = $document->find('PPI::Statement::Include');
 	is( scalar @{$statements}, 11, 'Found expected include statements.' );
 
@@ -136,7 +129,7 @@ END_PERL
 
 
 ARGUMENTS: {
-	my $document = PPI::Document->new(\<<'END_PERL');
+	my $document = safe_new \<<'END_PERL';
 use 5.006;       # Don't expect anything.
 use Foo;         # Don't expect anything.
 use Foo 5;       # Don't expect anything.
@@ -145,8 +138,6 @@ use Foo 5 'bar'; # One thing.
 use Foo qw< bar >, "baz";
 use Test::More tests => 5 * 9   # Don't get tripped up by the lack of the ";"
 END_PERL
-
-	isa_ok( $document, 'PPI::Document' );
 	my $statements = $document->find('PPI::Statement::Include');
 	is( scalar @{$statements}, 7, 'Found expected include statements.' );
 
@@ -259,7 +250,7 @@ KEYWORDS_AS_MODULE_NAMES: {
 			for my $version ( '', 'v1.2.3', '1.2.3', 'v10' ) {
 				my $code = "$include $name $version;";
 
-				my $Document = PPI::Document->new( \"$code 999;" );
+				my $Document = safe_new \"$code 999;";
 
 				subtest "'$code'", => sub {
 {

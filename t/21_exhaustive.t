@@ -9,6 +9,7 @@ use Test::More; # Plan comes later
 use Params::Util qw( _INSTANCE );
 use PPI ();
 use PPI::Test qw( quotable );
+use Helper 'safe_new';
 
 # When distributing, keep this in to verify the test script
 # is working correctly, but limit to 2 (maaaaybe 3) so we
@@ -51,7 +52,7 @@ my @FAILURES = (
 	"( {8",
 );
 
-plan tests => ($MAX_CHARS + $ITERATIONS + @FAILURES + ($ENV{AUTHOR_TESTING} ? 1 : 0));
+plan tests => (9722 + ($ENV{AUTHOR_TESTING} ? 1 : 0));
 
 
 
@@ -164,7 +165,7 @@ sub round_trip_code {
 
 	my $Document  = eval {
 		# use Carp 'croak'; $SIG{__WARN__} = sub { croak('Triggered a warning') };
-		PPI::Document->new(\$code);
+		safe_new \$code;
 	};
 	if ( _INSTANCE($Document, 'PPI::Document') ) {
 		$result = $Document->serialize;
@@ -182,13 +183,13 @@ sub quickcheck {
 
 	while ( length $fails ) {
 		chop $code;
-		PPI::Document->new(\$code) or last;
+		safe_new \$code or last;
 		$fails = $code;
 	}
 
 	while ( length $fails ) {
 		substr( $code, 0, 1, '' );
-		PPI::Document->new(\$code) or return $fails;
+		safe_new \$code or return $fails;
 		$fails = $code;
 	}
 

@@ -6,11 +6,11 @@ use lib 't/lib';
 use PPI::Test::pragmas;
 
 use PPI::Document ();
-use Test::More tests => ($ENV{AUTHOR_TESTING} ? 1 : 0) + 20 ;
+use Test::More tests => ($ENV{AUTHOR_TESTING} ? 1 : 0) + 28;
+use Helper 'safe_new';
 
 __REPLACE_METH: {
-	my $Document = PPI::Document->new( \"print 'Hello World';" );
-	isa_ok( $Document, 'PPI::Document' );
+	my $Document = safe_new \"print 'Hello World';";
 	my $string = $Document->find_first('Token::Quote');
 	isa_ok( $string, 'PPI::Token::Quote' );
 	is( $string->content, "'Hello World'", 'Got expected token' );
@@ -22,13 +22,12 @@ __REPLACE_METH: {
 }
 
 __REPLACE_CHILD_METH: {
-	my $Document = PPI::Document->new( \"print 'Hello World';" );
-	isa_ok( $Document, 'PPI::Document' );
+	my $Document = safe_new \"print 'Hello World';";
 	my $statement = $Document->find_first('Statement');
 	isa_ok( $statement, 'PPI::Statement' );
 	is( $statement->content, "print 'Hello World';", 'Got expected token' );
 
-	my $doc = PPI::Document->new(\'for my $var ( @vars ) { say "foo" }');
+	my $doc = safe_new \'for my $var ( @vars ) { say "foo" }';
 	my $foo = $doc->find('PPI::Statement::Compound');
 	isa_ok( $foo->[0], 'PPI::Statement::Compound');
 	is( $foo->[0]->content, q~for my $var ( @vars ) { say "foo" }~, 'for loop');
@@ -36,7 +35,7 @@ __REPLACE_CHILD_METH: {
 	is( $Document->serialize, 'for my $var ( @vars ) { say "foo" }', 'replace works' );
 
 	{
-		my $doc = PPI::Document->new(\'if ($foo) { ... }');
+		my $doc = safe_new \'if ($foo) { ... }';
 		my $compound = $doc->find('PPI::Statement::Compound');
 		my $old_child = $compound->[0]->child(2);
 		is( $compound->[0]->child(2), '($foo)', 'found child');
@@ -53,7 +52,7 @@ __REPLACE_CHILD_METH: {
 	{
 		my $text = 'if ($foo) { ... }';
 
-		my $doc = PPI::Document->new(\$text);
+		my $doc = safe_new \$text;
 		my $compound = $doc->find('PPI::Statement::Compound');
 		is( $compound->[0]->child(2), '($foo)', 'found child');
 

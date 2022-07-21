@@ -19,6 +19,7 @@ use Test::Object qw( object_ok );
 
 use constant CI => Class::Inspector::;
 
+use Helper 'safe_new';
 
 
 
@@ -42,7 +43,7 @@ foreach my $dir ( '05_lexer', '08_regression', '11_util', '13_data', '15_transfo
 }
 
 # Declare our plan
-Test::More::plan( tests => scalar(@files) * 14 + 3 + ($ENV{AUTHOR_TESTING} ? 1 : 0) );
+Test::More::plan( tests => scalar(@files) * 16 + 4 + ($ENV{AUTHOR_TESTING} ? 1 : 0) );
 
 
 
@@ -52,7 +53,7 @@ Test::More::plan( tests => scalar(@files) * 14 + 3 + ($ENV{AUTHOR_TESTING} ? 1 :
 # Self-test the search functions before we use them
 
 # Check this actually finds something bad
-my $sample = PPI::Document->new(\<<'END_PERL');
+my $sample = safe_new \<<'END_PERL';
 isa($foo, 'Bad::Class1');
 isa($foo, 'PPI::Document');
 $foo->isa('Bad::Class2');
@@ -61,7 +62,6 @@ isa($foo, 'ARRAY'); # Not bad
 isa($foo->thing, qq <Bad::Class4> # ok?
 );
 END_PERL
-isa_ok( $sample, 'PPI::Document' );
 
 my $bad = $sample->find( \&bug_bad_isa_class_name );
 ok( _ARRAY($bad), 'Found bad things' );
@@ -82,7 +82,7 @@ foreach my $file ( @files ) {
 	like( $md5a, qr/^[[:xdigit:]]{32}\z/, 'md5hex_file ok' );
 
 	# Load the file
-	my $Document = PPI::Document->new($file);
+	my $Document = safe_new $file;
 	ok( _INSTANCE($Document, 'PPI::Document'), "$file: Parsed ok" );
 
 	# Compare the preload signature to the post-load value

@@ -4,9 +4,10 @@
 
 use lib 't/lib';
 use PPI::Test::pragmas;
-use Test::More tests => 27 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+use Test::More tests => 28 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use PPI ();
+use Helper 'safe_new';
 
 
 NEW: {
@@ -35,8 +36,7 @@ BAD: {
 
 
 PROCESS: {
-	my $doc1 = PPI::Document->new(\'print "Hello World!\n";');
-	isa_ok( $doc1, 'PPI::Document' );
+	my $doc1 = safe_new \'print "Hello World!\n";';
 	my $doc2 = \'print "Hello World!\n";';
 	my $doc3 = \' print  "Hello World!\n"; # comment';
 	my $doc4 = \'print "Hello World!\n"';

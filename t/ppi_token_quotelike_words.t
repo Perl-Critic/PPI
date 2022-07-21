@@ -4,9 +4,10 @@
 
 use lib 't/lib';
 use PPI::Test::pragmas;
-use Test::More tests => 1940 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+use Test::More tests => 2425 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use PPI ();
+use Helper 'safe_new';
 
 sub permute_test;
 sub assemble_and_run;
@@ -99,8 +100,7 @@ LITERAL: {
 sub execute_test {
 	my ( $code, $expected, $msg ) = @_;
 
-	my $d = PPI::Document->new( \$code );
-	isa_ok( $d, 'PPI::Document', $msg );
+	my $d = safe_new \$code;
 	my $found = $d->find( 'PPI::Token::QuoteLike::Words' ) || [];
 	is( @$found, 1, "$msg - exactly one qw" );
 	is( $found->[0]->content, $code, "$msg content()" );

@@ -2,18 +2,55 @@ package Helper;
 
 use strict;
 use warnings;
-use Exporter ();
+
+use parent 'Exporter';
+use Test::More;
+
 use PPI::Document ();
 
-our @ISA = "Exporter";
-our @EXPORT_OK = qw( check_with );
+our @EXPORT_OK = qw( check_with  safe_new );
+
+=head1 safe_new @args
+
+	my $doc = safe_new \"use strict";
+
+Creates a PPI::Document object from the arguments and reports errors if
+necessary. Can be used to replace most document new calls in the tests for
+easier testing.
+
+=cut
+
+sub safe_new {
+	my $Document = PPI::Document->new(@_);
+	my $errstr   = PPI::Document->errstr;
+	PPI::Document->_clear;
+	if ( Test::More->builder->in_todo ) {
+		local $TODO = 1;
+		fail "no errors";
+		fail 'PPI::Document';
+		return $Document;
+	}
+	is( $errstr, '', "no errors" );
+	isa_ok $Document, 'PPI::Document';
+	return $Document;
+}
+
+=head1 check_with
+
+	check_with "1.eqm'bar';", sub {
+		is $_->child( 0 )->child( 1 )->content, "eqm'bar",
+		  "eqm' bareword after number and concat op is not mistaken for eq";
+	};
+
+Creates a document object from the given code and stores it in $_, so the sub
+passed in the second argument can quickly run tests on it.
+
+=cut
 
 sub check_with {
-    my ( $code, $checker ) = @_;
-    my $Document = PPI::Document->new( \$code );
-    is( PPI::Document->errstr, undef ) if PPI::Document->errstr;
-    local $_ = $Document;
-    $checker->();
+	my ( $code, $checker ) = @_;
+	local $_ = safe_new \$code;
+	return $checker->();
 }
 
 1;

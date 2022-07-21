@@ -7,6 +7,7 @@ use PPI::Test::pragmas;
 use Test::More tests => 30 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use PPI ();
+use Helper 'safe_new';
 
 sub h;
 
@@ -404,10 +405,9 @@ sub h {
 		$test->{name},
 		sub {
 			my $exceptions = grep { $exception{$_} } keys %{ $test->{expected} };
-			plan tests => 7 - $exceptions + keys %{ $test->{expected} };
+			plan tests => 8 - $exceptions + keys %{ $test->{expected} };
 
-			my $document = PPI::Document->new( \$test->{content} );
-			isa_ok( $document, 'PPI::Document' );
+			my $document = safe_new \$test->{content};
 
 			SKIP: {
 				skip 'Damaged document', 1 if $test->{expected}{_damaged};

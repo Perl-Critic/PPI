@@ -7,12 +7,13 @@
 
 use lib 't/lib';
 use PPI::Test::pragmas;
-use Test::More tests => 220 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+use Test::More tests => 227 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use PPI ();
 use PPI::Singletons qw( %_PARENT );
 use PPI::Test qw( pause );
 use Scalar::Util qw( refaddr );
+use Helper 'safe_new';
 
 my $RE_IDENTIFIER = qr/[^\W\d]\w*/;
 
@@ -231,7 +232,7 @@ is( $Token7->next_sibling, '', 'Last token returns false for next_sibling' );
 
 # More extensive test for next_sibling
 SCOPE: {
-	my $doc = PPI::Document->new( \"sub foo { bar(); }" );
+	my $doc = safe_new \"sub foo { bar(); }";
 	my $end = $doc->last_token;
 	isa_ok( $end, 'PPI::Token::Structure' );
 	is( $end->content, '}', 'Got end token' );
@@ -254,7 +255,7 @@ is_object( $Token7->previous_sibling, $Braces, "Last token sees braces as previo
 
 # More extensive test for next_sibling
 SCOPE: {
-	my $doc = PPI::Document->new( \"{ no strict; bar(); }" );
+	my $doc = safe_new \"{ no strict; bar(); }";
 	my $start = $doc->first_token;
 	isa_ok( $start, 'PPI::Token::Structure' );
 	is( $start->content, '{', 'Got start token' );
@@ -286,8 +287,7 @@ is_object( $Token7->sprevious_sibling, $Braces, "Last token sees braces as sprev
 
 # Test snext_sibling and sprevious_sibling cases when inside a parent block
 SCOPE: {
-	my $cpan13454 = PPI::Document->new( \'{ 1 }' );
-	isa_ok( $cpan13454, 'PPI::Document' );
+	my $cpan13454 = safe_new \'{ 1 }';
 	my $num = $cpan13454->find_first('Token::Number');
 	isa_ok( $num, 'PPI::Token::Number' );
 	my $prev = $num->sprevious_sibling;
@@ -376,7 +376,6 @@ SCOPE: {
 # Cloning an Element/Node
 SCOPE: {
 	my $Doc2 = $Document->clone;
-	isa_ok( $Doc2, 'PPI::Document' );
 	isa_ok( $Doc2->schild(0), 'PPI::Statement' );
 	is_object( $Doc2->schild(0)->parent, $Doc2, 'Basic parent links stay intact after ->clone' );
 	is_object( $Doc2->schild(0)->schild(3)->start->document, $Doc2,
@@ -439,8 +438,7 @@ SCOPE: {
 	my $k2;
 	my $k3;
 	SCOPE: {
-		my $NodeDocument = PPI::Document->new( $INC{"PPI/Node.pm"} );
-		isa_ok( $NodeDocument, 'PPI::Document' );
+		my $NodeDocument = safe_new $INC{"PPI/Node.pm"};
 		$k2 = scalar keys %_PARENT;
 		ok( $k2 > ($k1 + 3000), 'PARENT keys increases after loading document' );
 		$NodeDocument->DESTROY;
@@ -456,8 +454,7 @@ SCOPE: {
 	my $k2;
 	my $k3;
 	SCOPE: {
-		my $NodeDocument = PPI::Document->new( $INC{"PPI/Node.pm"} );
-		isa_ok( $NodeDocument, 'PPI::Document' );
+		my $NodeDocument = safe_new $INC{"PPI/Node.pm"};
 		$k2 = scalar keys %_PARENT;
 		ok( $k2 > ($k1 + 3000), 'PARENT keys increases after loading document' );
 	}
@@ -487,8 +484,7 @@ END_PERL
 	$code =~ s/\s+$//s;
 
 	# Create the document
-	my $doc = PPI::Document->new( \$code );
-	isa_ok( $doc, 'PPI::Document' );
+	my $doc = safe_new \$code;
 
 	# Basic first_token and last_token using a single non-trival sample
 	### FIXME - Make this more thorough

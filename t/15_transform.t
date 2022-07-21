@@ -9,7 +9,7 @@ use File::Temp qw( tempdir );
 use PPI ();
 use PPI::Transform ();
 use Scalar::Util qw( refaddr );
-use Test::More 0.86 tests => 24 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+use Test::More 0.86 tests => 26 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 #####################################################################
 # Begin Tests
@@ -123,6 +123,8 @@ sub document {
 
 package Foo;
 
+use Helper 'safe_new';
+
 sub new {
 	bless { }, 'Foo';
 }
@@ -130,7 +132,7 @@ sub new {
 our $VALUE = '';
 
 sub get {
-	PPI::Document->new( \$VALUE );
+	safe_new \$VALUE;
 }
 
 sub set {

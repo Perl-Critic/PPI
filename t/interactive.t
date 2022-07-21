@@ -6,9 +6,10 @@
 
 use lib 't/lib';
 use PPI::Test::pragmas;
-use Test::More tests => 2 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+use Test::More tests => 3 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use PPI ();
+use Helper 'safe_new';
 
 
 # Define the test code
@@ -21,7 +22,6 @@ my $code = 'sub f:f(';
 #####################################################################
 # Run the actual tests
 
-my $document = eval { PPI::Document->new(\$code) };
+my $document = eval { safe_new \$code };
 $DB::single = $DB::single = 1 if $@; # Catch exceptions
 is( $@, '', 'Parsed without error' );
-isa_ok( $document, 'PPI::Document' );

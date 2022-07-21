@@ -4,10 +4,11 @@
 
 use lib 't/lib';
 use PPI::Test::pragmas;
-use Test::More tests => 23 + ( $ENV{AUTHOR_TESTING} ? 1 : 0 );
+use Test::More tests => 69 + ( $ENV{AUTHOR_TESTING} ? 1 : 0 );
 use B qw( perlstring );
 
 use PPI ();
+use Helper 'safe_new';
 
 test_statement(
     'use v5 ;',
@@ -326,7 +327,7 @@ sub test_statement {
     my ( $code, $expected, $msg ) = @_;
     $msg = perlstring $code if !defined $msg;
 
-    my $d = PPI::Document->new( \$code );
+    my $d = safe_new \$code;
     my $tokens = $d->find( sub { $_[1]->significant } );
     $tokens = [ map { ref( $_ ), $_->content } @$tokens ];
 

@@ -4,20 +4,20 @@
 
 use lib 't/lib';
 use PPI::Test::pragmas;
-use Test::More tests => 15 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+use Test::More tests => 16 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use PPI ();
+use Helper 'safe_new';
 
 
 STRING: {
 	# Prove what we say in the ->string docs
-	my $Document = PPI::Document->new(\<<'END_PERL');
+	my $Document = safe_new \<<'END_PERL';
   'foo'
   "foo"
   q{foo}
   qq <foo>
 END_PERL
-	isa_ok( $Document, 'PPI::Document' );
 
 	my $quotes = $Document->find('Token::Quote');
 	is( ref($quotes), 'ARRAY', 'Found quotes' );

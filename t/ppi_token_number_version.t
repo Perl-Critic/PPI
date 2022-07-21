@@ -4,10 +4,11 @@
 
 use lib 't/lib';
 use PPI::Test::pragmas;
-use Test::More tests => 735 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+use Test::More tests => 2187 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use PPI ();
 use PPI::Singletons qw( %KEYWORDS %OPERATOR %QUOTELIKE );
+use Helper 'safe_new';
 
 
 LITERAL: {
@@ -82,7 +83,7 @@ VSTRING_ENDS_CORRECTLY: {
 	for my $test ( @tests ) {
 		my $code = $test->{code};
 
-		my $d = PPI::Document->new( \$test->{code} );
+		my $d = safe_new \$test->{code};
 		my $tokens = $d->find( sub { 1; } );
 		$tokens = [ map { ref($_), $_->content() } @$tokens ];
 		my $expected = $test->{expected};

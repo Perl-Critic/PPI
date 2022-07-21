@@ -8,6 +8,7 @@ use Test::More;
 use Test::Object;
 use lib 't/lib';
 use PPI::Test::Object;
+use Helper 'safe_new';
 
 #####################################################################
 # Process a .code/.dump file pair
@@ -37,11 +38,8 @@ sub run_testdir {
 		ok( $has_dumpfile, "$codename: Found matching .dump file" );
 
 		# Create the lexer and get the Document object
-		my $document = PPI::Document->new( $codefile );
-		is( PPI::Document->errstr, "", "no error during document parsing" );
-		PPI::Document->_clear;
+		my $document = safe_new $codefile;
 		ok( $document, "$codename: Lexer->Document returns true" );
-		ok( _INSTANCE($document, 'PPI::Document'), "$codename: Object isa PPI::Document" );
 
 		SKIP: {
 			skip "No Document to test", 12 unless $document;
@@ -125,13 +123,8 @@ sub increment_testdir {
 		# the regression test code fragments.
 		for my $chars ( 1 .. length $buffer ) {
 			my $string   = substr $buffer, 0, $chars;
-			my $document = eval {
-				PPI::Document->new( \$string );
-			};
-			is( PPI::Document->errstr, "", "no error during document parsing" );
-			PPI::Document->_clear;
+			my $document = eval { safe_new \$string };
 			is( $@ => '', "$codename: $chars chars ok" );
-			is( ref($document) => 'PPI::Document', "$codename: $chars chars document" );
 			is( $document->serialize => $string, "$codename: $chars char roundtrip" );
 		}
 	}

@@ -4,9 +4,10 @@
 
 use lib 't/lib';
 use PPI::Test::pragmas;
-use Test::More tests => 1788 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+use Test::More tests => 2235 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use PPI ();
+use Helper 'safe_new';
 
 sub execute_test;
 sub permute_test;
@@ -67,8 +68,7 @@ sub execute_test {
 	my ( $code, $expected, $msg ) = @_;
 	$msg = $code if !defined $msg;
 
-	my $Document = PPI::Document->new( \$code );
-	isa_ok( $Document, 'PPI::Document', "$msg got document" );
+	my $Document = safe_new \$code;
 
 	my $attributes = $Document->find( 'PPI::Token::Attribute') || [];
 	is( scalar(@$attributes), scalar(@$expected), "'$msg' got expected number of attributes" );

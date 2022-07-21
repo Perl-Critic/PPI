@@ -10,6 +10,7 @@ use Test::More; # Plan comes later
 use File::Spec::Functions qw( catdir );
 use PPI ();
 use PPI::Test qw( find_files );
+use Helper 'safe_new';
 
 
 
@@ -42,7 +43,7 @@ foreach my $dir (
 push @files, find_files( 't' );
 
 # Declare our plan
-Test::More::plan( tests => ($ENV{AUTHOR_TESTING} ? 1 : 0) + scalar(@files) * 9 );
+Test::More::plan( tests => ($ENV{AUTHOR_TESTING} ? 1 : 0) + scalar(@files) * 10 - 1 );
 
 
 
@@ -78,9 +79,8 @@ sub roundtrip_ok {
 		SKIP: {
 			skip( 'Ignoring 14_charset.t', 7 ) if $file =~ /14_charset/;
 
-			my $Document = PPI::Document->new( $file );
+			my $Document = safe_new $file;
 			ok( $Document, "$file: ->new returned true" );
-			isa_ok( $Document, 'PPI::Document' );
 
 			# Serialize it back out, and compare with the raw version
 			skip( "Ignoring failed parse of $file", 5 ) unless defined $Document;

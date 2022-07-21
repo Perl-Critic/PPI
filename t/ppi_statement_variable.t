@@ -4,14 +4,15 @@
 
 use lib 't/lib';
 use PPI::Test::pragmas;
-use Test::More tests => 17 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+use Test::More tests => 18 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use PPI ();
+use Helper 'safe_new';
 
 
 VARIABLES: {
 	# Test the things we assert to work in the synopsis
-	my $Document = PPI::Document->new(\<<'END_PERL');
+	my $Document = safe_new \<<'END_PERL';
 package Bar;
 my $foo = 1;
 my ( $foo, $bar) = (1, 2);
@@ -23,7 +24,6 @@ LABEL: my $foo = 1;
 # As well as those basics, lets also try some harder ones
 local($foo = $bar->$bar(), $bar);
 END_PERL
-	isa_ok( $Document, 'PPI::Document' );
 
 	# There should be 6 statement objects
 	my $ST = $Document->find('Statement::Variable');

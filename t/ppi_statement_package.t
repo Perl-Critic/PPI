@@ -4,14 +4,15 @@
 
 use lib 't/lib';
 use PPI::Test::pragmas;
-use Test::More tests => 2506 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+use Test::More tests => 2508 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use PPI ();
 use PPI::Singletons qw( %KEYWORDS );
+use Helper 'safe_new';
 
 
 HASH_CONSTRUCTORS_DONT_CONTAIN_PACKAGES_RT52259: {
-	my $Document = PPI::Document->new(\<<'END_PERL');
+	my $Document = safe_new \<<'END_PERL';
 {    package  => "", };
 +{   package  => "", };
 {   'package' => "", };
@@ -19,7 +20,6 @@ HASH_CONSTRUCTORS_DONT_CONTAIN_PACKAGES_RT52259: {
 {   'package' ,  "", };
 +{  'package' ,  "", };
 END_PERL
-	isa_ok( $Document, 'PPI::Document' );
 
 	my $packages = $Document->find('PPI::Statement::Package');
 	my $test_name = 'Found no package statements in hash constructors - RT #52259';
@@ -34,7 +34,7 @@ END_PERL
 
 INSIDE_SCOPE: {
 	# Create a document with various example package statements
-	my $Document = PPI::Document->new( \<<'END_PERL' );
+	my $Document = safe_new \<<'END_PERL';
 package Foo;
 SCOPE: {
 	package # comment
@@ -45,7 +45,6 @@ package Other v1.23;
 package Again 0.09;
 1;
 END_PERL
-	isa_ok( $Document, 'PPI::Document' );
 
 	# Check that both of the package statements are detected
 	my $packages = $Document->find('Statement::Package');
@@ -134,7 +133,7 @@ sub test_package_blocks {
 
 	subtest "'$code'", sub {
 
-	my $Document = PPI::Document->new( \"$code 999;" );
+	my $Document = safe_new \"$code 999;";
 	is(     $Document->schildren, 2, "correct number of statements in document" );
 	isa_ok( $Document->schild(0), 'PPI::Statement::Package', "entire code" );
 

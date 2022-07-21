@@ -4,9 +4,10 @@
 
 use lib 't/lib';
 use PPI::Test::pragmas;
-use Test::More tests => 9 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+use Test::More tests => 12 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use PPI ();
+use Helper 'safe_new';
 
 
 LITERAL: {
@@ -18,8 +19,7 @@ LITERAL: {
 	while ( @pairs ) {
 		my $from  = shift @pairs;
 		my $to    = shift @pairs;
-		my $doc   = PPI::Document->new( \"( $from => 1 );" );
-		isa_ok( $doc, 'PPI::Document' );
+		my $doc   = safe_new \"( $from => 1 );";
 		my $word = $doc->find_first('Token::DashedWord');
 		SKIP: {
 			skip( "PPI::Token::DashedWord is deactivated", 2 );

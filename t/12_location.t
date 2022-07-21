@@ -4,9 +4,10 @@
 
 use lib 't/lib';
 use PPI::Test::pragmas;
-use Test::More tests => 682 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+use Test::More tests => 683 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use PPI ();
+use Helper 'safe_new';
 
 
 my $test_source = <<'END_PERL';
@@ -352,8 +353,7 @@ my @test_locations = (
 # Test the locations of everything in the test code
 
 # Prepare
-my $Document = PPI::Document->new( \$test_source );
-isa_ok( $Document, 'PPI::Document' );
+my $Document = safe_new \$test_source;
 $Document->tab_width(4);
 is($Document->tab_width, 4, 'Tab width set correctly');
 ok( $Document->index_locations, '->index_locations returns true' );

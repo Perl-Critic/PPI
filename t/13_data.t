@@ -4,17 +4,17 @@
 
 use lib 't/lib';
 use PPI::Test::pragmas;
-use Test::More tests => 7 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+use Test::More tests => 8 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use File::Spec::Functions qw( catfile );
 use PPI ();
+use Helper 'safe_new';
 
 
 my $module = catfile('t', 'data', '13_data', 'Foo.pm');
 ok( -f $module, 'Test file exists' );
 
-my $Document = PPI::Document->new( $module );
-isa_ok( $Document, 'PPI::Document' );
+my $Document = safe_new $module;
 
 # Get the data token
 my $Token = $Document->find_first( 'Token::Data' );

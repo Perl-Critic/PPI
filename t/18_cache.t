@@ -4,7 +4,7 @@
 
 use lib 't/lib';
 use PPI::Test::pragmas;
-use Test::More tests => 40 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+use Test::More tests => 44 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use File::Spec::Functions qw( catfile );
 use File::Temp qw( tempdir );
@@ -15,6 +15,8 @@ use Test::SubCalls 1.07 ();
 
 use constant VMS  => !! ( $^O eq 'VMS' );
 use constant FILE => VMS ? 'File::Spec::Unix' : 'File::Spec';
+
+use Helper 'safe_new';
 
 my $this_file  = FILE->catdir( 't', 'data', '03_document', 'test.dat' );
 my $cache_dir  = tempdir(CLEANUP => 1);
@@ -39,8 +41,7 @@ is( scalar($Cache->path), $cache_dir, '->path returns the original path'    );
 is( scalar($Cache->readonly), '',      '->readonly returns false by default' );
 
 # Create a test document
-my $doc = PPI::Document->new( $sample_document );
-isa_ok( $doc, 'PPI::Document' );
+my $doc = safe_new $sample_document;
 my $doc_md5  = '64568092e7faba16d99fa04706c46517';
 is( $doc->hex_id, $doc_md5, '->hex_id specifically matches the UNIX newline md5' );
 my $doc_file = catfile($cache_dir, '6', '64', '64568092e7faba16d99fa04706c46517.ppi');
@@ -99,10 +100,8 @@ SCOPE: {
 	# Set the tracking on the Tokenizer constructor
 	ok( Test::SubCalls::sub_track( 'PPI::Tokenizer::new' ), 'Tracking calls to PPI::Tokenizer::new' );
 	Test::SubCalls::sub_calls( 'PPI::Tokenizer::new', 0 );
-	my $doc1 = PPI::Document->new( $this_file );
-	my $doc2 = PPI::Document->new( $this_file );
-	isa_ok( $doc1, 'PPI::Document' );
-	isa_ok( $doc2, 'PPI::Document' );
+	my $doc1 = safe_new $this_file;
+	my $doc2 = safe_new $this_file;
 
 	unless ( $doc1 and $doc2 ) {
 		skip( "Skipping due to previous failures", 3 );
@@ -128,8 +127,7 @@ SCOPE: {
 
 	# Does it still keep the previously cached documents
 	Test::SubCalls::sub_reset( 'PPI::Tokenizer::new' );
-	my $doc3 = PPI::Document->new( $this_file );
-	isa_ok( $doc3, 'PPI::Document' );
+	my $doc3 = safe_new $this_file;
 	Test::SubCalls::sub_calls( 'PPI::Tokenizer::new', 0,
 		'Tokenizer was not created. Previous cache used ok' );
 }

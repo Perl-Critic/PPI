@@ -4,9 +4,10 @@
 
 use lib 't/lib';
 use PPI::Test::pragmas;
-use Test::More tests => 240 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+use Test::More tests => 280 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use PPI ();
+use Helper 'safe_new';
 
 
 SUB_WORD_OPTIONAL: {
@@ -27,8 +28,7 @@ sub test_sub_as {
 	my ( $sub, $name, $followed_by ) = @_;
 
 	my $code     = "$sub$name$followed_by";
-	my $Document = PPI::Document->new( \$code );
-	isa_ok( $Document, 'PPI::Document', "$code: got document" );
+	my $Document = safe_new \$code;
 
 	my ( $sub_statement, $dummy ) = $Document->schildren;
 	isa_ok( $sub_statement, 'PPI::Statement::Scheduled', "$code: document child is a scheduled statement" );

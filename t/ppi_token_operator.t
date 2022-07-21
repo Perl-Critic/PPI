@@ -4,15 +4,15 @@
 
 use lib 't/lib';
 use PPI::Test::pragmas;
-use Test::More tests => 1179 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+use Test::More tests => 3009 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use PPI ();
 use PPI::Singletons qw( %KEYWORDS %OPERATOR );
+use Helper 'safe_new';
 
 FIND_ONE_OP: {
 	my $source = '$a = .987;';
-	my $doc = PPI::Document->new( \$source );
-	isa_ok( $doc, 'PPI::Document', "parsed '$source'" );
+	my $doc = safe_new \$source;
 	my $ops = $doc->find( 'Token::Number::Float' );
 	is( ref $ops, 'ARRAY', "found number" );
 	is( @$ops, 1, "number found exactly once" );
@@ -27,8 +27,7 @@ FIND_ONE_OP: {
 PARSE_ALL_OPERATORS: {
 	foreach my $op ( sort keys %OPERATOR ) {
 		my $source = $op eq '<>' || $op eq '<<>>' ? $op . ';' : "\$foo $op 2;";
-		my $doc = PPI::Document->new( \$source );
-		isa_ok( $doc, 'PPI::Document', "operator $op parsed '$source'" );
+		my $doc = safe_new \$source;
 		my $ops = $doc->find( $op eq '<<>>' || $op eq '<>'
 			? 'Token::QuoteLike::Readline' : 'Token::Operator' );
 		is( ref $ops, 'ARRAY', "operator $op found operators" );
@@ -582,7 +581,7 @@ OPERATOR_X: {
 	}
 
 	foreach my $test ( @tests ) {
-		my $d = PPI::Document->new( \$test->{code} );
+		my $d = safe_new \$test->{code};
 		my $tokens = $d->find( sub { 1; } );
 		$tokens = [ map { ref($_), $_->content() } @$tokens ];
 		my $expected = $test->{expected};
@@ -674,7 +673,7 @@ OPERATOR_FAT_COMMA: {
 	for my $test ( @tests ) {
 		my $code = $test->{code};
 
-		my $d = PPI::Document->new( \$test->{code} );
+		my $d = safe_new \$test->{code};
 		my $tokens = $d->find( sub { 1; } );
 		$tokens = [ map { ref($_), $_->content() } @$tokens ];
 		my $expected = $test->{expected};
@@ -701,8 +700,7 @@ OPERATORS_PLUS_MINUS: {
         for ( my $i = 0; $i < @operands; $i += 2 ) {
             my ( $a, $b ) = @operands[ $i, $i + 1 ];
             my $code = "${a}${op}${b}";
-            my $doc  = PPI::Document->new( \$code );
-            isa_ok( $doc, 'PPI::Document', "parsed '$code'" );
+            my $doc  = safe_new \$code;
             my $ops = $doc->find('Token::Operator');
             is( ref $ops, 'ARRAY', "found operator $op" );
             is( @$ops, 1, "operator $op found exactly once" );
@@ -715,8 +713,7 @@ OPERATORS_PLUS_MINUS: {
         my ( $a, $b ) = ( '(1)', '2' );
         my $op = '+';
         my $code = "${a}${op}${b}";
-        my $doc  = PPI::Document->new( \$code );
-        isa_ok( $doc, 'PPI::Document', "parsed '$code'" );
+        my $doc  = safe_new \$code;
         my $ops = $doc->find('Token::Operator');
         is( ref $ops, 'ARRAY', "found operator $op" );
     }
@@ -725,8 +722,7 @@ OPERATORS_PLUS_MINUS: {
         my ( $a, $b ) = ( '(1)', '2' );
         my $op = '-';
         my $code = "${a}${op}${b}";
-        my $doc  = PPI::Document->new( \$code );
-        isa_ok( $doc, 'PPI::Document', "parsed '$code'" );
+        my $doc  = safe_new \$code;
         my $ops = $doc->find('Token::Operator');
         local $TODO = "(1)-2 not parsed correctly";
         is( ref $ops, 'ARRAY', "found operator $op" );

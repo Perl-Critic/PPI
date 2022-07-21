@@ -4,13 +4,14 @@
 
 use lib 't/lib';
 use PPI::Test::pragmas;
-use Test::More tests => 38 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+use Test::More tests => 39 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use PPI ();
+use Helper 'safe_new';
 
 
 __TOKENIZER_ON_CHAR: {
-	my $document = PPI::Document->new(\<<'END_PERL');
+	my $document = safe_new \<<'END_PERL';
 $[;                     # Magic  $[
 $$;                     # Magic  $$
 %-;                     # Magic  %-
@@ -30,8 +31,6 @@ $0x2;                   # Magic  $0  -- program being executed
 $10;                    # Magic  $10 -- capture variable
 $1100;                  # Magic  $1100 -- capture variable
 END_PERL
-
-	isa_ok( $document, 'PPI::Document' );
 
 	$document->index_locations();
 

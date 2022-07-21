@@ -9,6 +9,9 @@ use warnings;
 use PPI::Document ();
 use Test::More;
 
+use lib 't/lib';
+use Helper 'safe_new';
+
 my $sigs = <<'EOF';
 use strict;
 use warnings;
@@ -47,7 +50,7 @@ sub default ( $default = foo() ) { }
 
 EOF
 
-my $doc = PPI::Document->new( \$sigs );
+my $doc = safe_new \$sigs;
 $doc->serialize;
 is( $doc->content, $sigs, 'whitespace in signatures is preserved' );
 

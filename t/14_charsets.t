@@ -8,17 +8,18 @@ BEGIN {
 		Test::More->import( skip_all => "Unicode support requires perl 5.8.7" );
 		exit(0);
 	}
-	plan( tests => 16 + ($ENV{AUTHOR_TESTING} ? 1 : 0) );
+	plan( tests => 44 + ($ENV{AUTHOR_TESTING} ? 1 : 0) );
 }
 
 use utf8;  # perl version check above says this is okay
 use Params::Util qw( _INSTANCE );
 use PPI ();
+use Helper 'safe_new';
 
 sub good_ok {
 	my $source  = shift;
 	my $message = shift;
-	my $doc = PPI::Document->new( \$source );
+	my $doc = safe_new \$source;
 	ok( _INSTANCE($doc, 'PPI::Document'), $message );
 	if ( ! _INSTANCE($doc, 'PPI::Document') ) {
 		diag($PPI::Document::errstr);
@@ -73,7 +74,6 @@ END_CODE
 	use Encode ();
 	my $bytes = Encode::encode('utf8', 'use utf8; my %h = ( κλειδί => "Clé" );');
 	ok(!utf8::is_utf8($bytes), "utf8 flag not set on byte string");
-
 	{
 	    local $TODO = "Fix CRASH";
 	    good_ok( $bytes, "Hash with greek key in bytes string"          );

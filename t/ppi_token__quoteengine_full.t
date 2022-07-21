@@ -4,9 +4,10 @@
 
 use lib 't/lib';
 use PPI::Test::pragmas;
-use Test::More tests => 93 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+use Test::More tests => 123 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use PPI ();
+use Helper 'safe_new';
 
 
 NEW: {
@@ -33,7 +34,7 @@ QW: {
 	my @braced = ( qw{ 1 1 0 0 0 } );
 	my $i      = 0;
 	for my $q ('qw()', 'qw<>', 'qw//', 'qw##', 'qw,,') {
-		my $d = PPI::Document->new(\$q);
+		my $d = safe_new \$q;
 		my $o = $d->{children}->[0]->{children}->[0];
 		my $s = $o->{sections}->[0];
 		is( $o->{operator},  'qw',      "$q correct operator"  );
@@ -58,7 +59,7 @@ QW2: {
 	while ( @stuff ) {
 		my $opener = shift @stuff;
 		my $closer = shift @stuff;
-		my $d = PPI::Document->new(\"qw${opener}a");
+		my $d = safe_new \"qw${opener}a";
 		my $o = $d->{children}->[0]->{children}->[0];
 		my $s = $o->{sections}->[0];
 		is( $o->{operator},  'qw',        "qw$opener correct operator"  );
@@ -84,7 +85,7 @@ OTHER: {
 							    [ '{}' ] ],
 	) {
 		my ( $code, $match, $subst, $mods, $delims ) = @{ $_ };
-		my $doc = PPI::Document->new( \$code );
+		my $doc = safe_new \$code;
 		$doc or warn "'$code' did not create a document";
 		my $obj = $doc->child( 0 )->child( 0 );
 		is( $obj->_section_content( 0 ), $match, "$code correct match" );

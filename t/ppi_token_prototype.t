@@ -4,9 +4,10 @@
 
 use lib 't/lib';
 use PPI::Test::pragmas;
-use Test::More tests => 800 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+use Test::More tests => 1008 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use PPI ();
+use Helper 'safe_new';
 
 
 PARSING: {
@@ -38,8 +39,7 @@ PARSING: {
 			) {
 				my ( $code_prototype, $expected_content, $expected_prototype ) = @$proto_and_expected;
 				my $code = "$name$code_prototype$block";
-				my $document = PPI::Document->new( \$code );
-				isa_ok( $document, 'PPI::Document', $code );
+				my $document = safe_new \$code;
 
 				my $all_prototypes = $document->find( 'PPI::Token::Prototype' );
 				if ( $code_prototype eq '' ) {

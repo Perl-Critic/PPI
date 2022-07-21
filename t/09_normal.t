@@ -5,10 +5,11 @@
 
 use lib 't/lib';
 use PPI::Test::pragmas;
-use Test::More tests => 17 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+use Test::More tests => 21 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use PPI ();
 use PPI::Singletons qw( %LAYER );
+use Helper 'safe_new';
 
 
 
@@ -18,8 +19,7 @@ use PPI::Singletons qw( %LAYER );
 # Creation and Manipulation
 
 SCOPE: {
-	my $Document = PPI::Document->new(\'my $foo = bar();');
-	isa_ok( $Document, 'PPI::Document' );
+	my $Document = safe_new \'my $foo = bar();';
 
 	my $Normal = $Document->normalized;
 	isa_ok( $Normal, 'PPI::Document::Normalized' );
@@ -37,12 +37,9 @@ SCOPE: {
 # Basic empiric testing
 SCOPE: {
 	# The following should be equivalent
-	my $Document1 = PPI::Document->new( \'my $foo = 1; # comment' );
-	my $Document2 = PPI::Document->new( \'my  $foo=1 ;# different comment' );
-	my $Document3 = PPI::Document->new( \'sub foo { print "Hello World!\n"; }' );
-	isa_ok( $Document1, 'PPI::Document' );
-	isa_ok( $Document2, 'PPI::Document' );
-	isa_ok( $Document3, 'PPI::Document' );
+	my $Document1 = safe_new \'my $foo = 1; # comment';
+	my $Document2 = safe_new \'my  $foo=1 ;# different comment';
+	my $Document3 = safe_new \'sub foo { print "Hello World!\n"; }';
 	my $Normal1 = $Document1->normalized;
 	my $Normal2 = $Document2->normalized;
 	my $Normal3 = $Document3->normalized;

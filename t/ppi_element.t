@@ -4,14 +4,14 @@
 
 use lib 't/lib';
 use PPI::Test::pragmas;
-use Test::More tests => 57 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+use Test::More tests => 68 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use PPI ();
+use Helper 'safe_new';
 
 
 __INSERT_AFTER: {
-	my $Document = PPI::Document->new( \"print 'Hello World';" );
-	isa_ok( $Document, 'PPI::Document' );
+	my $Document = safe_new \"print 'Hello World';";
 	my $string = $Document->find_first('Token::Quote');
 	isa_ok( $string, 'PPI::Token::Quote' );
 	is( $string->content, "'Hello World'", 'Got expected token' );
@@ -25,8 +25,7 @@ __INSERT_AFTER: {
 
 
 __INSERT_BEFORE: {
-	my $Document = PPI::Document->new( \"print 'Hello World';" );
-	isa_ok( $Document, 'PPI::Document' );
+	my $Document = safe_new \"print 'Hello World';";
 	my $semi = $Document->find_first('Token::Structure');
 	isa_ok( $semi, 'PPI::Token::Structure' );
 	is( $semi->content, ';', 'Got expected token' );
@@ -40,8 +39,7 @@ __INSERT_BEFORE: {
 
 
 ANCESTOR_OF: {
-	my $Document = PPI::Document->new( \'( [ thingy ] ); $blarg = 1' );
-	isa_ok( $Document, 'PPI::Document' );
+	my $Document = safe_new \'( [ thingy ] ); $blarg = 1';
 	ok(
 		$Document->ancestor_of($Document),
 		'Document is an ancestor of itself.',
@@ -78,13 +76,11 @@ ANCESTOR_OF: {
 
 
 COLUMN_NUMBER: {
-	my $document = PPI::Document->new(\<<'END_PERL');
+	my $document = safe_new \<<'END_PERL';
 
 
    foo
 END_PERL
-
-	isa_ok( $document, 'PPI::Document' );
 	my $words = $document->find('PPI::Token::Word');
 	is( scalar @{$words}, 1, 'Found expected word token.' );
 	is( $words->[0]->column_number, 4, 'Got correct column number.' );
@@ -92,8 +88,7 @@ END_PERL
 
 
 DESCENDANT_OF: {
-	my $Document = PPI::Document->new( \'( [ thingy ] ); $blarg = 1' );
-	isa_ok( $Document, 'PPI::Document' );
+	my $Document = safe_new \'( [ thingy ] ); $blarg = 1';
 	ok(
 		$Document->descendant_of($Document),
 		'Document is a descendant of itself.',
@@ -130,8 +125,7 @@ DESCENDANT_OF: {
 
 
 INSERT_AFTER: {
-	my $Document = PPI::Document->new( \"print 'Hello World';" );
-	isa_ok( $Document, 'PPI::Document' );
+	my $Document = safe_new \"print 'Hello World';";
 	my $string = $Document->find_first('Token::Quote');
 	isa_ok( $string, 'PPI::Token::Quote' );
 	is( $string->content, "'Hello World'", 'Got expected token' );
@@ -145,8 +139,7 @@ INSERT_AFTER: {
 
 
 INSERT_BEFORE: {
-	my $Document = PPI::Document->new( \"print 'Hello World';" );
-	isa_ok( $Document, 'PPI::Document' );
+	my $Document = safe_new \"print 'Hello World';";
 	my $semi = $Document->find_first('Token::Structure');
 	isa_ok( $semi, 'PPI::Token::Structure' );
 	is( $semi->content, ';', 'Got expected token' );
@@ -160,13 +153,11 @@ INSERT_BEFORE: {
 
 
 LINE_NUMBER: {
-	my $document = PPI::Document->new(\<<'END_PERL');
+	my $document = safe_new \<<'END_PERL';
 
 
    foo
 END_PERL
-
-	isa_ok( $document, 'PPI::Document' );
 	my $words = $document->find('PPI::Token::Word');
 	is( scalar @{$words}, 1, 'Found expected word token.' );
 	is( $words->[0]->line_number, 3, 'Got correct line number.' );
@@ -176,14 +167,12 @@ END_PERL
 LOGICAL_FILENAME: {
 	# Double quoted so that we don't really have a "#line" at the beginning and
 	# errors in this file itself aren't affected by this.
-	my $document = PPI::Document->new(\<<"END_PERL");
+	my $document = safe_new \<<"END_PERL";
 
 
 \#line 1 test-file
    foo
 END_PERL
-
-	isa_ok( $document, 'PPI::Document' );
 	my $words = $document->find('PPI::Token::Word');
 	is( scalar @{$words}, 1, 'Found expected word token.' );
 	is(
@@ -197,14 +186,12 @@ END_PERL
 LOGICAL_LINE_NUMBER: {
 	# Double quoted so that we don't really have a "#line" at the beginning and
 	# errors in this file itself aren't affected by this.
-	my $document = PPI::Document->new(\<<"END_PERL");
+	my $document = safe_new \<<"END_PERL";
 
 
 \#line 1 test-file
    foo
 END_PERL
-
-	isa_ok( $document, 'PPI::Document' );
 	my $words = $document->find('PPI::Token::Word');
 	is( scalar @{$words}, 1, 'Found expected word token.' );
 	is( $words->[0]->logical_line_number, 1, 'Got correct logical line number.' );
@@ -212,13 +199,11 @@ END_PERL
 
 
 VISUAL_COLUMN_NUMBER: {
-	my $document = PPI::Document->new(\<<"END_PERL");
+	my $document = safe_new \<<"END_PERL";
 
 
 \t foo
 END_PERL
-
-	isa_ok( $document, 'PPI::Document' );
 	my $tab_width = 5;
 	$document->tab_width($tab_width);  # don't use a "usual" value.
 	my $words = $document->find('PPI::Token::Word');
