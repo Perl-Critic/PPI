@@ -7,7 +7,7 @@ use PPI::Test::pragmas;
 use Helper qw( check_with );
 
 use PPI ();
-use Test::More tests => 1762 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+use Test::More tests => 1776 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 LITERAL: {
 	my @pairs = (

@@ -7,12 +7,13 @@
 
 use lib 't/lib';
 use PPI::Test::pragmas;
-use Test::More tests => 220 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+use Test::More tests => 221 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use PPI ();
 use PPI::Singletons qw( %_PARENT );
 use PPI::Test qw( pause );
 use Scalar::Util qw( refaddr );
+use Helper 'safe_new';
 
 my $RE_IDENTIFIER = qr/[^\W\d]\w*/;
 
@@ -439,8 +440,7 @@ SCOPE: {
 	my $k2;
 	my $k3;
 	SCOPE: {
-		my $NodeDocument = PPI::Document->new( $INC{"PPI/Node.pm"} );
-		isa_ok( $NodeDocument, 'PPI::Document' );
+		my $NodeDocument = safe_new $INC{"PPI/Node.pm"};
 		$k2 = scalar keys %_PARENT;
 		ok( $k2 > ($k1 + 3000), 'PARENT keys increases after loading document' );
 		$NodeDocument->DESTROY;

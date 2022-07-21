@@ -6,7 +6,7 @@ use lib 't/lib';
 use PPI::Test::pragmas;
 
 # Execute the tests
-use Test::More tests => 7 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+use Test::More tests => 11 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use lib 't/lib';
 use Helper qw( check_with );
