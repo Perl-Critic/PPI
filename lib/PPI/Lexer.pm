@@ -209,11 +209,13 @@ sub lex_tokenizer {
 
 	# Create the empty document
 	my $Document = PPI::Document->new;
+	$Tokenizer->_document($Document);
 
 	# Lex the token stream into the document
 	$self->{Tokenizer} = $Tokenizer;
 	if ( !eval { $self->_lex_document($Document); 1 } ) {
 		# If an error occurs DESTROY the partially built document.
+		$Tokenizer->_document(undef);
 		undef $Document;
 		if ( _INSTANCE($@, 'PPI::Exception') ) {
 			return $self->_error( $@->message );

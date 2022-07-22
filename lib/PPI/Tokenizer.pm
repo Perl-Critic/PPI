@@ -159,6 +159,7 @@ sub new {
 		# Source code
 		source       => undef,
 		source_bytes => undef,
+		document     => undef,
 
 		# Line buffer
 		line         => undef,
@@ -246,6 +247,11 @@ sub new {
 	}
 
 	$self;
+}
+
+sub _document {
+	my $self = shift;
+	return @_ ? $self->{document} = shift : $self->{document};
 }
 
 
