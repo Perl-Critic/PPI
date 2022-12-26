@@ -270,7 +270,7 @@ sub feature_mods {
 		  if version::->parse($perl_version) >= 5.035;
 	}
 
-	my %known     = ( signatures => 1 );
+	my %known     = ( signatures => 1, try => 1 );
 	my $on_or_off = $self->type eq "use";
 
 	if ( $self->module eq "feature" ) {
@@ -287,6 +287,9 @@ sub feature_mods {
 	elsif ( $self->module eq "Modern::Perl" ) {
 		my $v = $self->module_version->$_call_if_object("literal") || 0;
 		return { signatures => $v >= 2023 ? "perl" : 0 };
+	}
+	elsif ( $self->module eq "Syntax::Keyword::Try" ) {
+		return { try => $on_or_off ? "Syntax::Keyword::Try" : 0 };
 	}
 
 	return;

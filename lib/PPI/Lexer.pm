@@ -440,7 +440,12 @@ sub _statement {
 	my $is_lexsub = 0;
 
 	# Is it a token in our known classes list
-	my $class = $STATEMENT_CLASSES{$Token->content};
+	my $class = {
+		%STATEMENT_CLASSES,
+		( try => 'PPI::Statement::Compound' ) x
+		  !!( $Parent->schild(-1) || $Parent )->presumed_features->{try},
+	}->{ $Token->content };
+
 	if ( $class ) {
 		# Is the next significant token a =>
 		# Read ahead to the next significant token
@@ -903,6 +908,22 @@ sub _continues {
 		# LABEL BLOCK continue ...
 		# Only a block will do
 		return $Token->isa('PPI::Token::Structure') && $Token->content eq '{';
+	}
+
+	if ( $type eq 'try' and $LastChild->presumed_features->{try} ) {
+		return 1 if not $LastChild->isa('PPI::Structure::Block');
+
+		my $NextLast = $Statement->schild(-2);
+		return ''
+		  if $NextLast
+		  and $NextLast->isa('PPI::Token')
+		  and $NextLast->isa('PPI::Token::Word')
+		  and $NextLast->content eq 'catch';
+
+		return 1    #
+		  if $Token->isa('PPI::Token::Word') and $Token->content eq 'catch';
+
+		return '';
 	}
 
 	# Handle the common continuable block case
