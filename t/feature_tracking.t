@@ -2,7 +2,7 @@
 
 use lib 't/lib';
 use PPI::Test::pragmas;
-use Test::More tests => 6 + ( $ENV{AUTHOR_TESTING} ? 1 : 0 );
+use Test::More tests => 9 + ( $ENV{AUTHOR_TESTING} ? 1 : 0 );
 
 use B 'perlstring';
 
@@ -128,6 +128,78 @@ END_PERL
 		'PPI::Token::Structure',      '}',
 	  ],
 	  "disabling of features";
+}
+
+PROTOTYPE_ATTR: {
+	test_document
+	  <<'END_PERL',
+		sub meep :prototype($) {}
+END_PERL
+	  [
+		'PPI::Statement::Sub'   => 'sub meep :prototype($) {}',
+		'PPI::Token::Word'      => 'sub',
+		'PPI::Token::Word'      => 'meep',
+		'PPI::Token::Operator'  => ':',
+		'PPI::Token::Attribute' => 'prototype($)',
+		'PPI::Structure::Block' => '{}',
+		'PPI::Token::Structure' => '{',
+		'PPI::Token::Structure' => '}',
+	  ],
+	  "prototype attribute";
+}
+
+SYNTAX_KEYWORD_TRY: {
+	test_document
+	  <<'END_PERL',
+		use Syntax::Keyword::Try;
+		try{}catch{}
+END_PERL
+	  [
+		'PPI::Statement::Include'  => 'use Syntax::Keyword::Try;',
+		'PPI::Token::Word'         => 'use',
+		'PPI::Token::Word'         => 'Syntax::Keyword::Try',
+		'PPI::Token::Structure'    => ';',
+		'PPI::Statement::Compound' => 'try{}catch{}',
+		'PPI::Token::Word'         => 'try',
+		'PPI::Structure::Block'    => '{}',
+		'PPI::Token::Structure'    => '{',
+		'PPI::Token::Structure'    => '}',
+		'PPI::Token::Word'         => 'catch',
+		'PPI::Structure::Block'    => '{}',
+		'PPI::Token::Structure'    => '{',
+		'PPI::Token::Structure'    => '}',
+	  ],
+	  "Syntax::Keyword::Try";
+}
+
+CORE_TRY: {
+	test_document
+	  <<'END_PERL',
+		use feature "try";
+		try{}catch($e){}
+END_PERL
+	  [
+		'PPI::Statement::Include',    'use feature "try";',
+		'PPI::Token::Word',           'use',
+		'PPI::Token::Word',           'feature',
+		'PPI::Token::Quote::Double',  '"try"',
+		'PPI::Token::Structure',      ';',
+		'PPI::Statement::Compound',   'try{}catch($e){}',
+		'PPI::Token::Word',           'try',
+		'PPI::Structure::Block',      '{}',
+		'PPI::Token::Structure',      '{',
+		'PPI::Token::Structure',      '}',
+		'PPI::Token::Word',           'catch',
+		'PPI::Structure::List',       '($e)',
+		'PPI::Token::Structure',      '(',
+		'PPI::Statement::Expression', '$e',
+		'PPI::Token::Symbol',         '$e',
+		'PPI::Token::Structure',      ')',
+		'PPI::Structure::Block',      '{}',
+		'PPI::Token::Structure',      '{',
+		'PPI::Token::Structure',      '}',
+	  ],
+	  "core try";
 }
 
 CPAN_MOJOLICIOUS_LITE: {
