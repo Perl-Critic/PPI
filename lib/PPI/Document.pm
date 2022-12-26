@@ -145,6 +145,32 @@ Setting feature_mods with a hashref allows defining perl parsing features to be
 enabled for the whole document. (e.g. when the code is assumed to be run as a
 oneliner)
 
+=head3 custom_feature_includes
+
+  custom_feature_includes =>
+    { strEct => { signatures => "Syntax::Keyword::Try" } }
+
+Setting custom_feature_includes with a hashref allows defining include names
+which act like pragmas that enable parsing features within their scope.
+
+This is mostly useful when your work project has its own boilerplate module.
+
+=head3 custom_feature_include_cb
+
+  custom_feature_include_cb => sub {
+    my ($statement) = @_;
+    return $statement->module eq "strEct" ? { signatures => "perl" } : ();
+  },
+
+Setting custom_feature_include_cb with a code reference causes all inspections
+on includes to call that sub before doing any other inspections. The sub can
+decide to either return a hashref of features to be enabled or disabled, which
+will be used for the scope the include was called in, or undef to continue with
+the default inspections. The argument to the sub will be the
+L<PPI::Statement::Include> object.
+
+This can be useful when your work project has a complex boilerplate module.
+
 =cut
 
 sub new {
@@ -232,9 +258,11 @@ sub load {
 
 sub _setattr {
 	my ( $class, $document, %attr ) = @_;
-	$document->{readonly}     = !!$attr{readonly};
-	$document->{filename}     = $attr{filename};
-	$document->{feature_mods} = $attr{feature_mods};
+	$document->{readonly}                  = !!$attr{readonly};
+	$document->{filename}                  = $attr{filename};
+	$document->{feature_mods}              = $attr{feature_mods};
+	$document->{custom_feature_includes}   = $attr{custom_feature_includes};
+	$document->{custom_feature_include_cb} = $attr{custom_feature_include_cb};
 	return $document;
 }
 
@@ -358,6 +386,26 @@ sub feature_mods {
 	my $self = shift;
 	return $self->{feature_mods} unless @_;
 	$self->{feature_mods} = shift;
+}
+
+=head2 custom_feature_includes { module_name => { feature_name => $provider } }
+
+=cut
+
+sub custom_feature_includes {
+	my $self = shift;
+	return $self->{custom_feature_includes} unless @_;
+	$self->{custom_feature_includes} = shift;
+}
+
+=head2 custom_feature_include_cb sub { ... }
+
+=cut
+
+sub custom_feature_include_cb {
+	my $self = shift;
+	return $self->{custom_feature_include_cb} unless @_;
+	$self->{custom_feature_include_cb} = shift;
 }
 
 =pod
