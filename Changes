@@ -10,6 +10,8 @@ Revision history for Perl extension PPI
 	  - `use feature` in code
 	  - `use $Common::CPAN::Module` in code
 	  - PPI::Document->new( feature_mods => ... )
+	  - PPI::Document->new( custom_feature_includes => ... )
+	  - PPI::Document->new( custom_feature_include_cb => ... )
 	- Added ability to parse features:
 	  - signatures, as PPI::Structure::Signature
 	  - try catch, as PPI::Statement::Compound
