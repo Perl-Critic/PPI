@@ -573,8 +573,8 @@ sub _process_next_char {
 		return undef;
 	}
 
-	# Increment the counter and check for end of line
-	return 0 if ++$self->{line_cursor} >= $self->{line_length};
+    $self->{line_cursor}++;
+    return 0 if $self->_at_line_end;
 
 	# Pass control to the token class
 	my $result;
@@ -612,6 +612,11 @@ sub _process_next_char {
 	}
 
 	1;
+}
+
+sub _at_line_end {
+    my ($self) = @_;
+    return $self->{line_cursor} >= $self->{line_length};
 }
 
 
