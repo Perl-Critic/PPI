@@ -1,6 +1,9 @@
 Revision history for Perl extension PPI
 
 {{$NEXT}}
+	Summary:
+	- Parse prototypes as literal quotes, enables parens and newlines in protos
+
 	Details:
 	- Wrapped most Document->new calls in tests with automatic checks
 

@@ -47,8 +47,9 @@ our @ISA = qw{
 sub string {
 	my $self     = shift;
 	my @sections = $self->_sections;
-	my $str      = $sections[0];
-	substr( $self->{content}, $str->{position}, $str->{size} );	
+	return unless    #
+	  my $str = $sections[0];
+	substr( $self->{content}, $str->{position}, $str->{size} );
 }
 
 
