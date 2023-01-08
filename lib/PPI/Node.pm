@@ -517,7 +517,7 @@ sub remove_child {
 
 	# Splice it out, and remove the child's parent entry
 	splice( @{$self->{children}}, $p, 1 );
-	delete $_PARENT{refaddr $child};
+	delete $_PARENT{$key};
 
 	$child;
 }
