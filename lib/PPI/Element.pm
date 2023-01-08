@@ -256,8 +256,8 @@ immediately after the current one, or false if there is no next sibling.
 
 sub next_sibling {
 	my $self     = shift;
-	my $parent   = $_PARENT{refaddr $self} or return '';
 	my $key      = refaddr $self;
+	my $parent   = $_PARENT{$key} or return '';
 	my $elements = $parent->{children};
 	my $position = List::Util::first {
 		refaddr $elements->[$_] == $key
@@ -279,8 +279,8 @@ sibling.
 
 sub snext_sibling {
 	my $self     = shift;
-	my $parent   = $_PARENT{refaddr $self} or return '';
 	my $key      = refaddr $self;
+	my $parent   = $_PARENT{$key} or return '';
 	my $elements = $parent->{children};
 	my $position = List::Util::first {
 		refaddr $elements->[$_] == $key
@@ -304,8 +304,8 @@ C<PPI::Element> object.
 
 sub previous_sibling {
 	my $self     = shift;
-	my $parent   = $_PARENT{refaddr $self} or return '';
 	my $key      = refaddr $self;
+	my $parent   = $_PARENT{$key} or return '';
 	my $elements = $parent->{children};
 	my $position = List::Util::first {
 		refaddr $elements->[$_] == $key
@@ -327,8 +327,8 @@ sibling.
 
 sub sprevious_sibling {
 	my $self     = shift;
-	my $parent   = $_PARENT{refaddr $self} or return '';
 	my $key      = refaddr $self;
+	my $parent   = $_PARENT{$key} or return '';
 	my $elements = $parent->{children};
 	my $position = List::Util::first {
 		refaddr $elements->[$_] == $key
