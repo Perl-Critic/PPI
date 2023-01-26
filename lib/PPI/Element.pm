@@ -25,10 +25,9 @@ use strict;
 use Clone 0.30      ();
 use Scalar::Util    qw{refaddr};
 use Params::Util    qw{_INSTANCE _ARRAY};
-use List::Util      ();
 use PPI::Util       ();
 use PPI::Node       ();
-use PPI::Singletons '%_PARENT';
+use PPI::Singletons '%_PARENT', '%_POSITION_CACHE';
 
 our $VERSION = '1.279';
 
@@ -259,9 +258,7 @@ sub next_sibling {
 	my $key      = refaddr $self;
 	my $parent   = $_PARENT{$key} or return '';
 	my $elements = $parent->{children};
-	my $position = List::Util::first {
-		refaddr $elements->[$_] == $key
-		} 0..$#$elements;
+	my $position = $parent->__position($self);
 	$elements->[$position + 1] || '';
 }
 
@@ -282,9 +279,7 @@ sub snext_sibling {
 	my $key      = refaddr $self;
 	my $parent   = $_PARENT{$key} or return '';
 	my $elements = $parent->{children};
-	my $position = List::Util::first {
-		refaddr $elements->[$_] == $key
-		} 0..$#$elements;
+	my $position = $parent->__position($self);
 	while ( defined(my $it = $elements->[++$position]) ) {
 		return $it if $it->significant;
 	}
@@ -307,9 +302,7 @@ sub previous_sibling {
 	my $key      = refaddr $self;
 	my $parent   = $_PARENT{$key} or return '';
 	my $elements = $parent->{children};
-	my $position = List::Util::first {
-		refaddr $elements->[$_] == $key
-		} 0..$#$elements;
+	my $position = $parent->__position($self);
 	$position and $elements->[$position - 1] or '';
 }
 
@@ -330,9 +323,7 @@ sub sprevious_sibling {
 	my $key      = refaddr $self;
 	my $parent   = $_PARENT{$key} or return '';
 	my $elements = $parent->{children};
-	my $position = List::Util::first {
-		refaddr $elements->[$_] == $key
-		} 0..$#$elements;
+	my $position = $parent->__position($self);
 	while ( $position-- and defined(my $it = $elements->[$position]) ) {
 		return $it if $it->significant;
 	}
@@ -844,8 +835,10 @@ sub _clear {
 # ->delete means our reference count has probably fallen to zero.
 # Therefore we don't need to remove ourselves from our parent,
 # just the index ( just in case ).
-### XS -> PPI/XS.xs:_PPI_Element__DESTROY 0.900+
-sub DESTROY { delete $_PARENT{refaddr $_[0]} }
+sub DESTROY {
+  delete $_PARENT{refaddr $_[0]};
+  delete $_POSITION_CACHE{refaddr $_[0]};
+}
 
 # Operator overloads
 sub __equals  { ref $_[1] and refaddr($_[0]) == refaddr($_[1]) }

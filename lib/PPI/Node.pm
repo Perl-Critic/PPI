@@ -51,10 +51,9 @@ L<PPI::Element> objects also apply to C<PPI::Node> objects.
 use strict;
 use Carp            ();
 use Scalar::Util    qw{refaddr};
-use List::Util      ();
 use Params::Util    qw{_INSTANCE _CLASS _CODELIKE _NUMBER};
 use PPI::Element    ();
-use PPI::Singletons '%_PARENT';
+use PPI::Singletons '%_PARENT', '%_POSITION_CACHE';
 
 our $VERSION = '1.279';
 
@@ -510,9 +509,7 @@ sub remove_child {
 
 	# Find the position of the child
 	my $key = refaddr $child;
-	my $p   = List::Util::first {
-		refaddr $self->{children}[$_] == $key
-	} 0..$#{$self->{children}};
+	my $p   = $self->__position($child);
 	return undef unless defined $p;
 
 	# Splice it out, and remove the child's parent entry
@@ -702,23 +699,33 @@ sub DESTROY {
 		}
 	}
 
-	# Remove us from our parent node as normal
-	delete $_PARENT{refaddr $_[0]};
+	$_[0]->SUPER::DESTROY;
 }
 
-# Find the position of a child
 sub __position {
-	my $key = refaddr $_[1];
-	List::Util::first { refaddr $_[0]{children}[$_] == $key } 0..$#{$_[0]{children}};
+	my ( $self, $child ) = @_;
+	my $key = refaddr $child;
+
+	return undef unless #
+		my $elements = $self->{children};
+
+	if (defined (my $position = $_POSITION_CACHE{$key})) {
+		my $maybe_child = $elements->[$position];
+		return $position if defined $maybe_child and refaddr $maybe_child == $key;
+	}
+
+	delete $_POSITION_CACHE{$key};
+
+	$_POSITION_CACHE{refaddr $elements->[$_]} = $_ for 0 .. $#{$elements};
+
+	return $_POSITION_CACHE{$key};
 }
 
 # Insert one or more elements before a child
 sub __insert_before_child {
 	my ( $self, $child, @insertions ) = @_;
 	my $key  = refaddr $child;
-	my $p    = List::Util::first {
-	         refaddr $self->{children}[$_] == $key
-	         } 0..$#{$self->{children}};
+	my $p    = $self->__position($child);
 	foreach ( @insertions ) {
 		Scalar::Util::weaken(
 			$_PARENT{refaddr $_} = $self
@@ -732,9 +739,7 @@ sub __insert_before_child {
 sub __insert_after_child {
 	my ( $self, $child, @insertions ) = @_;
 	my $key  = refaddr $child;
-	my $p    = List::Util::first {
-	         refaddr $self->{children}[$_] == $key
-	         } 0..$#{$self->{children}};
+	my $p    = $self->__position($child);
 	foreach ( @insertions ) {
 		Scalar::Util::weaken(
 			$_PARENT{refaddr $_} = $self
@@ -750,9 +755,7 @@ sub __replace_child {
 	my $old_child_addr  = refaddr $old_child;
 
 	# Cache parent of new children
-	my $old_child_index = List::Util::first {
-	         refaddr $self->{children}[$_] == $old_child_addr
-	         } 0..$#{$self->{children}};
+	my $old_child_index = $self->__position($old_child);
 
 	return undef if !defined $old_child_index;
 
