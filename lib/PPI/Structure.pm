@@ -99,6 +99,7 @@ our $VERSION = '1.280';
 
 our @ISA = "PPI::Node";
 
+use PPI::Structure::AnonSub     ();
 use PPI::Structure::Block       ();
 use PPI::Structure::Condition   ();
 use PPI::Structure::Constructor ();

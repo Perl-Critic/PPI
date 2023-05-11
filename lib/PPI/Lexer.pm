@@ -514,6 +514,7 @@ sub _statement {
 	return $class if $class;
 
 	# Handle the more in-depth sub detection
+	$DB::single = $DB::single = 1;
 	if ( $is_lexsub || $Token->content eq 'sub' ) {
 		# Read ahead to the next significant token
 		my $Next;
@@ -533,6 +534,10 @@ sub _statement {
 			if ( $Next->isa('PPI::Token::Word') ) {
 				$self->_rollback( $Next );
 				return 'PPI::Statement::Sub';
+			}
+			if ( $Next->content eq "{" ) {
+				$self->_rollback( $Next );
+				return 'PPI::Structure::AnonSub';
 			}
 
 			### Comment out these two, as they would return PPI::Statement anyway
