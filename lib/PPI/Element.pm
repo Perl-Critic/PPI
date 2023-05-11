@@ -120,9 +120,155 @@ Returns the basic code as a string (excluding here-doc content).
 ### XS -> PPI/XS.xs:_PPI_Element__content 0.900+
 sub content() { '' }
 
+=head2 serialize
 
+Unlike the C<content> method, which shows only the immediate content
+within an element, Document objects also have to be able to be written
+out to a file again.
 
+When doing this we need to take into account some additional factors.
 
+Primarily, we need to handle here-docs correctly, so that are written
+to the file in the expected place.
+
+The C<serialize> method generates the actual file content for a given
+Document object. The resulting string can be written straight to a file.
+
+Returns the serialized element as a string.
+
+=cut
+
+sub serialize {
+	my $self   = shift;
+	my @tokens = $self->tokens;
+
+	# The here-doc content buffer
+	my $heredoc = '';
+
+	# Start the main loop
+	my $output = '';
+	foreach my $i ( 0 .. $#tokens ) {
+		my $Token = $tokens[$i];
+
+		# Handle normal tokens
+		unless ( $Token->isa('PPI::Token::HereDoc') ) {
+			my $content = $Token->content;
+
+			# Handle the trivial cases
+			unless ( $heredoc ne '' and $content =~ /\n/ ) {
+				$output .= $content;
+				next;
+			}
+
+			# We have pending here-doc content that needs to be
+			# inserted just after the first newline in the content.
+			if ( $content eq "\n" ) {
+				# Shortcut the most common case for speed
+				$output .= $content . $heredoc;
+			} else {
+				# Slower and more general version
+				$content =~ s/\n/\n$heredoc/;
+				$output .= $content;
+			}
+
+			$heredoc = '';
+			next;
+		}
+
+		# This token is a HereDoc.
+		# First, add the token content as normal, which in this
+		# case will definitely not contain a newline.
+		$output .= $Token->content;
+
+		# Pick up the indentation, which may be undef.
+		my $indentation = $Token->indentation || '';
+
+		# Now add all of the here-doc content to the heredoc buffer.
+		foreach my $line ( $Token->heredoc ) {
+			$heredoc .= "\n" eq $line ? $line : $indentation . $line;
+		}
+
+		if ( $Token->{_damaged} ) {
+			# Special Case:
+			# There are a couple of warning/bug situations
+			# that can occur when a HereDoc content was read in
+			# from the end of a file that we silently allow.
+			#
+			# When writing back out to the file we have to
+			# auto-repair these problems if we aren't going back
+			# on to the end of the file.
+
+			# When calculating $last_line, ignore the final token if
+			# and only if it has a single newline at the end.
+			my $last_index = $#tokens;
+			if ( $tokens[$last_index]->{content} =~ /^[^\n]*\n$/ ) {
+				$last_index--;
+			}
+
+			# This is a two part test.
+			# First, are we on the last line of the
+			# content part of the file
+			my $last_line = List::Util::none {
+				$tokens[$_] and $tokens[$_]->{content} =~ /\n/
+				} (($i + 1) .. $last_index);
+			if ( ! defined $last_line ) {
+				# Handles the null list case
+				$last_line = 1;
+			}
+
+			# Secondly, are their any more here-docs after us,
+			# (with content or a terminator)
+			my $any_after = List::Util::any {
+				$tokens[$_]->isa('PPI::Token::HereDoc')
+				and (
+					scalar(@{$tokens[$_]->{_heredoc}})
+					or
+					defined $tokens[$_]->{_terminator_line}
+					)
+				} (($i + 1) .. $#tokens);
+			if ( ! defined $any_after ) {
+				# Handles the null list case
+				$any_after = '';
+			}
+
+			# We don't need to repair the last here-doc on the
+			# last line. But we do need to repair anything else.
+			unless ( $last_line and ! $any_after ) {
+				# Add a terminating string if it didn't have one
+				unless ( defined $Token->{_terminator_line} ) {
+					$Token->{_terminator_line} = $Token->{_terminator};
+				}
+
+				# Add a trailing newline to the terminating
+				# string if it didn't have one.
+				unless ( $Token->{_terminator_line} =~ /\n$/ ) {
+					$Token->{_terminator_line} .= "\n";
+				}
+			}
+		}
+
+		# Now add the termination line to the heredoc buffer
+		if ( defined $Token->{_terminator_line} ) {
+			$heredoc .= $indentation . $Token->{_terminator_line};
+		}
+	}
+
+	# End of tokens
+
+	if ( $heredoc ne '' ) {
+		# If the file doesn't end in a newline, we need to add one
+		# so that the here-doc content starts on the next line.
+		unless ( $output =~ /\n$/ ) {
+			$output .= "\n";
+		}
+
+		# Now we add the remaining here-doc content
+		# to the end of the file.
+		$output .= $heredoc;
+	}
+
+	$output;
+}
 
 #####################################################################
 # Navigation Methods
