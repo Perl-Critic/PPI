@@ -1,0 +1,4 @@
+1 ? $var->method : 0;
+1 ? var->method : 0;
+1 ? ($var)->method : 0;
+1 ? $var::->method : 0;
