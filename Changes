@@ -3,6 +3,7 @@ Revision history for Perl extension PPI
 {{$NEXT}}
 	Summary:
 	- Parse prototypes as literal quotes, enables parens and newlines in protos
+	- Fix false positive detection of labels (GH#289) (Dan Church)
 
 	Details:
 	- Wrapped most Document->new calls in tests with automatic checks

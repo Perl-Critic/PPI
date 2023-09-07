@@ -7,7 +7,7 @@
 use if !(-e 'META.yml'), "Test::InDistDir";
 use lib 't/lib';
 use PPI::Test::pragmas;
-use Test::More tests => 1087 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+use Test::More tests => 1085 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use PPI ();
 use PPI::Test qw( pause );
@@ -21,11 +21,6 @@ use Helper 'safe_new';
 # Code/Dump Testing
 
 PPI::Test::Run->run_testdir(qw{ t data 08_regression });
-
-{
-local $TODO = 'known bug';
-PPI::Test::Run->run_testdir(qw{ t data 08_regression_todo });
-}
 
 
 
