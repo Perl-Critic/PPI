@@ -31,7 +31,7 @@ represent floating point numbers with exponential notation.
 use strict;
 use PPI::Token::Number::Float ();
 
-our $VERSION = '1.277';
+our $VERSION = '1.278';
 
 our @ISA = "PPI::Token::Number::Float";
 

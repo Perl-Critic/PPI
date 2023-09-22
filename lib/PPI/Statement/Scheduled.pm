@@ -56,7 +56,7 @@ may have 'sub' in front of them.
 use strict;
 use PPI::Statement::Sub ();
 
-our $VERSION = '1.277';
+our $VERSION = '1.278';
 
 our @ISA = "PPI::Statement::Sub";
 

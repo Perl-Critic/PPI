@@ -1,5 +1,7 @@
 Revision history for Perl extension PPI
 
+{{$NEXT}}
+
 1.277   2023-09-22 09:12:48Z
 	Summary:
 	- Parse prototypes as literal quotes, enables parens and newlines in protos

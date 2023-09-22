@@ -29,7 +29,7 @@ keywords.  As such, this class may be removed from PPI in the future.
 use strict;
 use PPI::Token ();
 
-our $VERSION = '1.277';
+our $VERSION = '1.278';
 
 our @ISA = "PPI::Token";
 
