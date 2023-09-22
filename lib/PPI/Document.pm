@@ -914,7 +914,7 @@ Adam Kennedy E<lt>adamk@cpan.orgE<gt>
 
 =head1 SEE ALSO
 
-L<PPI>, L<http://ali.as/>
+L<PPI>, L<https://web.archive.org/web/20230911221703/http://ali.as/>
 
 =head1 COPYRIGHT
 
