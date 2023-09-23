@@ -12,8 +12,6 @@ jobs:
       image: perldocker/perl-tester:5.34
     steps:
       - uses: actions/checkout@v4
-      - name: install extra modules
-        run: cpm install -g Test::DependentModules
       - name: Run Tests
         env:
           AUTHOR_TESTING: 0
@@ -21,7 +19,14 @@ jobs:
           EXTENDED_TESTING: 1
           RELEASE_TESTING: 1
         run: auto-build-and-test-dist
+      - name: install action prereqs
+        run: cpm install -g Test::DependentModules IO::All
+      - name: generate dep prereqs
+        run: perl -Ixt -MDepReqs -e 'DepReqs->run'
+      - name: install dep prereqs
+        run: cpm install -g --cpanfile xt/cpanfile --show-build-log-on-failure
       - name: Test Dependents
         env:
           TEST_DEPENDENTS: 1
+          PERL_TEST_DM_CPAN_VERBOSE: 1
         run: prove -l xt/dependent-modules.t
