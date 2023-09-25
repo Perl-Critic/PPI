@@ -128,7 +128,11 @@ sub type {
 		}
 		return 'for';
 	}
-	return $TYPES{$content} if $Element->isa('PPI::Token::Word');
+	return {
+		%TYPES,
+		( try => 'try' ) x !!$self->presumed_features->{try},
+	}->{$content}
+	  if $Element->isa('PPI::Token::Word');
 	return 'continue'       if $Element->isa('PPI::Structure::Block');
 
 	# Unknown (shouldn't exist?)
