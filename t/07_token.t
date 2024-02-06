@@ -8,7 +8,7 @@ sub dies_on_incomplete_bx { $] >= 5.031002 }
 use if !(-e 'META.yml'), "Test::InDistDir";
 use lib 't/lib';
 use PPI::Test::pragmas;
-use Test::More tests => 588 + (warns_on_misplaced_underscore() ? 2 : 0 ) + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+use Test::More tests => 594 + (warns_on_misplaced_underscore() ? 2 : 0 ) + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use File::Spec::Functions qw( catdir );
 use PPI ();
@@ -210,5 +210,22 @@ HEX: {
 		ok(!$token->{_error}, "no error for '$code' even on invalid digits");
 		is($token->content, $test->{parsed}, "correctly parsed everything expected");
                 is($token->literal, $test->{value}, "literal('$code') is $test->{value}");
+	}
+}
+
+OCTAL: {
+	my @tests = (
+		{ code => '0o10', parsed => '0o10', value => 8 },
+		{ code => '0O10', parsed => '0O10', value => 8 },
+	);
+
+	foreach my $test ( @tests ) {
+		my $code = $test->{code};
+		my $T = PPI::Tokenizer->new( \$code );
+		my $token = $T->get_token;
+
+		isa_ok($token, 'PPI::Token::Number::Octal');
+		is($token->content, $test->{parsed}, "correctly parsed everything expected");
+		is($token->literal, $test->{value}, "literal('$code') is $test->{value}");
 	}
 }
