@@ -1,5 +1,7 @@
 Revision history for Perl extension PPI
 
+{{$NEXT}}
+
 1.278   2024-03-11 02:20:06Z
 	- Add support for new octal number syntax (GH#295) (Branislav Branislav
       Zahradník)

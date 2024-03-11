@@ -49,7 +49,7 @@ L<PPI::Token> and L<PPI::Element> parent classes.
 use strict;
 use PPI::Token ();
 
-our $VERSION = '1.278';
+our $VERSION = '1.279';
 
 our @ISA = "PPI::Token::Quote::Literal";
 
