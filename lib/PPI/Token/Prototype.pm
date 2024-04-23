@@ -8,9 +8,11 @@ PPI::Token::Prototype - A subroutine prototype descriptor
 
 =head1 INHERITANCE
 
-  PPI::Token::End
-  isa PPI::Token
-      isa PPI::Element
+  PPI::Token::Prototype
+  isa PPI::Token::Quote::Literal
+      isa PPI::Token::Quote
+          isa PPI::Token
+              isa PPI::Element
 
 =head1 SYNOPSIS
 
