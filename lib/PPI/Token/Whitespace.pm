@@ -212,8 +212,23 @@ sub __TOKENIZER__on_char {
 		# 2. The one before that is the word 'sub'.
 		# 3. The one before that is a 'structure'
 
-		# Get the three previous significant tokens
-		my @tokens = $t->_previous_significant_tokens(3);
+		# Get at least the three previous significant tokens, and extend the
+		# retrieval range to include at least one token that can walk the
+		# already generated tree. (i.e. has a parent)
+		my ( $tokens_to_get, @tokens ) = (3);
+		while ( !@tokens or ( $tokens[-1] and !$tokens[-1]->parent ) ) {
+			@tokens = $t->_previous_significant_tokens($tokens_to_get);
+			last if @tokens < $tokens_to_get;
+			$tokens_to_get++;
+		}
+
+		my ($closest_parented_token) = grep $_->parent, @tokens;
+		die "no parented element found" unless    #
+		  $closest_parented_token ||= $t->_document;
+		  $DB::single = $DB::single = 1 if
+		  $closest_parented_token->presumed_features->{signatures};
+		return 'Structure'
+		  if $closest_parented_token->presumed_features->{signatures};
 
 		# A normal subroutine declaration
 		my $p1 = $tokens[1];
