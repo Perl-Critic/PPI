@@ -186,7 +186,11 @@ sub __TOKENIZER__on_line_start {
 		# anything to the "use v6..." line. So return as if
 		# we didn't find anything at all.
 		return 1;
-	}
+	} elsif ( $line =~ /^\s*format\s*[A-Za-z0-9_]+\s*=\s*$/ ) {
+        $t->_new_token( 'Format', $line );
+        $t->{class} = 'PPI::Token::Format';
+        return 0;
+    }
 
 	1;
 }
