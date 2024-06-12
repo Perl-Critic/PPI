@@ -8,9 +8,10 @@ use Exporter     ();
 our $VERSION = '1.279';
 
 our @ISA       = 'Exporter';
-our @EXPORT_OK = qw{ %_PARENT %OPERATOR %MAGIC %LAYER $CURLY_SYMBOL %QUOTELIKE %KEYWORDS };
+our @EXPORT_OK = qw{ %_PARENT %_POSITION_CACHE %OPERATOR %MAGIC %LAYER $CURLY_SYMBOL %QUOTELIKE %KEYWORDS };
 
 our %_PARENT; # Master Child -> Parent index
+our %_POSITION_CACHE; # cache for position in parent
 
 # operator index
 our %OPERATOR = map { $_ => 1 } (
