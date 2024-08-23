@@ -1,6 +1,9 @@
 Revision history for Perl extension PPI
 
-{{$NEXT}}
+1.279   2024-08-23 14:02:44Z
+	Summary:
+	- Implemented a cache to speed up sibling iteration
+	  (GH#287) (Graham Knop (haarg))
 
 1.278   2024-03-11 02:20:06Z
 	- Add support for new octal number syntax (GH#295) (Branislav Branislav
