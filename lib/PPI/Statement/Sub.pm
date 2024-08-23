@@ -35,7 +35,7 @@ use List::Util     ();
 use Params::Util   qw{_INSTANCE};
 use PPI::Statement ();
 
-our $VERSION = '1.279';
+our $VERSION = '1.280';
 
 our @ISA = "PPI::Statement";
 

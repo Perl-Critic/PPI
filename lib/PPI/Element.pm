@@ -29,7 +29,7 @@ use PPI::Util       ();
 use PPI::Node       ();
 use PPI::Singletons '%_PARENT', '%_POSITION_CACHE';
 
-our $VERSION = '1.279';
+our $VERSION = '1.280';
 
 our $errstr = "";
 

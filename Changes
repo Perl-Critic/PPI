@@ -1,5 +1,7 @@
 Revision history for Perl extension PPI
 
+{{$NEXT}}
+
 1.279   2024-08-23 14:02:44Z
 	Summary:
 	- Implemented a cache to speed up sibling iteration

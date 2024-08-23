@@ -48,7 +48,7 @@ use strict;
 use PPI::Statement                 ();
 use PPI::Statement::Include::Perl6 ();
 
-our $VERSION = '1.279';
+our $VERSION = '1.280';
 
 our @ISA = "PPI::Statement";
 
