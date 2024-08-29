@@ -458,9 +458,32 @@ sub previous_token {
 	}
 }
 
+=head2 presumed_features
 
+Returns a hash that indicates which features appear to be active for the given
+element.
 
+=cut
 
+sub presumed_features {
+	my ($self) = @_;
+
+	my @feature_mods;
+	my $walker = $self;
+	while ($walker) {
+		my $sib_walk = $walker;
+		while ($sib_walk) {
+			push @feature_mods, $sib_walk if $sib_walk->can("feature_mods");
+			$sib_walk = $sib_walk->sprevious_sibling;
+		}
+		$walker = $walker->parent;
+	}
+
+	my %feature_mods = map %{$_}, reverse grep defined, map $_->feature_mods,
+	  @feature_mods;
+
+	return \%feature_mods;
+}
 
 #####################################################################
 # Manipulation

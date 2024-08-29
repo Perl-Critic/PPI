@@ -70,6 +70,7 @@ use PPI::Token::Separator             ();
 use PPI::Token::Data                  ();
 use PPI::Token::End                   ();
 use PPI::Token::Prototype             ();
+use PPI::Token::Signature             ();
 use PPI::Token::Attribute             ();
 use PPI::Token::Unknown               ();
 
