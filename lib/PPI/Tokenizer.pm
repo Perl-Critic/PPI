@@ -858,6 +858,25 @@ sub __current_token_is_forced_word {
 	return '';
 }
 
+sub _current_token_has_signatures_active {
+	my ($t) = @_;
+
+	# Get at least the three previous significant tokens, and extend the
+	# retrieval range to include at least one token that can walk the
+	# already generated tree. (i.e. has a parent)
+	my ( $tokens_to_get, @tokens ) = (3);
+	while ( !@tokens or ( $tokens[-1] and !$tokens[-1]->parent ) ) {
+		@tokens = $t->_previous_significant_tokens($tokens_to_get);
+		last if @tokens < $tokens_to_get;
+		$tokens_to_get++;
+	}
+
+	my ($closest_parented_token) = grep $_->parent, @tokens;
+	die "no parented element found" unless    #
+	  $closest_parented_token ||= $t->_document;
+	return $closest_parented_token->presumed_features->{signatures}, @tokens;
+}
+
 1;
 
 =pod
