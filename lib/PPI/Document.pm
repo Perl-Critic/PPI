@@ -132,10 +132,9 @@ The constructor also takes attribute flags.
 
 At this time, the only available attribute is the C<readonly> flag.
 
-Setting C<readonly> to true will allow various systems to provide
-additional optimisations and caching. Note that because C<readonly> is an
-optimisation flag, it is off by default and you will need to explicitly
-enable it.
+Setting C<readonly> to true will allow various systems to provide additional
+optimisations and caching. Note that because C<readonly> is an optimisation
+flag, it is off by default and you will need to explicitly enable it.
 
 Returns a C<PPI::Document> object, or C<undef> if parsing fails.
 L<PPI::Exception> objects can also be thrown if there are parsing problems.
