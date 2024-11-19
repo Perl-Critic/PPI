@@ -236,6 +236,62 @@ sub arguments {
 	return @args;
 }
 
+=head2 feature_mods
+
+	# `use feature 'signatures';`
+	my %mods = $include->feature_mods;
+	# { signatures => "perl" }
+
+	# `use 5.036;`
+	my %mods = $include->feature_mods;
+	# { signatures => "perl" }
+
+Returns a hashref of features identified as enabled by the include, or undef if
+the include does not enable features. The value for each feature indicates the
+provider of the feature.
+
+=cut
+
+sub feature_mods {
+	my ($self) = @_;
+	return if $self->type eq "require";
+
+	if ( my $perl_version = $self->version ) {
+		## tried using feature.pm, but it is impossible to install future
+		## versions of it, so e.g. a 5.20 install cannot know about
+		## 5.36 features
+	}
+
+	my %known;
+	my $on_or_off = $self->type eq "use";
+
+	if ( $self->module eq "feature" ) {
+		my @features = grep $known{$_}, $self->_decompose_arguments;
+		return { map +( $_ => $on_or_off ? "perl" : 0 ), @features };
+	}
+
+	return;
+}
+
+sub _decompose_arguments {
+	my ($self) = @_;
+	my @args = $self->arguments;
+	while ( grep ref, @args ) {
+		@args = map $self->_decompose_argument($_), @args;
+	}
+	return @args;
+}
+
+sub _decompose_argument {
+	my ( $self, $arg ) = @_;
+	return $arg->children
+	  if $arg->isa("PPI::Structure::List")
+	  or $arg->isa("PPI::Statement::Expression");
+	my $as_text = $arg->can("literal") || $arg->can("string");
+	return $as_text->($arg) if $as_text;
+	die "unknown arg decompose type: $arg , " . ref $arg;
+}
+
 1;
 
 =pod

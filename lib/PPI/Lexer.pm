@@ -133,6 +133,8 @@ creates a L<PPI::Tokenizer> for the content and lexes the token stream
 produced by the tokenizer. Basically, a sort of all-in-one method for
 getting a L<PPI::Document> object from a file name.
 
+Additional arguments are passed to the tokenizer as a hash.
+
 Returns a L<PPI::Document> object, or C<undef> on error.
 
 =cut
@@ -143,6 +145,7 @@ sub lex_file {
 	unless ( defined $file ) {
 		return $self->_error("Did not pass a filename to PPI::Lexer::lex_file");
 	}
+	my %args = @_;
 
 	# Create the Tokenizer
 	my $Tokenizer = eval {
@@ -154,7 +157,7 @@ sub lex_file {
 		return $self->_error( $errstr );
 	}
 
-	$self->lex_tokenizer( $Tokenizer );
+	$self->lex_tokenizer( $Tokenizer, %args );
 }
 
 =pod
@@ -164,6 +167,8 @@ sub lex_file {
 The C<lex_source> method takes a normal scalar string as argument. It
 creates a L<PPI::Tokenizer> object for the string, and then lexes the
 resulting token stream.
+
+Additional arguments are passed to the tokenizer as a hash.
 
 Returns a L<PPI::Document> object, or C<undef> on error.
 
@@ -175,6 +180,7 @@ sub lex_source {
 	unless ( defined $source and not ref $source ) {
 		return $self->_error("Did not pass a string to PPI::Lexer::lex_source");
 	}
+	my %args = @_;
 
 	# Create the Tokenizer and hand off to the next method
 	my $Tokenizer = eval {
@@ -186,7 +192,7 @@ sub lex_source {
 		return $self->_error( $errstr );
 	}
 
-	$self->lex_tokenizer( $Tokenizer );
+	$self->lex_tokenizer( $Tokenizer, %args );
 }
 
 =pod
@@ -195,6 +201,8 @@ sub lex_source {
 
 The C<lex_tokenizer> takes as argument a L<PPI::Tokenizer> object. It
 lexes the token stream from the tokenizer into a L<PPI::Document> object.
+
+Additional arguments are set on the L<PPI::Document> produced.
 
 Returns a L<PPI::Document> object, or C<undef> on error.
 
@@ -206,9 +214,11 @@ sub lex_tokenizer {
 	return $self->_error(
 		"Did not pass a PPI::Tokenizer object to PPI::Lexer::lex_tokenizer"
 	) unless $Tokenizer;
+	my %args = @_;
 
 	# Create the empty document
 	my $Document = PPI::Document->new;
+	ref($Document)->_setattr( $Document, %args ) if keys %args;
 	$Tokenizer->_document($Document);
 
 	# Lex the token stream into the document

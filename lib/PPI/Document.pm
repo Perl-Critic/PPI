@@ -128,16 +128,22 @@ In all cases, the document is considered to be "anonymous" and not tied back
 to where it was created from. Specifically, if you create a PPI::Document from
 a filename, the document will B<not> remember where it was created from.
 
+Returns a C<PPI::Document> object, or C<undef> if parsing fails.
+L<PPI::Exception> objects can also be thrown if there are parsing problems.
+
 The constructor also takes attribute flags.
 
-At this time, the only available attribute is the C<readonly> flag.
+=head3 readonly
 
 Setting C<readonly> to true will allow various systems to provide additional
 optimisations and caching. Note that because C<readonly> is an optimisation
 flag, it is off by default and you will need to explicitly enable it.
 
-Returns a C<PPI::Document> object, or C<undef> if parsing fails.
-L<PPI::Exception> objects can also be thrown if there are parsing problems.
+=head3 feature_mods
+
+Setting feature_mods with a hashref allows defining perl parsing features to be
+enabled for the whole document. (e.g. when the code is assumed to be run as a
+oneliner)
 
 =cut
 
@@ -180,25 +186,25 @@ sub new {
 			my $document = $CACHE->get_document($file_contents);
 			return $class->_setattr( $document, %attr ) if $document;
 
-			$document = PPI::Lexer->lex_source( $$file_contents );
+			$document = PPI::Lexer->lex_source( $$file_contents, %attr );
 			if ( $document ) {
 				# Save in the cache
 				$CACHE->store_document( $document );
-				return $class->_setattr( $document, %attr );
+				return $document;
 			}
 		} else {
-			my $document = PPI::Lexer->lex_file( $source );
-			return $class->_setattr( $document, %attr ) if $document;
+			my $document = PPI::Lexer->lex_file( $source, %attr );
+			return $document if $document;
 		}
 
 	} elsif ( _SCALAR0($source) ) {
-		my $document = PPI::Lexer->lex_source( $$source );
-		return $class->_setattr( $document, %attr ) if $document;
+		my $document = PPI::Lexer->lex_source( $$source, %attr );
+		return $document if $document;
 
 	} elsif ( _ARRAY0($source) ) {
 		$source = join '', map { "$_\n" } @$source;
-		my $document = PPI::Lexer->lex_source( $source );
-		return $class->_setattr( $document, %attr ) if $document;
+		my $document = PPI::Lexer->lex_source( $source, %attr );
+		return $document if $document;
 
 	} else {
 		$class->_error("Unknown object or reference was passed to PPI::Document::new");
@@ -225,9 +231,10 @@ sub load {
 }
 
 sub _setattr {
-	my ($class, $document, %attr) = @_;
-	$document->{readonly} = !! $attr{readonly};
-	$document->{filename} = $attr{filename};
+	my ( $class, $document, %attr ) = @_;
+	$document->{readonly}     = !!$attr{readonly};
+	$document->{filename}     = $attr{filename};
+	$document->{feature_mods} = $attr{feature_mods};
 	return $document;
 }
 
@@ -341,6 +348,16 @@ sub tab_width {
 	my $self = shift;
 	return $self->{tab_width} unless @_;
 	$self->{tab_width} = shift;
+}
+
+=head2 feature_mods { feature_name => $provider }
+
+=cut
+
+sub feature_mods {
+	my $self = shift;
+	return $self->{feature_mods} unless @_;
+	$self->{feature_mods} = shift;
 }
 
 =pod
