@@ -45,6 +45,10 @@ L<PPI::Statement>, L<PPI::Node> and L<PPI::Element> methods.
 =cut
 
 use strict;
+
+use version 0.77 ();
+use Safe::Isa '$_call_if_object';
+
 use PPI::Statement                 ();
 use PPI::Statement::Include::Perl6 ();
 
@@ -260,14 +264,26 @@ sub feature_mods {
 		## tried using feature.pm, but it is impossible to install future
 		## versions of it, so e.g. a 5.20 install cannot know about
 		## 5.36 features
+
+		# crude proof of concept hack due to above
+		return { signatures => "perl" }
+		  if version::->parse($perl_version) >= 5.035;
 	}
 
-	my %known;
+	my %known     = ( signatures => 1 );
 	my $on_or_off = $self->type eq "use";
 
 	if ( $self->module eq "feature" ) {
 		my @features = grep $known{$_}, $self->_decompose_arguments;
 		return { map +( $_ => $on_or_off ? "perl" : 0 ), @features };
+	}
+	elsif ( $self->module eq "Mojolicious::Lite" ) {
+		my $wants_signatures = grep /-signatures/, $self->_decompose_arguments;
+		return { signatures => $wants_signatures ? "perl" : 0 };
+	}
+	elsif ( $self->module eq "Modern::Perl" ) {
+		my $v = $self->module_version->$_call_if_object("literal") || 0;
+		return { signatures => $v >= 2023 ? "perl" : 0 };
 	}
 
 	return;

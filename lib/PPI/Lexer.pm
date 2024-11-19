@@ -1044,6 +1044,8 @@ sub _round {
 		return 'PPI::Structure::Given';
 	} elsif ( $Parent->isa('PPI::Statement::When') ) {
 		return 'PPI::Structure::When';
+	} elsif ( $Parent->isa('PPI::Statement::Sub') ) {
+		return 'PPI::Structure::Signature';
 	}
 
 	# Otherwise, it must be a list

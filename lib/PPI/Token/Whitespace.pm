@@ -212,8 +212,8 @@ sub __TOKENIZER__on_char {
 		# 2. The one before that is the word 'sub'.
 		# 3. The one before that is a 'structure'
 
-		# Get the three previous significant tokens
-		my @tokens = $t->_previous_significant_tokens(3);
+		my ( $has_sig, @tokens ) = $t->_current_token_has_signatures_active;
+		return 'Structure' if $has_sig;
 
 		# A normal subroutine declaration
 		my $p1 = $tokens[1];

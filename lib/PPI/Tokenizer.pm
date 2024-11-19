@@ -86,6 +86,7 @@ use PPI::Element    ();
 use PPI::Token      ();
 use PPI::Exception  ();
 use PPI::Exception::ParserRejection ();
+use PPI::Document ();
 
 our $VERSION = '1.280';
 
@@ -856,6 +857,24 @@ sub __current_token_is_forced_word {
 
 	# Otherwise we probably aren't forced
 	return '';
+}
+
+sub _current_token_has_signatures_active {
+	my ($t) = @_;
+
+	# Get at least the three previous significant tokens, and extend the
+	# retrieval range to include at least one token that can walk the
+	# already generated tree. (i.e. has a parent)
+	my ( $tokens_to_get, @tokens ) = (3);
+	while ( !@tokens or ( $tokens[-1] and !$tokens[-1]->parent ) ) {
+		@tokens = $t->_previous_significant_tokens($tokens_to_get);
+		last if @tokens < $tokens_to_get;
+		$tokens_to_get++;
+	}
+
+	my ($closest_parented_token) = grep $_->parent, @tokens;
+	$closest_parented_token ||= $t->_document || $t->_document(PPI::Document->new);
+	return $closest_parented_token->presumed_features->{signatures}, @tokens;
 }
 
 1;
