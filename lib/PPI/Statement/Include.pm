@@ -236,6 +236,46 @@ sub arguments {
 	return @args;
 }
 
+=head2 feature_mods
+
+	# `use feature 'signatures';`
+	my %mods = $include->feature_mods;
+	# { signatures => "perl" }
+
+	# `use 5.036;`
+	my %mods = $include->feature_mods;
+	# { signatures => "perl" }
+
+Returns a hashref of features identified as enabled by the include, or undef if
+the include does not enable features. The value for each feature indicates the
+provider of the feature.
+
+=cut
+
+sub feature_mods {
+	my ($self) = @_;
+	return if $self->type eq "require";
+
+	if ( my $perl_version = $self->version ) {
+		## tried using feature.pm, but it is impossible to install future
+		## versions of it, so e.g. a 5.20 install cannot know about
+		## 5.36 features
+	}
+
+	my %known;
+	my $on_or_off = $self->type eq "use";
+
+	if ( $self->module eq "feature" ) {
+		my @features = grep $known{$_},
+		  map +( $_->can("literal") || $_->can("string") || die "???" )->($_),
+		  map $_->isa("PPI::Structure::List") ? $_->children : $_,
+		  $self->arguments;
+		return { map +( $_ => $on_or_off ? "perl" : 0 ), @features };
+	}
+
+	return;
+}
+
 1;
 
 =pod
