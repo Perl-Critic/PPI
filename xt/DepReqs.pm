@@ -15,7 +15,7 @@ use Devel::Confess;
 __PACKAGE__->run unless caller;
 
 sub exclusions {
-    qr/^(
+    qr@^(
         # don't remember why i excluded these
         Apache2-SSI|Devel-IPerl|Padre
         # fails tests regarding directory write permissions, probably not PPI
@@ -32,6 +32,7 @@ sub exclusions {
         # broken on cpan
         |Acme-VarMess|Module-Checkstyle|MooseX-Documenter|Perl-Achievements
         |Perl-Metrics|Ravenel|Test-LocalFunctions|UML-Class-Simple
+        |Test2-Plugin-DBBreak
         # maybe broken on cpan
         |App-Grepl|App-Midgen|App-PRT|Pod-Weaver-Section-SQL
         # investigate
@@ -45,7 +46,9 @@ sub exclusions {
         |MLPerl
         # RT 129344
         |Module-AnyEvent-Helper
-    )$/x
+        # https://github.com/Perceptyx/perl-opentracing-roles/issues/8
+        |OpenTracing-AutoScope
+    )$@x
 }
 
 sub force_big_metacpan_fetch {
