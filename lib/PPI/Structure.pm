@@ -108,6 +108,7 @@ use PPI::Structure::List        ();
 use PPI::Structure::Subscript   ();
 use PPI::Structure::Unknown     ();
 use PPI::Structure::When        ();
+use PPI::Structure::Signature   ();
 
 
 

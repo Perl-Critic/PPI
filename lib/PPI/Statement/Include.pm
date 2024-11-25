@@ -45,6 +45,10 @@ L<PPI::Statement>, L<PPI::Node> and L<PPI::Element> methods.
 =cut
 
 use strict;
+
+use version 0.77 ();
+use Safe::Isa '$_call_if_object';
+
 use PPI::Statement                 ();
 use PPI::Statement::Include::Perl6 ();
 
@@ -234,6 +238,87 @@ sub arguments {
 	}
 
 	return @args;
+}
+
+=head2 feature_mods
+
+	# `use feature 'signatures';`
+	my %mods = $include->feature_mods;
+	# { signatures => "perl" }
+
+	# `use 5.036;`
+	my %mods = $include->feature_mods;
+	# { signatures => "perl" }
+
+Returns a hashref of features identified as enabled by the include, or undef if
+the include does not enable features. The value for each feature indicates the
+provider of the feature.
+
+=cut
+
+sub feature_mods {
+	my ($self) = @_;
+	return if $self->type eq "require";
+
+	if ( my $cb_features = $self->_custom_feature_include_cb->($self) )    #
+	{ return $cb_features; }
+
+	if ( my $perl_version = $self->version ) {
+		## tried using feature.pm, but it is impossible to install future
+		## versions of it, so e.g. a 5.20 install cannot know about
+		## 5.36 features
+
+		# crude proof of concept hack due to above
+		return { signatures => "perl" }
+		  if version::->parse($perl_version) >= 5.035;
+	}
+
+	my %known     = ( signatures => 1, try => 1 );
+	my $on_or_off = $self->type eq "use";
+
+	if ( $on_or_off
+		and my $custom = $self->_custom_feature_includes->{ $self->module } )  #
+	{ return $custom; }
+
+	if ( $self->module eq "feature" ) {
+		my @features = grep $known{$_},
+		  map +( $_->can("literal") || $_->can("string") || die "???" )->($_),
+		  map $_->isa("PPI::Structure::List") ? $_->children : $_,
+		  $self->arguments;
+		return { map +( $_ => $on_or_off ? "perl" : 0 ), @features };
+	}
+	elsif ( $self->module eq "Mojolicious::Lite" ) {
+		my $wants_signatures = grep /-signatures/, $self->arguments;
+		return { signatures => $wants_signatures ? "perl" : 0 };
+	}
+	elsif ( $self->module eq "Modern::Perl" ) {
+		my $v = $self->module_version->$_call_if_object("literal") || 0;
+		return { signatures => $v >= 2023 ? "perl" : 0 };
+	}
+	elsif ( $self->module eq "experimental" ) {
+		my $wants_signatures =    #
+		  grep /signatures/, map $_->literal, $self->arguments;
+		return { signatures => $wants_signatures ? "perl" : 0 };
+	}
+	elsif ( $self->module eq "Syntax::Keyword::Try" ) {
+		return { try => $on_or_off ? "Syntax::Keyword::Try" : 0 };
+	}
+
+	return;
+}
+
+sub _custom_feature_includes {
+	my ($self) = @_;
+	return unless                                                             #
+	  my $document = $self->document;
+	return $document->custom_feature_includes || {};
+}
+
+sub _custom_feature_include_cb {
+	my ($self) = @_;
+	return unless                                                             #
+	  my $document = $self->document;
+	return $document->custom_feature_include_cb || sub { };
 }
 
 1;
