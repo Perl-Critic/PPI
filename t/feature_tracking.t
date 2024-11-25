@@ -2,7 +2,7 @@
 
 use lib 't/lib';
 use PPI::Test::pragmas;
-use Test::More tests => 10 + ( $ENV{AUTHOR_TESTING} ? 1 : 0 );
+use Test::More tests => 11 + ( $ENV{AUTHOR_TESTING} ? 1 : 0 );
 
 use B 'perlstring';
 
@@ -201,6 +201,47 @@ END_PERL
 HOMEBREW_ARGS: {
 	test_document
 	  [ custom_feature_includes => { strEct => { signatures => 1 } } ],
+	  <<'END_PERL',
+		use strEct;
+		sub meep($) {}
+		sub marp($left, $right) {}
+END_PERL
+	  [
+		'PPI::Statement::Include',    'use strEct;',
+		'PPI::Token::Word',           'use',
+		'PPI::Token::Word',           'strEct',
+		'PPI::Token::Structure',      ';',
+		'PPI::Statement::Sub',        'sub meep($) {}',
+		'PPI::Token::Word',           'sub',
+		'PPI::Token::Word',           'meep',
+		'PPI::Structure::Signature',  '($)',
+		'PPI::Token::Structure',      '(',
+		'PPI::Statement::Expression', '$',
+		'PPI::Token::Symbol',         '$',
+		'PPI::Token::Structure',      ')',
+		'PPI::Structure::Block',      '{}',
+		'PPI::Token::Structure',      '{',
+		'PPI::Token::Structure',      '}',
+		'PPI::Statement::Sub',        'sub marp($left, $right) {}',
+		'PPI::Token::Word',           'sub',
+		'PPI::Token::Word',           'marp',
+		'PPI::Structure::Signature',  '($left, $right)',
+		'PPI::Token::Structure',      '(',
+		'PPI::Statement::Expression', '$left, $right',
+		'PPI::Token::Symbol',         '$left',
+		'PPI::Token::Operator',       ',',
+		'PPI::Token::Symbol',         '$right',
+		'PPI::Token::Structure',      ')',
+		'PPI::Structure::Block',      '{}',
+		'PPI::Token::Structure',      '{',
+		'PPI::Token::Structure',      '}',
+	  ],
+	  "simple custom boilerplate modules";
+}
+
+ENV_HOMEBREW_ARGS: {
+	local $ENV{PPI_CUSTOM_FEATURE_INCLUDES} = "{strEct=>{signatures=>'perl'}}";
+	test_document
 	  <<'END_PERL',
 		use strEct;
 		sub meep($) {}

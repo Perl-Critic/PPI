@@ -12,6 +12,7 @@ Revision history for Perl extension PPI
 	  - PPI::Document->new( feature_mods => ... )
 	  - PPI::Document->new( custom_feature_includes => ... )
 	  - PPI::Document->new( custom_feature_include_cb => ... )
+	  - $ENV{PPI_CUSTOM_FEATURE_INCLUDES}
 	- Added ability to parse features:
 	  - signatures, as PPI::Structure::Signature
 	  - try catch, as PPI::Statement::Compound

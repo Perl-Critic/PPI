@@ -155,6 +155,12 @@ which act like pragmas that enable parsing features within their scope.
 
 This is mostly useful when your work project has its own boilerplate module.
 
+It can also be provided in the environment variable
+PPI_CUSTOM_FEATURE_INCLUDES, like so:
+
+  PPI_CUSTOM_FEATURE_INCLUDES='{strEct=>{signatures=>"perl"}}' \
+    perlcritic lib/OurModule.pm
+
 =head3 custom_feature_include_cb
 
   custom_feature_include_cb => sub {
@@ -263,6 +269,15 @@ sub _setattr {
 	$document->{feature_mods}              = $attr{feature_mods};
 	$document->{custom_feature_includes}   = $attr{custom_feature_includes};
 	$document->{custom_feature_include_cb} = $attr{custom_feature_include_cb};
+	if ( $ENV{PPI_CUSTOM_FEATURE_INCLUDES} ) {
+		my $includes = eval $ENV{PPI_CUSTOM_FEATURE_INCLUDES};
+		die "\$ENV{PPI_CUSTOM_FEATURE_INCLUDES} "
+		  . "does not contain valid perl:\n"
+		  . "val: '$ENV{PPI_CUSTOM_FEATURE_INCLUDES}'\nerr: $@"
+		  if $@;
+		$document->{custom_feature_includes} =
+		  { %{ $document->{custom_feature_includes} || {} }, %{$includes} };
+	}
 	return $document;
 }
 
