@@ -292,6 +292,10 @@ sub feature_mods {
 		my $v = $self->module_version->$_call_if_object("literal") || 0;
 		return { signatures => $v >= 2023 ? "perl" : 0 };
 	}
+	elsif ( $self->module eq "experimental" ) {
+		my $wants_signatures = grep /signatures/, $self->_decompose_arguments;
+		return { signatures => $wants_signatures ? "perl" : 0 };
+	}
 	elsif ( $self->module eq "Syntax::Keyword::Try" ) {
 		return { try => $on_or_off ? "Syntax::Keyword::Try" : 0 };
 	}
