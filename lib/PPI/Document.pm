@@ -71,6 +71,7 @@ use Digest::MD5                   ();
 use PPI::Util                     ();
 use PPI                           ();
 use PPI::Node                     ();
+use YAML::PP                      ();
 
 use overload 'bool' => \&PPI::Util::TRUE;
 use overload '""'   => 'content';
@@ -154,6 +155,15 @@ Setting custom_feature_includes with a hashref allows defining include names
 which act like pragmas that enable parsing features within their scope.
 
 This is mostly useful when your work project has its own boilerplate module.
+
+It can also be provided as JSON or YAML in the environment variable
+PPI_CUSTOM_FEATURE_INCLUDES, like so:
+
+  PPI_CUSTOM_FEATURE_INCLUDES='strEct: {signatures: perl}' \
+    perlcritic lib/OurModule.pm
+
+  PPI_CUSTOM_FEATURE_INCLUDES='{"strEct":{"signatures":"perl"}}' \
+    perlcritic lib/OurModule.pm
 
 =head3 custom_feature_include_cb
 
@@ -263,6 +273,15 @@ sub _setattr {
 	$document->{feature_mods}              = $attr{feature_mods};
 	$document->{custom_feature_includes}   = $attr{custom_feature_includes};
 	$document->{custom_feature_include_cb} = $attr{custom_feature_include_cb};
+	if ( $ENV{PPI_CUSTOM_FEATURE_INCLUDES} ) {
+		my $includes = YAML::PP::Load $ENV{PPI_CUSTOM_FEATURE_INCLUDES};
+		die "\$ENV{PPI_CUSTOM_FEATURE_INCLUDES} "
+		  . "does not contain valid perl:\n"
+		  . "val: '$ENV{PPI_CUSTOM_FEATURE_INCLUDES}'\nerr: $@"
+		  if $@;
+		$document->{custom_feature_includes} =
+		  { %{ $document->{custom_feature_includes} || {} }, %{$includes} };
+	}
 	return $document;
 }
 

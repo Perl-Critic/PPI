@@ -218,7 +218,7 @@ sub lex_tokenizer {
 
 	# Create the empty document
 	my $Document = PPI::Document->new;
-	ref($Document)->_setattr( $Document, %args ) if keys %args;
+	ref($Document)->_setattr( $Document, %args );
 	$Tokenizer->_document($Document);
 
 	# Lex the token stream into the document
