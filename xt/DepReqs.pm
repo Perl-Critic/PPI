@@ -33,7 +33,7 @@ sub exclusions {
         # broken on cpan
         |Acme-VarMess|Module-Checkstyle|MooseX-Documenter|Perl-Achievements
         |Perl-Metrics|Ravenel|Test-LocalFunctions|UML-Class-Simple
-        |Test2-Plugin-DBBreak
+        |Test2-Plugin-DBBreak|Catalyst-View-EmbeddedPerl-PerRequest-ValiantRole
         # maybe broken on cpan
         |App-Grepl|App-Midgen|App-PRT|Pod-Weaver-Section-SQL
         # investigate
@@ -69,6 +69,8 @@ sub exclusions {
         | Kafka-Producer-Avro | MarpaX-Languages-PowerBuilder | Net-Async-OpenExchRates
         | Perl-Critic-Policy-PreferredModules | Pg-Corruption | PowerBuilder-DataWindow
         | Test-Kwalitee-Extra | Test-Legal | Test-Perl-Metrics-Simple
+        # https://github.com/uperl/Perl-Critic-Plicease/pull/9
+        | Perl-Critic-Plicease
     )$@x
 }
 
