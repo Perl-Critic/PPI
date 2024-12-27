@@ -76,7 +76,7 @@ use YAML::PP                      ();
 use overload 'bool' => \&PPI::Util::TRUE;
 use overload '""'   => 'content';
 
-our $VERSION = '1.280';
+our $VERSION = '1.282';
 
 our ( $errstr, @ISA ) = ( "", "PPI::Node" );
 

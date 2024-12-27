@@ -5,7 +5,7 @@ package PPI::Singletons;
 use strict;
 use Exporter     ();
 
-our $VERSION = '1.280';
+our $VERSION = '1.282';
 
 our @ISA       = 'Exporter';
 our @EXPORT_OK = qw{ %_PARENT %_POSITION_CACHE %OPERATOR %MAGIC %LAYER $CURLY_SYMBOL %QUOTELIKE %KEYWORDS };

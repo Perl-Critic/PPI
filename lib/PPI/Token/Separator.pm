@@ -35,7 +35,7 @@ parent classes.
 use strict;
 use PPI::Token::Word ();
 
-our $VERSION = '1.280';
+our $VERSION = '1.282';
 
 our @ISA = "PPI::Token::Word";
 
