@@ -1,6 +1,6 @@
 Revision history for Perl extension PPI
 
-{{$NEXT}}
+1.281   2024-12-27 14:44:47Z
 	Summary:
 	- Implement support for signatures and other parsing features
 
