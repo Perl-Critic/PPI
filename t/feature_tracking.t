@@ -415,8 +415,10 @@ END_PERL
 	  "simple custom boilerplate modules";
 }
 
-
-ok( PPI::Tokenizer->new( \"d()" )->all_tokens, "bare tokenizer auto-vivifies document object" );
+ok(
+	PPI::Tokenizer->new( \"d()" )->all_tokens,
+	"bare tokenizer auto-vivifies document object"
+);
 
 ### TODO from ppi_token_unknown.t , deduplicate
 

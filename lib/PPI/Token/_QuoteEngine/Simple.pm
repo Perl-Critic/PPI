@@ -35,7 +35,8 @@ sub _fill {
 		# End of file
 		$self->{content} .= $$string;
 		return 0;
-	} else {
+	}
+	else {
 		# End of string
 		$self->{content} .= $string;
 		return $self;

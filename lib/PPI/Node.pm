@@ -49,19 +49,15 @@ L<PPI::Element> objects also apply to C<PPI::Node> objects.
 =cut
 
 use strict;
-use Carp            ();
-use Scalar::Util    qw{refaddr};
-use Params::Util    qw{_INSTANCE _CLASS _CODELIKE _NUMBER};
-use PPI::Element    ();
+use Carp         ();
+use Scalar::Util qw{refaddr};
+use Params::Util qw{_INSTANCE _CLASS _CODELIKE _NUMBER};
+use PPI::Element ();
 use PPI::Singletons '%_PARENT', '%_POSITION_CACHE';
 
 our $VERSION = '1.282';
 
 our @ISA = "PPI::Element";
-
-
-
-
 
 #####################################################################
 # The basic constructor
@@ -70,10 +66,6 @@ sub new {
 	my $class = ref $_[0] || $_[0];
 	bless { children => [] }, $class;
 }
-
-
-
-
 
 #####################################################################
 # PDOM Methods
@@ -108,14 +100,12 @@ sub add_element {
 	my $self = shift;
 
 	# Check the element
-	my $Element = _INSTANCE(shift, 'PPI::Element') or return undef;
-	$_PARENT{refaddr $Element} and return undef;
+	my $Element = _INSTANCE( shift, 'PPI::Element' ) or return undef;
+	$_PARENT{ refaddr $Element } and return undef;
 
 	# Add the argument to the elements
-	push @{$self->{children}}, $Element;
-	Scalar::Util::weaken(
-		$_PARENT{refaddr $Element} = $self
-	);
+	push @{ $self->{children} }, $Element;
+	Scalar::Util::weaken( $_PARENT{ refaddr $Element } = $self );
 
 	1;
 }
@@ -123,10 +113,8 @@ sub add_element {
 # In a typical run profile, add_element is the number 1 resource drain.
 # This is a highly optimised unsafe version, for internal use only.
 sub __add_element {
-	Scalar::Util::weaken(
-		$_PARENT{refaddr $_[1]} = $_[0]
-	);
-	push @{$_[0]->{children}}, $_[1];
+	Scalar::Util::weaken( $_PARENT{ refaddr $_[1] } = $_[0] );
+	push @{ $_[0]->{children} }, $_[1];
 }
 
 =pod
@@ -146,10 +134,11 @@ returns a count of the number of elements.
 =cut
 
 sub elements {
-	if ( wantarray ) {
-		return @{$_[0]->{children}};
-	} else {
-		return scalar @{$_[0]->{children}};
+	if (wantarray) {
+		return @{ $_[0]->{children} };
+	}
+	else {
+		return scalar @{ $_[0]->{children} };
 	}
 }
 
@@ -207,7 +196,7 @@ returns a count of the number of lexical children.
 
 # In the default case, this is the same as for the elements method
 sub children {
-	wantarray ? @{$_[0]->{children}} : scalar @{$_[0]->{children}};
+	wantarray ? @{ $_[0]->{children} } : scalar @{ $_[0]->{children} };
 }
 
 =pod
@@ -223,9 +212,9 @@ returns the number of significant children.
 =cut
 
 sub schildren {
-	return grep { $_->significant } @{$_[0]->{children}} if wantarray;
+	return grep { $_->significant } @{ $_[0]->{children} } if wantarray;
 	my $count = 0;
-	foreach ( @{$_[0]->{children}} ) {
+	foreach ( @{ $_[0]->{children} } ) {
 		$count++ if $_->significant;
 	}
 	return $count;
@@ -245,7 +234,7 @@ element at that node.
 
 sub child {
 	my ( $self, $index ) = @_;
-	PPI::Exception->throw( "method child() needs an index" )
+	PPI::Exception->throw("method child() needs an index")
 	  if not defined _NUMBER $index;
 	$self->{children}->[$index];
 }
@@ -273,12 +262,14 @@ sub schild {
 	my $el   = $self->{children};
 	if ( $idx < 0 ) {
 		my $cursor = 0;
-		while ( exists $el->[--$cursor] ) {
-			return $el->[$cursor] if $el->[$cursor]->significant and ++$idx >= 0;
+		while ( exists $el->[ --$cursor ] ) {
+			return $el->[$cursor]
+			  if $el->[$cursor]->significant and ++$idx >= 0;
 		}
-	} else {
+	}
+	else {
 		my $cursor = -1;
-		while ( exists $el->[++$cursor] ) {
+		while ( exists $el->[ ++$cursor ] ) {
 			return $el->[$cursor] if $el->[$cursor]->significant and --$idx < 0;
 		}
 	}
@@ -302,7 +293,7 @@ on error.
 
 sub contains {
 	my $self    = shift;
-	my $Element = _INSTANCE(shift, 'PPI::Element') or return undef;
+	my $Element = _INSTANCE( shift, 'PPI::Element' ) or return undef;
 
 	# Iterate up the Element's parent chain until we either run out
 	# of parents, or get to ourself.
@@ -374,9 +365,9 @@ sub find {
 
 	# Use a queue based search, rather than a recursive one
 	my @found;
-	my @queue = @{$self->{children}};
-	my $ok = eval {
-		while ( @queue ) {
+	my @queue = @{ $self->{children} };
+	my $ok    = eval {
+		while (@queue) {
 			my $Element = shift @queue;
 			my $rv      = &$wanted( $self, $Element );
 			push @found, $Element if $rv;
@@ -391,10 +382,11 @@ sub find {
 			# better logical order.
 			if ( $Element->isa('PPI::Structure') ) {
 				unshift @queue, $Element->finish if $Element->finish;
-				unshift @queue, @{$Element->{children}};
+				unshift @queue, @{ $Element->{children} };
 				unshift @queue, $Element->start if $Element->start;
-			} else {
-				unshift @queue, @{$Element->{children}};
+			}
+			else {
+				unshift @queue, @{ $Element->{children} };
 			}
 		}
 		1;
@@ -431,14 +423,14 @@ sub find_first {
 	my $wanted = $self->_wanted(shift) or return undef;
 
 	# Use the same queue-based search as for ->find
-	my @queue = @{$self->{children}};
+	my @queue = @{ $self->{children} };
 	my $rv;
 	my $ok = eval {
 		# The defined() here prevents a ton of calls to PPI::Util::TRUE
-		while ( @queue ) {
-			my $Element = shift @queue;
+		while (@queue) {
+			my $Element    = shift @queue;
 			my $element_rv = $wanted->( $self, $Element );
-			if ( $element_rv ) {
+			if ($element_rv) {
 				$rv = $Element;
 				last;
 			}
@@ -452,11 +444,12 @@ sub find_first {
 			# Depth-first keeps the queue size down and provides a
 			# better logical order.
 			if ( $Element->isa('PPI::Structure') ) {
-				unshift @queue, $Element->finish if defined($Element->finish);
-				unshift @queue, @{$Element->{children}};
-				unshift @queue, $Element->start  if defined($Element->start);
-			} else {
-				unshift @queue, @{$Element->{children}};
+				unshift @queue, $Element->finish if defined( $Element->finish );
+				unshift @queue, @{ $Element->{children} };
+				unshift @queue, $Element->start if defined( $Element->start );
+			}
+			else {
+				unshift @queue, @{ $Element->{children} };
 			}
 		}
 		1;
@@ -487,7 +480,7 @@ not, or C<undef> if given an invalid condition, or an error occurs.
 sub find_any {
 	my $self = shift;
 	my $rv   = $self->find_first(@_);
-	$rv ? 1 : $rv; # false or undef
+	$rv ? 1 : $rv;    # false or undef
 }
 
 =pod
@@ -505,7 +498,7 @@ If successful, returns the removed element.  Otherwise, returns C<undef>.
 
 sub remove_child {
 	my $self  = shift;
-	my $child = _INSTANCE(shift, 'PPI::Element') or return undef;
+	my $child = _INSTANCE( shift, 'PPI::Element' ) or return undef;
 
 	# Find the position of the child
 	my $key = refaddr $child;
@@ -513,7 +506,7 @@ sub remove_child {
 	return undef unless defined $p;
 
 	# Splice it out, and remove the child's parent entry
-	splice( @{$self->{children}}, $p, 1 );
+	splice( @{ $self->{children} }, $p, 1 );
 	delete $_PARENT{$key};
 
 	$child;
@@ -528,8 +521,8 @@ If successful, returns the replace element.  Otherwise, returns C<undef>.
 sub replace_child {
 	my $self = shift;
 
-	my $child       = _INSTANCE(shift, 'PPI::Element') or return undef;
-	my $replacement = _INSTANCE(shift, 'PPI::Element') or return undef;
+	my $child       = _INSTANCE( shift, 'PPI::Element' ) or return undef;
+	my $replacement = _INSTANCE( shift, 'PPI::Element' ) or return undef;
 
 	my $success = $self->__replace_child( $child, $replacement );
 
@@ -560,10 +553,10 @@ sub prune {
 	# Use a depth-first queue search
 	my $pruned = 0;
 	my @queue  = $self->children;
-	my $ok = eval {
+	my $ok     = eval {
 		while ( my $element = shift @queue ) {
 			my $rv = &$wanted( $self, $element );
-			if ( $rv ) {
+			if ($rv) {
 				# Delete the child
 				$element->delete or return undef;
 				$pruned++;
@@ -573,7 +566,7 @@ sub prune {
 			# Support the undef == "don't descend"
 			next unless defined $rv;
 
-			if ( _INSTANCE($element, 'PPI::Node') ) {
+			if ( _INSTANCE( $element, 'PPI::Node' ) ) {
 				# Depth-first keeps the queue size down
 				unshift @queue, $element->children;
 			}
@@ -582,7 +575,7 @@ sub prune {
 	};
 	if ( !$ok ) {
 		# Caught exception thrown from the wanted function
-		return undef;		
+		return undef;
 	}
 
 	$pruned;
@@ -594,7 +587,7 @@ sub prune {
 ###       break File::Find::Rule::PPI
 sub _wanted {
 	my $either = shift;
-	my $it     = defined($_[0]) ? shift : do {
+	my $it     = defined( $_[0] ) ? shift : do {
 		Carp::carp('Undefined value passed as search condition') if $^W;
 		return undef;
 	};
@@ -603,15 +596,18 @@ sub _wanted {
 	return $it if _CODELIKE($it);
 	if ( ref $it ) {
 		# No other ref types are supported
-		Carp::carp('Illegal non-CODE reference passed as search condition') if $^W;
+		Carp::carp('Illegal non-CODE reference passed as search condition')
+		  if $^W;
 		return undef;
 	}
 
 	# The first argument should be an Element class, possibly in shorthand
-	$it = "PPI::$it" unless substr($it, 0, 5) eq 'PPI::';
+	$it = "PPI::$it" unless substr( $it, 0, 5 ) eq 'PPI::';
 	unless ( _CLASS($it) and $it->isa('PPI::Element') ) {
 		# We got something, but it isn't an element
-		Carp::carp("Cannot create search condition for '$it': Not a PPI::Element") if $^W;
+		Carp::carp(
+			"Cannot create search condition for '$it': Not a PPI::Element")
+		  if $^W;
 		return undef;
 	}
 
@@ -624,45 +620,42 @@ sub _wanted {
 		my $content = shift;
 		if ( ref $content eq 'Regexp' ) {
 			$content = "$content";
-		} elsif ( ref $content ) {
+		}
+		elsif ( ref $content ) {
 			# No other ref types are supported
-			Carp::carp("Cannot create search condition for '$it': Not a PPI::Element") if $^W;
+			Carp::carp(
+				"Cannot create search condition for '$it': Not a PPI::Element")
+			  if $^W;
 			return undef;
-		} else {
+		}
+		else {
 			$content = quotemeta $content;
 		}
 
 		# Complete the content part of the wanted function
 		$wanted_content .= "\n\treturn '' unless defined \$_[1]->{content};";
-		$wanted_content .= "\n\treturn '' unless \$_[1]->{content} =~ /$content/;";
+		$wanted_content .=
+		  "\n\treturn '' unless \$_[1]->{content} =~ /$content/;";
 	}
 
 	# Create the complete wanted function
-	my $code = "sub {"
-		. $wanted_class
-		. $wanted_content
-		. "\n\t1;"
-		. "\n}";
+	my $code = "sub {" . $wanted_class . $wanted_content . "\n\t1;" . "\n}";
 
 	# Compile the wanted function
 	$code = eval $code;
-	(ref $code eq 'CODE') ? $code : undef;
+	( ref $code eq 'CODE' ) ? $code : undef;
 }
-
-
-
-
 
 ####################################################################
 # PPI::Element overloaded methods
 
 sub tokens {
-	map { $_->tokens } @{$_[0]->{children}};
+	map { $_->tokens } @{ $_[0]->{children} };
 }
 
 ### XS -> PPI/XS.xs:_PPI_Element__content 0.900+
 sub content {
-	join '', map { $_->content } @{$_[0]->{children}};
+	join '', map { $_->content } @{ $_[0]->{children} };
 }
 
 # Clone as normal, but then go down and relink all the _PARENT entries
@@ -679,10 +672,6 @@ sub location {
 	$first->location;
 }
 
-
-
-
-
 #####################################################################
 # Internal Methods
 
@@ -690,8 +679,8 @@ sub DESTROY {
 	local $_;
 	if ( $_[0]->{children} ) {
 		my @queue = $_[0];
-		while ( defined($_ = shift @queue) ) {
-			unshift @queue, @{delete $_->{children}} if $_->{children};
+		while ( defined( $_ = shift @queue ) ) {
+			unshift @queue, @{ delete $_->{children} } if $_->{children};
 
 			# Remove all internal/private weird crosslinking so that
 			# the cascading DESTROY calls will get called properly.
@@ -706,17 +695,18 @@ sub __position {
 	my ( $self, $child ) = @_;
 	my $key = refaddr $child;
 
-	return undef unless #
-		my $elements = $self->{children};
+	return undef unless    #
+	  my $elements = $self->{children};
 
-	if (defined (my $position = $_POSITION_CACHE{$key})) {
+	if ( defined( my $position = $_POSITION_CACHE{$key} ) ) {
 		my $maybe_child = $elements->[$position];
-		return $position if defined $maybe_child and refaddr $maybe_child == $key;
+		return $position
+		  if defined $maybe_child and refaddr $maybe_child == $key;
 	}
 
 	delete $_POSITION_CACHE{$key};
 
-	$_POSITION_CACHE{refaddr $elements->[$_]} = $_ for 0 .. $#{$elements};
+	$_POSITION_CACHE{ refaddr $elements->[$_] } = $_ for 0 .. $#{$elements};
 
 	return $_POSITION_CACHE{$key};
 }
@@ -724,49 +714,43 @@ sub __position {
 # Insert one or more elements before a child
 sub __insert_before_child {
 	my ( $self, $child, @insertions ) = @_;
-	my $key  = refaddr $child;
-	my $p    = $self->__position($child);
-	foreach ( @insertions ) {
-		Scalar::Util::weaken(
-			$_PARENT{refaddr $_} = $self
-			);
+	my $key = refaddr $child;
+	my $p   = $self->__position($child);
+	foreach (@insertions) {
+		Scalar::Util::weaken( $_PARENT{ refaddr $_ } = $self );
 	}
-	splice( @{$self->{children}}, $p, 0, @insertions );
+	splice( @{ $self->{children} }, $p, 0, @insertions );
 	1;
 }
 
 # Insert one or more elements after a child
 sub __insert_after_child {
 	my ( $self, $child, @insertions ) = @_;
-	my $key  = refaddr $child;
-	my $p    = $self->__position($child);
-	foreach ( @insertions ) {
-		Scalar::Util::weaken(
-			$_PARENT{refaddr $_} = $self
-			);
+	my $key = refaddr $child;
+	my $p   = $self->__position($child);
+	foreach (@insertions) {
+		Scalar::Util::weaken( $_PARENT{ refaddr $_ } = $self );
 	}
-	splice( @{$self->{children}}, $p + 1, 0, @insertions );
+	splice( @{ $self->{children} }, $p + 1, 0, @insertions );
 	1;
 }
 
 # Replace a child
 sub __replace_child {
 	my ( $self, $old_child, @replacements ) = @_;
-	my $old_child_addr  = refaddr $old_child;
+	my $old_child_addr = refaddr $old_child;
 
 	# Cache parent of new children
 	my $old_child_index = $self->__position($old_child);
 
 	return undef if !defined $old_child_index;
 
-	foreach ( @replacements ) {
-		Scalar::Util::weaken(
-			$_PARENT{refaddr $_} = $self
-			);
+	foreach (@replacements) {
+		Scalar::Util::weaken( $_PARENT{ refaddr $_ } = $self );
 	}
 
 	# Replace old child with new children
-	splice( @{$self->{children}}, $old_child_index, 1, @replacements );
+	splice( @{ $self->{children} }, $old_child_index, 1, @replacements );
 
 	# Uncache parent of old child
 	delete $_PARENT{$old_child_addr};
@@ -779,24 +763,20 @@ sub __link_children {
 	my $self = shift;
 
 	# Relink all our children ( depth first )
-	my @queue = ( $self );
+	my @queue = ($self);
 	while ( my $Node = shift @queue ) {
 		# Link our immediate children
-		foreach my $Element ( @{$Node->{children}} ) {
-			Scalar::Util::weaken(
-				$_PARENT{refaddr($Element)} = $Node
-				);
+		foreach my $Element ( @{ $Node->{children} } ) {
+			Scalar::Util::weaken( $_PARENT{ refaddr($Element) } = $Node );
 			unshift @queue, $Element if $Element->isa('PPI::Node');
 		}
 
 		# If it's a structure, relink the open/close braces
 		next unless $Node->isa('PPI::Structure');
-		Scalar::Util::weaken(
-			$_PARENT{refaddr($Node->start)}  = $Node
-			) if $Node->start;
-		Scalar::Util::weaken(
-			$_PARENT{refaddr($Node->finish)} = $Node
-			) if $Node->finish;
+		Scalar::Util::weaken( $_PARENT{ refaddr( $Node->start ) } = $Node )
+		  if $Node->start;
+		Scalar::Util::weaken( $_PARENT{ refaddr( $Node->finish ) } = $Node )
+		  if $Node->finish;
 	}
 
 	1;

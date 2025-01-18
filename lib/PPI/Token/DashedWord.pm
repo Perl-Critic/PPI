@@ -44,8 +44,6 @@ C<content> because C<-Foo'Bar> expands to C<-Foo::Bar>.
 
 *literal = *PPI::Token::Word::literal;
 
-
-
 #####################################################################
 # Tokenizer Methods
 
@@ -62,13 +60,14 @@ sub __TOKENIZER__on_char {
 	# Are we a file test operator?
 	if ( $t->{token}->{content} =~ /^\-[rwxoRWXOezsfdlpSbctugkTBMAC]$/ ) {
 		# File test operator
-		$t->{class} = $t->{token}->set_class( 'Operator' );
-	} else {
+		$t->{class} = $t->{token}->set_class('Operator');
+	}
+	else {
 		# No, normal dashed bareword
-		$t->{class} = $t->{token}->set_class( 'Word' );
+		$t->{class} = $t->{token}->set_class('Word');
 	}
 
-	$t->_finalize_token->__TOKENIZER__on_char( $t );
+	$t->_finalize_token->__TOKENIZER__on_char($t);
 }
 
 1;

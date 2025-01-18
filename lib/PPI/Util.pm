@@ -14,16 +14,12 @@ our @EXPORT_OK = qw{ _Document _slurp };
 
 # 5.8.7 was the first version to resolve the notorious
 # "unicode length caching" bug.
-use constant HAVE_UNICODE => !! ( $] >= 5.008007 );
+use constant HAVE_UNICODE => !!( $] >= 5.008007 );
 
 # Common reusable true and false functions
 # This makes it easy to upgrade many places in PPI::XS
-sub TRUE  () { 1  }
+sub TRUE ()  { 1 }
 sub FALSE () { '' }
-
-
-
-
 
 #####################################################################
 # Functions
@@ -35,9 +31,9 @@ sub _Document {
 	return undef unless defined $_[0];
 	require PPI::Document;
 	return PPI::Document->new(shift) unless ref $_[0];
-	return PPI::Document->new(shift) if _SCALAR0($_[0]);
-	return PPI::Document->new(shift) if _ARRAY0($_[0]);
-	return shift if _INSTANCE($_[0], 'PPI::Document');
+	return PPI::Document->new(shift) if _SCALAR0( $_[0] );
+	return PPI::Document->new(shift) if _ARRAY0( $_[0] );
+	return shift                     if _INSTANCE( $_[0], 'PPI::Document' );
 	return undef;
 }
 
@@ -48,7 +44,7 @@ sub _slurp {
 	local *FILE;
 	open( FILE, '<', $file ) or return "open($file) failed: $!";
 	my $source = <FILE>;
-	close( FILE ) or return "close($file) failed: $!";
+	close(FILE) or return "close($file) failed: $!";
 	return \$source;
 }
 

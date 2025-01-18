@@ -21,7 +21,7 @@ $Test::ClassAPI::IGNORE{'reftype'}++;
 $Test::ClassAPI::IGNORE{'blessed'}++;
 
 # Execute the tests
-Test::ClassAPI->execute('complete', 'collisions');
+Test::ClassAPI->execute( 'complete', 'collisions' );
 exit(0);
 
 # Now, define the API for the classes

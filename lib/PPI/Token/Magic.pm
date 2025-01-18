@@ -42,9 +42,9 @@ L<PPI::Token::Symbol>, L<PPI::Token> and L<PPI::Element>.
 =cut
 
 use strict;
-use PPI::Token::Symbol ();
+use PPI::Token::Symbol  ();
 use PPI::Token::Unknown ();
-use PPI::Singletons qw' %MAGIC $CURLY_SYMBOL ';
+use PPI::Singletons     qw' %MAGIC $CURLY_SYMBOL ';
 
 our $VERSION = '1.282';
 
@@ -69,19 +69,19 @@ sub __TOKENIZER__on_char {
 			if ( $c =~ /^\$\'\d$/ ) {
 				# In this case, we have a magic plus a digit.
 				# Save the CURRENT token, and rerun the on_char
-				return $t->_finalize_token->__TOKENIZER__on_char( $t );
+				return $t->_finalize_token->__TOKENIZER__on_char($t);
 			}
 
 			# A symbol in the style $_foo or $::foo or $'foo.
 			# Overwrite the current token
 			$t->{class} = $t->{token}->set_class('Symbol');
-			return PPI::Token::Symbol->__TOKENIZER__on_char( $t );
+			return PPI::Token::Symbol->__TOKENIZER__on_char($t);
 		}
 
 		if ( $c =~ /^\$\$\w/ ) {
 			# This is really a scalar dereference. ( $$foo )
 			# Add the current token as the cast...
-			$t->{token} = PPI::Token::Cast->new( '$' );
+			$t->{token} = PPI::Token::Cast->new('$');
 			$t->_finalize_token;
 
 			# ... and create a new token for the symbol
@@ -95,7 +95,7 @@ sub __TOKENIZER__on_char {
 			if ( $t->{line} =~ m/$CURLY_SYMBOL/gc ) {
 				# This is really a dereference. ( $${^_foo} )
 				# Add the current token as the cast...
-				$t->{token} = PPI::Token::Cast->new( '$' );
+				$t->{token} = PPI::Token::Cast->new('$');
 				$t->_finalize_token;
 
 				# ... and create a new token for the symbol
@@ -107,22 +107,24 @@ sub __TOKENIZER__on_char {
 			# This is really an index dereferencing cast, although
 			# it has the same two chars as the magic variable $#.
 			$t->{class} = $t->{token}->set_class('Cast');
-			return $t->_finalize_token->__TOKENIZER__on_char( $t );
+			return $t->_finalize_token->__TOKENIZER__on_char($t);
 		}
 
 		if ( $c =~ /^(\$\#)\w/ ) {
 			# This is really an array index thingy ( $#array )
-			$t->{token} = PPI::Token::ArrayIndex->new( "$1" );
-			return PPI::Token::ArrayIndex->__TOKENIZER__on_char( $t );
+			$t->{token} = PPI::Token::ArrayIndex->new("$1");
+			return PPI::Token::ArrayIndex->__TOKENIZER__on_char($t);
 		}
 
 		if ( $c =~ /^\$\^\w+$/o ) {
 			# It's an escaped char magic... maybe ( like $^M )
-			my $next = substr( $t->{line}, $t->{line_cursor}+1, 1 ); # Peek ahead
-			if ($MAGIC{$c} && (!$next || $next !~ /\w/)) {
+			my $next =
+			  substr( $t->{line}, $t->{line_cursor} + 1, 1 );    # Peek ahead
+			if ( $MAGIC{$c} && ( !$next || $next !~ /\w/ ) ) {
 				$t->{token}->{content} = $c;
 				$t->{line_cursor}++;
-			} else {
+			}
+			else {
 				# Maybe it's a long magic variable like $^WIDE_SYSTEM_CALLS
 				return 1;
 			}
@@ -131,19 +133,21 @@ sub __TOKENIZER__on_char {
 		if ( $c =~ /^\$\#\{/ ) {
 			# The $# is actually a cast, and { is its block
 			# Add the current token as the cast...
-			$t->{token} = PPI::Token::Cast->new( '$#' );
+			$t->{token} = PPI::Token::Cast->new('$#');
 			$t->_finalize_token;
 
 			# ... and create a new token for the block
 			return $t->_new_token( 'Structure', '{' );
 		}
-	} elsif ($c =~ /^%\^/) {
+	}
+	elsif ( $c =~ /^%\^/ ) {
 		return 1 if $c eq '%^';
 		# It's an escaped char magic... maybe ( like %^H )
-		if ($MAGIC{$c}) {
+		if ( $MAGIC{$c} ) {
 			$t->{token}->{content} = $c;
 			$t->{line_cursor}++;
-		} else {
+		}
+		else {
 			# Back off, treat '%' as an operator
 			chop $t->{token}->{content};
 			bless $t->{token}, $t->{class} = 'PPI::Token::Operator';
@@ -153,15 +157,17 @@ sub __TOKENIZER__on_char {
 
 	if ( $MAGIC{$c} ) {
 		# $#+ and $#-
-		$t->{line_cursor} += length( $c ) - length( $t->{token}->{content} );
+		$t->{line_cursor} += length($c) - length( $t->{token}->{content} );
 		$t->{token}->{content} = $c;
-	} else {
+	}
+	else {
 		pos $t->{line} = $t->{line_cursor};
 		if ( $t->{line} =~ m/($CURLY_SYMBOL)/gc ) {
 			# control character symbol (e.g. ${^MATCH})
 			$t->{token}->{content} .= $1;
-			$t->{line_cursor}      += length $1;
-		} elsif ( $c =~ /^\$\d+$/ and $t->{line} =~ /\G(\d+)/gc ) {
+			$t->{line_cursor} += length $1;
+		}
+		elsif ( $c =~ /^\$\d+$/ and $t->{line} =~ /\G(\d+)/gc ) {
 			# Grab trailing digits of regex capture variables.
 			$t->{token}{content} .= $1;
 			$t->{line_cursor} += length $1;
@@ -169,7 +175,7 @@ sub __TOKENIZER__on_char {
 	}
 
 	# End the current magic token, and recheck
-	$t->_finalize_token->__TOKENIZER__on_char( $t );
+	$t->_finalize_token->__TOKENIZER__on_char($t);
 }
 
 # Our version of canonical is plain simple

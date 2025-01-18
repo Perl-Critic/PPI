@@ -26,10 +26,6 @@ our $VERSION = '1.282';
 
 our @ISA = 'PPI::Document';
 
-
-
-
-
 #####################################################################
 # Constructor and Accessors
 
@@ -62,10 +58,12 @@ sub new {
 	# Unlike a normal inheritance situation, due to our need to stay
 	# compatible with caching magic, this actually returns a regular
 	# anonymous document. We need to rebless if
-	if ( _INSTANCE($self, 'PPI::Document') ) {
+	if ( _INSTANCE( $self, 'PPI::Document' ) ) {
 		bless $self, 'PPI::Document::File';
-	} else {
-		die "PPI::Document::File SUPER call returned an object of the wrong type";
+	}
+	else {
+		die
+		  "PPI::Document::File SUPER call returned an object of the wrong type";
 	}
 
 	$self;

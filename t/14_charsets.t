@@ -1,34 +1,31 @@
-﻿#!/usr/bin/perl
+#!/usr/bin/perl
 
 use lib 't/lib';
 use PPI::Test::pragmas;
 use Test::More;
+
 BEGIN {
-	if ($] < 5.008007) {
+	if ( $] < 5.008007 ) {
 		Test::More->import( skip_all => "Unicode support requires perl 5.8.7" );
 		exit(0);
 	}
-	plan( tests => 44 + ($ENV{AUTHOR_TESTING} ? 1 : 0) );
+	plan( tests => 44 + ( $ENV{AUTHOR_TESTING} ? 1 : 0 ) );
 }
 
-use utf8;  # perl version check above says this is okay
+use utf8;    # perl version check above says this is okay
 use Params::Util qw( _INSTANCE );
-use PPI ();
+use PPI          ();
 use Helper 'safe_new';
 
 sub good_ok {
 	my $source  = shift;
 	my $message = shift;
-	my $doc = safe_new \$source;
-	ok( _INSTANCE($doc, 'PPI::Document'), $message );
-	if ( ! _INSTANCE($doc, 'PPI::Document') ) {
+	my $doc     = safe_new \$source;
+	ok( _INSTANCE( $doc, 'PPI::Document' ), $message );
+	if ( !_INSTANCE( $doc, 'PPI::Document' ) ) {
 		diag($PPI::Document::errstr);
 	}
 }
-
-
-
-
 
 #####################################################################
 # Begin Tests
@@ -51,15 +48,15 @@ SKIP: {
 
 	# Testing accented characters in UTF-8
 	good_ok( 'sub func { }',           "Parsed code without accented chars" );
-	good_ok( 'rätselhaft();',          "Function with umlaut"               );
-	good_ok( 'ätselhaft()',            "Starting with umlaut"               );
-	good_ok( '"rätselhaft"',           "In double quotes"                   );
-	good_ok( "'rätselhaft'",           "In single quotes"                   );
-	good_ok( 'sub func { s/a/ä/g; }',  "Regex with umlaut"                  );
-	good_ok( 'sub func { $ä=1; }',     "Variable with umlaut"               );
-	good_ok( '$一 = "壹";',              "Variables with Chinese characters"  );
-	good_ok( '$a=1; # ä is an umlaut', "Comment with umlaut"                );
-	good_ok( <<'END_CODE',             "POD with umlaut"                    );
+	good_ok( 'rätselhaft();',          "Function with umlaut" );
+	good_ok( 'ätselhaft()',            "Starting with umlaut" );
+	good_ok( '"rätselhaft"',           "In double quotes" );
+	good_ok( "'rätselhaft'",           "In single quotes" );
+	good_ok( 'sub func { s/a/ä/g; }',  "Regex with umlaut" );
+	good_ok( 'sub func { $ä=1; }',     "Variable with umlaut" );
+	good_ok( '$一 = "壹";',              "Variables with Chinese characters" );
+	good_ok( '$a=1; # ä is an umlaut', "Comment with umlaut" );
+	good_ok( <<'END_CODE',             "POD with umlaut" );
 sub func { }
 
 =pod
@@ -69,13 +66,15 @@ sub func { }
 } 
 END_CODE
 
-	ok(utf8::is_utf8('κλειδί'), "utf8 flag set on source string");
-	good_ok( 'my %h = ( κλειδί => "Clé" );', "Hash with greek key in character string"          );
+	ok( utf8::is_utf8('κλειδί'), "utf8 flag set on source string" );
+	good_ok( 'my %h = ( κλειδί => "Clé" );',
+		"Hash with greek key in character string" );
 	use Encode ();
-	my $bytes = Encode::encode('utf8', 'use utf8; my %h = ( κλειδί => "Clé" );');
-	ok(!utf8::is_utf8($bytes), "utf8 flag not set on byte string");
+	my $bytes =
+	  Encode::encode( 'utf8', 'use utf8; my %h = ( κλειδί => "Clé" );' );
+	ok( !utf8::is_utf8($bytes), "utf8 flag not set on byte string" );
 	{
-	    local $TODO = "Fix CRASH";
-	    good_ok( $bytes, "Hash with greek key in bytes string"          );
+		local $TODO = "Fix CRASH";
+		good_ok( $bytes, "Hash with greek key in bytes string" );
 	}
 }

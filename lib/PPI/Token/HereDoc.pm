@@ -90,10 +90,6 @@ our $VERSION = '1.282';
 
 our @ISA = "PPI::Token";
 
-
-
-
-
 #####################################################################
 # PPI::Token::HereDoc Methods
 
@@ -110,7 +106,7 @@ the here-doc, B<excluding> the terminator line.
 
 =cut
 
-sub heredoc { @{shift->{_heredoc}} }
+sub heredoc { @{ shift->{_heredoc} } }
 
 =pod
 
@@ -143,9 +139,10 @@ sub terminator {
 
 sub _is_terminator {
 	my ( $self, $terminator, $line, $indented ) = @_;
-	if ( $indented ) {
+	if ($indented) {
 		return $line =~ /^\s*\Q$terminator\E$/;
-	} else {
+	}
+	else {
 		return $line eq $terminator;
 	}
 }
@@ -158,11 +155,9 @@ sub _indent {
 
 sub _is_match_indent {
 	my ( $self, $token, $indent ) = @_;
-	return (grep { /^$indent/ || $_ eq "\n" } @{$token->{_heredoc}}) == @{$token->{_heredoc}};
+	return ( grep { /^$indent/ || $_ eq "\n" } @{ $token->{_heredoc} } ) ==
+	  @{ $token->{_heredoc} };
 }
-
-
-
 
 #####################################################################
 # Tokenizer Methods
@@ -179,10 +174,12 @@ sub __TOKENIZER__on_char {
 	### empty line.
 	pos $t->{line} = $t->{line_cursor};
 
-	if ( $t->{line} !~ m/\G( ~? \s* (?: "[^"]*" | '[^']*' | `[^`]*` | \\?\w+ ) )/gcx ) {
+	if ( $t->{line} !~
+		m/\G( ~? \s* (?: "[^"]*" | '[^']*' | `[^`]*` | \\?\w+ ) )/gcx )
+	{
 		# Degenerate to a left-shift operation
 		$t->{token}->set_class('Operator');
-		return $t->_finalize_token->__TOKENIZER__on_char( $t );
+		return $t->_finalize_token->__TOKENIZER__on_char($t);
 	}
 
 	# Add the rest of the token, work out what type it is,
@@ -200,34 +197,39 @@ sub __TOKENIZER__on_char {
 		$token->{_indented}   = 1 if $1 eq '~';
 		$token->{_terminator} = $2;
 
-	} elsif ( $content =~ /^\<\<(~?)\s*\'(.*)\'$/ ) {
+	}
+	elsif ( $content =~ /^\<\<(~?)\s*\'(.*)\'$/ ) {
 		# ''-quoted literal
 		$token->{_mode}       = 'literal';
 		$token->{_indented}   = 1 if $1 eq '~';
 		$token->{_terminator} = $2;
 		$token->{_terminator} =~ s/\\'/'/g;
 
-	} elsif ( $content =~ /^\<\<(~?)\s*\"(.*)\"$/ ) {
+	}
+	elsif ( $content =~ /^\<\<(~?)\s*\"(.*)\"$/ ) {
 		# ""-quoted literal
 		$token->{_mode}       = 'interpolate';
 		$token->{_indented}   = 1 if $1 eq '~';
 		$token->{_terminator} = $2;
 		$token->{_terminator} =~ s/\\"/"/g;
 
-	} elsif ( $content =~ /^\<\<(~?)\s*\`(.*)\`$/ ) {
+	}
+	elsif ( $content =~ /^\<\<(~?)\s*\`(.*)\`$/ ) {
 		# ``-quoted command
 		$token->{_mode}       = 'command';
 		$token->{_indented}   = 1 if $1 eq '~';
 		$token->{_terminator} = $2;
 		$token->{_terminator} =~ s/\\`/`/g;
 
-	} elsif ( $content =~ /^\<\<(~?)\\(\w+)$/ ) {
+	}
+	elsif ( $content =~ /^\<\<(~?)\\(\w+)$/ ) {
 		# Legacy forward-slashed bareword
 		$token->{_mode}       = 'literal';
 		$token->{_indented}   = 1 if $1 eq '~';
 		$token->{_terminator} = $2;
 
-	} else {
+	}
+	else {
 		# WTF?
 		return undef;
 	}
@@ -236,13 +238,14 @@ sub __TOKENIZER__on_char {
 	$token->{_heredoc} = \my @heredoc;
 	my $terminator = $token->{_terminator} . "\n";
 	while ( defined( my $line = $t->_get_line ) ) {
-		if ( $self->_is_terminator( $terminator, $line, $token->{_indented} ) ) {
+		if ( $self->_is_terminator( $terminator, $line, $token->{_indented} ) )
+		{
 			# Keep the actual termination line for consistency
 			# when we are re-assembling the file
 			$token->{_terminator_line} = $line;
 
 			if ( $token->{_indented} ) {
-				my $indent = $self->_indent( $token );
+				my $indent = $self->_indent($token);
 				$token->{_indentation} = $indent;
 				# Indentation of here-doc doesn't match delimiter
 				unless ( $self->_is_match_indent( $token, $indent ) ) {
@@ -254,7 +257,7 @@ sub __TOKENIZER__on_char {
 			}
 
 			# The HereDoc is now fully parsed
-			return $t->_finalize_token->__TOKENIZER__on_char( $t );
+			return $t->_finalize_token->__TOKENIZER__on_char($t);
 		}
 
 		# Add the line
@@ -281,11 +284,12 @@ sub __TOKENIZER__on_char {
 		# newline at the end. If so, remove it from the content and set it as
 		# the terminator line.
 		$token->{_terminator_line} = pop @heredoc
-			if $self->_is_terminator( $token->{_terminator}, $heredoc[-1], $token->{_indented} );
+		  if $self->_is_terminator( $token->{_terminator}, $heredoc[-1],
+			$token->{_indented} );
 	}
 
 	if ( $token->{_indented} && $token->{_terminator_line} ) {
-		my $indent = $self->_indent( $token );
+		my $indent = $self->_indent($token);
 		$token->{_indentation} = $indent;
 		if ( $self->_is_match_indent( $token, $indent ) ) {
 			# Remove indent from here-doc as much as possible
@@ -300,7 +304,7 @@ sub __TOKENIZER__on_char {
 	$token->{_damaged} = 1;
 
 	# The HereDoc is not fully parsed
-	$t->_finalize_token->__TOKENIZER__on_char( $t );
+	$t->_finalize_token->__TOKENIZER__on_char($t);
 }
 
 1;

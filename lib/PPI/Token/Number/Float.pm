@@ -55,16 +55,12 @@ Return the numeric value of this token.
 
 sub literal {
 	my $self = shift;
-	my $str = $self->_literal;
-	my $neg = $str =~ s/^\-//;
+	my $str  = $self->_literal;
+	my $neg  = $str =~ s/^\-//;
 	$str =~ s/^\./0./;
-	my $val = 0+$str;
+	my $val = 0 + $str;
 	return $neg ? -$val : $val;
 }
-
-
-
-
 
 #####################################################################
 # Tokenizer Methods
@@ -80,39 +76,41 @@ sub __TOKENIZER__on_char {
 	# Allow digits
 	return 1 if $char =~ /\d/o;
 
-	if ( $char eq '.' ) { # A second decimal point? That gets complicated.
+	if ( $char eq '.' ) {    # A second decimal point? That gets complicated.
 		if ( $t->{token}{content} =~ /\.$/ ) {
 			# We have a .., which is an operator. Take the . off the end of the
 			# token and finish it, then make the .. operator.
 			chop $t->{token}{content};
-			$t->{class} = $t->{token}->set_class( 'Number' );
-			$t->_new_token('Operator', '..');
+			$t->{class} = $t->{token}->set_class('Number');
+			$t->_new_token( 'Operator', '..' );
 			return 0;
-		} elsif ( $t->{token}{content} =~ /\._/ ) {
-			($t->{token}{content}, my $bareword)
-				= split /\./, $t->{token}{content};
-			$t->{class} = $t->{token}->set_class( 'Number' );
-			$t->_new_token('Operator', '.');
-			$t->_new_token('Word', $bareword);
-			$t->_new_token('Operator', '.');
+		}
+		elsif ( $t->{token}{content} =~ /\._/ ) {
+			( $t->{token}{content}, my $bareword ) = split /\./,
+			  $t->{token}{content};
+			$t->{class} = $t->{token}->set_class('Number');
+			$t->_new_token( 'Operator', '.' );
+			$t->_new_token( 'Word',     $bareword );
+			$t->_new_token( 'Operator', '.' );
 			return 0;
-		} else {
-			$t->{class} = $t->{token}->set_class( 'Number::Version' );
+		}
+		else {
+			$t->{class} = $t->{token}->set_class('Number::Version');
 			return 1;
 		}
 	}
 
 	# perl seems to regard pretty much anything that's not strictly an exp num
 	# as float + stuff
-	my $char2 = substr $t->{line}, $t->{line_cursor}+1, 1;
-	if ("$char$char2" =~ /[eE][0-9+-]/) {
-		$t->{class} = $t->{token}->set_class( 'Number::Exp' );
+	my $char2 = substr $t->{line}, $t->{line_cursor} + 1, 1;
+	if ( "$char$char2" =~ /[eE][0-9+-]/ ) {
+		$t->{class} = $t->{token}->set_class('Number::Exp');
 		return 1;
 	}
 
 	# Doesn't fit a special case, or is after the end of the token
 	# End of token.
-	$t->_finalize_token->__TOKENIZER__on_char( $t );
+	$t->_finalize_token->__TOKENIZER__on_char($t);
 }
 
 1;

@@ -53,15 +53,11 @@ Return the numeric value of this token.
 
 sub literal {
 	my $self = shift;
-	my $str = $self->_literal;
-	my $neg = $str =~ s/^\-//;
-	my $val = hex lc( $str ); # lc for compatibility with perls before 5.14
+	my $str  = $self->_literal;
+	my $neg  = $str =~ s/^\-//;
+	my $val  = hex lc($str);      # lc for compatibility with perls before 5.14
 	return $neg ? -$val : $val;
 }
-
-
-
-
 
 #####################################################################
 # Tokenizer Methods
@@ -80,7 +76,7 @@ sub __TOKENIZER__on_char {
 
 	# Doesn't fit a special case, or is after the end of the token
 	# End of token.
-	$t->_finalize_token->__TOKENIZER__on_char( $t );
+	$t->_finalize_token->__TOKENIZER__on_char($t);
 }
 
 1;

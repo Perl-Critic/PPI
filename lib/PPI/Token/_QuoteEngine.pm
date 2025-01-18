@@ -35,17 +35,13 @@ use Carp ();
 
 our $VERSION = '1.282';
 
-
-
-
-
 # Hook for the __TOKENIZER__on_char token call
 sub __TOKENIZER__on_char {
 	my $class = shift;
 	my $t     = $_[0]->{token} ? shift : return undef;
 
 	# Call the fill method to process the quote
-	my $rv = $t->{token}->_fill( $t );
+	my $rv = $t->{token}->_fill($t);
 	return undef unless defined $rv;
 
 	## Doesn't support "end of file" indicator
@@ -56,10 +52,6 @@ sub __TOKENIZER__on_char {
 
 	0;
 }
-
-
-
-
 
 #####################################################################
 # Optimised character processors, used for quotes
@@ -74,7 +66,7 @@ sub __TOKENIZER__on_char {
 sub _scan_for_unescaped_character {
 	my $class = shift;
 	my $t     = shift;
-	my $char  = (length $_[0] == 1) ? quotemeta shift : return undef;
+	my $char  = ( length $_[0] == 1 ) ? quotemeta shift : return undef;
 
 	# Create the search regex.
 	# Same as above but with a negative look-behind assertion.
@@ -95,13 +87,15 @@ sub _scan_for_unescaped_character {
 		# Load in the next line
 		$string .= substr $t->{line}, $t->{line_cursor};
 		my $rv = $t->_fill_line('inscan');
-		if ( $rv ) {
+		if ($rv) {
 			# Push to first character
 			$t->{line_cursor} = 0;
-		} elsif ( defined $rv ) {
+		}
+		elsif ( defined $rv ) {
 			# We hit the End of File
 			return \$string;
-		} else {
+		}
+		else {
 			# Unexpected error
 			return undef;
 		}
@@ -115,20 +109,21 @@ sub _scan_for_unescaped_character {
 # and open close bracket pairs in the string. When complete, the
 # method leaves the line cursor on the LAST character found.
 sub _scan_for_brace_character {
-	my $class       = shift;
-	my $t           = shift;
-	my $close_brace = $_[0] =~ /^(?:\>|\)|\}|\])$/ ? shift : Carp::confess(''); # return undef;
-	my $open_brace  = $close_brace;
+	my $class = shift;
+	my $t     = shift;
+	my $close_brace =
+	  $_[0] =~ /^(?:\>|\)|\}|\])$/ ? shift : Carp::confess('');  # return undef;
+	my $open_brace = $close_brace;
 	$open_brace =~ tr/\>\)\}\]/\<\(\{\[/;
 
 	# Create the search string
 	$close_brace = quotemeta $close_brace;
-	$open_brace = quotemeta $open_brace;
+	$open_brace  = quotemeta $open_brace;
 	my $search = qr/\G(.*?(?<!\\)(?:\\\\)*(?:$open_brace|$close_brace))/;
 
 	# Loop as long as we can get new lines
 	my $string = '';
-	my $depth = 1;
+	my $depth  = 1;
 	while ( exists $t->{line} ) {
 		# Get the search area
 		pos $t->{line} = $t->{line_cursor};
@@ -138,7 +133,7 @@ sub _scan_for_brace_character {
 			# Load in the next line
 			$string .= substr( $t->{line}, $t->{line_cursor} );
 			my $rv = $t->_fill_line('inscan');
-			if ( $rv ) {
+			if ($rv) {
 				# Push to first character
 				$t->{line_cursor} = 0;
 				next;
@@ -157,7 +152,7 @@ sub _scan_for_brace_character {
 		$t->{line_cursor} += length $1;
 
 		# Alter the depth and continue if we aren't at the end
-		$depth += ($1 =~ /$open_brace$/) ? 1 : -1 and next;
+		$depth += ( $1 =~ /$open_brace$/ ) ? 1 : -1 and next;
 
 		# Rewind the cursor by one character ( cludgy hack )
 		$t->{line_cursor} -= 1;
@@ -200,13 +195,15 @@ sub _scan_quote_like_operator_gap {
 		# If we reach the EOF, $t->{line} gets deleted,
 		# which is caught by the while.
 		my $rv = $t->_fill_line('inscan');
-		if ( $rv ) {
+		if ($rv) {
 			# Set the cursor to the first character
 			$t->{line_cursor} = 0;
-		} elsif ( defined $rv ) {
+		}
+		elsif ( defined $rv ) {
 			# Returning the string as a reference indicates EOF
 			return \$string;
-		} else {
+		}
+		else {
 			return undef;
 		}
 	}
