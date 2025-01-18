@@ -36,13 +36,9 @@ use PPI::Token::_QuoteEngine::Full ();
 our $VERSION = '1.282';
 
 our @ISA = qw{
-	PPI::Token::_QuoteEngine::Full
-	PPI::Token::QuoteLike
+  PPI::Token::_QuoteEngine::Full
+  PPI::Token::QuoteLike
 };
-
-
-
-
 
 #####################################################################
 # PPI::Token::QuoteLike::Regexp Methods
@@ -57,7 +53,7 @@ will be compiled into the match portion of the regexp.
 =cut
 
 sub get_match_string {
-	return $_[0]->_section_content( 0 );
+	return $_[0]->_section_content(0);
 }
 
 =pod

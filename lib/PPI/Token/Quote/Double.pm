@@ -37,13 +37,9 @@ use PPI::Token::_QuoteEngine::Simple ();
 our $VERSION = '1.282';
 
 our @ISA = qw{
-	PPI::Token::_QuoteEngine::Simple
-	PPI::Token::Quote
+  PPI::Token::_QuoteEngine::Simple
+  PPI::Token::Quote
 };
-
-
-
-
 
 #####################################################################
 # PPI::Token::Quote::Double Methods
@@ -63,7 +59,7 @@ Returns true if the string contains interpolations, or false if not.
 # Upgrade: Returns parsed expressions.
 sub interpolations {
 	# Are there any unescaped $things in the string
-	!! ($_[0]->content =~ /(?<!\\)(?:\\\\)*[\$\@]/);
+	!!( $_[0]->content =~ /(?<!\\)(?:\\\\)*[\$\@]/ );
 }
 
 =pod
@@ -87,23 +83,17 @@ The object itself is returned as a convenience.
 
 sub simplify {
 	# This only works on EXACTLY this class
-	my $self = _INSTANCE(shift, 'PPI::Token::Quote::Double') or return undef;
+	my $self = _INSTANCE( shift, 'PPI::Token::Quote::Double' ) or return undef;
 
 	# Don't bother if there are characters that could complicate things
 	my $content = $self->content;
-	my $value   = substr($content, 1, length($content) - 2);
+	my $value   = substr( $content, 1, length($content) - 2 );
 	return $self if $value =~ /[\\\$@\'\"]/;
 
 	# Change the token to a single string
 	$self->{content} = "'$value'";
 	bless $self, 'PPI::Token::Quote::Single';
 }
-
-
-
-
-
-
 
 #####################################################################
 # PPI::Token::Quote Methods

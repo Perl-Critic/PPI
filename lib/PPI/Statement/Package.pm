@@ -65,11 +65,11 @@ If the package statement is done any different way, it returns false.
 =cut
 
 sub namespace {
-	my $self = shift;
+	my $self      = shift;
 	my $namespace = $self->schild(1) or return '';
 	$namespace->isa('PPI::Token::Word')
-		? $namespace->content
-		: '';
+	  ? $namespace->content
+	  : '';
 }
 
 =pod
@@ -87,11 +87,11 @@ document (if any), otherwise the empty string.
 =cut
 
 sub version {
-	my $self = shift;
+	my $self    = shift;
 	my $version = $self->schild(2) or return '';
 	$version->isa('PPI::Token::Structure')
-		? ''
-		: $version->content;
+	  ? ''
+	  : $version->content;
 }
 
 =pod
@@ -113,11 +113,13 @@ a file does not represent a scope.
 =cut
 
 sub file_scoped {
-	my $self     = shift;
-	my ($Parent, $Document) = ($self->parent, $self->top);
-	$Parent and $Document and $Parent == $Document
-	and $Document->isa('PPI::Document')
-	and ! $Document->isa('PPI::Document::Fragment');
+	my $self = shift;
+	my ( $Parent, $Document ) = ( $self->parent, $self->top );
+		  $Parent
+	  and $Document
+	  and $Parent == $Document
+	  and $Document->isa('PPI::Document')
+	  and !$Document->isa('PPI::Document::Fragment');
 }
 
 1;

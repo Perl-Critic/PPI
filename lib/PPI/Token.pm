@@ -73,25 +73,22 @@ use PPI::Token::Prototype             ();
 use PPI::Token::Attribute             ();
 use PPI::Token::Unknown               ();
 
-
-
-
-
 #####################################################################
 # Constructor and Related
 
 sub new {
-	bless { content => (defined $_[1] ? "$_[1]" : '') }, $_[0];
+	bless { content => ( defined $_[1] ? "$_[1]" : '' ) }, $_[0];
 }
 
 sub set_class {
-	my $self  = shift;
+	my $self = shift;
 	# @_ or throw Exception("No arguments to set_class");
-	my $class = substr( $_[0], 0, 12 ) eq 'PPI::Token::' ? shift : 'PPI::Token::' . shift;
+	my $class =
+	  substr( $_[0], 0, 12 ) eq 'PPI::Token::' ? shift : 'PPI::Token::' . shift;
 
 	# Find out if the current and new classes are complex
-	my $old_quote = (ref($self) =~ /\b(?:Quote|Regex)\b/o) ? 1 : 0;
-	my $new_quote = ($class =~ /\b(?:Quote|Regex)\b/o)     ? 1 : 0;
+	my $old_quote = ( ref($self) =~ /\b(?:Quote|Regex)\b/o ) ? 1 : 0;
+	my $new_quote = ( $class     =~ /\b(?:Quote|Regex)\b/o ) ? 1 : 0;
 
 	# No matter what happens, we will have to rebless
 	bless $self, $class;
@@ -99,7 +96,7 @@ sub set_class {
 	# If we are changing to or from a Quote style token, we
 	# can't just rebless and need to do some extra thing
 	# Otherwise, we have done enough
-	return $class if ($old_quote - $new_quote) == 0;
+	return $class if ( $old_quote - $new_quote ) == 0;
 
 	# Make a new token from the old content, and overwrite the current
 	# token's attributes with the new token's attributes.
@@ -109,10 +106,6 @@ sub set_class {
 	# Return the class as a convenience
 	return $class;
 }
-
-
-
-
 
 #####################################################################
 # PPI::Token Methods
@@ -153,11 +146,7 @@ The C<length> method returns the length of the string in a Token.
 
 =cut
 
-sub length { CORE::length($_[0]->{content}) }
-
-
-
-
+sub length { CORE::length( $_[0]->{content} ) }
 
 #####################################################################
 # Overloaded PPI::Element methods
@@ -169,10 +158,11 @@ sub content {
 # You can insert either a statement, or a non-significant token.
 sub insert_before {
 	my $self    = shift;
-	my $Element = _INSTANCE(shift, 'PPI::Element')  or return undef;
+	my $Element = _INSTANCE( shift, 'PPI::Element' ) or return undef;
 	if ( $Element->isa('PPI::Structure') ) {
 		return $self->__insert_before($Element);
-	} elsif ( $Element->isa('PPI::Token') ) {
+	}
+	elsif ( $Element->isa('PPI::Token') ) {
 		return $self->__insert_before($Element);
 	}
 	'';
@@ -181,18 +171,15 @@ sub insert_before {
 # As above, you can insert a statement, or a non-significant token
 sub insert_after {
 	my $self    = shift;
-	my $Element = _INSTANCE(shift, 'PPI::Element') or return undef;
+	my $Element = _INSTANCE( shift, 'PPI::Element' ) or return undef;
 	if ( $Element->isa('PPI::Structure') ) {
 		return $self->__insert_after($Element);
-	} elsif ( $Element->isa('PPI::Token') ) {
+	}
+	elsif ( $Element->isa('PPI::Token') ) {
 		return $self->__insert_after($Element);
 	}
 	'';
 }
-
-
-
-
 
 #####################################################################
 # Tokenizer Methods
@@ -201,23 +188,17 @@ sub __TOKENIZER__on_line_start() { 1 }
 sub __TOKENIZER__on_line_end()   { 1 }
 sub __TOKENIZER__on_char()       { 'Unknown' }
 
-
-
-
-
 #####################################################################
 # Lexer Methods
 
 sub __LEXER__opens {
-	ref($_[0]) eq 'PPI::Token::Structure'
-	and
-	$_[0]->{content} =~ /(?:\(|\[|\{)/
+	ref( $_[0] ) eq 'PPI::Token::Structure'
+	  and $_[0]->{content} =~ /(?:\(|\[|\{)/;
 }
 
 sub __LEXER__closes {
-	ref($_[0]) eq 'PPI::Token::Structure'
-	and
-	$_[0]->{content} =~ /(?:\)|\]|\})/
+	ref( $_[0] ) eq 'PPI::Token::Structure'
+	  and $_[0]->{content} =~ /(?:\)|\]|\})/;
 }
 
 1;

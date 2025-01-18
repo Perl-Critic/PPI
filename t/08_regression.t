@@ -4,27 +4,21 @@
 
 # Some other regressions tests are included here for simplicity.
 
-use if !(-e 'META.yml'), "Test::InDistDir";
+use if !( -e 'META.yml' ), "Test::InDistDir";
 use lib 't/lib';
 use PPI::Test::pragmas;
-use Test::More tests => 1085 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+use Test::More tests => 1085 + ( $ENV{AUTHOR_TESTING} ? 1 : 0 );
 
-use PPI ();
-use PPI::Test qw( pause );
-use PPI::Test::Run ();
+use PPI             ();
+use PPI::Test       qw( pause );
+use PPI::Test::Run  ();
 use PPI::Singletons qw( %_PARENT );
 use Helper 'safe_new';
-
-
 
 #####################################################################
 # Code/Dump Testing
 
 PPI::Test::Run->run_testdir(qw{ t data 08_regression });
-
-
-
-
 
 #####################################################################
 # Regression Test for rt.cpan.org #11522
@@ -32,24 +26,20 @@ PPI::Test::Run->run_testdir(qw{ t data 08_regression });
 # Check that objects created in a foreach don't leak circulars.
 foreach ( 1 .. 3 ) {
 	pause();
-	is( scalar(keys(%_PARENT)), 0, "No parent links at start of loop $_" );
+	is( scalar( keys(%_PARENT) ), 0, "No parent links at start of loop $_" );
 	# Keep the document from going out of scope before the _PARENT test below.
-	my $Document = safe_new \q[print "Foo!"];  ## no critic ( Variables::ProhibitUnusedVarsStricter )
-	is( scalar(keys(%_PARENT)), 4, 'Correct number of keys created' );
+	my $Document = safe_new \q[print "Foo!"];    ## no critic ( Variables::ProhibitUnusedVarsStricter )
+	is( scalar( keys(%_PARENT) ), 4, 'Correct number of keys created' );
 }
 
-
-
-
-
 #####################################################################
-# A number of things picked up during exhaustive testing I want to 
+# A number of things picked up during exhaustive testing I want to
 # watch for regressions on
 
 # Create a document with a complete braced regexp
 SCOPE: {
 	my $Document = safe_new \"s {foo} <bar>i";
-	my $stmt   = $Document->first_element;
+	my $stmt     = $Document->first_element;
 	isa_ok( $stmt, 'PPI::Statement' );
 	my $regexp = $stmt->first_element;
 	isa_ok( $regexp, 'PPI::Token::Regexp::Substitute' );
@@ -62,24 +52,27 @@ SCOPE: {
 		content   => 's {foo} <bar>i',
 		modifiers => { i => 1 },
 		operator  => 's',
-		sections  => [ {
-			position => 3,
-			size     => 3,
-			type     => '{}',
-		}, {
-			position => 9,
-			size     => 3,
-			type     => '<>',
-		} ],
+		sections  => [
+			{
+				position => 3,
+				size     => 3,
+				type     => '{}',
+			},
+			{
+				position => 9,
+				size     => 3,
+				type     => '<>',
+			}
+		],
 		separator => undef,
 	};
-	is_deeply( { %$regexp }, $expected, 'Complex regexp matches expected' );
+	is_deeply( {%$regexp}, $expected, 'Complex regexp matches expected' );
 }
 
 # Also test the handling of a screwed up single part multi-regexp
 SCOPE: {
 	my $Document = safe_new \"s {foo}_";
-	my $stmt   = $Document->first_element;
+	my $stmt     = $Document->first_element;
 	isa_ok( $stmt, 'PPI::Statement' );
 	my $regexp = $stmt->first_element;
 	isa_ok( $regexp, 'PPI::Token::Regexp::Substitute' );
@@ -87,33 +80,37 @@ SCOPE: {
 	# Check the internal details as before
 	my $expected = {
 		_sections => 2,
-		_error    => "No second section of regexp, or does not start with a balanced character",
+		_error    =>
+"No second section of regexp, or does not start with a balanced character",
 		braced    => 1,
 		content   => 's {foo}',
 		modifiers => {},
 		operator  => 's',
-		sections  => [ {
-			position => 3,
-			size     => 3,
-			type     => '{}',
-		}, {
-			position => 7,
-			size     => 0,
-			type     => '',
-		} ],
+		sections  => [
+			{
+				position => 3,
+				size     => 3,
+				type     => '{}',
+			},
+			{
+				position => 7,
+				size     => 0,
+				type     => '',
+			}
+		],
 		separator => undef,
 	};
-	is_deeply( { %$regexp }, $expected, 'Badly short regexp matches expected' );
+	is_deeply( {%$regexp}, $expected, 'Badly short regexp matches expected' );
 }
 
 # Encode an assumption that the value of a zero-length substr one char
 # after the end of the string returns ''. This assumption is used to make
 # the decision on the sections->[1]->{position} value being one char after
 # the end of the current string
-is( substr('foo', 3, 0), '', 'substr one char after string end returns ""' );
+is( substr( 'foo', 3, 0 ), '', 'substr one char after string end returns ""' );
 
-# rt.cpan.org: Ticket #16671 $_ is not localized 
-# Apparently I DID fix the localisation during parsing, but I forgot to 
+# rt.cpan.org: Ticket #16671 $_ is not localized
+# Apparently I DID fix the localisation during parsing, but I forgot to
 # localise in PPI::Node::DESTROY (ack).
 $_ = 1234;
 is( $_, 1234, 'Set $_ to 1234' );
@@ -122,22 +119,17 @@ SCOPE: {
 }
 is( $_, 1234, 'Remains after document creation and destruction' );
 
-
-
-
-
 #####################################################################
 # Bug 16815: location of Structure::List is not defined.
 
 SCOPE: {
 	my $code = '@foo = (1,2)';
-	my $doc = safe_new \$code;
-	ok( $doc->find_first('Structure::List')->location, '->location for a ::List returns true' );
+	my $doc  = safe_new \$code;
+	ok(
+		$doc->find_first('Structure::List')->location,
+		'->location for a ::List returns true'
+	);
 }
-
-
-
-
 
 #####################################################################
 # Bug 18413: PPI::Node prune() implementation broken
@@ -162,10 +154,6 @@ END_PERL
 	ok( defined $doc->prune('PPI::Statement::Sub'), '->prune ok' );
 }
 
-
-
-
-
 #####################################################################
 # Bug 19883: 'package' bareword used as hash key is detected as package statement
 
@@ -174,10 +162,6 @@ SCOPE: {
 	isa_ok( $doc->child(0)->child(0)->child(0), 'PPI::Statement' );
 	isa_ok( $doc->child(0)->child(0)->child(0), 'PPI::Statement::Expression' );
 }
-
-
-
-
 
 #####################################################################
 # Bug 19629: End of list mistakenly seen as end of statement
@@ -197,24 +181,20 @@ SCOPE: {
 	isa_ok( $doc->child(0), 'PPI::Statement' );
 }
 
-
-
-
-
 #####################################################################
 # Bug 21575: PPI::Statement::Variable::variables breaks for lists
 #            with leading whitespace
 
 SCOPE: {
-	my $doc = safe_new \'my ( $self, $param ) = @_;';
+	my $doc  = safe_new \'my ( $self, $param ) = @_;';
 	my $stmt = $doc->child(0);
 	isa_ok( $stmt, 'PPI::Statement::Variable' );
-	is_deeply( [$stmt->variables], ['$self', '$param'], 'variables() for my list with whitespace' );
+	is_deeply(
+		[ $stmt->variables ],
+		[ '$self', '$param' ],
+		'variables() for my list with whitespace'
+	);
 }
-
-
-
-
 
 #####################################################################
 # Bug #23788: PPI::Statement::location() returns undef for C<({})>.
@@ -222,15 +202,13 @@ SCOPE: {
 SCOPE: {
 	my $doc = safe_new \'({})';
 
-	my $bad = $doc->find( sub {
-		not defined $_[1]->location
-	} );
+	my $bad = $doc->find(
+		sub {
+			not defined $_[1]->location;
+		}
+	);
 	is( $bad, '', 'All elements return defined for ->location' );
 }
-
-
-
-
 
 #####################################################################
 # Chris Laco on users@perlcritic.tigris.org (sorry no direct URL...)
@@ -238,29 +216,25 @@ SCOPE: {
 # Empty constructor has no location
 
 SCOPE: {
-	my $doc = safe_new \'$h={};';
+	my $doc  = safe_new \'$h={};';
 	my $hash = $doc->find('PPI::Structure::Constructor')->[0];
-	ok($hash, 'location for empty constructor - fetched a constructor');
-	is_deeply( $hash->location, [1,4,4,1,undef], 'location for empty constructor');
+	ok( $hash, 'location for empty constructor - fetched a constructor' );
+	is_deeply(
+		$hash->location,
+		[ 1, 4, 4, 1, undef ],
+		'location for empty constructor'
+	);
 }
-
-
-
-
 
 #####################################################################
 # Perl::MinimumVersion regression
 
 SCOPE: {
-	my $doc = safe_new \'use utf8;';
+	my $doc  = safe_new \'use utf8;';
 	my $stmt = $doc->child(0);
 	isa_ok( $stmt, 'PPI::Statement::Include' );
 	is( $stmt->pragma, 'utf8', 'pragma() with numbers' );
 }
-
-
-
-
 
 #####################################################################
 # Proof that _new_token must return "1"
@@ -271,90 +245,83 @@ $$content =~ s/(?:\015{1,2}\012|\015|\012)/\n/gs;
 END_PERL
 }
 
-
-
-
 ######################################################################
 # Check quoteengine token behaviour at end of file
 
 SCOPE: {
-	my $doc = safe_new \'s/';
+	my $doc    = safe_new \'s/';
 	my $regexp = $doc->child(0)->child(0);
 	isa_ok( $regexp, 'PPI::Token::Regexp::Substitute' );
 	is( $regexp->_sections, 0, 'Found 0 section' );
 }
 
 SCOPE: {
-	my $doc = safe_new \'s{';
+	my $doc    = safe_new \'s{';
 	my $regexp = $doc->child(0)->child(0);
 	isa_ok( $regexp, 'PPI::Token::Regexp::Substitute' );
 	is( $regexp->_sections, 0, 'Found 0 section' );
 }
 
 SCOPE: {
-	my $doc = safe_new \'s/foo';
+	my $doc    = safe_new \'s/foo';
 	my $regexp = $doc->child(0)->child(0);
 	isa_ok( $regexp, 'PPI::Token::Regexp::Substitute' );
-	is( $regexp->_sections, 1, 'Found 1 section' );
+	is( $regexp->_sections,           1,     'Found 1 section' );
 	is( $regexp->_section_content(0), 'foo', 's/foo correct at EOL' );
 }
 
 SCOPE: {
-	my $doc = safe_new \'s{foo';
+	my $doc    = safe_new \'s{foo';
 	my $regexp = $doc->child(0)->child(0);
 	isa_ok( $regexp, 'PPI::Token::Regexp::Substitute' );
-	is( $regexp->_sections, 1, 'Found 1 section' );
+	is( $regexp->_sections,           1,     'Found 1 section' );
 	is( $regexp->_section_content(0), 'foo', 's{foo correct at EOL' );
 }
 
 SCOPE: {
-	my $doc = safe_new \'s/foo/';
+	my $doc    = safe_new \'s/foo/';
 	my $regexp = $doc->child(0)->child(0);
 	isa_ok( $regexp, 'PPI::Token::Regexp::Substitute' );
 	is( $regexp->_sections, 1, 'Found 1 section' );
 }
 
 SCOPE: {
-	my $doc = safe_new \'s{foo}{';
+	my $doc    = safe_new \'s{foo}{';
 	my $regexp = $doc->child(0)->child(0);
 	isa_ok( $regexp, 'PPI::Token::Regexp::Substitute' );
 	is( $regexp->_sections, 1, 'Found 1 section' );
 }
 
 SCOPE: {
-	my $doc = safe_new \'s{foo}/';
+	my $doc    = safe_new \'s{foo}/';
 	my $regexp = $doc->child(0)->child(0);
 	isa_ok( $regexp, 'PPI::Token::Regexp::Substitute' );
 	is( $regexp->_sections, 1, 'Found 1 section' );
 }
 
 SCOPE: {
-	my $doc = safe_new \'s/foo/bar';
+	my $doc    = safe_new \'s/foo/bar';
 	my $regexp = $doc->child(0)->child(0);
 	isa_ok( $regexp, 'PPI::Token::Regexp::Substitute' );
-	is( $regexp->_sections, 2, 'Found 2 sections' );
+	is( $regexp->_sections,           2,     'Found 2 sections' );
 	is( $regexp->_section_content(1), 'bar', 's/foo/bar correct at EOL' );
 }
 
 SCOPE: {
-	my $doc = safe_new \'s{foo}{bar';
+	my $doc    = safe_new \'s{foo}{bar';
 	my $regexp = $doc->child(0)->child(0);
 	isa_ok( $regexp, 'PPI::Token::Regexp::Substitute' );
-	is( $regexp->_sections, 2, 'Found 2 sections' );
+	is( $regexp->_sections,           2,     'Found 2 sections' );
 	is( $regexp->_section_content(1), 'bar', 's{foo}{bar correct at EOL' );
 }
 
 SCOPE: {
-	my $doc = safe_new \'s{foo}/bar';
+	my $doc    = safe_new \'s{foo}/bar';
 	my $regexp = $doc->child(0)->child(0);
 	isa_ok( $regexp, 'PPI::Token::Regexp::Substitute' );
-	is( $regexp->_sections, 2, 'Found 2 sections' );
+	is( $regexp->_sections,           2,     'Found 2 sections' );
 	is( $regexp->_section_content(1), 'bar', 's{foo}/bar correct at EOL' );
 }
-
-
-
-
 
 ######################################################################
 # Confirmation of cases where we special case / to a regex

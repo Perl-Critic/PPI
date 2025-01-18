@@ -23,10 +23,6 @@ use Params::Util  qw{_INSTANCE _CLASS _CODE _SCALAR0};
 
 our $VERSION = '1.282';
 
-
-
-
-
 #####################################################################
 # Apply Handler Registration
 
@@ -37,9 +33,12 @@ my @ORDER;
 # I'm just leaving it undocumented for now.
 sub register_apply_handler {
 	my $class   = shift;
-	my $handler = _CLASS(shift) or Carp::croak("Invalid PPI::Transform->register_apply_handler param");
-	my $get     = _CODE(shift)  or Carp::croak("Invalid PPI::Transform->register_apply_handler param");
-	my $set     = _CODE(shift)  or Carp::croak("Invalid PPI::Transform->register_apply_handler param");
+	my $handler = _CLASS(shift)
+	  or Carp::croak("Invalid PPI::Transform->register_apply_handler param");
+	my $get = _CODE(shift)
+	  or Carp::croak("Invalid PPI::Transform->register_apply_handler param");
+	my $set = _CODE(shift)
+	  or Carp::croak("Invalid PPI::Transform->register_apply_handler param");
 	if ( $HANDLER{$handler} ) {
 		Carp::croak("PPI::Transform->apply handler '$handler' already exists");
 	}
@@ -51,11 +50,11 @@ sub register_apply_handler {
 
 # Register the default handlers
 __PACKAGE__->register_apply_handler( 'SCALAR', \&_SCALAR_get, \&_SCALAR_set );
-__PACKAGE__->register_apply_handler( 'PPI::Document', sub { $_[0] }, sub() { 1 } );
-
-
-
-
+__PACKAGE__->register_apply_handler(
+	'PPI::Document',
+	sub { $_[0] },
+	sub() { 1 }
+);
 
 #####################################################################
 # Constructor
@@ -83,7 +82,7 @@ C<undef> on error.
 
 sub new {
 	my $class = shift;
-	bless { @_ }, $class;
+	bless {@_}, $class;
 }
 
 =pod
@@ -137,19 +136,23 @@ sub apply {
 	my $it   = defined $_[0] ? shift : return undef;
 
 	# Try to find an apply handler
-	my $class = _SCALAR0($it) ? 'SCALAR'
-		: List::Util::first { _INSTANCE($it, $_) } @ORDER
-		or return undef;
+	my $class =
+	  _SCALAR0($it)
+	  ? 'SCALAR'
+	  : List::Util::first { _INSTANCE( $it, $_ ) } @ORDER
+	  or return undef;
 	my $handler = $HANDLER{$class}
-		or die("->apply handler for $class missing! Panic");
+	  or die("->apply handler for $class missing! Panic");
 
 	# Get, change, set
-	my $Document = _INSTANCE($handler->[0]->($it), 'PPI::Document')
-		or Carp::croak("->apply handler for $class failed to get a PPI::Document");
-	$self->document( $Document ) or return undef;
-	$handler->[1]->($it, $Document)
-		or Carp::croak("->apply handler for $class failed to save the changed document");
-	1;		
+	my $Document = _INSTANCE( $handler->[0]->($it), 'PPI::Document' )
+	  or
+	  Carp::croak("->apply handler for $class failed to get a PPI::Document");
+	$self->document($Document) or return undef;
+	$handler->[1]->( $it, $Document )
+	  or Carp::croak(
+		"->apply handler for $class failed to save the changed document");
+	1;
 }
 
 =pod
@@ -178,14 +181,10 @@ sub file {
 	my $output = @_ ? defined $_[0] ? "$_[0]" : undef : $input or return undef;
 
 	# Process the file
-	my $Document = PPI::Document->new( "$input" ) or return undef;
-	$self->document( $Document )                  or return undef;
-	$Document->save( $output );
+	my $Document = PPI::Document->new("$input") or return undef;
+	$self->document($Document)                  or return undef;
+	$Document->save($output);
 }
-
-
-
-
 
 #####################################################################
 # Apply Hander Methods
@@ -200,18 +199,13 @@ sub _SCALAR_set {
 	1;
 }
 
-
-
-
-
 #####################################################################
 # Support Functions
 
 sub _SELF {
 	return shift if ref $_[0];
-	my $self = $_[0]->new or Carp::croak(
-		"Failed to auto-instantiate new $_[0] object"
-	);
+	my $self = $_[0]->new
+	  or Carp::croak("Failed to auto-instantiate new $_[0] object");
 	$self;
 }
 

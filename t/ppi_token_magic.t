@@ -4,11 +4,10 @@
 
 use lib 't/lib';
 use PPI::Test::pragmas;
-use Test::More tests => 39 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+use Test::More tests => 39 + ( $ENV{AUTHOR_TESTING} ? 1 : 0 );
 
 use PPI ();
 use Helper 'safe_new';
-
 
 __TOKENIZER_ON_CHAR: {
 	my $document = safe_new \<<'END_PERL';
@@ -34,14 +33,14 @@ END_PERL
 
 	$document->index_locations();
 
-	my $symbols = $document->find( 'PPI::Token::Symbol' );
+	my $symbols = $document->find('PPI::Token::Symbol');
 
 	is( scalar(@$symbols), 18, 'Found the correct number of symbols' );
-	my $comments = $document->find( 'PPI::Token::Comment' );
+	my $comments = $document->find('PPI::Token::Comment');
 
-	foreach my $token ( @$symbols ) {
-		my ($hash, $class, $name, $remk) =
-			split /\s+/, $comments->[$token->line_number - 1], 4;
+	foreach my $token (@$symbols) {
+		my ( $hash, $class, $name, $remk ) =
+		  split /\s+/, $comments->[ $token->line_number - 1 ], 4;
 		isa_ok( $token, "PPI::Token::$class" );
 		is( $token->symbol, $name, $remk || "The symbol is $name" );
 	}

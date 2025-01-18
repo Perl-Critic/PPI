@@ -24,22 +24,16 @@ sub document_ok {
 	# A document should have zero or more children that are either
 	# a statement or a non-significant child.
 	my @children = $doc->children;
-	my $good = grep {
-		_INSTANCE($_, 'PPI::Statement')
-		or (
-			_INSTANCE($_, 'PPI::Token') and ! $_->significant
-			)
-		} @children;
+	my $good     = grep {
+		_INSTANCE( $_, 'PPI::Statement' )
+		  or ( _INSTANCE( $_, 'PPI::Token' ) and !$_->significant )
+	} @children;
 
 	is( $good, scalar(@children),
 		'Document contains only statements and non-significant tokens' );
 
 	1;
 }
-
-
-
-
 
 #####################################################################
 # Are there an unknowns
@@ -55,26 +49,19 @@ sub unknown_objects {
 
 	is(
 		$doc->find_any('Token::Unknown'),
-		'',
-		"Contains no PPI::Token::Unknown elements",
+		'', "Contains no PPI::Token::Unknown elements",
 	);
 	is(
 		$doc->find_any('Structure::Unknown'),
-		'',
-		"Contains no PPI::Structure::Unknown elements",
+		'', "Contains no PPI::Structure::Unknown elements",
 	);
 	is(
 		$doc->find_any('Statement::Unknown'),
-		'',
-		"Contains no PPI::Statement::Unknown elements",
+		'', "Contains no PPI::Statement::Unknown elements",
 	);
 
 	1;
 }
-
-
-
-
 
 #####################################################################
 # Are there any invalid nestings?
@@ -89,13 +76,14 @@ sub nested_statements {
 	my $doc = shift;
 
 	ok(
-		! $doc->find_any( sub {
-			_INSTANCE($_[1], 'PPI::Statement')
-			and
-			any { _INSTANCE($_, 'PPI::Statement') } $_[1]->children
-		} ),
+		!$doc->find_any(
+			sub {
+				_INSTANCE( $_[1], 'PPI::Statement' )
+				  and any { _INSTANCE( $_, 'PPI::Statement' ) } $_[1]->children;
+			}
+		),
 		'Document contains no nested statements',
-	);	
+	);
 }
 
 Test::Object->register(
@@ -108,11 +96,12 @@ sub nested_structures {
 	my $doc = shift;
 
 	ok(
-		! $doc->find_any( sub {
-			_INSTANCE($_[1], 'PPI::Structure')
-			and
-			any { _INSTANCE($_, 'PPI::Structure') } $_[1]->children
-		} ),
+		!$doc->find_any(
+			sub {
+				_INSTANCE( $_[1], 'PPI::Structure' )
+				  and any { _INSTANCE( $_, 'PPI::Structure' ) } $_[1]->children;
+			}
+		),
 		'Document contains no nested structures',
 	);
 }
@@ -127,18 +116,15 @@ sub no_attribute_in_attribute {
 	my $doc = shift;
 
 	ok(
-		! $doc->find_any( sub {
-			_INSTANCE($_[1], 'PPI::Token::Attribute')
-			and
-			! exists $_[1]->{_attribute}
-		} ),
+		!$doc->find_any(
+			sub {
+				_INSTANCE( $_[1], 'PPI::Token::Attribute' )
+				  and !exists $_[1]->{_attribute};
+			}
+		),
 		'No ->{_attribute} in PPI::Token::Attributes',
 	);
 }
-
-
-
-
 
 #####################################################################
 # PPI::Statement Tests
@@ -158,10 +144,6 @@ sub valid_compound_type {
 	);
 }
 
-
-
-
-
 #####################################################################
 # Does ->location work properly
 # As an aside, fixes #23788: PPI::Statement::location() returns undef for C<({})>.
@@ -169,14 +151,16 @@ sub valid_compound_type {
 Test::Object->register(
 	class => 'PPI::Document',
 	tests => 1,
-	code   => \&defined_location,
+	code  => \&defined_location,
 );
 
 sub defined_location {
 	my $document = shift;
-	my $bad      = $document->find( sub {
-		not defined $_[1]->location
-	} );
+	my $bad      = $document->find(
+		sub {
+			not defined $_[1]->location;
+		}
+	);
 	is( $bad, '', '->location always defined' );
 }
 

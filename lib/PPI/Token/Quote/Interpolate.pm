@@ -27,19 +27,15 @@ L<PPI::Element> classes.
 =cut
 
 use strict;
-use PPI::Token::Quote ();
+use PPI::Token::Quote              ();
 use PPI::Token::_QuoteEngine::Full ();
 
 our $VERSION = '1.282';
 
 our @ISA = qw{
-	PPI::Token::_QuoteEngine::Full
-	PPI::Token::Quote
+  PPI::Token::_QuoteEngine::Full
+  PPI::Token::Quote
 };
-
-
-
-
 
 #####################################################################
 # PPI::Token::Quote Methods
@@ -48,7 +44,7 @@ sub string {
 	my $self     = shift;
 	my @sections = $self->_sections;
 	my $str      = $sections[0];
-	substr( $self->{content}, $str->{position}, $str->{size} );	
+	substr( $self->{content}, $str->{position}, $str->{size} );
 }
 
 1;

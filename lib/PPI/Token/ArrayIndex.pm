@@ -31,10 +31,6 @@ our $VERSION = '1.282';
 
 our @ISA = "PPI::Token";
 
-
-
-
-
 #####################################################################
 # Tokenizer Methods
 
@@ -49,7 +45,7 @@ sub __TOKENIZER__on_char {
 	}
 
 	# End of token
-	$t->_finalize_token->__TOKENIZER__on_char( $t );
+	$t->_finalize_token->__TOKENIZER__on_char($t);
 }
 
 1;

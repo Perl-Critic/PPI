@@ -79,14 +79,14 @@ in private methods.
 # Make sure everything we need is loaded so
 # we don't have to go and load all of PPI.
 use strict;
-use Params::Util    qw{_INSTANCE _SCALAR0 _ARRAY0};
-use List::Util 1.33 ();
-use PPI::Util       ();
-use PPI::Element    ();
-use PPI::Token      ();
-use PPI::Exception  ();
+use Params::Util                    qw{_INSTANCE _SCALAR0 _ARRAY0};
+use List::Util 1.33                 ();
+use PPI::Util                       ();
+use PPI::Element                    ();
+use PPI::Token                      ();
+use PPI::Exception                  ();
 use PPI::Exception::ParserRejection ();
-use PPI::Document ();
+use PPI::Document                   ();
 
 our $VERSION = '1.282';
 
@@ -106,31 +106,29 @@ my %X_CAN_FOLLOW_STRUCTURE = map { $_ => 1 } qw( } ] \) );
 # chop, chomp, dump are ambiguous because they can have either parms
 # or no parms.
 my %X_CAN_FOLLOW_WORD = map { $_ => 1 } qw(
-		endgrent
-		endhostent
-		endnetent
-		endprotoent
-		endpwent
-		endservent
-		fork
-		getgrent
-		gethostent
-		getlogin
-		getnetent
-		getppid
-		getprotoent
-		getpwent
-		getservent
-		setgrent
-		setpwent
-		time
-		times
-		wait
-		wantarray
-		__SUB__
+  endgrent
+  endhostent
+  endnetent
+  endprotoent
+  endpwent
+  endservent
+  fork
+  getgrent
+  gethostent
+  getlogin
+  getnetent
+  getppid
+  getprotoent
+  getpwent
+  getservent
+  setgrent
+  setpwent
+  time
+  times
+  wait
+  wantarray
+  __SUB__
 );
-
-
 
 #####################################################################
 # Creation and Initialization
@@ -153,7 +151,7 @@ L<PPI::Exception> exception on error.
 =cut
 
 sub new {
-	my $class = ref($_[0]) || $_[0];
+	my $class = ref( $_[0] ) || $_[0];
 
 	# Create the empty tokenizer struct
 	my $self = bless {
@@ -163,15 +161,15 @@ sub new {
 		document     => undef,
 
 		# Line buffer
-		line         => undef,
-		line_length  => undef,
-		line_cursor  => undef,
-		line_count   => 0,
+		line        => undef,
+		line_length => undef,
+		line_cursor => undef,
+		line_count  => 0,
 
 		# Parse state
-		token        => undef,
-		class        => 'PPI::Token::BOM',
-		zone         => 'PPI::Token::Whitespace',
+		token => undef,
+		class => 'PPI::Token::BOM',
+		zone  => 'PPI::Token::Whitespace',
 
 		# Output token buffer
 		tokens       => [],
@@ -179,32 +177,38 @@ sub new {
 		token_eof    => 0,
 
 		# Perl 6 blocks
-		perl6        => [],
+		perl6 => [],
 	}, $class;
 
-	if ( ! defined $_[1] ) {
+	if ( !defined $_[1] ) {
 		# We weren't given anything
 		PPI::Exception->throw("No source provided to Tokenizer");
 
-	} elsif ( ! ref $_[1] ) {
-		my $source = PPI::Util::_slurp($_[1]);
+	}
+	elsif ( !ref $_[1] ) {
+		my $source = PPI::Util::_slurp( $_[1] );
 		if ( ref $source ) {
 			# Content returned by reference
 			$self->{source} = $$source;
-		} else {
+		}
+		else {
 			# Errors returned as a string
-			return( $source );
+			return ($source);
 		}
 
-	} elsif ( _SCALAR0($_[1]) ) {
-		$self->{source} = ${$_[1]};
+	}
+	elsif ( _SCALAR0( $_[1] ) ) {
+		$self->{source} = ${ $_[1] };
 
-	} elsif ( _ARRAY0($_[1]) ) {
-		$self->{source} = join '', map { "\n" } @{$_[1]};
+	}
+	elsif ( _ARRAY0( $_[1] ) ) {
+		$self->{source} = join '', map { "\n" } @{ $_[1] };
 
-	} else {
+	}
+	else {
 		# We don't support whatever this is
-		PPI::Exception->throw(ref($_[1]) . " is not supported as a source provider");
+		PPI::Exception->throw(
+			ref( $_[1] ) . " is not supported as a source provider" );
 	}
 
 	# We can't handle a null string
@@ -214,8 +218,9 @@ sub new {
 		$self->{source} =~ s/(?:\015{1,2}\012|\015|\012)/\n/g;
 		$self->{source} = [ split /(?<=\n)/, $self->{source} ];
 
-	} else {
-		$self->{source} = [ ];
+	}
+	else {
+		$self->{source} = [];
 	}
 
 	### EVIL
@@ -236,13 +241,16 @@ sub new {
 	# once the tokenizer hits end of file, it examines the last token to
 	# manually either remove the ' ' token, or chop it off the end of
 	# a longer one in which the space would be valid.
-	if ( List::Util::any { /^__(?:DATA|END)__\s*$/ } @{$self->{source}} ) {
+	if ( List::Util::any { /^__(?:DATA|END)__\s*$/ } @{ $self->{source} } ) {
 		$self->{source_eof_chop} = '';
-	} elsif ( ! defined $self->{source}->[0] ) {
+	}
+	elsif ( !defined $self->{source}->[0] ) {
 		$self->{source_eof_chop} = '';
-	} elsif ( $self->{source}->[-1] =~ /\s$/ ) {
+	}
+	elsif ( $self->{source}->[-1] =~ /\s$/ ) {
 		$self->{source_eof_chop} = '';
-	} else {
+	}
+	else {
 		$self->{source_eof_chop} = 1;
 		$self->{source}->[-1] .= ' ';
 	}
@@ -254,10 +262,6 @@ sub _document {
 	my $self = shift;
 	return @_ ? $self->{document} = shift : $self->{document};
 }
-
-
-
-
 
 #####################################################################
 # Main Public Methods
@@ -289,9 +293,9 @@ sub get_token {
 	my $self = shift;
 
 	# Shortcut for EOF
-	if ( $self->{token_eof}
-	 and $self->{token_cursor} > scalar @{$self->{tokens}}
-	) {
+	if (    $self->{token_eof}
+		and $self->{token_cursor} > scalar @{ $self->{tokens} } )
+	{
 		return 0;
 	}
 
@@ -310,22 +314,29 @@ sub get_token {
 		while ( $line_rv = $self->_process_next_line ) {
 			# If there is something in the buffer, return it
 			# The defined() prevents a ton of calls to PPI::Util::TRUE
-			if ( defined( my $token = $self->{tokens}->[ $self->{token_cursor} ] ) ) {
+			if (
+				defined(
+					my $token = $self->{tokens}->[ $self->{token_cursor} ]
+				)
+			  )
+			{
 				$self->{token_cursor}++;
 				return $token;
 			}
 		}
 		return undef;
 	};
-	if ( $@ ) {
-		if ( _INSTANCE($@, 'PPI::Exception') ) {
+	if ($@) {
+		if ( _INSTANCE( $@, 'PPI::Exception' ) ) {
 			$@->throw;
-		} else {
+		}
+		else {
 			my $errstr = $@;
 			$errstr =~ s/^(.*) at line .+$/$1/;
-			PPI::Exception->throw( $errstr );
+			PPI::Exception->throw($errstr);
 		}
-	} elsif ( $rv ) {
+	}
+	elsif ($rv) {
 		return $rv;
 	}
 
@@ -371,7 +382,7 @@ sub all_tokens {
 		# Process lines until we get EOF
 		unless ( $self->{token_eof} ) {
 			my $rv;
-			while ( $rv = $self->_process_next_line ) {}
+			while ( $rv = $self->_process_next_line ) { }
 			unless ( defined $rv ) {
 				PPI::Exception->throw("Error while processing source");
 			}
@@ -384,11 +395,11 @@ sub all_tokens {
 	if ( !$ok ) {
 		my $errstr = $@;
 		$errstr =~ s/^(.*) at line .+$/$1/;
-		PPI::Exception->throw( $errstr );
+		PPI::Exception->throw($errstr);
 	}
 
 	# End of file, return a copy of the token array.
-	return [ @{$self->{tokens}} ];
+	return [ @{ $self->{tokens} } ];
 }
 
 =pod
@@ -443,10 +454,6 @@ sub decrement_cursor {
 	--$self->{token_cursor};
 }
 
-
-
-
-
 #####################################################################
 # Working With Source
 
@@ -454,16 +461,16 @@ sub decrement_cursor {
 # Returns undef at EOF.
 sub _get_line {
 	my $self = shift;
-	return undef unless $self->{source}; # EOF hit previously
+	return undef unless $self->{source};    # EOF hit previously
 
 	# Pull off the next line
-	my $line = shift @{$self->{source}};
+	my $line = shift @{ $self->{source} };
 
 	# Flag EOF if we hit it
 	$self->{source} = undef unless defined $line;
 
 	# Return the line (or EOF flag)
-	return $line; # string or undef
+	return $line;                           # string or undef
 }
 
 # Fetches the next line, ready to process
@@ -477,7 +484,7 @@ sub _fill_line {
 	my $line = $self->_get_line;
 	unless ( defined $line ) {
 		# End of file
-		unless ( $inscan ) {
+		unless ($inscan) {
 			delete $self->{line};
 			delete $self->{line_cursor};
 			delete $self->{line_length};
@@ -505,10 +512,6 @@ sub _char {
 	substr( $self->{line}, $self->{line_cursor}, 1 );
 }
 
-
-
-
-
 ####################################################################
 # Per line processing methods
 
@@ -530,10 +533,10 @@ sub _process_next_line {
 	}
 
 	# Run the __TOKENIZER__on_line_start
-	$rv = $self->{class}->__TOKENIZER__on_line_start( $self );
-	unless ( $rv ) {
+	$rv = $self->{class}->__TOKENIZER__on_line_start($self);
+	unless ($rv) {
 		# If there are no more source lines, then clean up
-		if ( ref $self->{source} eq 'ARRAY' and ! @{$self->{source}} ) {
+		if ( ref $self->{source} eq 'ARRAY' and !@{ $self->{source} } ) {
 			$self->_clean_eof;
 		}
 
@@ -543,25 +546,23 @@ sub _process_next_line {
 	}
 
 	# If we can't deal with the entire line, process char by char
-	while ( $rv = $self->_process_next_char ) {}
+	while ( $rv = $self->_process_next_char ) { }
 	unless ( defined $rv ) {
-		PPI::Exception->throw("Error at line $self->{line_count}, character $self->{line_cursor}");
+		PPI::Exception->throw(
+			"Error at line $self->{line_count}, character $self->{line_cursor}"
+		);
 	}
 
 	# Trigger any action that needs to happen at the end of a line
-	$self->{class}->__TOKENIZER__on_line_end( $self );
+	$self->{class}->__TOKENIZER__on_line_end($self);
 
 	# If there are no more source lines, then clean up
-	unless ( ref($self->{source}) eq 'ARRAY' and @{$self->{source}} ) {
+	unless ( ref( $self->{source} ) eq 'ARRAY' and @{ $self->{source} } ) {
 		return $self->_clean_eof;
 	}
 
 	return 1;
 }
-
-
-
-
 
 #####################################################################
 # Per-character processing methods
@@ -575,18 +576,18 @@ sub _process_next_char {
 
 	### FIXME - This checks for a screwed up condition that triggers
 	###         several warnings, amongst other things.
-	if ( ! defined $self->{line_cursor} or ! defined $self->{line_length} ) {
+	if ( !defined $self->{line_cursor} or !defined $self->{line_length} ) {
 		# $DB::single = 1;
 		return undef;
 	}
 
-    $self->{line_cursor}++;
-    return 0 if $self->_at_line_end;
+	$self->{line_cursor}++;
+	return 0 if $self->_at_line_end;
 
 	# Pass control to the token class
 	my $result;
-	unless ( $result = $self->{class}->__TOKENIZER__on_char( $self ) ) {
-		# undef is error. 0 is "Did stuff ourself, you don't have to do anything"
+	unless ( $result = $self->{class}->__TOKENIZER__on_char($self) ) {
+	   # undef is error. 0 is "Did stuff ourself, you don't have to do anything"
 		return defined $result ? 1 : undef;
 	}
 
@@ -599,8 +600,10 @@ sub _process_next_char {
 		# Add the character
 		if ( defined $self->{token} ) {
 			$self->{token}->{content} .= $char;
-		} else {
-			defined($self->{token} = $self->{class}->new($char)) or return undef;
+		}
+		else {
+			defined( $self->{token} = $self->{class}->new($char) )
+			  or return undef;
 		}
 
 		return 1;
@@ -610,25 +613,23 @@ sub _process_next_char {
 	if ( $self->{class} ne "PPI::Token::$result" ) {
 		# New class
 		$self->_new_token( $result, $char );
-	} elsif ( defined $self->{token} ) {
+	}
+	elsif ( defined $self->{token} ) {
 		# Same class as current
 		$self->{token}->{content} .= $char;
-	} else {
+	}
+	else {
 		# Same class, but no current
-		defined($self->{token} = $self->{class}->new($char)) or return undef;
+		defined( $self->{token} = $self->{class}->new($char) ) or return undef;
 	}
 
 	1;
 }
 
 sub _at_line_end {
-    my ($self) = @_;
-    return $self->{line_cursor} >= $self->{line_length};
+	my ($self) = @_;
+	return $self->{line_cursor} >= $self->{line_length};
 }
-
-
-
-
 
 #####################################################################
 # Altering Tokens in Tokenizer
@@ -652,14 +653,14 @@ sub _finalize_token {
 sub _new_token {
 	my $self = shift;
 	# throw PPI::Exception() unless @_;
-	my $class = substr( $_[0], 0, 12 ) eq 'PPI::Token::'
-		? shift : 'PPI::Token::' . shift;
+	my $class =
+	  substr( $_[0], 0, 12 ) eq 'PPI::Token::' ? shift : 'PPI::Token::' . shift;
 
 	# Finalize any existing token
 	$self->_finalize_token if defined $self->{token};
 
 	# Create the new token and update the parse class
-	defined($self->{token} = $class->new($_[0])) or PPI::Exception->throw;
+	defined( $self->{token} = $class->new( $_[0] ) ) or PPI::Exception->throw;
 	$self->{class} = $class;
 
 	1;
@@ -676,19 +677,19 @@ sub _clean_eof {
 	# Find the last token, and if it has no content, kill it.
 	# There appears to be some evidence that such "null tokens" are
 	# somehow getting created accidentally.
-	my $last_token = $self->{tokens}->[ -1 ];
+	my $last_token = $self->{tokens}->[-1];
 	unless ( length $last_token->{content} ) {
-		pop @{$self->{tokens}};
+		pop @{ $self->{tokens} };
 	}
 
 	# Now, if the last character of the last token is a space we added,
 	# chop it off, deleting the token if there's nothing else left.
 	if ( $self->{source_eof_chop} ) {
-		$last_token = $self->{tokens}->[ -1 ];
+		$last_token = $self->{tokens}->[-1];
 		$last_token->{content} =~ s/ $//;
 		unless ( length $last_token->{content} ) {
 			# Popping token
-			pop @{$self->{tokens}};
+			pop @{ $self->{tokens} };
 		}
 
 		# The hack involving adding an extra space is now reversed, and
@@ -698,10 +699,6 @@ sub _clean_eof {
 
 	1;
 }
-
-
-
-
 
 #####################################################################
 # Utility Methods
@@ -715,7 +712,7 @@ sub _last_significant_token {
 	my $self   = shift;
 	my $cursor = $#{ $self->{tokens} };
 	while ( $cursor >= 0 ) {
-		my $token = $self->{tokens}->[$cursor--];
+		my $token = $self->{tokens}->[ $cursor-- ];
 		return $token if $token->significant;
 	}
 	return;
@@ -731,7 +728,7 @@ sub _previous_significant_tokens {
 
 	my @tokens;
 	while ( $cursor >= 0 ) {
-		my $token = $self->{tokens}->[$cursor--];
+		my $token = $self->{tokens}->[ $cursor-- ];
 		next if not $token->significant;
 		push @tokens, $token;
 		last if @tokens >= $count;
@@ -764,7 +761,6 @@ my %OBVIOUS_CONTENT = (
 	'}' => 'operator',
 );
 
-
 my %USUALLY_FORCES = map { $_ => 1 } qw( sub package use no );
 
 # Try to determine operator/operand context, if possible.
@@ -774,7 +770,7 @@ sub _opcontext {
 	my @tokens = $self->_previous_significant_tokens(1);
 	my $p0     = $tokens[0];
 	return '' if not $p0;
-	my $c0     = ref $p0;
+	my $c0 = ref $p0;
 
 	# Map the obvious cases
 	return $OBVIOUS_CLASS{$c0}   if defined $OBVIOUS_CLASS{$c0};
@@ -787,26 +783,27 @@ sub _opcontext {
 	return 'operand' if $p0->content eq '';
 
 	# Otherwise, we don't know
-	return ''
+	return '';
 }
 
 # Assuming we are currently parsing the word 'x', return true
 # if previous tokens imply the x is an operator, false otherwise.
 sub _current_x_is_operator {
-	my ( $self ) = @_;
-	return if !@{$self->{tokens}};
+	my ($self) = @_;
+	return if !@{ $self->{tokens} };
 
-	my ($prev, $prevprev) = $self->_previous_significant_tokens(2);
+	my ( $prev, $prevprev ) = $self->_previous_significant_tokens(2);
 	return if !$prev;
 
-	return !$self->__current_token_is_forced_word if $prev->isa('PPI::Token::Word');
+	return !$self->__current_token_is_forced_word
+	  if $prev->isa('PPI::Token::Word');
 
-	return (!$prev->isa('PPI::Token::Operator') || $X_CAN_FOLLOW_OPERATOR{$prev})
-		&& (!$prev->isa('PPI::Token::Structure') || $X_CAN_FOLLOW_STRUCTURE{$prev})
-		&& !$prev->isa('PPI::Token::Label')
-	;
+	return (!$prev->isa('PPI::Token::Operator')
+		  || $X_CAN_FOLLOW_OPERATOR{$prev} )
+	  && (!$prev->isa('PPI::Token::Structure')
+		|| $X_CAN_FOLLOW_STRUCTURE{$prev} )
+	  && !$prev->isa('PPI::Token::Label');
 }
-
 
 # Assuming we are at the end of parsing the current token that could be a word,
 # a wordlike operator, or a version string, try to determine whether context
@@ -841,10 +838,15 @@ sub __current_token_is_forced_word {
 		# preceded by 'package sub', in which case we're a version string.
 		# We also have to make sure that the sub/package/etc doing the forcing
 		# is not a method call.
-		if( $USUALLY_FORCES{$content}) {
-			return if defined $word and $word =~ /^v[0-9]+$/ and ( $content eq "use" or $content eq "no" );
+		if ( $USUALLY_FORCES{$content} ) {
+			return
+				  if defined $word
+			  and $word =~ /^v[0-9]+$/
+			  and ( $content eq "use" or $content eq "no" );
 			return 1 if not $prevprev;
-			return 1 if not $USUALLY_FORCES{$prevprev->content} and $prevprev->content ne '->';
+			return 1
+			  if not $USUALLY_FORCES{ $prevprev->content }
+			  and $prevprev->content ne '->';
 			return;
 		}
 	}
@@ -873,7 +875,8 @@ sub _current_token_has_signatures_active {
 	}
 
 	my ($closest_parented_token) = grep $_->parent, @tokens;
-	$closest_parented_token ||= $t->_document || $t->_document(PPI::Document->new);
+	$closest_parented_token ||=
+	  $t->_document || $t->_document( PPI::Document->new );
 	return $closest_parented_token->presumed_features->{signatures}, @tokens;
 }
 

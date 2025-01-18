@@ -38,13 +38,10 @@ our @ISA = "PPI::Token";
 
 our %POSTFIX = map { $_ => 1 } (
 	qw{
-	%* @* $*
+	  %* @* $*
 	},
-	'$#*' # throws warnings if it's inside a qw
+	'$#*'    # throws warnings if it's inside a qw
 );
-
-
-
 
 #####################################################################
 # Tokenizer Methods
@@ -59,7 +56,7 @@ sub __TOKENIZER__on_char {
 	my $content = $t->{token}->{content};
 	return 1 if $POSTFIX{ $content . $char };
 
-	$t->_finalize_token->__TOKENIZER__on_char( $t );
+	$t->_finalize_token->__TOKENIZER__on_char($t);
 }
 
 1;
