@@ -18,7 +18,7 @@ This is a special token in that it can only occur at the beginning of
 documents.  If a BOM byte mark occurs elsewhere in a file, it should
 be treated as L<PPI::Token::Whitespace>.  We recognize the byte order
 marks identified at this URL:
-L<http://www.unicode.org/faq/utf_bom.html#BOM>
+L<https://web.archive.org/web/https://www.unicode.org/faq/utf_bom.html#BOM>
 
     UTF-32, big-endian     00 00 FE FF
     UTF-32, little-endian  FF FE 00 00
