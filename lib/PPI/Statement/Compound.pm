@@ -70,10 +70,6 @@ my %TYPES = (
 # Lexer clues
 sub __LEXER__normal() { '' }
 
-
-
-
-
 #####################################################################
 # PPI::Statement::Compound analysis methods
 
@@ -106,18 +102,18 @@ or C<undef> if the type cannot be determined.
 
 sub type {
 	my $self    = shift;
-	my $p       = 0; # Child position
+	my $p       = 0;                                   # Child position
 	my $Element = $self->schild($p) or return undef;
 
 	# A labelled statement
 	if ( $Element->isa('PPI::Token::Label') ) {
-		$Element = $self->schild(++$p) or return 'label';
+		$Element = $self->schild( ++$p ) or return 'label';
 	}
 
 	# Most simple cases
 	my $content = $Element->content;
 	if ( $content =~ /^for(?:each)?\z/ ) {
-		$Element = $self->schild(++$p) or return $content;
+		$Element = $self->schild( ++$p ) or return $content;
 		if ( $Element->isa('PPI::Token') ) {
 			return 'foreach' if $Element->content =~ /^my|our|state\z/;
 			return 'foreach' if $Element->isa('PPI::Token::Symbol');
@@ -128,29 +124,19 @@ sub type {
 		}
 		return 'for';
 	}
-	return {
-		%TYPES,
-		( try => 'try' ) x !!$self->presumed_features->{try},
-	}->{$content}
+	return { %TYPES, ( try => 'try' ) x !!$self->presumed_features->{try}, }
+	  ->{$content}
 	  if $Element->isa('PPI::Token::Word');
-	return 'continue'       if $Element->isa('PPI::Structure::Block');
+	return 'continue' if $Element->isa('PPI::Structure::Block');
 
 	# Unknown (shouldn't exist?)
 	undef;
 }
 
-
-
-
-
 #####################################################################
 # PPI::Node Methods
 
 sub scope() { 1 }
-
-
-
-
 
 #####################################################################
 # PPI::Element Methods
@@ -169,9 +155,11 @@ sub _complete {
 		$child->_complete             or return '';
 
 		# It can STILL be
-	} elsif ( $type eq 'while' ) {
+	}
+	elsif ( $type eq 'while' ) {
 		die "CODE INCOMPLETE";
-	} else {
+	}
+	else {
 		die "CODE INCOMPLETE";
 	}
 }

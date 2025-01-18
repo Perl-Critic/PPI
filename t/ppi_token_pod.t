@@ -4,10 +4,9 @@
 
 use lib 't/lib';
 use PPI::Test::pragmas;
-use Test::More tests => 8 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+use Test::More tests => 8 + ( $ENV{AUTHOR_TESTING} ? 1 : 0 );
 
 use PPI ();
-
 
 MERGE: {
 	# Create the test fragments
@@ -17,20 +16,25 @@ MERGE: {
 	isa_ok( $two, 'PPI::Token::Pod' );
 
 	# Create the combined Pod
-	my $merged = PPI::Token::Pod->merge($one, $two);
+	my $merged = PPI::Token::Pod->merge( $one, $two );
 	isa_ok( $merged, 'PPI::Token::Pod' );
-	is( $merged->content, "=pod\n\nOne\n\nTwo\n\n=cut\n", 'Merged POD looks ok' );
+	is(
+		$merged->content,
+		"=pod\n\nOne\n\nTwo\n\n=cut\n",
+		'Merged POD looks ok'
+	);
 }
-
 
 TOKENIZE: {
 	foreach my $test (
-		[ "=pod\n=cut", [ 'PPI::Token::Pod' ] ],
-		[ "=pod\n=cut\n", [ 'PPI::Token::Pod' ] ],
+		[ "=pod\n=cut",     ['PPI::Token::Pod'] ],
+		[ "=pod\n=cut\n",   ['PPI::Token::Pod'] ],
 		[ "=pod\n=cut\n\n", [ 'PPI::Token::Pod', 'PPI::Token::Whitespace' ] ],
-		[ "=pod\n=Cut\n\n", [ 'PPI::Token::Pod' ] ],  # pod doesn't end, so no whitespace token
-	) {
-		my $T = PPI::Tokenizer->new( \$test->[0] );
+		[ "=pod\n=Cut\n\n", ['PPI::Token::Pod'] ]
+		,    # pod doesn't end, so no whitespace token
+	  )
+	{
+		my $T      = PPI::Tokenizer->new( \$test->[0] );
 		my @tokens = map { ref $_ } @{ $T->all_tokens };
 		is_deeply( \@tokens, $test->[1], 'all tokens as expected' );
 	}

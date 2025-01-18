@@ -4,18 +4,17 @@
 
 use lib 't/lib';
 use PPI::Test::pragmas;
-use Test::More tests => 2187 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+use Test::More tests => 2187 + ( $ENV{AUTHOR_TESTING} ? 1 : 0 );
 
-use PPI ();
+use PPI             ();
 use PPI::Singletons qw( %KEYWORDS %OPERATOR %QUOTELIKE );
 use Helper 'safe_new';
 
-
 LITERAL: {
-	my $doc1 = new_ok( 'PPI::Document' => [ \'1.2.3.4'  ] );
+	my $doc1 = new_ok( 'PPI::Document' => [ \'1.2.3.4' ] );
 	my $doc2 = new_ok( 'PPI::Document' => [ \'v1.2.3.4' ] );
-	isa_ok( $doc1->child(0), 'PPI::Statement' );
-	isa_ok( $doc2->child(0), 'PPI::Statement' );
+	isa_ok( $doc1->child(0),           'PPI::Statement' );
+	isa_ok( $doc2->child(0),           'PPI::Statement' );
 	isa_ok( $doc1->child(0)->child(0), 'PPI::Token::Number::Version' );
 	isa_ok( $doc2->child(0)->child(0), 'PPI::Token::Number::Version' );
 
@@ -26,19 +25,18 @@ LITERAL: {
 	is( $literal1, $literal2, 'Literals match for 1.2.3.4 vs v1.2.3.4' );
 }
 
-
 VSTRING_ENDS_CORRECTLY: {
 	my @tests = (
 		(
 			map {
 				{
-					desc=>"no . in 'v49$_', so not a version string",
-					code=>"v49$_",
-					expected=>[ 'PPI::Token::Word' => "v49$_" ],
+					desc     => "no . in 'v49$_', so not a version string",
+					code     => "v49$_",
+					expected => [ 'PPI::Token::Word' => "v49$_" ],
 				}
 			} (
-				'x3', # not fooled by faux x operator with operand
-				'e10', # not fooled by faux scientific notation
+				'x3',     # not fooled by faux x operator with operand
+				'e10',    # not fooled by faux scientific notation
 				keys %KEYWORDS,
 			),
 		),
@@ -49,12 +47,10 @@ VSTRING_ENDS_CORRECTLY: {
 					code => "v49.49$_",
 					expected => [
 						'PPI::Token::Number::Version' => 'v49.49',
-						get_class($_) => $_,
+						get_class($_)                 => $_,
 					],
 				},
-			} (
-				keys %KEYWORDS,
-			),
+			} ( keys %KEYWORDS, ),
 		),
 		(
 			map {
@@ -63,27 +59,25 @@ VSTRING_ENDS_CORRECTLY: {
 					code => "49.49.49$_",
 					expected => [
 						'PPI::Token::Number::Version' => '49.49.49',
-						get_class($_) => $_,
+						get_class($_)                 => $_,
 					],
 				},
-			} (
-				keys %KEYWORDS,
-			),
+			} ( keys %KEYWORDS, ),
 		),
 		{
-			desc => 'version string, x, and operand',
-			code => 'v49.49.49x3',
+			desc     => 'version string, x, and operand',
+			code     => 'v49.49.49x3',
 			expected => [
 				'PPI::Token::Number::Version' => 'v49.49.49',
-				'PPI::Token::Operator' => 'x',
-				'PPI::Token::Number' => '3',
+				'PPI::Token::Operator'        => 'x',
+				'PPI::Token::Number'          => '3',
 			],
 		},
 	);
-	for my $test ( @tests ) {
+	for my $test (@tests) {
 		my $code = $test->{code};
 
-		my $d = safe_new \$test->{code};
+		my $d      = safe_new \$test->{code};
 		my $tokens = $d->find( sub { 1; } );
 		$tokens = [ map { ref($_), $_->content() } @$tokens ];
 		my $expected = $test->{expected};
@@ -98,9 +92,9 @@ VSTRING_ENDS_CORRECTLY: {
 }
 
 sub get_class {
-	my ( $t ) = @_;
+	my ($t) = @_;
 	my $ql = $QUOTELIKE{$t};
-	return "PPI::Token::$ql" if $ql;
+	return "PPI::Token::$ql"      if $ql;
 	return 'PPI::Token::Operator' if $OPERATOR{$t};
 	return 'PPI::Token::Word';
 }

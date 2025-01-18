@@ -32,10 +32,6 @@ our $VERSION = '1.282';
 
 our @ISA = "PPI::Token";
 
-
-
-
-
 #####################################################################
 # PPI::Token::Pod Methods
 
@@ -52,10 +48,10 @@ Returns a new C<PPI::Token::Pod> object, or C<undef> on error.
 =cut
 
 sub merge {
-	my $class = (! ref $_[0]) ? shift : return undef;
+	my $class = ( !ref $_[0] ) ? shift : return undef;
 
 	# Check there are no bad arguments
-	if ( grep { ! _INSTANCE($_, 'PPI::Token::Pod') } @_ ) {
+	if ( grep { !_INSTANCE( $_, 'PPI::Token::Pod' ) } @_ ) {
 		return undef;
 	}
 
@@ -64,7 +60,7 @@ sub merge {
 
 	# Remove the leading =pod tags, trailing =cut tags, and any empty lines
 	# between them and the pod contents.
-	foreach my $pod ( @content ) {
+	foreach my $pod (@content) {
 		# Leading =pod tag
 		if ( @$pod and $pod->[0] =~ /^=pod\b/o ) {
 			shift @$pod;
@@ -76,13 +72,13 @@ sub merge {
 		}
 
 		# Leading and trailing empty lines
-		while ( @$pod and $pod->[0]  eq '' ) { shift @$pod }
-		while ( @$pod and $pod->[-1] eq '' ) { pop @$pod   }
+		while ( @$pod and $pod->[0] eq '' )  { shift @$pod }
+		while ( @$pod and $pod->[-1] eq '' ) { pop @$pod }
 	}
 
 	# Remove any empty pod sections, and add the =pod and =cut tags
 	# for the merged pod back to it.
-	@content = ( [ '=pod' ], grep { @$_ } @content, [ '=cut' ] );
+	@content = ( ['=pod'], grep { @$_ } @content, ['=cut'] );
 
 	# Create the new object
 	$class->new( join "\n", map { join( "\n", @$_ ) . "\n" } @content );
@@ -101,20 +97,11 @@ sub lines {
 	split /(?:\015{1,2}\012|\015|\012)/, $_[0]->{content};
 }
 
-
-
-
-
-
 #####################################################################
 # PPI::Element Methods
 
 ### XS -> PPI/XS.xs:_PPI_Token_Pod__significant 0.900+
 sub significant() { '' }
-
-
-
-
 
 #####################################################################
 # Tokenizer Methods

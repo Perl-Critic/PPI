@@ -1,0 +1,23 @@
+Perltidy version is 20240903
+
+./t/data/24_v6/Grammar.pm: Begin Error Output Stream
+
+25: | [ <!before \d> <?word> | _ ] <?ident_digit>
+    ^
+found | where term expected
+25: 
+25: Partial match to quote modifier [msixpodualngc] at word: 'ident_digit'
+25: Please put a space between quote modifiers and trailing keywords.
+27: unexpected character decimal 162 (¢) in script
+27: Giving up after error
+
+Final nesting depth of '{'s is 2
+The most recent un-matched '{' is on line 24
+24: token ident {
+                ^
+
+Final nesting depth of '['s is 1
+The most recent un-matched '[' is on line 25
+25: | [ <!before \d> <?word> | _ ] <?ident_digit>
+      ^
+690: To save a full .LOG file rerun with -g

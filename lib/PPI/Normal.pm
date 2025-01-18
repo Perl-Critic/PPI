@@ -35,21 +35,18 @@ process to be.
 =cut
 
 use strict;
-use Carp                      ();
-use List::Util 1.33           ();
-use PPI::Util                 '_Document';
+use Carp ();
+use List::Util 1.33 ();
+use PPI::Util '_Document';
 use PPI::Document::Normalized ();
 use PPI::Normal::Standard     ();
-use PPI::Singletons           '%LAYER';
+use PPI::Singletons '%LAYER';
 
 our $VERSION = '1.282';
 
 # With the registration mechanism in place, load in the main set of
 # normalization methods to initialize the store.
 PPI::Normal::Standard->import;
-
-
-
 
 #####################################################################
 # Configuration
@@ -72,13 +69,13 @@ Returns true if all functions are registered, or C<undef> on error.
 
 sub register {
 	my $class = shift;
-	while ( @_ ) {
+	while (@_) {
 		# Check the function
 		my $function = shift;
-		SCOPE: {
+	  SCOPE: {
 			no strict 'refs';
 			defined $function and defined &{"$function"}
-				or Carp::croak("Bad function name provided to PPI::Normal");
+			  or Carp::croak("Bad function name provided to PPI::Normal");
 		}
 
 		# Has it already been added?
@@ -89,7 +86,7 @@ sub register {
 		# Check the layer to add it to
 		my $layer = shift;
 		defined $layer and $layer =~ /^(?:1|2)$/
-			or Carp::croak("Bad layer provided to PPI::Normal");
+		  or Carp::croak("Bad layer provided to PPI::Normal");
 
 		# Add to the layer data store
 		push @{ $LAYER{$layer} }, $function;
@@ -97,10 +94,6 @@ sub register {
 
 	1;
 }
-
-
-
-
 
 #####################################################################
 # Constructor and Accessors
@@ -127,14 +120,15 @@ Returns a new C<PPI::Normal> object, or C<undef> on error.
 
 sub new {
 	my $class = shift;
-	my $layer = @_ ?
-		(defined $_[0] and ! ref $_[0] and $_[0] =~ /^[12]$/) ? shift : return undef
-		: 1;
+	my $layer =
+		@_
+	  ? ( defined $_[0] and !ref $_[0] and $_[0] =~ /^[12]$/ )
+		  ? shift
+		  : return undef
+	  : 1;
 
 	# Create the object
-	my $object = bless {
-		layer => $layer,
-		}, $class;
+	my $object = bless { layer => $layer, }, $class;
 
 	$object;
 }
@@ -148,10 +142,6 @@ The C<layer> accessor returns the normalisation layer of the object.
 =cut
 
 sub layer { $_[0]->{layer} }
-
-
-
-
 
 #####################################################################
 # Main Methods
@@ -181,7 +171,7 @@ sub process {
 	my @functions = map { @{ $LAYER{$_} } } ( 1 .. $self->layer );
 
 	# Execute each function
-	foreach my $function ( @functions ) {
+	foreach my $function (@functions) {
 		no strict 'refs';
 		&{"$function"}( $self->{Document} );
 	}

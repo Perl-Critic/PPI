@@ -42,8 +42,8 @@ use PPI::Token::_QuoteEngine::Full ();
 our $VERSION = '1.282';
 
 our @ISA = qw{
-	PPI::Token::_QuoteEngine::Full
-	PPI::Token::QuoteLike
+  PPI::Token::_QuoteEngine::Full
+  PPI::Token::QuoteLike
 };
 
 1;

@@ -50,11 +50,6 @@ our $VERSION = '1.282';
 use overload 'bool' => \&PPI::Util::TRUE;
 use overload '=='   => 'equal';
 
-
-
-
-
-
 #####################################################################
 # Constructor and Accessors
 
@@ -74,21 +69,22 @@ sub new {
 	my %args  = @_;
 
 	# Check the required params
-	my $Document  = _INSTANCE($args{Document}, 'PPI::Document') or return undef;
+	my $Document = _INSTANCE( $args{Document}, 'PPI::Document' )
+	  or return undef;
 	my $version   = $args{version};
-	my $functions = _ARRAY($args{functions}) or return undef;
+	my $functions = _ARRAY( $args{functions} ) or return undef;
 
 	# Create the object
 	my $self = bless {
 		Document  => $Document,
 		version   => $version,
 		functions => $functions,
-		}, $class;
+	}, $class;
 
 	$self;
 }
 
-sub _Document { $_[0]->{Document}  }
+sub _Document { $_[0]->{Document} }
 
 =pod
 
@@ -99,7 +95,7 @@ the object.
 
 =cut
 
-sub version   { $_[0]->{version}   }
+sub version { $_[0]->{version} }
 
 =pod
 
@@ -112,10 +108,6 @@ the object.
 =cut
 
 sub functions { $_[0]->{functions} }
-
-
-
-
 
 #####################################################################
 # Comparison Methods
@@ -144,13 +136,13 @@ or C<undef> if there is an error.
 
 sub equal {
 	my $self  = shift;
-	my $other = _INSTANCE(shift, 'PPI::Document::Normalized') or return undef;
+	my $other = _INSTANCE( shift, 'PPI::Document::Normalized' ) or return undef;
 
 	# Prevent multiple concurrent runs
 	return undef if $self->{processing};
 
 	# Check the version and function list first
-	my $v1 = $self->version || "undef";
+	my $v1 = $self->version  || "undef";
 	my $v2 = $other->version || "undef";
 	return '' if $v1 ne $v2;
 	$self->_equal_ARRAY( $self->functions, $other->functions ) or return '';
@@ -165,8 +157,8 @@ sub equal {
 
 # Check that two objects are matched
 sub _equal_blessed {
-	my ($self, $this, $that) = @_;
-	my ($bthis, $bthat) = (blessed $this, blessed $that);
+	my ( $self, $this, $that ) = @_;
+	my ( $bthis, $bthat ) = ( blessed $this, blessed $that );
 	$bthis and $bthat and $bthis eq $bthat or return '';
 
 	# Check the object as a reference
@@ -175,8 +167,8 @@ sub _equal_blessed {
 
 # Check that two references match their types
 sub _equal_reference {
-	my ($self, $this, $that) = @_;
-	my ($rthis, $rthat) = (refaddr $this, refaddr $that);
+	my ( $self, $this, $that ) = @_;
+	my ( $rthis, $rthat ) = ( refaddr $this, refaddr $that );
 	$rthis and $rthat or return undef;
 
 	# If we have seen this before, are the pointing
@@ -187,25 +179,25 @@ sub _equal_reference {
 	}
 
 	# Check the reference types
-	my ($tthis, $tthat) = (reftype $this, reftype $that);
+	my ( $tthis, $tthat ) = ( reftype $this, reftype $that );
 	$tthis and $tthat and $tthis eq $tthat or return undef;
 
 	# Check the children of the reference type
 	$self->{seen}->{$rthis} = $rthat;
 	my $method = "_equal_$tthat";
-	my $rv = $self->$method( $this, $that );
+	my $rv     = $self->$method( $this, $that );
 	delete $self->{seen}->{$rthis};
 	$rv;
 }
 
 # Compare the children of two SCALAR references
 sub _equal_SCALAR {
-	my ($self, $this, $that) = @_;
-	my ($cthis, $cthat) = ($$this, $$that);
+	my ( $self, $this, $that ) = @_;
+	my ( $cthis, $cthat ) = ( $$this, $$that );
 	return $self->_equal_blessed( $cthis, $cthat )   if blessed $cthis;
 	return $self->_equal_reference( $cthis, $cthat ) if ref $cthis;
-	return (defined $cthat and $cthis eq $cthat)     if defined $cthis;
-	! defined $cthat;
+	return ( defined $cthat and $cthis eq $cthat )   if defined $cthis;
+	!defined $cthat;
 }
 
 # For completeness sake, lets just treat REF as a specialist SCALAR case
@@ -213,7 +205,7 @@ sub _equal_REF { shift->_equal_SCALAR(@_) }
 
 # Compare the children of two ARRAY references
 sub _equal_ARRAY {
-	my ($self, $this, $that) = @_;
+	my ( $self, $this, $that ) = @_;
 
 	# Compare the number of elements
 	scalar(@$this) == scalar(@$that) or return '';
@@ -221,14 +213,17 @@ sub _equal_ARRAY {
 	# Check each element in the array.
 	# Descend depth-first.
 	foreach my $i ( 0 .. scalar(@$this) ) {
-		my ($cthis, $cthat) = ($this->[$i], $that->[$i]);
+		my ( $cthis, $cthat ) = ( $this->[$i], $that->[$i] );
 		if ( blessed $cthis ) {
 			return '' unless $self->_equal_blessed( $cthis, $cthat );
-		} elsif ( ref $cthis ) {
+		}
+		elsif ( ref $cthis ) {
 			return '' unless $self->_equal_reference( $cthis, $cthat );
-		} elsif ( defined $cthis ) {
-			return '' unless (defined $cthat and $cthis eq $cthat);
-		} else {
+		}
+		elsif ( defined $cthis ) {
+			return '' unless ( defined $cthat and $cthis eq $cthat );
+		}
+		else {
 			return '' if defined $cthat;
 		}
 	}
@@ -238,45 +233,48 @@ sub _equal_ARRAY {
 
 # Compare the children of a HASH reference
 sub _equal_HASH {
-	my ($self, $this, $that) = @_;
+	my ( $self, $this, $that ) = @_;
 
 	# Compare the number of keys
-	return '' unless scalar(keys %$this) == scalar(keys %$that);
+	return '' unless scalar( keys %$this ) == scalar( keys %$that );
 
 	# Compare each key, descending depth-first.
 	foreach my $k ( keys %$this ) {
 		return '' unless exists $that->{$k};
-		my ($cthis, $cthat) = ($this->{$k}, $that->{$k});
+		my ( $cthis, $cthat ) = ( $this->{$k}, $that->{$k} );
 		if ( blessed $cthis ) {
 			return '' unless $self->_equal_blessed( $cthis, $cthat );
-		} elsif ( ref $cthis ) {
+		}
+		elsif ( ref $cthis ) {
 			return '' unless $self->_equal_reference( $cthis, $cthat );
-		} elsif ( defined $cthis ) {
-			return '' unless (defined $cthat and $cthis eq $cthat);
-		} else {
+		}
+		elsif ( defined $cthis ) {
+			return '' unless ( defined $cthat and $cthis eq $cthat );
+		}
+		else {
 			return '' if defined $cthat;
 		}
 	}
 
 	1;
-}		
+}
 
 # We do not support GLOB comparisons
 sub _equal_GLOB {
-	my ($self, $this, $that) = @_;
+	my ( $self, $this, $that ) = @_;
 	warn('GLOB comparisons are not supported');
 	'';
 }
 
 # We do not support CODE comparisons
 sub _equal_CODE {
-	my ($self, $this, $that) = @_;
+	my ( $self, $this, $that ) = @_;
 	refaddr $this == refaddr $that;
 }
 
 # We don't support IO comparisons
 sub _equal_IO {
-	my ($self, $this, $that) = @_;
+	my ( $self, $this, $that ) = @_;
 	warn('IO comparisons are not supported');
 	'';
 }
@@ -312,4 +310,4 @@ The full text of the license can be found in the
 LICENSE file included with this module.
 
 =cut
-	
+

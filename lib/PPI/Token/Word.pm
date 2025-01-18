@@ -36,7 +36,7 @@ now, look at L<Perl::Critic::Utils>.
 =cut
 
 use strict;
-use PPI::Token ();
+use PPI::Token      ();
 use PPI::Singletons qw' %OPERATOR %QUOTELIKE %KEYWORDS ';
 
 our $VERSION = '1.282';
@@ -77,13 +77,10 @@ sub method_call {
 	my $self = shift;
 
 	my $previous = $self->sprevious_sibling;
-	if (
-		$previous
-		and
-		$previous->isa('PPI::Token::Operator')
-		and
-		$previous->content eq '->'
-	) {
+	if (    $previous
+		and $previous->isa('PPI::Token::Operator')
+		and $previous->content eq '->' )
+	{
 		return 1;
 	}
 
@@ -91,31 +88,23 @@ sub method_call {
 	return 0 unless $snext;
 
 	if (
-		$snext->isa('PPI::Structure::List')
-		or
-		$snext->isa('PPI::Token::Structure')
-		or
-		$snext->isa('PPI::Token::Operator')
-		and (
-			$snext->content eq ','
-			or
-			$snext->content eq '=>'
-		)
-	) {
+		   $snext->isa('PPI::Structure::List')
+		or $snext->isa('PPI::Token::Structure')
+		or $snext->isa('PPI::Token::Operator') and ( $snext->content eq ','
+			or $snext->content eq '=>' )
+	  )
+	{
 		return 0;
 	}
 
-	if (
-		$snext->isa('PPI::Token::Word')
-		and
-		$snext->content =~ m< \w :: \z >xms
-	) {
+	if (    $snext->isa('PPI::Token::Word')
+		and $snext->content =~ m< \w :: \z >xms )
+	{
 		return 1;
 	}
 
 	return;
 }
-
 
 sub __TOKENIZER__on_char {
 	my $class = shift;
@@ -129,7 +118,7 @@ sub __TOKENIZER__on_char {
 		# the word "eq'foo", then just make 'eq' (or whatever
 		# else is in the %KEYWORDS hash.
 		if ( $word =~ /^(\w+)'/ && $KEYWORDS{$1} ) {
-		    $word = $1;
+			$word = $1;
 		}
 		$t->{token}->{content} .= $word;
 		$t->{line_cursor} += length $word;
@@ -138,35 +127,35 @@ sub __TOKENIZER__on_char {
 
 	# We might be a subroutine attribute.
 	if ( __current_token_is_attribute($t) ) {
-		$t->{class} = $t->{token}->set_class( 'Attribute' );
-		return $t->{class}->__TOKENIZER__commit( $t );
+		$t->{class} = $t->{token}->set_class('Attribute');
+		return $t->{class}->__TOKENIZER__commit($t);
 	}
 
 	my $word = $t->{token}->{content};
 	if ( $KEYWORDS{$word} ) {
 		# Check for a Perl keyword that is forced to be a normal word instead
 		if ( $t->__current_token_is_forced_word ) {
-			$t->{class} = $t->{token}->set_class( 'Word' );
-			return $t->{class}->__TOKENIZER__on_char( $t );
+			$t->{class} = $t->{token}->set_class('Word');
+			return $t->{class}->__TOKENIZER__on_char($t);
 		}
 
-		# Check for a quote like operator. %QUOTELIKE must be subset of %KEYWORDS
+	   # Check for a quote like operator. %QUOTELIKE must be subset of %KEYWORDS
 		if ( $QUOTELIKE{$word} ) {
 			$t->{class} = $t->{token}->set_class( $QUOTELIKE{$word} );
-			return $t->{class}->__TOKENIZER__on_char( $t );
+			return $t->{class}->__TOKENIZER__on_char($t);
 		}
 
 		# Or one of the word operators. %OPERATOR must be subset of %KEYWORDS
 		if ( $OPERATOR{$word} ) {
-			$t->{class} = $t->{token}->set_class( 'Operator' );
-			return $t->_finalize_token->__TOKENIZER__on_char( $t );
+			$t->{class} = $t->{token}->set_class('Operator');
+			return $t->_finalize_token->__TOKENIZER__on_char($t);
 		}
 	}
 
 	# Unless this is a simple identifier, at this point
 	# it has to be a normal bareword
 	if ( $word =~ /\:/ ) {
-		return $t->_finalize_token->__TOKENIZER__on_char( $t );
+		return $t->_finalize_token->__TOKENIZER__on_char($t);
 	}
 
 	# If the NEXT character in the line is a colon, this
@@ -175,38 +164,39 @@ sub __TOKENIZER__on_char {
 	if ( $char eq ':' ) {
 		$t->{token}->{content} .= ':';
 		$t->{line_cursor}++;
-		$t->{class} = $t->{token}->set_class( 'Label' );
+		$t->{class} = $t->{token}->set_class('Label');
 
-	# If not a label, '_' on its own is the magic filehandle
-	} elsif ( $word eq '_' ) {
-		$t->{class} = $t->{token}->set_class( 'Magic' );
+		# If not a label, '_' on its own is the magic filehandle
+	}
+	elsif ( $word eq '_' ) {
+		$t->{class} = $t->{token}->set_class('Magic');
 
 	}
 
 	# Finalise and process the character again
-	$t->_finalize_token->__TOKENIZER__on_char( $t );
+	$t->_finalize_token->__TOKENIZER__on_char($t);
 }
-
-
 
 # We are committed to being a bareword.
 # Or so we would like to believe.
 sub __TOKENIZER__commit {
-	my ($class, $t) = @_;
+	my ( $class, $t ) = @_;
 
 	# Our current position is the first character of the bareword.
 	# Capture the bareword.
 	pos $t->{line} = $t->{line_cursor};
 	unless ( $t->{line} =~ m/\G((?!\d)\w+(?:(?:\'|::)\w+)*(?:::)?)/gc ) {
 		# Programmer error
-		die sprintf "Fatal error... regex failed to match in '%s' when expected", substr $t->{line}, $t->{line_cursor};
+		die sprintf
+		  "Fatal error... regex failed to match in '%s' when expected",
+		  substr $t->{line}, $t->{line_cursor};
 	}
 
 	# Special Case: If we accidentally treat eq'foo' like the word "eq'foo",
 	# then unwind it and just make it 'eq' (or the other stringy comparitors)
 	my $word = $1;
 	if ( $word =~ /^(\w+)'/ && $KEYWORDS{$1} ) {
-	    $word = $1;
+		$word = $1;
 	}
 
 	# Advance the position one after the end of the bareword
@@ -215,8 +205,9 @@ sub __TOKENIZER__commit {
 	# We might be a subroutine attribute.
 	if ( __current_token_is_attribute($t) ) {
 		$t->_new_token( 'Attribute', $word );
-		return ($t->{line_cursor} >= $t->{line_length}) ? 0
-			: $t->{class}->__TOKENIZER__on_char($t);
+		return ( $t->{line_cursor} >= $t->{line_length} )
+		  ? 0
+		  : $t->{class}->__TOKENIZER__on_char($t);
 	}
 
 	# Check for the end of the file
@@ -235,9 +226,10 @@ sub __TOKENIZER__commit {
 		$t->{line_cursor} = length $t->{line};
 		if ( $end_rest =~ /\n$/ ) {
 			chomp $end_rest;
-			$t->_new_token( 'Comment', $end_rest ) if length $end_rest;
+			$t->_new_token( 'Comment',    $end_rest ) if length $end_rest;
 			$t->_new_token( 'Whitespace', "\n" );
-		} else {
+		}
+		else {
 			$t->_new_token( 'Comment', $end_rest ) if length $end_rest;
 		}
 		$t->_finalize_token;
@@ -259,9 +251,10 @@ sub __TOKENIZER__commit {
 		$t->{line_cursor} = length $t->{line};
 		if ( $data_rest =~ /\n$/ ) {
 			chomp $data_rest;
-			$t->_new_token( 'Comment', $data_rest ) if length $data_rest;
+			$t->_new_token( 'Comment',    $data_rest ) if length $data_rest;
 			$t->_new_token( 'Whitespace', "\n" );
-		} else {
+		}
+		else {
 			$t->_new_token( 'Comment', $data_rest ) if length $data_rest;
 		}
 		$t->_finalize_token;
@@ -274,21 +267,27 @@ sub __TOKENIZER__commit {
 		# Since it's not a simple identifier...
 		$token_class = 'Word';
 
-	} elsif ( $KEYWORDS{$word} and $t->__current_token_is_forced_word ) {
+	}
+	elsif ( $KEYWORDS{$word} and $t->__current_token_is_forced_word ) {
 		$token_class = 'Word';
 
-	} elsif ( $QUOTELIKE{$word} ) {
+	}
+	elsif ( $QUOTELIKE{$word} ) {
 		# Special Case: A Quote-like operator
 		$t->_new_token( $QUOTELIKE{$word}, $word );
-		return ($t->{line_cursor} >= $t->{line_length}) ? 0
-			: $t->{class}->__TOKENIZER__on_char( $t );
+		return ( $t->{line_cursor} >= $t->{line_length} )
+		  ? 0
+		  : $t->{class}->__TOKENIZER__on_char($t);
 
-	} elsif ( $OPERATOR{$word} && ($word ne 'x' || $t->_current_x_is_operator) ) {
+	}
+	elsif ( $OPERATOR{$word} && ( $word ne 'x' || $t->_current_x_is_operator ) )
+	{
 		# Word operator
 		$token_class = 'Operator';
 
-	} else {
-		# Get tokens early to be sure to not disturb state set up by pos and m//gc.
+	}
+	else {
+	 # Get tokens early to be sure to not disturb state set up by pos and m//gc.
 		my @tokens = $t->_previous_significant_tokens(1);
 
 		# If the next character is a ':' then it's a label...
@@ -305,16 +304,22 @@ sub __TOKENIZER__commit {
 				# attribute operator doesn't directly
 				# touch the object name already works.
 				$token_class = 'Word';
-			} elsif ( !($tokens[0] and $tokens[0]->isa('PPI::Token::Operator')) ) {
+			}
+			elsif (
+				!( $tokens[0] and $tokens[0]->isa('PPI::Token::Operator') ) )
+			{
 				$word .= $1;
 				$t->{line_cursor} += length($1);
 				$token_class = 'Label';
-			} else {
+			}
+			else {
 				$token_class = 'Word';
 			}
-		} elsif ( $word eq '_' ) {
+		}
+		elsif ( $word eq '_' ) {
 			$token_class = 'Magic';
-		} else {
+		}
+		else {
 			$token_class = 'Word';
 		}
 	}
@@ -329,20 +334,18 @@ sub __TOKENIZER__commit {
 	$t->_finalize_token->__TOKENIZER__on_char($t);
 }
 
-
-
 # Is the current Word really a subroutine attribute?
 sub __current_token_is_attribute {
-	my ( $t ) = @_;
+	my ($t) = @_;
 	my @tokens = $t->_previous_significant_tokens(1);
 	return (
 		$tokens[0]
-		and (
+		  and (
 			# hint from tokenizer
 			$tokens[0]->{_attribute}
 			# nothing between attribute and us except whitespace
 			or $tokens[0]->isa('PPI::Token::Attribute')
-		)
+		  )
 	);
 }
 

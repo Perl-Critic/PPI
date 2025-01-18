@@ -32,8 +32,8 @@ use PPI::Token::_QuoteEngine::Full ();
 our $VERSION = '1.282';
 
 our @ISA = qw{
-	PPI::Token::_QuoteEngine::Full
-	PPI::Token::QuoteLike
+  PPI::Token::_QuoteEngine::Full
+  PPI::Token::QuoteLike
 };
 
 =pod
@@ -47,7 +47,7 @@ the last element if the token is in scalar context.
 =cut
 
 sub literal {
-	my ( $self ) = @_;
+	my ($self) = @_;
 
 	my $content = $self->_section_content(0);
 	return if !defined $content;
