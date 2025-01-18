@@ -1,3 +1,5 @@
 --indent-columns=4
 --entab-leading-whitespace=4
 --tabs
+--noblanks-before-comments
+--converge
