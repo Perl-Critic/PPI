@@ -41,9 +41,10 @@ our @ISA = "PPI::Structure";
 # Highly special custom isa method that will continue to respond
 # positively to ->isa('PPI::Structure::ForLoop') but warns.
 my $has_warned = 0;
+
 sub isa {
 	if ( $_[1] and $_[1] eq 'PPI::Structure::ForLoop' ) {
-		unless ( $has_warned ) {
+		unless ($has_warned) {
 			warn("PPI::Structure::ForLoop has been deprecated");
 			$has_warned = 1;
 		}

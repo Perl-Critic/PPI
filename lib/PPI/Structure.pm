@@ -110,34 +110,24 @@ use PPI::Structure::Unknown     ();
 use PPI::Structure::When        ();
 use PPI::Structure::Signature   ();
 
-
-
-
-
 #####################################################################
 # Constructor
 
 sub new {
 	my $class = shift;
-	my $Token = PPI::Token::__LEXER__opens($_[0]) ? shift : return undef;
+	my $Token = PPI::Token::__LEXER__opens( $_[0] ) ? shift : return undef;
 
 	# Create the object
 	my $self = bless {
 		children => [],
 		start    => $Token,
-		}, $class;
+	}, $class;
 
 	# Set the start braces parent link
-	Scalar::Util::weaken(
-		$_PARENT{Scalar::Util::refaddr $Token} = $self
-	);
+	Scalar::Util::weaken( $_PARENT{ Scalar::Util::refaddr $Token } = $self );
 
 	$self;
 }
-
-
-
-
 
 #####################################################################
 # PPI::Structure API methods
@@ -162,7 +152,7 @@ due to manipulation of the PDOM tree.
 
 =cut
 
-sub start  { $_[0]->{start}  }
+sub start { $_[0]->{start} }
 
 =pod
 
@@ -216,12 +206,8 @@ for the braces, and does not recurse downwards.
 =cut
 
 sub complete {
-	!! ($_[0]->{start} and $_[0]->{finish});
+	!!( $_[0]->{start} and $_[0]->{finish} );
 }
-
-
-
-
 
 #####################################################################
 # PPI::Node overloaded methods
@@ -230,15 +216,21 @@ sub complete {
 sub elements {
 	my $self = shift;
 
-	if ( wantarray ) {
+	if (wantarray) {
 		# Return a list in array context
-		return ( $self->{start} || (), @{$self->{children}}, $self->{finish} || () );
-	} else {
+		return (
+			$self->{start} || (),
+			@{ $self->{children} },
+			$self->{finish} || ()
+		);
+	}
+	else {
 		# Return the number of elements in scalar context.
 		# This is memory-cheaper than creating another big array
-		return scalar(@{$self->{children}})
-			+ ($self->{start}  ? 1 : 0)
-			+ ($self->{finish} ? 1 : 0);
+		return
+		  scalar( @{ $self->{children} } ) +
+		  ( $self->{start}  ? 1 : 0 ) +
+		  ( $self->{finish} ? 1 : 0 );
 	}
 }
 
@@ -263,21 +255,17 @@ sub location {
 	$first->location;
 }
 
-
-
-
-
 #####################################################################
 # PPI::Element overloaded methods
 
 # Get the full set of tokens, including start and finish
 sub tokens {
-	my $self = shift;
+	my $self   = shift;
 	my @tokens = (
-		$self->{start}  || (),
+		$self->{start} || (),
 		$self->SUPER::tokens(@_),
 		$self->{finish} || (),
-		);
+	);
 	@tokens;
 }
 
@@ -285,9 +273,9 @@ sub tokens {
 # This will recurse downwards through everything
 ### Reimplement this using List::Utils stuff
 sub content {
-	my $self = shift;
+	my $self    = shift;
 	my $content = $self->{start} ? $self->{start}->content : '';
-	foreach my $child ( @{$self->{children}} ) {
+	foreach my $child ( @{ $self->{children} } ) {
 		$content .= $child->content;
 	}
 	$content .= $self->{finish}->content if $self->{finish};
@@ -296,16 +284,17 @@ sub content {
 
 # Is the structure completed
 sub _complete {
-	!! ( defined $_[0]->{finish} );
+	!!( defined $_[0]->{finish} );
 }
 
 # You can insert either another structure, or a token
 sub insert_before {
 	my $self    = shift;
-	my $Element = _INSTANCE(shift, 'PPI::Element') or return undef;
+	my $Element = _INSTANCE( shift, 'PPI::Element' ) or return undef;
 	if ( $Element->isa('PPI::Structure') ) {
 		return $self->__insert_before($Element);
-	} elsif ( $Element->isa('PPI::Token') ) {
+	}
+	elsif ( $Element->isa('PPI::Token') ) {
 		return $self->__insert_before($Element);
 	}
 	'';
@@ -314,10 +303,11 @@ sub insert_before {
 # As above, you can insert either another structure, or a token
 sub insert_after {
 	my $self    = shift;
-	my $Element = _INSTANCE(shift, 'PPI::Element') or return undef;
+	my $Element = _INSTANCE( shift, 'PPI::Element' ) or return undef;
 	if ( $Element->isa('PPI::Structure') ) {
 		return $self->__insert_after($Element);
-	} elsif ( $Element->isa('PPI::Token') ) {
+	}
+	elsif ( $Element->isa('PPI::Token') ) {
 		return $self->__insert_after($Element);
 	}
 	'';

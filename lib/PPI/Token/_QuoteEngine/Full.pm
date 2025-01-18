@@ -22,38 +22,86 @@ my %SECTIONS = (
 # For each quote type, the extra fields that should be set.
 # This should give us faster initialization.
 my %QUOTES = (
-	'q'   => { operator => 'q',   braced => undef, separator => undef, _sections => 1 },
-	'qq'  => { operator => 'qq',  braced => undef, separator => undef, _sections => 1 },
-	'qx'  => { operator => 'qx',  braced => undef, separator => undef, _sections => 1 },
-	'qw'  => { operator => 'qw',  braced => undef, separator => undef, _sections => 1 },
-	'qr'  => { operator => 'qr',  braced => undef, separator => undef, _sections => 1, modifiers => 1 },
-	'm'   => { operator => 'm',   braced => undef, separator => undef, _sections => 1, modifiers => 1 },
-	's'   => { operator => 's',   braced => undef, separator => undef, _sections => 2, modifiers => 1 },
-	'tr'  => { operator => 'tr',  braced => undef, separator => undef, _sections => 2, modifiers => 1 },
+	'q' =>
+	  { operator => 'q', braced => undef, separator => undef, _sections => 1 },
+	'qq' =>
+	  { operator => 'qq', braced => undef, separator => undef, _sections => 1 },
+	'qx' =>
+	  { operator => 'qx', braced => undef, separator => undef, _sections => 1 },
+	'qw' =>
+	  { operator => 'qw', braced => undef, separator => undef, _sections => 1 },
+	'qr' => {
+		operator  => 'qr',
+		braced    => undef,
+		separator => undef,
+		_sections => 1,
+		modifiers => 1
+	},
+	'm' => {
+		operator  => 'm',
+		braced    => undef,
+		separator => undef,
+		_sections => 1,
+		modifiers => 1
+	},
+	's' => {
+		operator  => 's',
+		braced    => undef,
+		separator => undef,
+		_sections => 2,
+		modifiers => 1
+	},
+	'tr' => {
+		operator  => 'tr',
+		braced    => undef,
+		separator => undef,
+		_sections => 2,
+		modifiers => 1
+	},
 
 	# Y is the little-used variant of tr
-	'y'   => { operator => 'y',   braced => undef, separator => undef, _sections => 2, modifiers => 1 },
+	'y' => {
+		operator  => 'y',
+		braced    => undef,
+		separator => undef,
+		_sections => 2,
+		modifiers => 1
+	},
 
-	'/'   => { operator => undef, braced => 0,     separator => '/',   _sections => 1, modifiers => 1 },
+	'/' => {
+		operator  => undef,
+		braced    => 0,
+		separator => '/',
+		_sections => 1,
+		modifiers => 1
+	},
 
 	# Angle brackets quotes mean "readline(*FILEHANDLE)"
-	'<'   => { operator => undef, braced => 1,     separator => undef, _sections => 1, },
+	'<' =>
+	  { operator => undef, braced => 1, separator => undef, _sections => 1, },
 
 	# The final ( and kind of depreciated ) "first match only" one is not
 	# used yet, since I'm not sure on the context differences between
 	# this and the trinary operator, but it's here for completeness.
-	'?'   => { operator => undef, braced => 0,     separator => '?',   _sections => 1, modifiers => 1 },
+	'?' => {
+		operator  => undef,
+		braced    => 0,
+		separator => '?',
+		_sections => 1,
+		modifiers => 1
+	},
 
 	# parse prototypes as a literal quote
-	'('   => { operator => undef, braced => 1,     separator => undef, _sections => 1, },
+	'(' =>
+	  { operator => undef, braced => 1, separator => undef, _sections => 1, },
 );
-
 
 sub new {
 	my $class = shift;
-	my $init  = defined $_[0]
-		? shift
-		: Carp::croak("::Full->new called without init string");
+	my $init =
+	  defined $_[0]
+	  ? shift
+	  : Carp::croak("::Full->new called without init string");
 
 	# Create the token
 	### This manual SUPER'ing ONLY works because none of
@@ -62,9 +110,8 @@ sub new {
 	my $self = PPI::Token::new( $class, $init ) or return undef;
 
 	# Do we have a prototype for the initializer? If so, add the extra fields
-	my $options = $QUOTES{$init} or return $self->_error(
-		"Unknown quote type '$init'"
-	);
+	my $options = $QUOTES{$init}
+	  or return $self->_error("Unknown quote type '$init'");
 	foreach ( keys %$options ) {
 		$self->{$_} = $options->{$_};
 	}
@@ -83,7 +130,7 @@ sub _fill {
 	my $class = shift;
 	my $t     = shift;
 	my $self  = $t->{token}
-		or Carp::croak("::Full->_fill called without current token");
+	  or Carp::croak("::Full->_fill called without current token");
 
 	# Load in the operator stuff if needed
 	if ( $self->{operator} ) {
@@ -91,7 +138,7 @@ sub _fill {
 		# operator and the opening separator.
 		if ( substr( $t->{line}, $t->{line_cursor}, 1 ) =~ /\s/ ) {
 			# Go past the gap
-			my $gap = $self->_scan_quote_like_operator_gap( $t );
+			my $gap = $self->_scan_quote_like_operator_gap($t);
 			return undef unless defined $gap;
 			if ( ref $gap ) {
 				# End of file
@@ -108,18 +155,20 @@ sub _fill {
 
 		# Determine if these are normal or braced type sections
 		if ( my $section = $SECTIONS{$sep} ) {
-			$self->{braced}        = 1;
+			$self->{braced} = 1;
 			$self->{sections}->[0] = Clone::clone($section);
-		} else {
-			$self->{braced}        = 0;
-			$self->{separator}     = $sep;
+		}
+		else {
+			$self->{braced}    = 0;
+			$self->{separator} = $sep;
 		}
 	}
 
 	# Parse different based on whether we are normal or braced
-	my $rv = $self->{braced}
-		? $self->_fill_braced($t)
- 		: $self->_fill_normal($t);
+	my $rv =
+		$self->{braced}
+	  ? $self->_fill_braced($t)
+	  : $self->_fill_normal($t);
 	return $rv if !$rv;
 
 	# Return now unless it has modifiers ( i.e. s/foo//eieio )
@@ -128,10 +177,12 @@ sub _fill {
 	# Check for modifiers
 	my $char;
 	my $len = 0;
-	while ( ($char = substr( $t->{line}, $t->{line_cursor} + 1, 1 )) =~ /[^\W\d_]/ ) {
+	while ( ( $char = substr( $t->{line}, $t->{line_cursor} + 1, 1 ) ) =~
+		/[^\W\d_]/ )
+	{
 		$len++;
 		$self->{content} .= $char;
-		$self->{modifiers}->{lc $char} = 1;
+		$self->{modifiers}->{ lc $char } = 1;
 		$t->{line_cursor}++;
 	}
 }
@@ -146,19 +197,20 @@ sub _fill_normal {
 	return undef unless defined $string;
 	if ( ref $string ) {
 		# End of file
-		if ( length($$string) > 1 )  {
+		if ( length($$string) > 1 ) {
 			# Complete the properties for the first section
 			my $str = $$string;
 			chop $str;
 			$self->{sections}->[0] = {
-				position => length($self->{content}),
+				position => length( $self->{content} ),
 				size     => length($$string) - 1,
 				type     => "$self->{separator}$self->{separator}",
 			};
 			$self->{_sections} = 1;
-		} else {
+		}
+		else {
 			# No sections at all
-			$self->{sections}  = [ ];
+			$self->{sections}  = [];
 			$self->{_sections} = 0;
 		}
 		$self->{content} .= $$string;
@@ -186,16 +238,17 @@ sub _fill_normal {
 	return undef unless defined $string;
 	if ( ref $string ) {
 		# End of file
-		if ( length($$string) > 1 )  {
+		if ( length($$string) > 1 ) {
 			# Complete the properties for the second section
 			my $str = $$string;
 			chop $str;
 			$self->{sections}->[1] = {
-				position => length($self->{content}),
+				position => length( $self->{content} ),
 				size     => length($$string) - 1,
 				type     => "$self->{separator}$self->{separator}",
 			};
-		} else {
+		}
+		else {
 			# No sections at all
 			$self->{_sections} = 1;
 		}
@@ -205,7 +258,7 @@ sub _fill_normal {
 
 	# Complete the properties of the second section
 	$self->{sections}->[1] = {
-		position => length($self->{content}),
+		position => length( $self->{content} ),
 		size     => length($string) - 1
 	};
 	$self->{content} .= $string;
@@ -224,19 +277,20 @@ sub _fill_braced {
 	return undef unless defined $brace_str;
 	if ( ref $brace_str ) {
 		# End of file
-		if ( length($$brace_str) > 1 )  {
+		if ( length($$brace_str) > 1 ) {
 			# Complete the properties for the first section
 			my $str = $$brace_str;
 			chop $str;
 			$self->{sections}->[0] = {
-				position => length($self->{content}),
+				position => length( $self->{content} ),
 				size     => length($$brace_str) - 1,
 				type     => $section->{type},
 			};
 			$self->{_sections} = 1;
-		} else {
+		}
+		else {
 			# No sections at all
-			$self->{sections}  = [ ];
+			$self->{sections}  = [];
 			$self->{_sections} = 0;
 		}
 		$self->{content} .= $$brace_str;
@@ -258,7 +312,7 @@ sub _fill_braced {
 	my $char = substr( $t->{line}, ++$t->{line_cursor}, 1 );
 	if ( $char =~ /\s/ ) {
 		# Go past the gap
-		my $gap_str = $self->_scan_quote_like_operator_gap( $t );
+		my $gap_str = $self->_scan_quote_like_operator_gap($t);
 		return undef unless defined $gap_str;
 		if ( ref $gap_str ) {
 			# End of file
@@ -271,12 +325,12 @@ sub _fill_braced {
 
 	$section = $SECTIONS{$char};
 
-	if ( $section ) {
+	if ($section) {
 		# It's a brace
 
 		# Initialize the second section
 		$self->{content} .= $char;
-		$section = { %$section };
+		$section = {%$section};
 
 		# Advance into the second section
 		$t->{line_cursor}++;
@@ -286,32 +340,35 @@ sub _fill_braced {
 		return undef unless defined $brace_str;
 		if ( ref $brace_str ) {
 			# End of file
-			if ( length($$brace_str) > 1 )  {
+			if ( length($$brace_str) > 1 ) {
 				# Complete the properties for the second section
 				my $str = $$brace_str;
 				chop $str;
 				$self->{sections}->[1] = {
-					position => length($self->{content}),
+					position => length( $self->{content} ),
 					size     => length($$brace_str) - 1,
 					type     => $section->{type},
 				};
 				$self->{_sections} = 2;
-			} else {
+			}
+			else {
 				# No sections at all
 				$self->{_sections} = 1;
 			}
 			$self->{content} .= $$brace_str;
 			return 0;
-		} else {
+		}
+		else {
 			# Complete the properties for the second section
 			$self->{sections}->[1] = {
-				position => length($self->{content}),
+				position => length( $self->{content} ),
 				size     => length($brace_str) - 1,
 				type     => $section->{type},
 			};
 			$self->{content} .= $brace_str;
 		}
-	} elsif ( $char =~ m/ \A [^\w\s] \z /smx ) {
+	}
+	elsif ( $char =~ m/ \A [^\w\s] \z /smx ) {
 		# It is some other delimiter (weird, but possible)
 
 		# Add the delimiter to the content.
@@ -325,16 +382,17 @@ sub _fill_braced {
 		return undef unless defined $string;
 		if ( ref $string ) {
 			# End of file
-			if ( length($$string) > 1 )  {
+			if ( length($$string) > 1 ) {
 				# Complete the properties for the second section
 				my $str = $$string;
 				chop $str;
 				$self->{sections}->[1] = {
-					position => length($self->{content}),
+					position => length( $self->{content} ),
 					size     => length($$string) - 1,
 					type     => "$char$char",
 				};
-			} else {
+			}
+			else {
 				# Only the one section
 				$self->{_sections} = 1;
 			}
@@ -344,13 +402,14 @@ sub _fill_braced {
 
 		# Complete the properties of the second section
 		$self->{sections}->[1] = {
-			position => length($self->{content}),
+			position => length( $self->{content} ),
 			size     => length($string) - 1,
-			type     => "$char$char", 
+			type     => "$char$char",
 		};
 		$self->{content} .= $string;
 
-	} else {
+	}
+	else {
 
 		# Error, it has to be a delimiter of some sort.
 		# Although this will result in a REALLY illegal regexp,
@@ -358,13 +417,14 @@ sub _fill_braced {
 
 		# Create a null second section
 		$self->{sections}->[1] = {
-			position => length($self->{content}),
+			position => length( $self->{content} ),
 			size     => 0,
 			type     => '',
 		};
 
 		# Attach an error to the token and move on
-		$self->{_error} = "No second section of regexp, or does not start with a balanced character";
+		$self->{_error} =
+"No second section of regexp, or does not start with a balanced character";
 
 		# Roll back the cursor one char and return signalling end of regexp
 		$t->{line_cursor}--;
@@ -374,24 +434,20 @@ sub _fill_braced {
 	1;
 }
 
-
-
-
-
 #####################################################################
 # Additional methods to find out about the quote
 
 # In a scalar context, get the number of sections
 # In an array context, get the section information
 sub _sections {
-	wantarray ? @{$_[0]->{sections}} : scalar @{$_[0]->{sections}}
+	wantarray ? @{ $_[0]->{sections} } : scalar @{ $_[0]->{sections} };
 }
 
 # Get a section's content
 sub _section_content {
 	my $self = shift;
 	my $i    = shift;
-	$self->{sections} or return;
+	$self->{sections}                     or return;
 	my $section = $self->{sections}->[$i] or return;
 	return substr( $self->content, $section->{position}, $section->{size} );
 }
@@ -415,11 +471,12 @@ sub _delimiters {
 	foreach my $sect ( @{ $self->{sections} } ) {
 		if ( exists $sect->{type} ) {
 			push @delims, $sect->{type};
-		} else {
+		}
+		else {
 			my $content = $self->content;
 			push @delims,
-			substr( $content, $sect->{position} - 1, 1 ) .
-			substr( $content, $sect->{position} + $sect->{size}, 1 );
+			  substr( $content, $sect->{position} - 1, 1 )
+			  . substr( $content, $sect->{position} + $sect->{size}, 1 );
 		}
 	}
 	return @delims;

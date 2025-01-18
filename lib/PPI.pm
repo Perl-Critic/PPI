@@ -8,7 +8,7 @@ use strict;
 # Set the version for CPAN
 our $VERSION = '1.282';
 
-our ( $XS_COMPATIBLE, @XS_EXCLUDE ) = ( '0.845' );
+our ( $XS_COMPATIBLE, @XS_EXCLUDE ) = ('0.845');
 
 # Load everything
 use PPI::Util                 ();
@@ -29,7 +29,7 @@ use PPI::Lexer                ();
 die
   if !$PPI::XS_DISABLE
   and !eval { require PPI::XS; 1 }
-  and $@ !~ /^Can't locate .*? at /;    # ignore failure to load if not installed
+  and $@ !~ /^Can't locate .*? at /;   # ignore failure to load if not installed
 
 1;
 

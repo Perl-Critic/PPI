@@ -56,7 +56,7 @@ use PPI::Document    ();
 
 our $VERSION = '1.282';
 
-use constant VMS => !! ( $^O eq 'VMS' );
+use constant VMS => !!( $^O eq 'VMS' );
 
 sub import {
 	my $class = ref $_[0] ? ref shift : shift;
@@ -66,16 +66,12 @@ sub import {
 	my $cache = $class->new(@_);
 
 	# Make PPI::Document use it
-	unless ( PPI::Document->set_cache( $cache ) ) {
+	unless ( PPI::Document->set_cache($cache) ) {
 		Carp::croak("Failed to set cache in PPI::Document");
 	}
 
 	1;
 }
-
-
-
-
 
 #####################################################################
 # Constructor and Accessors
@@ -115,21 +111,21 @@ sub new {
 
 	# Path should exist and be usable
 	my $path = $params{path}
-		or Carp::croak("Cannot create PPI::Cache, no path provided");
+	  or Carp::croak("Cannot create PPI::Cache, no path provided");
 	unless ( -d $path ) {
 		Carp::croak("Cannot create PPI::Cache, path does not exist");
 	}
 	unless ( -r $path and -x $path ) {
 		Carp::croak("Cannot create PPI::Cache, no read permissions for path");
 	}
-	if ( ! $params{readonly} and ! -w $path ) {
+	if ( !$params{readonly} and !-w $path ) {
 		Carp::croak("Cannot create PPI::Cache, no write permissions for path");
 	}
 
 	# Create the basic object
 	my $self = bless {
 		path     => $path,
-		readonly => !! $params{readonly},
+		readonly => !!$params{readonly},
 	}, $class;
 
 	$self;
@@ -157,10 +153,6 @@ to the cache.
 
 sub readonly { $_[0]->{readonly} }
 
-
-
-
-
 #####################################################################
 # PPI::Cache Methods
 
@@ -174,9 +166,10 @@ cache and retrieves it if so.
 =cut
 
 sub get_document {
-	my $self = ref $_[0]
-		? shift
-		: Carp::croak('PPI::Cache::get_document called as static method');
+	my $self =
+	  ref $_[0]
+	  ? shift
+	  : Carp::croak('PPI::Cache::get_document called as static method');
 	my $md5hex = $self->_md5hex(shift) or return undef;
 	$self->_load($md5hex);
 }
@@ -196,7 +189,7 @@ FIXME (make this return either one or the other, not both)
 
 sub store_document {
 	my $self     = shift;
-	my $Document = _INSTANCE(shift, 'PPI::Document') or return undef;
+	my $Document = _INSTANCE( shift, 'PPI::Document' ) or return undef;
 
 	# Shortcut if we are readonly
 	return 1 if $self->readonly;
@@ -208,24 +201,21 @@ sub store_document {
 	$self->_store( $md5hex, $Document );
 }
 
-
-
-
-
 #####################################################################
 # Support Methods
 
 # Store an arbitrary PPI::Document object (using Storable) to a particular
 # path within the cache filesystem.
 sub _store {
-	my ($self, $md5hex, $object) = @_;
-	my ($dir, $file) = $self->_paths($md5hex);
+	my ( $self, $md5hex, $object ) = @_;
+	my ( $dir, $file ) = $self->_paths($md5hex);
 
 	# Save the file
 	File::Path::mkpath( $dir, 0, 0755 ) unless -d $dir;
-	if ( VMS ) {
+	if (VMS) {
 		Storable::lock_nstore( $object, $file );
-	} else {
+	}
+	else {
 		Storable::nstore( $object, $file );
 	}
 }
@@ -233,18 +223,20 @@ sub _store {
 # Load an arbitrary object (using Storable) from a particular
 # path within the cache filesystem.
 sub _load {
-	my ($self, $md5hex) = @_;
-	my (undef, $file) = $self->_paths($md5hex);
+	my ( $self, $md5hex ) = @_;
+	my ( undef, $file )   = $self->_paths($md5hex);
 
 	# Load the file
 	return '' unless -f $file;
-	my $object = VMS
-		? Storable::retrieve( $file )
-		: Storable::lock_retrieve( $file );
+	my $object =
+	  VMS
+	  ? Storable::retrieve($file)
+	  : Storable::lock_retrieve($file);
 
 	# Security check
-	unless ( _INSTANCE($object, 'PPI::Document') ) {
-		Carp::croak("Security Violation: Object in '$file' is not a PPI::Document");
+	unless ( _INSTANCE( $object, 'PPI::Document' ) ) {
+		Carp::croak(
+			"Security Violation: Object in '$file' is not a PPI::Document");
 	}
 
 	$object;
@@ -254,20 +246,25 @@ sub _load {
 sub _paths {
 	my $self   = shift;
 	my $md5hex = lc shift;
-	my $dir    = File::Spec->catdir( $self->path, substr($md5hex, 0, 1), substr($md5hex, 0, 2) );
-	my $file   = File::Spec->catfile( $dir, $md5hex . '.ppi' );
-	return ($dir, $file);
+	my $dir    = File::Spec->catdir(
+		$self->path,
+		substr( $md5hex, 0, 1 ),
+		substr( $md5hex, 0, 2 )
+	);
+	my $file = File::Spec->catfile( $dir, $md5hex . '.ppi' );
+	return ( $dir, $file );
 }
 
 # Check a md5hex param
 sub _md5hex {
 	my $either = shift;
-	my $it     = _SCALAR($_[0])
-		? PPI::Util::md5hex(${$_[0]})
-		: $_[0];
-	return (defined $it and ! ref $it and $it =~ /^[[:xdigit:]]{32}\z/s)
-		? lc $it
-		: undef;
+	my $it =
+		_SCALAR( $_[0] )
+	  ? PPI::Util::md5hex( ${ $_[0] } )
+	  : $_[0];
+	return ( defined $it and !ref $it and $it =~ /^[[:xdigit:]]{32}\z/s )
+	  ? lc $it
+	  : undef;
 }
 
 1;

@@ -33,19 +33,15 @@ L<PPI::Element> classes.
 =cut
 
 use strict;
-use PPI::Token::Quote ();
+use PPI::Token::Quote                ();
 use PPI::Token::_QuoteEngine::Simple ();
 
 our $VERSION = '1.282';
 
 our @ISA = qw{
-	PPI::Token::_QuoteEngine::Simple
-	PPI::Token::Quote
+  PPI::Token::_QuoteEngine::Simple
+  PPI::Token::Quote
 };
-
-
-
-
 
 #####################################################################
 # PPI::Token::Quote Methods
@@ -54,7 +50,6 @@ sub string {
 	my $str = $_[0]->{content};
 	substr( $str, 1, length($str) - 2 );
 }
-
 
 my %UNESCAPE = (
 	"\\'"  => "'",

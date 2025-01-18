@@ -4,11 +4,10 @@
 
 use lib 't/lib';
 use PPI::Test::pragmas;
-use Test::More tests => 53 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+use Test::More tests => 53 + ( $ENV{AUTHOR_TESTING} ? 1 : 0 );
 
 use PPI ();
 use Helper 'safe_new';
-
 
 TYPE: {
 	my $Document = safe_new \<<'END_PERL';
@@ -73,17 +72,19 @@ END_PERL
 
 	is( $statements->[0]->type, 'while', q<Type of while is "while"> );
 	is( $statements->[1]->type, 'while', q<Type of until is "while"> );
-	is( $statements->[2]->type, 'while', q<Type of while with label is "while"> );
-	is( $statements->[3]->type, 'while', q<Type of until with label is "while"> );
-	is( $statements->[4]->type, 'if',    q<Type of if is "if"> );
-	is( $statements->[5]->type, 'if',    q<Type of unless is "if"> );
+	is( $statements->[2]->type,
+		'while', q<Type of while with label is "while"> );
+	is( $statements->[3]->type,
+		'while', q<Type of until with label is "while"> );
+	is( $statements->[4]->type, 'if', q<Type of if is "if"> );
+	is( $statements->[5]->type, 'if', q<Type of unless is "if"> );
 
-	foreach my $index (6..37) {
+	foreach my $index ( 6 .. 37 ) {
 		my $statement = $statements->[$index];
 		is( $statement->type, 'foreach', qq<Type is "foreach": $statement> );
 	}
 
-	foreach my $index (38..49) {
+	foreach my $index ( 38 .. 49 ) {
 		my $statement = $statements->[$index];
 		is( $statement->type, 'for', qq<Type is "for": $statement> );
 	}

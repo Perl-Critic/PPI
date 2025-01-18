@@ -75,7 +75,7 @@ sub __TOKENIZER__on_char {
 
 	# Make sure not to include the trailing newline
 	if ( substr( $t->{line}, $t->{line_cursor}, 1 ) eq "\n" ) {
-		return $t->_finalize_token->__TOKENIZER__on_char( $t );
+		return $t->_finalize_token->__TOKENIZER__on_char($t);
 	}
 
 	1;
@@ -86,13 +86,14 @@ sub __TOKENIZER__commit {
 
 	# Get the rest of the line
 	my $rest = substr( $t->{line}, $t->{line_cursor} );
-	if ( chomp $rest ) { # Include the newline separately
-		# Add the current token, and the newline
-		$t->_new_token('Comment', $rest);
-		$t->_new_token('Whitespace', "\n");
-	} else {
+	if ( chomp $rest ) {    # Include the newline separately
+							# Add the current token, and the newline
+		$t->_new_token( 'Comment',    $rest );
+		$t->_new_token( 'Whitespace', "\n" );
+	}
+	else {
 		# Add this token only
-		$t->_new_token('Comment', $rest);
+		$t->_new_token( 'Comment', $rest );
 	}
 
 	# Advance the line cursor to the end

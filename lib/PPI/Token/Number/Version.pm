@@ -62,10 +62,6 @@ sub literal {
 	return join '', map { chr $_ } ( split /\./, $content );
 }
 
-
-
-
-
 #####################################################################
 # Tokenizer Methods
 
@@ -77,14 +73,14 @@ sub __TOKENIZER__on_char {
 	# Allow digits
 	return 1 if $char =~ /\d/o;
 
-	if( $char eq '_' ) {
+	if ( $char eq '_' ) {
 		return 1 if $t->{token}{content} !~ /\.$/;
 
 		chop $t->{token}->{content};
-		$t->{class} = $t->{token}->set_class( 'Number::Float' )
-			if $t->{token}{content} !~ /\..+\./;
-		$t->_new_token('Operator', '.');
-		$t->_new_token('Word', '_');
+		$t->{class} = $t->{token}->set_class('Number::Float')
+		  if $t->{token}{content} !~ /\..+\./;
+		$t->_new_token( 'Operator', '.' );
+		$t->_new_token( 'Word',     '_' );
 		return 0;
 	}
 
@@ -95,18 +91,19 @@ sub __TOKENIZER__on_char {
 			# Take the . off the end of the token..
 			# and finish it, then make the .. operator.
 			chop $t->{token}->{content};
-			$t->{class} = $t->{token}->set_class( 'Number::Float' )
-				if $t->{token}{content} !~ /\..+\./;
-			$t->_new_token('Operator', '..');
+			$t->{class} = $t->{token}->set_class('Number::Float')
+			  if $t->{token}{content} !~ /\..+\./;
+			$t->_new_token( 'Operator', '..' );
 			return 0;
-		} else {
+		}
+		else {
 			return 1;
 		}
 	}
 
 	# Doesn't fit a special case, or is after the end of the token
 	# End of token.
-	$t->_finalize_token->__TOKENIZER__on_char( $t );
+	$t->_finalize_token->__TOKENIZER__on_char($t);
 }
 
 sub __TOKENIZER__commit {
@@ -116,14 +113,14 @@ sub __TOKENIZER__commit {
 	pos $t->{line} = $t->{line_cursor};
 	# This was not a v-string after all (it's a word);
 	return PPI::Token::Word->__TOKENIZER__commit($t)
-		if $t->{line} !~ m/\G(v\d[_\d]*(?:\.\d[_\d]*)+|v\d[_\d]*\b)/gc;
+	  if $t->{line} !~ m/\G(v\d[_\d]*(?:\.\d[_\d]*)+|v\d[_\d]*\b)/gc;
 
 	my $content = $1;
 
 	# If there are no periods this could be a word starting with v\d
 	# Forced to be a word. Done.
 	return PPI::Token::Word->__TOKENIZER__commit($t)
-		if $content !~ /\./ and $t->__current_token_is_forced_word($content);
+	  if $content !~ /\./ and $t->__current_token_is_forced_word($content);
 
 	# This is a v-string
 	$t->{line_cursor} += length $content;

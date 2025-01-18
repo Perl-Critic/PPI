@@ -4,16 +4,15 @@
 
 use lib 't/lib';
 use PPI::Test::pragmas;
-use Test::More tests => 9 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+use Test::More tests => 9 + ( $ENV{AUTHOR_TESTING} ? 1 : 0 );
 
 use PPI ();
 use Helper 'safe_new';
 
-
 PRUNE: {
 	# Avoids a bug in old Perls relating to the detection of scripts
 	# Known to occur in ActivePerl 5.6.1 and at least one 5.6.2 install.
-	my $hashbang = reverse 'lrep/nib/rsu/!#'; 
+	my $hashbang = reverse 'lrep/nib/rsu/!#';
 
 	my $document = safe_new \<<"END_PERL";
 $hashbang
@@ -31,7 +30,7 @@ print "\n";
 
 exit;
 END_PERL
-	ok( defined($document->prune ('PPI::Statement::Sub')),
+	ok( defined( $document->prune('PPI::Statement::Sub') ),
 		'Pruned multiple subs ok' );
 }
 
