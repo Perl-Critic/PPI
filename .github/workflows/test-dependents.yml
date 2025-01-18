@@ -29,4 +29,4 @@ jobs:
         env:
           TEST_DEPENDENTS: 1
           PERL_TEST_DM_CPAN_VERBOSE: 1
-        run: prove -l xt/dependent-modules.t
+        run: prove -l xt/author/dependent-modules.t

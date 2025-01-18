@@ -5,20 +5,14 @@
 use lib 't/lib';
 use PPI::Test::pragmas;
 use Test::More;
-BEGIN {
-        my $tests = 2935 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
-	if ( $ENV{AUTOMATED_TESTING} or $ENV{RELEASE_TESTING} ) {
-		plan( tests => $tests );
-	} else {
-		plan( skip_all => 'Author tests not required for installation' );
-	}
-}
 
 use Test::ClassAPI;
 use PPI;
 use PPI::Dumper;
 use PPI::Find;
 use PPI::Transform;
+
+plan tests => 3033;
 
 # Ignore various imported or special functions
 $Test::ClassAPI::IGNORE{'DESTROY'}++;
@@ -98,6 +92,7 @@ visual_column_number=method
 logical_line_number=method
 logical_filename=method
 class=method
+presumed_features=method
 
 [PPI::Node]
 PPI::Element=isa
@@ -116,6 +111,7 @@ find_any=method
 find_first=method
 remove_child=method
 prune=method
+replace_child=method
 
 [PPI::Token]
 PPI::Element=isa
@@ -202,6 +198,7 @@ literal=method
 PPI::Token=isa
 heredoc=method
 terminator=method
+indentation=method
 
 [PPI::Token::_QuoteEngine]
 
@@ -302,6 +299,7 @@ module_version=method
 pragma=method
 version=method
 version_literal=method
+feature_mods=method
 
 [PPI::Statement::Include::Perl6]
 PPI::Statement::Include=isa
@@ -406,6 +404,9 @@ errstr=method
 filename=method
 STORABLE_freeze=method
 STORABLE_thaw=method
+custom_feature_include_cb=method
+custom_feature_includes=method
+feature_mods=method
 
 [PPI::Document::Fragment]
 PPI::Document=isa

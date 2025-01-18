@@ -8,7 +8,7 @@ use IO::All;
 
 use lib '.';
 
-require( -e "xt" ? "xt/DepReqs.pm" : "DepReqs.pm" );
+require( -e "xt" ? "xt/DepReqs.pm" : "../DepReqs.pm" );
 
 skip_all "ENV var TEST_DEPENDENTS not set" if not $ENV{TEST_DEPENDENTS};
 
@@ -20,7 +20,7 @@ my $new_log = sub { push @error_log, @_; $old_log->(@_); };
 
 DepReqs::force_big_metacpan_fetch();
 
-my @deps = split /\n/, io( -e "xt" ? "xt/dependents" : "dependents" )->all;
+my @deps = split /\n/, io( -e "xt" ? "xt/dependents" : "../dependents" )->all;
 test_modules @deps;
 
 my $error_log = join "\n", @error_log;
