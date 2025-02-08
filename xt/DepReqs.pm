@@ -71,6 +71,8 @@ sub exclusions {
         | Test-Kwalitee-Extra | Test-Legal | Test-Perl-Metrics-Simple
         # https://github.com/uperl/Perl-Critic-Plicease/pull/9
         | Perl-Critic-Plicease
+        # depends on SourceCode::LineCounter::Perl, which bdfoy might have deleted
+        | App-PlUtil | App-PMUtils
     )$@x
 }
 
