@@ -115,6 +115,14 @@ sub __TOKENIZER__on_char {
 			return 1;
 		}
 
+		if ( $char eq ' ' ) {
+			pos $t->{line} = $t->{line_cursor} + 1;
+			if ( $t->{line} =~ m/\G\s*[a-z_]/gci ) {
+				$t->{class} = $t->{token}->set_class('Symbol');
+				return 1;
+			}
+		}
+
 		# Is it a nameless arg in a signature?
 		if ( $char eq ')' or $char eq '=' or $char eq ',' ) {
 			my ($has_sig) = $t->_current_token_has_signatures_active;
