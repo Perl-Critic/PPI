@@ -238,6 +238,7 @@ sub _lex_document {
 
 	# Start the processing loop
 	my $Token;
+    $DB::single = $DB::single = 1;
 	while ( ref( $Token = $self->_get_token ) ) {
 		# Add insignificant tokens directly beneath us
 		unless ( $Token->significant ) {
@@ -261,6 +262,7 @@ sub _lex_document {
 			# Move the lexing down into the statement
 			$self->_add_delayed($Document);
 			$self->_add_element( $Document, $Statement );
+            $DB::single = $DB::single = 1;
 			$self->_lex_statement($Statement);
 
 			next;
@@ -626,6 +628,7 @@ sub _lex_statement {
 
 	# Begin processing tokens
 	my $Token;
+    $DB::single = $DB::single = 1;
 	while ( ref( $Token = $self->_get_token ) ) {
 		# Delay whitespace and comment tokens
 		unless ( $Token->significant ) {

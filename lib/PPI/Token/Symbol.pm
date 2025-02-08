@@ -199,12 +199,13 @@ sub __TOKENIZER__on_char {
 				: (?! : ) # Allow single-colon non-magic variables
 			|
 				(?:
-						\w+
+					
 					|
-						\' (?! \d ) \w+
+						\' (?! \d )
 					|
-						\:: \w+
+						\::
 				)
+				\w+
 				(?: # Allow both :: and ' in namespace separators
 					(?:
 							\' (?!\d) \w+

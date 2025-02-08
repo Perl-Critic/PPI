@@ -110,9 +110,17 @@ sub __TOKENIZER__on_char {
 		}
 
 		if ( $char =~ /[a-z_]/i ) {
-			# Symbol
 			$t->{class} = $t->{token}->set_class('Symbol');
 			return 1;
+		}
+
+		$DB::single = $DB::single = 1;
+		if ( $char eq ' ' ) {
+			pos $t->{line} = $t->{line_cursor} + 1;
+			if ( $t->{line} =~ m/[a-z_]/gci ) {
+				$t->{class} = $t->{token}->set_class('Symbol');
+				return 1;
+			}
 		}
 
 		# Is it a nameless arg in a signature?

@@ -15,9 +15,28 @@ sub test_document;
 BASE_SIGNATURE_EXAMPLE: {
 	local $TODO = "crashes";
 	test_document
-	  <<'END_PERL',
-		for my $ s ( qw( a b ) ) { say $s }
-END_PERL
+	  'my $ s',
+	  [
+		'PPI::Statement::Sub',        'sub foo ($left, $right) {}',
+		'PPI::Token::Word',           'sub',
+		'PPI::Token::Word',           'foo',
+		'PPI::Structure::Signature',  '($left, $right)',
+		'PPI::Token::Structure',      '(',
+		'PPI::Statement::Expression', '$left, $right',
+		'PPI::Token::Symbol',         '$left',
+		'PPI::Token::Operator',       ',',
+		'PPI::Token::Symbol',         '$right',
+		'PPI::Token::Structure',      ')',
+		'PPI::Structure::Block',      '{}',
+		'PPI::Token::Structure',      '{',
+		'PPI::Token::Structure',      '}',
+	  ],
+	  "base signature example";
+}
+BASE_SIGNATURE_EXAMPLE: {
+	local $TODO = "crashes";
+	test_document
+	  'for my $ s ( qw( a b ) ) { say $s }',
 	  [
 		'PPI::Statement::Sub',        'sub foo ($left, $right) {}',
 		'PPI::Token::Word',           'sub',
@@ -59,6 +78,7 @@ sub test_document {
 	my ( $code, $expected, $msg ) = @_;
 	$msg = perlstring $code if !defined $msg;
 
+	$DB::single = $DB::single = 1;
 	my $d = PPI::Document->new( \$code, @{$args} ) or do {
 		diag explain $@;
 		fail "PPI::Document->new failed";
