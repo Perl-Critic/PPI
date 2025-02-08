@@ -49,10 +49,6 @@ our $VERSION = '1.282';
 
 our @ISA = "PPI::Token";
 
-
-
-
-
 #####################################################################
 # PPI::Token::Regexp Methods
 
@@ -66,7 +62,7 @@ performs the match.
 =cut
 
 sub get_match_string {
-	return $_[0]->_section_content( 0 );
+	return $_[0]->_section_content(0);
 }
 
 =pod
@@ -80,7 +76,7 @@ substitute, C<undef> is returned.
 =cut
 
 sub get_substitute_string {
-	return $_[0]->_section_content( 1 );
+	return $_[0]->_section_content(1);
 }
 
 =pod
@@ -109,7 +105,6 @@ the second element (if any) is the delimiters of the substitute string
 sub get_delimiters {
 	return $_[0]->_delimiters();
 }
-
 
 1;
 

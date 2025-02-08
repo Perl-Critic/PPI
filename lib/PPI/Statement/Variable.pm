@@ -65,12 +65,13 @@ sub type {
 	my @schild = grep { $_->significant } $self->children;
 
 	# Ignore labels
-	shift @schild if _INSTANCE($schild[0], 'PPI::Token::Label');
+	shift @schild if _INSTANCE( $schild[0], 'PPI::Token::Label' );
 
 	# Get the type
-	(_INSTANCE($schild[0], 'PPI::Token::Word') and $schild[0]->content =~ /^(my|local|our|state)$/)
-		? $schild[0]->content
-		: undef;
+	( _INSTANCE( $schild[0], 'PPI::Token::Word' )
+		  and $schild[0]->content =~ /^(my|local|our|state)$/ )
+	  ? $schild[0]->content
+	  : undef;
 }
 
 =pod
@@ -104,30 +105,26 @@ sub symbols {
 
 	# Get the children we care about
 	my @schild = grep { $_->significant } $self->children;
-	shift @schild if _INSTANCE($schild[0], 'PPI::Token::Label');
+	shift @schild if _INSTANCE( $schild[0], 'PPI::Token::Label' );
 
 	# If the second child is a symbol, return its name
-	if ( _INSTANCE($schild[1], 'PPI::Token::Symbol') ) {
+	if ( _INSTANCE( $schild[1], 'PPI::Token::Symbol' ) ) {
 		return $schild[1];
 	}
 
 	# If it's a list, return as a list
-	if ( _INSTANCE($schild[1], 'PPI::Structure::List') ) {
+	if ( _INSTANCE( $schild[1], 'PPI::Structure::List' ) ) {
 		my $Expression = $schild[1]->schild(0);
-		$Expression and
-		$Expression->isa('PPI::Statement::Expression') or return ();
+		$Expression and $Expression->isa('PPI::Statement::Expression')
+		  or return ();
 
 		# my and our are simpler than local
-		if (
-			$self->type eq 'my'
-			or
-			$self->type eq 'our'
-			or
-			$self->type eq 'state'
-		) {
-			return grep {
-				$_->isa('PPI::Token::Symbol')
-			} $Expression->schildren;
+		if (   $self->type eq 'my'
+			or $self->type eq 'our'
+			or $self->type eq 'state' )
+		{
+			return
+			  grep { $_->isa('PPI::Token::Symbol') } $Expression->schildren;
 		}
 
 		# Local is much more icky (potentially).
@@ -136,11 +133,8 @@ sub symbols {
 		# for future bug reports about local() things.
 
 		# This is a slightly better way to check.
-		return grep {
-			$self->_local_variable($_)
-		} grep {
-			$_->isa('PPI::Token::Symbol')
-		} $Expression->schildren;
+		return grep { $self->_local_variable($_) }
+		  grep { $_->isa('PPI::Token::Symbol') } $Expression->schildren;
 	}
 
 	# erm... this is unexpected
@@ -148,12 +142,12 @@ sub symbols {
 }
 
 sub _local_variable {
-	my ($self, $el) = @_;
+	my ( $self, $el ) = @_;
 
 	# The last symbol should be a variable
 	my $n = $el->snext_sibling or return 1;
 	my $p = $el->sprevious_sibling;
-	if ( ! $p or $p eq ',' ) {
+	if ( !$p or $p eq ',' ) {
 		# In the middle of a list
 		return 1 if $n eq ',';
 

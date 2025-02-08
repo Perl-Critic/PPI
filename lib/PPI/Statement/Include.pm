@@ -101,7 +101,7 @@ not specify a module name.
 =cut
 
 sub module {
-	my $self = shift;
+	my $self   = shift;
 	my $module = $self->schild(1) or return undef;
 	$module->isa('PPI::Token::Word') and $module->content;
 }
@@ -219,21 +219,19 @@ sub arguments {
 	shift @args;
 
 	# Remove the statement terminator
-	if (
-		$args[-1]->isa('PPI::Token::Structure')
-		and
-		$args[-1]->content eq ';'
-	) {
+	if (    $args[-1]->isa('PPI::Token::Structure')
+		and $args[-1]->content eq ';' )
+	{
 		pop @args;
 	}
 
 	# Remove the module or perl version.
-	shift @args;  
+	shift @args;
 
 	return unless @args;
 
 	if ( $args[0]->isa('PPI::Token::Number') ) {
-		my $after = $args[1] or return;
+		my $after = $args[1]                or return;
 		$after->isa('PPI::Token::Operator') or shift @args;
 	}
 
@@ -324,14 +322,14 @@ sub _decompose_argument {
 
 sub _custom_feature_includes {
 	my ($self) = @_;
-	return unless                                                             #
+	return unless    #
 	  my $document = $self->document;
 	return $document->custom_feature_includes || {};
 }
 
 sub _custom_feature_include_cb {
 	my ($self) = @_;
-	return unless                                                             #
+	return unless    #
 	  my $document = $self->document;
 	return $document->custom_feature_include_cb || sub { };
 }

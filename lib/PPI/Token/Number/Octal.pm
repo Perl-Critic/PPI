@@ -62,10 +62,6 @@ sub literal {
 	return $neg ? -$val : $val;
 }
 
-
-
-
-
 #####################################################################
 # Tokenizer Methods
 
@@ -87,7 +83,7 @@ sub __TOKENIZER__on_char {
 
 	# Doesn't fit a special case, or is after the end of the token
 	# End of token.
-	$t->_finalize_token->__TOKENIZER__on_char( $t );
+	$t->_finalize_token->__TOKENIZER__on_char($t);
 }
 
 1;

@@ -37,10 +37,6 @@ use Params::Util qw{_INSTANCE};
 
 our $VERSION = '1.282';
 
-
-
-
-
 #####################################################################
 # Constructor
 
@@ -103,43 +99,41 @@ what these values really are. True/false value, off by default.
 
 sub new {
 	my $class   = shift;
-	my $Element = _INSTANCE(shift, 'PPI::Element') or return undef;
+	my $Element = _INSTANCE( shift, 'PPI::Element' ) or return undef;
 
 	# Create the object
 	my $self = bless {
 		root    => $Element,
 		display => {
-			memaddr    => '', # Show the refaddr of the item
-			indent     => 2,  # Indent the structures
-			class      => 1,  # Show the object class
-			content    => 1,  # Show the object contents
-			whitespace => 1,  # Show whitespace tokens
-			comments   => 1,  # Show comment tokens
-			locations  => 0,  # Show token locations
-			},
-		}, $class;
+			memaddr    => '',    # Show the refaddr of the item
+			indent     => 2,     # Indent the structures
+			class      => 1,     # Show the object class
+			content    => 1,     # Show the object contents
+			whitespace => 1,     # Show whitespace tokens
+			comments   => 1,     # Show comment tokens
+			locations  => 0,     # Show token locations
+		},
+	}, $class;
 
 	# Handle the options
-	my @options = map { lc $_ } @_; # strict hashpairs # https://github.com/Perl-Critic/PPI/issues/201
+	my @options = map { lc $_ }
+	  @_;    # strict hashpairs # https://github.com/Perl-Critic/PPI/issues/201
 	my %options = @options;
-	foreach ( keys %{$self->{display}} ) {
+	foreach ( keys %{ $self->{display} } ) {
 		if ( exists $options{$_} ) {
 			if ( $_ eq 'indent' ) {
 				$self->{display}->{indent} = $options{$_};
-			} else {
-				$self->{display}->{$_} = !! $options{$_};
+			}
+			else {
+				$self->{display}->{$_} = !!$options{$_};
 			}
 		}
 	}
 
-	$self->{indent_string} = join '', (' ' x $self->{display}->{indent});
+	$self->{indent_string} = join '', ( ' ' x $self->{display}->{indent} );
 
 	$self;
 }
-
-
-
-
 
 #####################################################################
 # Main Interface Methods
@@ -155,7 +149,7 @@ Returns as for the internal print function.
 =cut
 
 sub print {
-	CORE::print(shift->string);
+	CORE::print( shift->string );
 }
 
 =pod
@@ -191,16 +185,12 @@ sub list {
 	@$array_ref;
 }
 
-
-
-
-
 #####################################################################
 # Generation Support Methods
 
 sub _dump {
 	my $self    = ref $_[0] ? shift : shift->new(shift);
-	my $Element = _INSTANCE($_[0], 'PPI::Element') ? shift : $self->{root};
+	my $Element = _INSTANCE( $_[0], 'PPI::Element' ) ? shift : $self->{root};
 	my $indent  = shift || '';
 	my $output  = shift || [];
 
@@ -208,7 +198,8 @@ sub _dump {
 	my $show = 1;
 	if ( $Element->isa('PPI::Token::Whitespace') ) {
 		$show = 0 unless $self->{display}->{whitespace};
-	} elsif ( $Element->isa('PPI::Token::Comment') ) {
+	}
+	elsif ( $Element->isa('PPI::Token::Comment') ) {
 		$show = 0 unless $self->{display}->{comments};
 	}
 	push @$output, $self->_element_string( $Element, $indent ) if $show;
@@ -216,7 +207,7 @@ sub _dump {
 	# Recurse into our children
 	if ( $Element->isa('PPI::Node') ) {
 		my $child_indent = $indent . $self->{indent_string};
-		foreach my $child ( @{$Element->{children}} ) {
+		foreach my $child ( @{ $Element->{children} } ) {
 			$self->_dump( $child, $child_indent, $output );
 		}
 	}
@@ -226,7 +217,7 @@ sub _dump {
 
 sub _element_string {
 	my $self    = ref $_[0] ? shift : shift->new(shift);
-	my $Element = _INSTANCE($_[0], 'PPI::Element') ? shift : $self->{root};
+	my $Element = _INSTANCE( $_[0], 'PPI::Element' ) ? shift : $self->{root};
 	my $indent  = shift || '';
 	my $string  = '';
 
@@ -234,20 +225,20 @@ sub _element_string {
 	if ( $self->{display}->{memaddr} ) {
 		$string .= $Element->refaddr . '  ';
 	}
-        
-        # Add the location if such exists
+
+	# Add the location if such exists
 	if ( $self->{display}->{locations} ) {
 		my $loc_string;
 		if ( $Element->isa('PPI::Token') ) {
 			my $location = $Element->location;
 			if ($location) {
-				$loc_string = sprintf("[ % 4d, % 3d, % 3d ] ", @$location);
+				$loc_string = sprintf( "[ % 4d, % 3d, % 3d ] ", @$location );
 			}
 		}
 		# Output location or pad with 20 spaces
 		$string .= $loc_string || " " x 20;
 	}
-        
+
 	# Add the indent
 	if ( $self->{display}->{indent} ) {
 		$string .= $indent;
@@ -268,19 +259,22 @@ sub _element_string {
 			$string .= "  \t'$content'";
 		}
 
-	} elsif ( $Element->isa('PPI::Structure') ) {
+	}
+	elsif ( $Element->isa('PPI::Structure') ) {
 		# Add the content
 		if ( $self->{display}->{content} ) {
-			my $start = $Element->start
-				? $Element->start->content
-				: '???';
-			my $finish = $Element->finish
-				? $Element->finish->content
-				: '???';
+			my $start =
+				$Element->start
+			  ? $Element->start->content
+			  : '???';
+			my $finish =
+				$Element->finish
+			  ? $Element->finish->content
+			  : '???';
 			$string .= "  \t$start ... $finish";
 		}
 	}
-	
+
 	$string;
 }
 

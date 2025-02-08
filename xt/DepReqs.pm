@@ -16,7 +16,7 @@ use Safe::Isa '$_call_if_object';
 __PACKAGE__->run unless caller;
 
 sub exclusions {
-    qr@^(
+	qr@^(
         # don't remember why i excluded these
         Apache2-SSI|Devel-IPerl|Padre
         # fails tests regarding directory write permissions, probably not PPI
@@ -75,7 +75,7 @@ sub exclusions {
 }
 
 sub cpm_install_fails {
-    qr@^(
+	qr@^(
         Apache2::Const | AptPkg::Cache | AptPkg::Config | BSON::XS | Code::Splice
         | Config::ApacheFile | Data::Dump::Steamer | Devel::MyDebugger
         | Dist::Zilla::Plugin::Test::NewVersion | Git::Github::Creator | Hook::Lex::Wrap
@@ -91,92 +91,92 @@ sub cpm_install_fails {
 }
 
 sub force_big_metacpan_fetch {
-    ## force metacpan to actually return the whole dependents list
-    # https://github.com/metacpan/metacpan-client/issues/122
-    my $old_fetch = \&MetaCPAN::Client::fetch;
-    my $new_fetch = sub { $old_fetch->( shift, shift . "?size=5000", @_ ) };
-    { no warnings 'redefine'; *MetaCPAN::Client::fetch = $new_fetch; }
+	## force metacpan to actually return the whole dependents list
+	# https://github.com/metacpan/metacpan-client/issues/122
+	my $old_fetch = \&MetaCPAN::Client::fetch;
+	my $new_fetch = sub { $old_fetch->( shift, shift . "?size=5000", @_ ) };
+	{ no warnings 'redefine'; *MetaCPAN::Client::fetch = $new_fetch; }
 
-    return $old_fetch;
+	return $old_fetch;
 }
 
 sub run {
-    my $old_fetch = force_big_metacpan_fetch;
+	my $old_fetch = force_big_metacpan_fetch;
 
-    { no warnings 'redefine'; *MetaCPAN::Client::fetch = $old_fetch; }
+	{ no warnings 'redefine'; *MetaCPAN::Client::fetch = $old_fetch; }
 
-    my $c = MetaCPAN::Client->new;
+	my $c = MetaCPAN::Client->new;
 
-    my @deps = _resolve_reverse_dependencies( PPI => 10, exclusions(), $c );
+	my @deps = _resolve_reverse_dependencies( PPI => 10, exclusions(), $c );
 
-    say "writing dependents file";
-    io( -e "xt" ? "xt/dependents" : "dependents" )->print( join "\n", @deps );
+	say "writing dependents file";
+	io( -e "xt" ? "xt/dependents" : "dependents" )->print( join "\n", @deps );
 
-    say "getting modules to pre-install";
-    my $cpm_fails = cpm_install_fails;
-    my @reqs;
-    my @skip;
-    for my $dependent (@deps) {
-        say $dependent;
-        my @dep_reqs = map @{ $c->release($_)->dependency }, $dependent;
-        my @fails =    #
-          map $_->{module}, grep $_->{module} =~ $cpm_fails, @dep_reqs;
-        if (@fails) {
-            push @skip, $dependent;
-            say "skipping dependent $dependent because "
-              . "it requires modules that fail to install: @fails";
-            next;
-        }
-        push @reqs, @dep_reqs;
-    }
-    say "skipping dependents because "
-      . "they requires modules that fail to install: @skip"
-      if @skip;
+	say "getting modules to pre-install";
+	my $cpm_fails = cpm_install_fails;
+	my @reqs;
+	my @skip;
+	for my $dependent (@deps) {
+		say $dependent;
+		my @dep_reqs = map @{ $c->release($_)->dependency }, $dependent;
+		my @fails =    #
+		  map $_->{module}, grep $_->{module} =~ $cpm_fails, @dep_reqs;
+		if (@fails) {
+			push @skip, $dependent;
+			say "skipping dependent $dependent because "
+			  . "it requires modules that fail to install: @fails";
+			next;
+		}
+		push @reqs, @dep_reqs;
+	}
+	say "skipping dependents because "
+	  . "they requires modules that fail to install: @skip"
+	  if @skip;
 
-    say "writing dependency pre-install file";
-    io("xt/cpanfile")
-      ->print( join "\n",
-        uniqstr map qq[requires "$_->{module}" => "$_->{version}";], @reqs );
+	say "writing dependency pre-install file";
+	io("xt/cpanfile")
+	  ->print( join "\n",
+		uniqstr map qq[requires "$_->{module}" => "$_->{version}";], @reqs );
 
-    say "debug printing file";
-    say io("xt/cpanfile")->all;
+	say "debug printing file";
+	say io("xt/cpanfile")->all;
 
-    # test early that all modules don't have an author that crashes tests later
-    # !!! careful, this changes CWD !!!
-    say "testing dists for author names";
-    Test::DependentModules::_load_cpan;
-    for my $name (@deps) {
-        say $name;
-        my $mod = $name;
-        $mod =~ s/-/::/g;
-        next unless    #
-          my $dist = Test::DependentModules::_get_distro($mod);
-        $dist->author->id;
-    }
+	# test early that all modules don't have an author that crashes tests later
+	# !!! careful, this changes CWD !!!
+	say "testing dists for author names";
+	Test::DependentModules::_load_cpan;
+	for my $name (@deps) {
+		say $name;
+		my $mod = $name;
+		$mod =~ s/-/::/g;
+		next unless    #
+		  my $dist = Test::DependentModules::_get_distro($mod);
+		$dist->author->id;
+	}
 
-    say "done";
+	say "done";
 }
 
 sub _resolve_reverse_dependencies {
-    my ( $base_dist, $depth, $exclude, $c ) = @_;
+	my ( $base_dist, $depth, $exclude, $c ) = @_;
 
-    my ( @work, %deps, %seen ) = ($base_dist);
+	my ( @work, %deps, %seen ) = ($base_dist);
 
-    for my $level ( 1 .. $depth ) {
-        say "resolving level: $level";
-        for my $dist (@work) {
-            my $deps = $c->rev_deps($dist);
+	for my $level ( 1 .. $depth ) {
+		say "resolving level: $level";
+		for my $dist (@work) {
+			my $deps = $c->rev_deps($dist);
 
-            while ( my $dist = $deps->next->$_call_if_object("distribution") ) {
-                next if $seen{$dist}++;
-                next if $exclude and $dist =~ $exclude;
-                $deps{$level}{$dist} = 1;
-            }
-        }
+			while ( my $dist = $deps->next->$_call_if_object("distribution") ) {
+				next if $seen{$dist}++;
+				next if $exclude and $dist =~ $exclude;
+				$deps{$level}{$dist} = 1;
+			}
+		}
 
-        @work = sort keys %{ $deps{$level} };
-    }
+		@work = sort keys %{ $deps{$level} };
+	}
 
-    my @deps = uniqstr map keys %{$_}, values %deps;
-    return sort @deps;
+	my @deps = uniqstr map keys %{$_}, values %deps;
+	return sort @deps;
 }
