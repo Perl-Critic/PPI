@@ -1,6 +1,6 @@
 Revision history for Perl extension PPI
 
-{{$NEXT}}
+1.282   2025-02-08 20:46:50Z (TRIAL RELEASE)
 	Summary:
 	- Allow variable names to have whitespace after the sigil (GH#158)
 
