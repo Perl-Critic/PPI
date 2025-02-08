@@ -196,18 +196,24 @@ sub __TOKENIZER__on_char {
 		return $t->_finalize_token->__TOKENIZER__on_char( $t );
 	}
 
-	# Trim off anything we oversucked...
-	$content =~ /^(
+	# Verify and extract actual full symbol name from sigil to end
+	my $sep = qr/ (?: :: | '(?!\d) ) /x; # :: and ' are namespace separators
+	my $pattern = qr/
+	^(
 		[\$@%&*]
-		(?: : (?!:) | # Allow single-colon non-magic variables
-			(?: \w+ | \' (?!\d) \w+ | \:: \w+ )
-			(?:
-				# Allow both :: and ' in namespace separators
-				(?: \' (?!\d) \w+ | \:: \w+ )
-			)*
-			(?: :: )? # Technically a compiler-magic hash, but keep it here
+		(?:
+				: (?! : )			# allow single-colon non-magic variables
+			|
+				$sep?				# optional separator
+				\w+					# a word
+				(?: $sep \w+ )* 	# optionally more separator+word pairs
+				(?: ::		 )?		# optionally what's technically a
+									# compiler-magic hash, but keep it here
 		)
-	)/x or return undef;
+	)
+	/x;
+	return undef if $content !~ $pattern;
+
 	unless ( length $1 eq length $content ) {
 		$t->{line_cursor} += length($1) - length($content);
 		$t->{token}->{content} = $1;
