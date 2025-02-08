@@ -26,7 +26,6 @@ use Params::Util qw{_INSTANCE};
 
 our $VERSION = '1.282';
 
-
 =head1 METHODS
 
 =head2 new $message | message => $message, ...
@@ -41,11 +40,10 @@ C<message> method.
 
 sub new {
 	my $class = shift;
-	return bless { @_ }, $class if @_ > 1;
+	return bless {@_}, $class if @_ > 1;
 	return bless { message => $_[0] }, $class if @_;
 	return bless { message => 'Unknown Exception' }, $class;
 }
-
 
 =head2 throw
 
@@ -62,24 +60,23 @@ This method never returns.
 
 sub throw {
 	my $it = shift;
-	if ( _INSTANCE($it, 'PPI::Exception') ) {
+	if ( _INSTANCE( $it, 'PPI::Exception' ) ) {
 		if ( $it->{callers} ) {
 			push @{ $it->{callers} }, [ caller(0) ];
-		} else {
+		}
+		else {
 			$it->{callers} ||= [];
 		}
-	} else {
+	}
+	else {
 		my $message = $_[0] || 'Unknown Exception';
 		$it = $it->new(
 			message => $message,
-			callers => [
-				[ caller(0) ],
-			],
+			callers => [ [ caller(0) ], ],
 		);
 	}
 	die $it;
 }
-
 
 =head2 message
 
@@ -92,7 +89,6 @@ sub message {
 	$_[0]->{message};
 }
 
-
 =head2 callers
 
 Returns a listref, each element of which is a listref of C<caller(0)>
@@ -103,6 +99,5 @@ information.  The returned listref can be empty.
 sub callers {
 	@{ $_[0]->{callers} || [] };
 }
-
 
 1;

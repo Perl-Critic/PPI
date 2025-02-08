@@ -4,14 +4,13 @@
 
 use lib 't/lib';
 use PPI::Test::pragmas;
-use Test::More tests => 280 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+use Test::More tests => 280 + ( $ENV{AUTHOR_TESTING} ? 1 : 0 );
 
 use PPI ();
 use Helper 'safe_new';
 
-
 SUB_WORD_OPTIONAL: {
-	for my $name ( qw( BEGIN CHECK UNITCHECK INIT END ) ) {
+	for my $name (qw( BEGIN CHECK UNITCHECK INIT END )) {
 		for my $sub ( '', 'sub ' ) {
 
 			# '{}' -- function definition
@@ -31,13 +30,15 @@ sub test_sub_as {
 	my $Document = safe_new \$code;
 
 	my ( $sub_statement, $dummy ) = $Document->schildren;
-	isa_ok( $sub_statement, 'PPI::Statement::Scheduled', "$code: document child is a scheduled statement" );
+	isa_ok( $sub_statement, 'PPI::Statement::Scheduled',
+		"$code: document child is a scheduled statement" );
 	is( $dummy, undef, "$code: document has exactly one child" );
 	ok( $sub_statement->reserved, "$code: is reserved" );
 	is( $sub_statement->name, $name, "$code: name() correct" );
 
 	if ( $followed_by =~ /}/ ) {
-		isa_ok( $sub_statement->block, 'PPI::Structure::Block', "$code: has a block" );
+		isa_ok( $sub_statement->block, 'PPI::Structure::Block',
+			"$code: has a block" );
 	}
 	else {
 		ok( !$sub_statement->block, "$code: has no block" );

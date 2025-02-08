@@ -22,11 +22,11 @@ implementations.
 =cut
 
 use strict;
-use Clone 0.30      ();
-use Scalar::Util    qw{refaddr};
-use Params::Util    qw{_INSTANCE _ARRAY};
-use PPI::Util       ();
-use PPI::Node       ();
+use Clone 0.30   ();
+use Scalar::Util qw{refaddr};
+use Params::Util qw{_INSTANCE _ARRAY};
+use PPI::Util    ();
+use PPI::Node    ();
 use PPI::Singletons '%_PARENT', '%_POSITION_CACHE';
 
 our $VERSION = '1.282';
@@ -39,10 +39,6 @@ use overload '=='   => '__equals';
 use overload '!='   => '__nequals';
 use overload 'eq'   => '__eq';
 use overload 'ne'   => '__ne';
-
-
-
-
 
 #####################################################################
 # General Properties
@@ -77,7 +73,7 @@ Returns the class of the Element as a string
 
 =cut
 
-sub class { ref($_[0]) }
+sub class { ref( $_[0] ) }
 
 =pod
 
@@ -119,10 +115,6 @@ Returns the basic code as a string (excluding here-doc content).
 ### XS -> PPI/XS.xs:_PPI_Element__content 0.900+
 sub content() { '' }
 
-
-
-
-
 #####################################################################
 # Navigation Methods
 
@@ -139,7 +131,7 @@ Node.
 
 =cut
 
-sub parent { $_PARENT{refaddr $_[0]} }
+sub parent { $_PARENT{ refaddr $_[0] } }
 
 =pod
 
@@ -155,7 +147,7 @@ sub descendant_of {
 	my $cursor = shift;
 	my $parent = shift or return undef;
 	while ( refaddr $cursor != refaddr $parent ) {
-		$cursor = $_PARENT{refaddr $cursor} or return '';
+		$cursor = $_PARENT{ refaddr $cursor } or return '';
 	}
 	return 1;
 }
@@ -174,7 +166,7 @@ sub ancestor_of {
 	my $self   = shift;
 	my $cursor = shift or return undef;
 	while ( refaddr $cursor != refaddr $self ) {
-		$cursor = $_PARENT{refaddr $cursor} or return '';
+		$cursor = $_PARENT{ refaddr $cursor } or return '';
 	}
 	return 1;
 }
@@ -197,8 +189,8 @@ a Statement.
 
 sub statement {
 	my $cursor = shift;
-	while ( ! _INSTANCE($cursor, 'PPI::Statement') ) {
-		$cursor = $_PARENT{refaddr $cursor} or return '';
+	while ( !_INSTANCE( $cursor, 'PPI::Statement' ) ) {
+		$cursor = $_PARENT{ refaddr $cursor } or return '';
 	}
 	$cursor;
 }
@@ -220,7 +212,7 @@ not within any parent PDOM object.
 
 sub top {
 	my $cursor = shift;
-	while ( my $parent = $_PARENT{refaddr $cursor} ) {
+	while ( my $parent = $_PARENT{ refaddr $cursor } ) {
 		$cursor = $parent;
 	}
 	$cursor;
@@ -240,7 +232,7 @@ contained within a Document.
 
 sub document {
 	my $top = shift->top;
-	_INSTANCE($top, 'PPI::Document') and $top;
+	_INSTANCE( $top, 'PPI::Document' ) and $top;
 }
 
 =pod
@@ -259,7 +251,7 @@ sub next_sibling {
 	my $parent   = $_PARENT{$key} or return '';
 	my $elements = $parent->{children};
 	my $position = $parent->__position($self);
-	$elements->[$position + 1] || '';
+	$elements->[ $position + 1 ] || '';
 }
 
 =pod
@@ -280,7 +272,7 @@ sub snext_sibling {
 	my $parent   = $_PARENT{$key} or return '';
 	my $elements = $parent->{children};
 	my $position = $parent->__position($self);
-	while ( defined(my $it = $elements->[++$position]) ) {
+	while ( defined( my $it = $elements->[ ++$position ] ) ) {
 		return $it if $it->significant;
 	}
 	'';
@@ -303,7 +295,7 @@ sub previous_sibling {
 	my $parent   = $_PARENT{$key} or return '';
 	my $elements = $parent->{children};
 	my $position = $parent->__position($self);
-	$position and $elements->[$position - 1] or '';
+	$position and $elements->[ $position - 1 ] or '';
 }
 
 =pod
@@ -324,7 +316,7 @@ sub sprevious_sibling {
 	my $parent   = $_PARENT{$key} or return '';
 	my $elements = $parent->{children};
 	my $position = $parent->__position($self);
-	while ( $position-- and defined(my $it = $elements->[$position]) ) {
+	while ( $position-- and defined( my $it = $elements->[$position] ) ) {
 		return $it if $it->significant;
 	}
 	'';
@@ -352,11 +344,10 @@ sub first_token {
 	my $cursor = shift;
 	while ( $cursor->isa('PPI::Node') ) {
 		$cursor = $cursor->first_element
-		or die "Found empty PPI::Node while getting first token";
+		  or die "Found empty PPI::Node while getting first token";
 	}
 	$cursor;
 }
-
 
 =pod
 
@@ -380,7 +371,7 @@ sub last_token {
 	my $cursor = shift;
 	while ( $cursor->isa('PPI::Node') ) {
 		$cursor = $cursor->last_element
-		or die "Found empty PPI::Node while getting first token";
+		  or die "Found empty PPI::Node while getting first token";
 	}
 	$cursor;
 }
@@ -409,9 +400,9 @@ sub next_token {
 	my $cursor = shift;
 
 	# Find the next element, going upwards as needed
-	while ( 1 ) {
+	while (1) {
 		my $element = $cursor->next_sibling;
-		if ( $element ) {
+		if ($element) {
 			return $element if $element->isa('PPI::Token');
 			return $element->first_token;
 		}
@@ -445,9 +436,9 @@ sub previous_token {
 	my $cursor = shift;
 
 	# Find the previous element, going upwards as needed
-	while ( 1 ) {
+	while (1) {
 		my $element = $cursor->previous_sibling;
-		if ( $element ) {
+		if ($element) {
 			return $element if $element->isa('PPI::Token');
 			return $element->last_token;
 		}
@@ -569,7 +560,7 @@ occurs while trying to remove the C<Element>.
 sub remove {
 	my $self   = shift;
 	my $parent = $self->parent or return $self;
-	$parent->remove_child( $self );
+	$parent->remove_child($self);
 }
 
 =pod
@@ -609,7 +600,7 @@ If successful, returns the replace element.  Otherwise, returns C<undef>.
 
 sub replace {
 	my $self    = ref $_[0] ? shift : return undef;
-	my $replace = _INSTANCE(shift, ref $self) or return undef;
+	my $replace = _INSTANCE( shift, ref $self ) or return undef;
 	return $self->parent->replace_child( $self, $replace );
 }
 
@@ -646,7 +637,7 @@ sub location {
 	$self->_ensure_location_present or return undef;
 
 	# Return a copy, not the original
-	return [ @{$self->{_location}} ];
+	return [ @{ $self->{_location} } ];
 }
 
 =pod
@@ -784,9 +775,9 @@ sub _ensure_location_present {
 # selectively flush only the part of the document that occurs after the
 # element for which the flush is called.
 sub _flush_locations {
-	my $self  = shift;
+	my $self = shift;
 	unless ( $self == $self->top ) {
-		return $self->top->_flush_locations( $self );
+		return $self->top->_flush_locations($self);
 	}
 
 	# Get the full list of all Tokens
@@ -794,11 +785,11 @@ sub _flush_locations {
 
 	# Optionally allow starting from an arbitrary element (or rather,
 	# the first Token equal-to-or-within an arbitrary element)
-	if ( _INSTANCE($_[0], 'PPI::Element') ) {
+	if ( _INSTANCE( $_[0], 'PPI::Element' ) ) {
 		my $start = shift->first_token;
 		while ( my $Token = shift @Tokens ) {
 			return 1 unless $Token->{_location};
-			next unless refaddr($Token) == refaddr($start);
+			next     unless refaddr($Token) == refaddr($start);
 
 			# Found the start. Flush its location
 			delete $$Token->{_location};
@@ -807,16 +798,12 @@ sub _flush_locations {
 	}
 
 	# Iterate over any remaining Tokens and flush their location
-	foreach my $Token ( @Tokens ) {
+	foreach my $Token (@Tokens) {
 		delete $Token->{_location};
 	}
 
 	1;
 }
-
-
-
-
 
 #####################################################################
 # XML Compatibility Methods
@@ -824,7 +811,7 @@ sub _flush_locations {
 sub _xml_name {
 	my $class = ref $_[0] || $_[0];
 	my $name  = lc join( '_', split /::/, $class );
-	substr($name, 4);
+	substr( $name, 4 );
 }
 
 sub _xml_attr {
@@ -834,10 +821,6 @@ sub _xml_attr {
 sub _xml_content {
 	defined $_[0]->{content} ? $_[0]->{content} : '';
 }
-
-
-
-
 
 #####################################################################
 # Internals
@@ -859,16 +842,17 @@ sub _clear {
 # Therefore we don't need to remove ourselves from our parent,
 # just the index ( just in case ).
 sub DESTROY {
-  delete $_PARENT{refaddr $_[0]};
-  delete $_POSITION_CACHE{refaddr $_[0]};
+	delete $_PARENT{ refaddr $_[0] };
+	delete $_POSITION_CACHE{ refaddr $_[0] };
 }
 
 # Operator overloads
-sub __equals  { ref $_[1] and refaddr($_[0]) == refaddr($_[1]) }
+sub __equals  { ref $_[1] and refaddr( $_[0] ) == refaddr( $_[1] ) }
 sub __nequals { !__equals(@_) }
+
 sub __eq {
-	my $self  = _INSTANCE($_[0], 'PPI::Element') ? $_[0]->content : $_[0];
-	my $other = _INSTANCE($_[1], 'PPI::Element') ? $_[1]->content : $_[1];
+	my $self  = _INSTANCE( $_[0], 'PPI::Element' ) ? $_[0]->content : $_[0];
+	my $other = _INSTANCE( $_[1], 'PPI::Element' ) ? $_[1]->content : $_[1];
 	$self eq $other;
 }
 sub __ne { !__eq(@_) }

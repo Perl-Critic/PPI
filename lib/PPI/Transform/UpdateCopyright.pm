@@ -33,10 +33,6 @@ use PPI::Transform ();
 
 our $VERSION = '1.282';
 
-
-
-
-
 #####################################################################
 # Constructor and Accessors
 
@@ -61,7 +57,7 @@ sub new {
 	my $self = shift->SUPER::new(@_);
 
 	# Must provide a name
-	unless ( defined _STRING($self->name) ) {
+	unless ( defined _STRING( $self->name ) ) {
 		PPI::Exception->throw("Did not provide a valid name param");
 	}
 
@@ -81,33 +77,31 @@ sub name {
 	$_[0]->{name};
 }
 
-
-
-
-
 #####################################################################
 # Transform
 
 sub document {
 	my $self     = shift;
-	my $document = _INSTANCE(shift, 'PPI::Document') or return undef;
+	my $document = _INSTANCE( shift, 'PPI::Document' ) or return undef;
 
 	# Find things to transform
 	my $name     = quotemeta $self->name;
 	my $regexp   = qr/\bcopyright\b.*$name/m;
-	my $elements = $document->find( sub {
-		$_[1]->isa('PPI::Token::Pod') or return '';
-		$_[1]->content =~ $regexp     or return '';
-		return 1;
-	} );
+	my $elements = $document->find(
+		sub {
+			$_[1]->isa('PPI::Token::Pod') or return '';
+			$_[1]->content =~ $regexp     or return '';
+			return 1;
+		}
+	);
 	return undef unless defined $elements;
-	return 0 unless $elements;
+	return 0     unless $elements;
 
 	# Try to transform any elements
 	my $changes = 0;
 	my $change  = sub {
 		my $copyright = shift;
-		my $thisyear  = (localtime time)[5] + 1900;
+		my $thisyear  = ( localtime time )[5] + 1900;
 		my @year      = $copyright =~ m/(\d{4})/g;
 
 		if ( @year == 1 ) {
@@ -115,7 +109,8 @@ sub document {
 			if ( $year[0] == $thisyear ) {
 				# No change
 				return $copyright;
-			} else {
+			}
+			else {
 				# Convert from single year to multiple year
 				$changes++;
 				$copyright =~ s/(\d{4})/$1 - $thisyear/;
@@ -128,7 +123,8 @@ sub document {
 			if ( $year[1] == $thisyear ) {
 				# No change
 				return $copyright;
-			} else {
+			}
+			else {
 				# Change the second year to the current one
 				$changes++;
 				$copyright =~ s/$year[1]/$thisyear/;
@@ -142,7 +138,7 @@ sub document {
 
 	# Attempt to transform each element
 	my $pattern = qr/\b(copyright.*\d)({4}(?:\s*-\s*\d{4})?)(.*$name)/mi;
-	foreach my $element ( @$elements ) {
+	foreach my $element (@$elements) {
 		$element =~ s/$pattern/$1 . $change->($2) . $2/eg;
 	}
 

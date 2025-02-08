@@ -25,10 +25,6 @@ our $VERSION = '1.282';
 
 our @ISA = 'PPI::Document';
 
-
-
-
-
 #####################################################################
 # PPI::Document Methods
 
@@ -48,10 +44,6 @@ sub index_locations {
 	warn "Useless attempt to index the locations of a document fragment";
 	undef;
 }
-
-
-
-
 
 #####################################################################
 # PPI::Element Methods

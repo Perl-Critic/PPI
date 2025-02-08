@@ -68,10 +68,6 @@ sub _literal {
 	return $string;
 }
 
-
-
-
-
 #####################################################################
 # Tokenizer Methods
 
@@ -89,20 +85,23 @@ sub __TOKENIZER__on_char {
 	if ( $token->{content} =~ /^-?0_*$/ ) {
 		# This could be special
 		if ( $char eq 'x' || $char eq 'X' ) {
-			$t->{class} = $t->{token}->set_class( 'Number::Hex' );
+			$t->{class} = $t->{token}->set_class('Number::Hex');
 			return 1;
-		} elsif ( $char eq 'b' || $char eq 'B' ) {
-			$t->{class} = $t->{token}->set_class( 'Number::Binary' );
+		}
+		elsif ( $char eq 'b' || $char eq 'B' ) {
+			$t->{class} = $t->{token}->set_class('Number::Binary');
 			return 1;
-		} elsif ( $char eq 'o' || $char eq 'O' ) {
-			$t->{class} = $t->{token}->set_class( 'Number::Octal' );
+		}
+		elsif ( $char eq 'o' || $char eq 'O' ) {
+			$t->{class} = $t->{token}->set_class('Number::Octal');
 			return 1;
-		} elsif ( $char =~ /\d/ ) {
+		}
+		elsif ( $char =~ /\d/ ) {
 			# You cannot have 8s and 9s on octals
 			if ( $char eq '8' or $char eq '9' ) {
 				$token->{_error} = "Illegal character in octal number '$char'";
 			}
-			$t->{class} = $t->{token}->set_class( 'Number::Octal' );
+			$t->{class} = $t->{token}->set_class('Number::Octal');
 			return 1;
 		}
 	}
@@ -111,17 +110,17 @@ sub __TOKENIZER__on_char {
 	return 1 if $char =~ /\d/o;
 
 	if ( $char eq '.' ) {
-		$t->{class} = $t->{token}->set_class( 'Number::Float' );
+		$t->{class} = $t->{token}->set_class('Number::Float');
 		return 1;
 	}
 	if ( $char eq 'e' || $char eq 'E' ) {
-		$t->{class} = $t->{token}->set_class( 'Number::Exp' );
+		$t->{class} = $t->{token}->set_class('Number::Exp');
 		return 1;
 	}
 
 	# Doesn't fit a special case, or is after the end of the token
 	# End of token.
-	$t->_finalize_token->__TOKENIZER__on_char( $t );
+	$t->_finalize_token->__TOKENIZER__on_char($t);
 }
 
 1;

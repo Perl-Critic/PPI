@@ -46,28 +46,28 @@ Return the numeric value of this token.
 sub literal {
 	my $self = shift;
 	return if $self->{_error};
-	my ($mantissa, $exponent) = split m/e/i, $self->_literal;
+	my ( $mantissa, $exponent ) = split m/e/i, $self->_literal;
 	my $neg = $mantissa =~ s/^\-//;
 	$mantissa =~ s/^\./0./;
 	$exponent =~ s/^\+//;
 
-	# Must cast exponent as numeric type, due to string type '00' exponent
-	# creating false positive condition in for() loop below, causing infinite loop
+  # Must cast exponent as numeric type, due to string type '00' exponent
+  # creating false positive condition in for() loop below, causing infinite loop
 	$exponent += 0;
 
 	# This algorithm is reasonably close to the S_mulexp10()
 	# algorithm from the Perl source code, so it should arrive
 	# at the same answer as Perl most of the time.
 	my $negpow = 0;
-	if ($exponent < 0) {
+	if ( $exponent < 0 ) {
 		$negpow = 1;
 		$exponent *= -1;
 	}
 
 	my $result = 1;
-	my $power = 10;
-	for (my $bit = 1; $exponent; $bit = $bit << 1) {
-		if ($exponent & $bit) {
+	my $power  = 10;
+	for ( my $bit = 1 ; $exponent ; $bit = $bit << 1 ) {
+		if ( $exponent & $bit ) {
 			$exponent = $exponent ^ $bit;
 			$result *= $power;
 		}
@@ -78,10 +78,6 @@ sub literal {
 	return $negpow ? $val / $result : $val * $result;
 }
 
-
-
-
-
 #####################################################################
 # Tokenizer Methods
 
@@ -90,7 +86,7 @@ sub __TOKENIZER__on_char {
 	my $t     = shift;
 	my $char  = substr( $t->{line}, $t->{line_cursor}, 1 );
 
-        # To get here, the token must have already encountered an 'E'
+	# To get here, the token must have already encountered an 'E'
 
 	# Allow underscores straight through
 	return 1 if $char eq '_';
@@ -107,9 +103,9 @@ sub __TOKENIZER__on_char {
 		if ( $t->{token}->{content} =~ s/\.(e)$//i ) {
 			my $word = $1;
 			$t->{class} = $t->{token}->set_class('Number');
-			$t->_new_token('Operator', '.');
-			$t->_new_token('Word', $word);
-			return $t->{class}->__TOKENIZER__on_char( $t );
+			$t->_new_token( 'Operator', '.' );
+			$t->_new_token( 'Word',     $word );
+			return $t->{class}->__TOKENIZER__on_char($t);
 		}
 		else {
 			$t->{token}->{_error} = "Illegal character in exponent '$char'";
@@ -118,7 +114,7 @@ sub __TOKENIZER__on_char {
 
 	# Doesn't fit a special case, or is after the end of the token
 	# End of token.
-	$t->_finalize_token->__TOKENIZER__on_char( $t );
+	$t->_finalize_token->__TOKENIZER__on_char($t);
 }
 
 1;

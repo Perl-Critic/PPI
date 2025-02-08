@@ -21,13 +21,14 @@ use Test::More 0.88;
 use if $ENV{AUTHOR_TESTING}, 'Test::Warnings', ':no_end_test';
 
 BEGIN {
-	select STDERR;  ## no critic ( InputOutput::ProhibitOneArgSelect )
+	select STDERR;    ## no critic ( InputOutput::ProhibitOneArgSelect )
 	$| = 1;
-	select STDOUT;  ## no critic ( InputOutput::ProhibitOneArgSelect )
+	select STDOUT;    ## no critic ( InputOutput::ProhibitOneArgSelect )
 
-	$^W++; # throw -w at runtime to try and catch warnings in un-warning-ed modules
+	$^W++
+	  ; # throw -w at runtime to try and catch warnings in un-warning-ed modules
 
-	no warnings 'once';  ## no critic ( TestingAndDebugging::ProhibitNoWarnings )
+	no warnings 'once';    ## no critic ( TestingAndDebugging::ProhibitNoWarnings )
 	$PPI::XS_DISABLE = 1;
 	$PPI::Lexer::X_TOKENIZER ||= $ENV{X_TOKENIZER};
 }
@@ -39,7 +40,7 @@ sub import {
 }
 
 END {
-    Test::Warnings::had_no_warnings() if $ENV{AUTHOR_TESTING};
+	Test::Warnings::had_no_warnings() if $ENV{AUTHOR_TESTING};
 }
 
 1;

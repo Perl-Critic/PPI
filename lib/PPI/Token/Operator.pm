@@ -47,10 +47,6 @@ our $VERSION = '1.282';
 
 our @ISA = "PPI::Token";
 
-
-
-
-
 #####################################################################
 # Tokenizer Methods
 
@@ -61,8 +57,11 @@ sub __TOKENIZER__on_char {
 	# Are we still an operator if we add the next character
 	my $content = $t->{token}->{content};
 	# special case for <<>> operator
-	if(length($content) < 4 &&
-		$content . substr( $t->{line}, $t->{line_cursor}, 4 - length($content) ) eq '<<>>') {
+	if ( length($content) < 4
+		&& $content
+		. substr( $t->{line}, $t->{line_cursor}, 4 - length($content) ) eq
+		'<<>>' )
+	{
 		return 1;
 	}
 	return 1 if $OPERATOR{ $content . $char };
@@ -72,7 +71,7 @@ sub __TOKENIZER__on_char {
 		if ( $char =~ /^[0-9]$/ ) {
 			# This is a decimal number
 			$t->{class} = $t->{token}->set_class('Number::Float');
-			return $t->{class}->__TOKENIZER__on_char( $t );
+			return $t->{class}->__TOKENIZER__on_char($t);
 		}
 	}
 
@@ -84,19 +83,19 @@ sub __TOKENIZER__on_char {
 		### Is the zero-width look-ahead assertion really
 		### supposed to be there?
 		if ( $t->{line} =~ m/\G ~? (?: (?!\d)\w | \s*['"`] | \\\w ) /gcx ) {
-			# This is a here-doc.
-			# Change the class and move to the HereDoc's own __TOKENIZER__on_char method.
+   # This is a here-doc.
+   # Change the class and move to the HereDoc's own __TOKENIZER__on_char method.
 			$t->{class} = $t->{token}->set_class('HereDoc');
-			return $t->{class}->__TOKENIZER__on_char( $t );
+			return $t->{class}->__TOKENIZER__on_char($t);
 		}
 	}
 
 	# Handle the special case of the null Readline
 	$t->{class} = $t->{token}->set_class('QuoteLike::Readline')
-		if $content eq '<>' or $content eq '<<>>';
+	  if $content eq '<>' or $content eq '<<>>';
 
 	# Finalize normally
-	$t->_finalize_token->__TOKENIZER__on_char( $t );
+	$t->_finalize_token->__TOKENIZER__on_char($t);
 }
 
 1;
