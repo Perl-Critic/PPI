@@ -201,6 +201,7 @@ sub __TOKENIZER__on_char {
 	my $pattern = qr/
 	^(
 		[\$@%&*]
+		\s*
 		(?:
 				: (?! : )			# allow single-colon non-magic variables
 			|

@@ -13,7 +13,6 @@ use PPI::Dumper;
 sub test_document;
 
 BASE_SPACE_SYMBOL: {
-	local $TODO = "crashes";
 	test_document    #
 	  '$ s',         #
 	  [
@@ -24,7 +23,6 @@ BASE_SPACE_SYMBOL: {
 }
 
 FOR_LOOP: {
-	local $TODO = "crashes";
 	test_document
 	  'for my $ s ( qw( a b ) ) { say $s }',
 	  [
@@ -48,7 +46,6 @@ FOR_LOOP: {
 }
 
 SIGIL_WITH_TRASH: {
-	local $TODO = "crashes";
 	test_document
 	  '$ \"8;b',
 	  [
