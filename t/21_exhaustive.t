@@ -137,15 +137,13 @@ sub compare_code {
 	my ( $code ) = @_;
 
 	my $round_tripped = round_trip_code($code);
-	my $ok = ($code eq $round_tripped);
-	if ( !$ok ) {
-		my $code_quoted = quotable($code);
-		diag( qq{input:  "$code_quoted"} );
-		my $round_tripped_quoted = quotable($round_tripped);
-		diag( qq{output: "$round_tripped_quoted"} );
-		my $shortest = quotable(quickcheck($code));
-                diag( qq{shorted failing substring: "$shortest"} );
-	}
+	my $code_quoted   = quotable($code);
+	diag        #
+	  "input:\n---\n$code_quoted\n---\n",
+	  'output: "' . quotable($round_tripped) . '"',
+	  'shorted failing substring: "' . quotable( quickcheck($code) ) . '"'
+	  unless    #
+	  my $ok = ( $code eq $round_tripped );
 
 	if ( scalar(keys %PPI::Element::PARENT) != 0 ) {
 		$ok = 0;
