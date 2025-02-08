@@ -192,17 +192,30 @@ sub __TOKENIZER__on_char {
 	}
 
 	# Trim off anything we oversucked...
-	$content =~ /^(
+	$content =~ /
+    ^(
 		[\$@%&*]
-		(?: : (?!:) | # Allow single-colon non-magic variables
-			(?: \w+ | \' (?!\d) \w+ | \:: \w+ )
-			(?:
-				# Allow both :: and ' in namespace separators
-				(?: \' (?!\d) \w+ | \:: \w+ )
-			)*
-			(?: :: )? # Technically a compiler-magic hash, but keep it here
+		(?:
+				: (?! : ) # Allow single-colon non-magic variables
+			|
+				(?:
+						\w+
+					|
+						\' (?! \d ) \w+
+					|
+						\:: \w+
+				)
+				(?: # Allow both :: and ' in namespace separators
+					(?:
+							\' (?!\d) \w+
+						|
+							\:: \w+
+					)
+				)*
+				(?: :: )? # Technically a compiler-magic hash, but keep it here
 		)
-	)/x or return undef;
+	)
+	/x or return undef;
 	unless ( length $1 eq length $content ) {
 		$t->{line_cursor} += length($1) - length($content);
 		$t->{token}->{content} = $1;
