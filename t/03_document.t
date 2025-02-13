@@ -4,7 +4,7 @@
 
 use lib 't/lib';
 use PPI::Test::pragmas;
-use Test::More tests => 19 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+use Test::More tests => 22 + ( $ENV{AUTHOR_TESTING} ? 1 : 0 );
 
 use File::Spec::Functions qw( catfile );
 use PPI ();
@@ -61,9 +61,7 @@ NEW_EMPTY: {
 	my $string = $doc1->serialize;
 	is( $string, '', '->serialize ok' );
 
-	# Check for warnings on null document index_locations
-	{
-		local $^W = 1;
-		$doc1->index_locations();
-	}
+	ok $doc1->location;
+	ok $doc2->location;
+	ok $doc3->location;
 }

@@ -658,14 +658,10 @@ sub index_locations {
 
 		# Found the first Token without a location
 		# Calculate the new location if needed.
-		if ($_) {
-			$location =
-				$self->_add_location( $location, $tokens[$_ - 1], \$heredoc );
-		} else {
-			my $logical_file =
-				$self->can('filename') ? $self->filename : undef;
-			$location = [ 1, 1, 1, 1, $logical_file ];
-		}
+		$location =
+			$_
+		  ? $self->_add_location( $location, $tokens[ $_ - 1 ], \$heredoc )
+		  : $self->_default_location;
 		$first = $_;
 		last;
 	}
@@ -685,6 +681,17 @@ sub index_locations {
 	}
 
 	1;
+}
+
+sub _default_location {
+	my ($self) = @_;
+	my $logical_file = $self->can('filename') ? $self->filename : undef;
+	return [ 1, 1, 1, 1, $logical_file ];
+}
+
+sub location {
+	my ($self) = @_;
+	return $self->SUPER::location || $self->_default_location;
 }
 
 sub _add_location {
