@@ -321,7 +321,9 @@ sub _decompose_argument {
 	return $as_text->($arg) if $as_text;
 	return if $arg->isa("PPI::Token::Operator")
 	  or $arg->content eq ",";
-	die "unknown arg decompose type: $arg , " . ref $arg;
+	warn "possibly unrecognized feature because of unknown arg decompose"
+	 . " type: '$arg' : " . ref $arg;
+	return;
 }
 
 sub _custom_feature_includes {
