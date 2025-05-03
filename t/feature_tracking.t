@@ -2,7 +2,7 @@
 
 use lib 't/lib';
 use PPI::Test::pragmas;
-use Test::More tests => 13 + ( $ENV{AUTHOR_TESTING} ? 1 : 0 );
+use Test::More tests => 14 + ( $ENV{AUTHOR_TESTING} ? 1 : 0 );
 
 use B 'perlstring';
 
@@ -415,6 +415,23 @@ END_PERL
 	  "simple custom boilerplate modules";
 }
 
+SIMPLE_LIST: {
+	test_document
+	  'use feature "signatures", "postderef"; 1;',
+	  [
+		'PPI::Statement::Include',      'use feature "signatures", "postderef";',
+		'PPI::Token::Word',             'use',
+		'PPI::Token::Word',             'feature',
+		'PPI::Token::Quote::Double', 	'"signatures"',
+		'PPI::Token::Operator',         ',',
+		'PPI::Token::Quote::Double', 	'"postderef"',
+		'PPI::Token::Structure',        ';',
+		'PPI::Statement',             '1;',
+		'PPI::Token::Number',             '1',
+		'PPI::Token::Structure',    ';',
+	  ],
+	  "simple custom boilerplate modules";
+}
 
 ok( PPI::Tokenizer->new( \"d()" )->all_tokens, "bare tokenizer auto-vivifies document object" );
 

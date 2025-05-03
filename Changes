@@ -2,6 +2,7 @@ Revision history for Perl extension PPI
 
 {{$NEXT}}
 	- Allow zero byte documents to have a location
+	- handle simple lists in feature arg decomposing
 
 1.281   2024-12-27 14:44:47Z
 	Summary:

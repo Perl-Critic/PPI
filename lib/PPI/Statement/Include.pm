@@ -319,6 +319,8 @@ sub _decompose_argument {
 	  or $arg->isa("PPI::Statement::Expression");
 	my $as_text = $arg->can("literal") || $arg->can("string");
 	return $as_text->($arg) if $as_text;
+	return if $arg->isa("PPI::Token::Operator")
+	  or $arg->content eq ",";
 	die "unknown arg decompose type: $arg , " . ref $arg;
 }
 
