@@ -12,7 +12,7 @@ use Helper 'safe_new';
 
 STRING: {
 	my $Document = safe_new \"print q{foo}, q!bar!, q <foo>, q((foo));";
-	my $literal = $Document->find('Token::Quote::Literal');
+	my $literal  = $Document->find('Token::Quote::Literal');
 	is( scalar(@$literal), 4, '->find returns three objects' );
 	isa_ok( $literal->[0], 'PPI::Token::Quote::Literal' );
 	isa_ok( $literal->[1], 'PPI::Token::Quote::Literal' );
@@ -26,7 +26,7 @@ STRING: {
 
 LITERAL: {
 	my $Document = safe_new \"print q{foo}, q!bar!, q <foo>, q((foo));";
-	my $literal = $Document->find('Token::Quote::Literal');
+	my $literal  = $Document->find('Token::Quote::Literal');
 	is( $literal->[0]->literal, 'foo',   '->literal returns as expected' );
 	is( $literal->[1]->literal, 'bar',   '->literal returns as expected' );
 	is( $literal->[2]->literal, 'foo',   '->literal returns as expected' );
@@ -62,7 +62,7 @@ test_statement(
 );
 
 sub one_line_explain {
-	my ( $data ) = @_;
+	my ($data) = @_;
 	my @explain = explain $data;
 	s/\n//g for @explain;
 	return join "", @explain;
@@ -83,9 +83,9 @@ sub test_statement {
 	my ( $code, $expected, $msg ) = @_;
 	$msg = perlstring $code if !defined $msg;
 
-	my $d = safe_new \$code;
+	my $d      = safe_new \$code;
 	my $tokens = $d->find( sub { $_[1]->significant } );
-	$tokens = [ map { ref( $_ ), $_->content } @$tokens ];
+	$tokens = [ map { ref($_), $_->content } @$tokens ];
 
 	if ( $expected->[0] !~ /^PPI::Statement/ ) {
 		$expected = [ 'PPI::Statement', $code, @$expected ];

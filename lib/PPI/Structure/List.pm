@@ -44,14 +44,13 @@ our @ISA = "PPI::Structure";
 # Highly special custom isa method that will continue to respond
 # positively to ->isa('PPI::Structure::ForLoop') but warns.
 my $has_warned = 0;
+
 sub isa {
 	if ( $_[1] and $_[1] eq 'PPI::Structure::ForLoop' ) {
-		if (
-			$_[0]->parent->isa('PPI::Statement::Compound')
-			and
-			$_[0]->parent->type =~ /^for/
-		) {
-			unless ( $has_warned ) {
+		if (    $_[0]->parent->isa('PPI::Statement::Compound')
+			and $_[0]->parent->type =~ /^for/ )
+		{
+			unless ($has_warned) {
 				local $Carp::CarpLevel = $Carp::CarpLevel + 1;
 				Carp::carp("PPI::Structure::ForLoop has been deprecated");
 				$has_warned = 1;

@@ -26,7 +26,7 @@ Most methods are provided to help work out what the object is actually
 pointing at, rather than what it might appear to be pointing at.
 
 =cut
- 
+
 use strict;
 use Params::Util qw{_INSTANCE};
 use PPI::Token   ();
@@ -34,10 +34,6 @@ use PPI::Token   ();
 our $VERSION = '1.282';
 
 our @ISA = "PPI::Token";
-
-
-
-
 
 #####################################################################
 # PPI::Token::Symbol Methods
@@ -91,8 +87,8 @@ sub symbol {
 	return $symbol if $type eq '&';
 
 	# Unless the next significant Element is a structure, it's correct.
-	my $after  = $self->snext_sibling;
-	return $symbol unless _INSTANCE($after, 'PPI::Structure');
+	my $after = $self->snext_sibling;
+	return $symbol unless _INSTANCE( $after, 'PPI::Structure' );
 
 	# Process the rest for cases where it might actually be something else
 	my $braces = $after->braces;
@@ -101,18 +97,21 @@ sub symbol {
 
 		# If it is cast to '$' or '@', that trumps any braces
 		my $before = $self->sprevious_sibling;
-		return $symbol if $before &&
-			$before->isa( 'PPI::Token::Cast' ) &&
-			$cast_which_trumps_braces{ $before->content };
+		return $symbol
+		  if $before
+		  && $before->isa('PPI::Token::Cast')
+		  && $cast_which_trumps_braces{ $before->content };
 
 		# Otherwise the braces rule
 		substr( $symbol, 0, 1, '@' ) if $braces eq '[]';
 		substr( $symbol, 0, 1, '%' ) if $braces eq '{}';
 
-	} elsif ( $type eq '@' ) {
+	}
+	elsif ( $type eq '@' ) {
 		substr( $symbol, 0, 1, '%' ) if $braces eq '{}';
 
-	} elsif ( $type eq '%' ) {
+	}
+	elsif ( $type eq '%' ) {
 		substr( $symbol, 0, 1, '@' ) if $braces eq '[]';
 
 	}
@@ -150,10 +149,6 @@ sub symbol_type {
 	substr( $_[0]->symbol, 0, 1 );
 }
 
-
-
-
-
 #####################################################################
 # Tokenizer Methods
 
@@ -164,14 +159,14 @@ sub __TOKENIZER__on_char {
 	pos $t->{line} = $t->{line_cursor};
 	if ( $t->{line} =~ m/\G([\w:\']+)/gc ) {
 		$t->{token}->{content} .= $1;
-		$t->{line_cursor}      += length $1;
+		$t->{line_cursor} += length $1;
 	}
 
 	# Handle magic things
-	my $content = $t->{token}->{content};	
+	my $content = $t->{token}->{content};
 	if ( $content eq '@_' or $content eq '$_' ) {
-		$t->{class} = $t->{token}->set_class( 'Magic' );
-		return $t->_finalize_token->__TOKENIZER__on_char( $t );
+		$t->{class} = $t->{token}->set_class('Magic');
+		return $t->_finalize_token->__TOKENIZER__on_char($t);
 	}
 
 	# Shortcut for most of the X:: symbols
@@ -181,23 +176,23 @@ sub __TOKENIZER__on_char {
 		if ( $nextchar eq '|' ) {
 			$t->{token}->{content} .= $nextchar;
 			$t->{line_cursor}++;
-			$t->{class} = $t->{token}->set_class( 'Magic' );
+			$t->{class} = $t->{token}->set_class('Magic');
 		}
-		return $t->_finalize_token->__TOKENIZER__on_char( $t );
+		return $t->_finalize_token->__TOKENIZER__on_char($t);
 	}
 	if ( $content =~ /^[\$%*@&]::(?:[^\w]|$)/ ) {
 		my $current = substr( $content, 0, 3, '' );
 		$t->{token}->{content} = $current;
-		$t->{line_cursor} -= length( $content );
-		return $t->_finalize_token->__TOKENIZER__on_char( $t );
+		$t->{line_cursor} -= length($content);
+		return $t->_finalize_token->__TOKENIZER__on_char($t);
 	}
 	if ( $content =~ /^(?:\$|\@)\d+/ ) {
-		$t->{class} = $t->{token}->set_class( 'Magic' );
-		return $t->_finalize_token->__TOKENIZER__on_char( $t );
+		$t->{class} = $t->{token}->set_class('Magic');
+		return $t->_finalize_token->__TOKENIZER__on_char($t);
 	}
 
 	# Verify and extract actual full symbol name from sigil to end
-	my $sep = qr/ (?: :: | '(?!\d) ) /x; # :: and ' are namespace separators
+	my $sep     = qr/ (?: :: | '(?!\d) ) /x; # :: and ' are namespace separators
 	my $pattern = qr/
 	^(
 		[\$@%&*]
@@ -219,7 +214,7 @@ sub __TOKENIZER__on_char {
 		$t->{token}->{content} = $1;
 	}
 
-	$t->_finalize_token->__TOKENIZER__on_char( $t );
+	$t->_finalize_token->__TOKENIZER__on_char($t);
 }
 
 1;

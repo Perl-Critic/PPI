@@ -5,31 +5,27 @@
 use lib 't/lib';
 use PPI::Test::pragmas;
 
-use PPI ();
+use PPI          ();
 use Scalar::Util qw( refaddr );
 use Test::More;
 
 BEGIN {
 	# Is Storable installed?
 	if ( eval { require Storable; 1 } ) {
-		plan( tests => 9 + ($ENV{AUTHOR_TESTING} ? 1 : 0) );
-	} else {
-		plan( 'skip_all' );
+		plan( tests => 9 + ( $ENV{AUTHOR_TESTING} ? 1 : 0 ) );
+	}
+	else {
+		plan('skip_all');
 		exit(0);
 	}
 }
-
-
-
-
-
 
 #####################################################################
 # Test freeze/thaw of PPI::Document objects
 
 SCOPE: {
 	# Create a document with various example package statements
-	my $Document = PPI::Lexer->lex_source( <<'END_PERL' );
+	my $Document = PPI::Lexer->lex_source(<<'END_PERL');
 package Foo;
 @ISA = (qw/File::Spec/);
 
@@ -37,19 +33,28 @@ package Foo;
 END_PERL
 	Test::More::isa_ok( $Document, 'PPI::Document' );
 	{
-	my $isa = $Document->find_first(sub { $_[1] eq '@ISA'; });
-	Test::More::ok( $isa, "Found ISA var");
-	Test::More::is( $isa->parent, q|@ISA = (qw/File::Spec/);|, "Got parent ok");
+		my $isa = $Document->find_first( sub { $_[1] eq '@ISA'; } );
+		Test::More::ok( $isa, "Found ISA var" );
+		Test::More::is(
+			$isa->parent,
+			q|@ISA = (qw/File::Spec/);|,
+			"Got parent ok"
+		);
 	}
 	my $clone = Storable::dclone($Document);
-	Test::More::ok($clone, "dclone ok");
-	Test::More::isnt( refaddr($Document), refaddr($clone), "Not the same object" );
-	Test::More::is(ref($Document), ref($clone), "Same class");
+	Test::More::ok( $clone, "dclone ok" );
+	Test::More::isnt( refaddr($Document), refaddr($clone),
+		"Not the same object" );
+	Test::More::is( ref($Document), ref($clone), "Same class" );
 	Test::More::is_deeply( $Document, $clone, "Deeply equal" );
 	{
-	my $isa = $clone->find_first(sub { $_[1] eq '@ISA'; });
-	Test::More::ok($isa, "Found ISA var");
-	Test::More::is($isa->parent, q|@ISA = (qw/File::Spec/);|, "Got parent ok");   # <-- this one fails
+		my $isa = $clone->find_first( sub { $_[1] eq '@ISA'; } );
+		Test::More::ok( $isa, "Found ISA var" );
+		Test::More::is(
+			$isa->parent,
+			q|@ISA = (qw/File::Spec/);|,
+			"Got parent ok"
+		);    # <-- this one fails
 	}
 
 }

@@ -37,9 +37,6 @@ our $VERSION = '1.282';
 
 our @ISA = "PPI::Token";
 
-
-
-
 #####################################################################
 # PPI::Token::Attribute Methods
 
@@ -80,10 +77,6 @@ sub parameters {
 	$self->{content} =~ /\((.*)\)$/ ? $1 : undef;
 }
 
-
-
-
-
 #####################################################################
 # Tokenizer Methods
 
@@ -95,13 +88,13 @@ sub __TOKENIZER__on_char {
 	# Unless this is a '(', we are finished.
 	unless ( $char eq '(' ) {
 		# Finalise and recheck
-		return $t->_finalize_token->__TOKENIZER__on_char( $t );
+		return $t->_finalize_token->__TOKENIZER__on_char($t);
 	}
 
 	# This is a bar(...) style attribute.
 	# We are currently on the ( so scan in until the end.
 	# We finish on the character AFTER our end
-	my $string = $class->__TOKENIZER__scan_for_end( $t );
+	my $string = $class->__TOKENIZER__scan_for_end($t);
 	if ( ref $string ) {
 		# EOF
 		$t->{token}->{content} .= $$string;
@@ -111,7 +104,7 @@ sub __TOKENIZER__on_char {
 
 	# Found the end of the attribute
 	$t->{token}->{content} .= $string;
-	$t->_finalize_token->__TOKENIZER__on_char( $t );
+	$t->_finalize_token->__TOKENIZER__on_char($t);
 }
 
 # Scan for a close braced, and take into account both escaping,
@@ -122,7 +115,7 @@ sub __TOKENIZER__scan_for_end {
 
 	# Loop as long as we can get new lines
 	my $string = '';
-	my $depth = 0;
+	my $depth  = 0;
 	while ( exists $t->{line} ) {
 		# Get the search area
 		pos $t->{line} = $t->{line_cursor};
@@ -141,7 +134,7 @@ sub __TOKENIZER__scan_for_end {
 		$t->{line_cursor} += length $1;
 
 		# Alter the depth and continue if we aren't at the end
-		$depth += ($1 =~ /\($/) ? 1 : -1 and next;
+		$depth += ( $1 =~ /\($/ ) ? 1 : -1 and next;
 
 		# Found the end
 		return $string;

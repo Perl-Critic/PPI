@@ -44,18 +44,10 @@ sub __LEXER__normal() { '' }
 
 sub _complete {
 	my $child = $_[0]->schild(-1);
-	return !! (
-		defined $child
-		and
-		$child->isa('PPI::Structure::Block')
-		and
-		$child->complete
-	);
+	return !!( defined $child
+		and $child->isa('PPI::Structure::Block')
+		and $child->complete );
 }
-
-
-
-
 
 #####################################################################
 # PPI::Statement::Sub Methods
@@ -76,7 +68,7 @@ sub name {
 
 	# Usually the second token is the name.
 	# The third token is the name if this is a lexical subroutine.
-	my $token = $self->schild(defined $self->type ? 2 : 1);
+	my $token = $self->schild( defined $self->type ? 2 : 1 );
 	return $token->content
 	  if defined $token and $token->isa('PPI::Token::Word');
 
@@ -105,8 +97,9 @@ return is an empty string.
 sub prototype {
 	my $self      = shift;
 	my $Prototype = List::Util::first {
-		_INSTANCE($_, 'PPI::Token::Prototype')
-	} $self->children;
+		_INSTANCE( $_, 'PPI::Token::Prototype' )
+	}
+	$self->children;
 	defined($Prototype) ? $Prototype->prototype : undef;
 }
 
@@ -124,7 +117,7 @@ code block.
 =cut
 
 sub block {
-	my $self = shift;
+	my $self      = shift;
 	my $lastchild = $self->schild(-1) or return '';
 	$lastchild->isa('PPI::Structure::Block') and $lastchild;
 }
@@ -142,7 +135,7 @@ if it does not.
 =cut
 
 sub forward {
-	! shift->block;
+	!shift->block;
 }
 
 =pod
@@ -189,12 +182,13 @@ sub type {
 	my @schild = grep { $_->significant } $self->children;
 
 	# Ignore labels
-	shift @schild if _INSTANCE($schild[0], 'PPI::Token::Label');
+	shift @schild if _INSTANCE( $schild[0], 'PPI::Token::Label' );
 
 	# Get the type
-	(_INSTANCE($schild[0], 'PPI::Token::Word') and $schild[0]->content =~ /^(my|our|state)$/)
-		? $schild[0]->content
-		: undef;
+	( _INSTANCE( $schild[0], 'PPI::Token::Word' )
+		  and $schild[0]->content =~ /^(my|our|state)$/ )
+	  ? $schild[0]->content
+	  : undef;
 }
 
 1;

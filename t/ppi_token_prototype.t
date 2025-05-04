@@ -21,7 +21,7 @@ PARSING: {
 	check_w_subs \@sub_patterns, '',           '',           '';
 	check_w_subs \@sub_patterns, '()',         '()',         '';
 	check_w_subs \@sub_patterns, '( )',        '( )',        '';
-	check_w_subs \@sub_patterns, ' () ',,      '()',         '';
+	check_w_subs \@sub_patterns, ' () ',       '()',         '';
 	check_w_subs \@sub_patterns, '(+@)',       '(+@)',       '+@';
 	check_w_subs \@sub_patterns, ' (+@) ',     '(+@)',       '+@';
 	check_w_subs \@sub_patterns, '(\[$;$_@])', '(\[$;$_@])', '\[$;$_@]';

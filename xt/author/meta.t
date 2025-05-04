@@ -3,6 +3,7 @@
 # Test that our META.yml file matches the current specification.
 
 use strict;
+
 BEGIN {
 	$|  = 1;
 	$^W = 1;

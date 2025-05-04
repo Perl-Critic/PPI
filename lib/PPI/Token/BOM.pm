@@ -48,39 +48,38 @@ our @ISA = "PPI::Token";
 
 sub significant() { '' }
 
-
-
-
-
 #####################################################################
 # Parsing Methods
 
 my %bom_types = (
-   "\x00\x00\xfe\xff" => 'UTF-32',
-   "\xff\xfe\x00\x00" => 'UTF-32',
-   "\xfe\xff"         => 'UTF-16',
-   "\xff\xfe"         => 'UTF-16',
-   "\xef\xbb\xbf"     => 'UTF-8',
+	"\x00\x00\xfe\xff" => 'UTF-32',
+	"\xff\xfe\x00\x00" => 'UTF-32',
+	"\xfe\xff"         => 'UTF-16',
+	"\xff\xfe"         => 'UTF-16',
+	"\xef\xbb\xbf"     => 'UTF-8',
 );
 
 sub __TOKENIZER__on_line_start {
 	my $t = $_[1];
 	$_ = $t->{line};
 
-	if (m/^(\x00\x00\xfe\xff |  # UTF-32, big-endian
+	if (
+		m/^(\x00\x00\xfe\xff |  # UTF-32, big-endian
 		\xff\xfe\x00\x00 |  # UTF-32, little-endian
 		\xfe\xff         |  # UTF-16, big-endian
 		\xff\xfe         |  # UTF-16, little-endian
 		\xef\xbb\xbf)       # UTF-8
-	    /xs) {
-	   my $bom = $1;
+	    /xs
+	  )
+	{
+		my $bom = $1;
 
-	   if ($bom_types{$bom} ne 'UTF-8') {
-	      return $t->_error("$bom_types{$bom} is not supported");
-	   }
+		if ( $bom_types{$bom} ne 'UTF-8' ) {
+			return $t->_error("$bom_types{$bom} is not supported");
+		}
 
-	   $t->_new_token('BOM', $bom) or return undef;
-	   $t->{line_cursor} += length $bom;
+		$t->_new_token( 'BOM', $bom ) or return undef;
+		$t->{line_cursor} += length $bom;
 	}
 
 	# Continue just as if there was no BOM

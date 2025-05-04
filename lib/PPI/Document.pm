@@ -64,14 +64,14 @@ Document-specific.
 =cut
 
 use strict;
-use Carp                          ();
-use List::Util 1.33               ();
-use Params::Util 1.00             qw{_SCALAR0 _ARRAY0 _INSTANCE};
-use Digest::MD5                   ();
-use PPI::Util                     ();
-use PPI                           ();
-use PPI::Node                     ();
-use YAML::PP                      ();
+use Carp              ();
+use List::Util 1.33   ();
+use Params::Util 1.00 qw{_SCALAR0 _ARRAY0 _INSTANCE};
+use Digest::MD5       ();
+use PPI::Util         ();
+use PPI               ();
+use PPI::Node         ();
+use YAML::PP          ();
 
 use overload 'bool' => \&PPI::Util::TRUE;
 use overload '""'   => 'content';
@@ -91,10 +91,6 @@ use constant LOCATION_CHARACTER    => 1;
 use constant LOCATION_COLUMN       => 2;
 use constant LOCATION_LOGICAL_LINE => 3;
 use constant LOCATION_LOGICAL_FILE => 4;
-
-
-
-
 
 #####################################################################
 # Constructor and Static Methods
@@ -184,36 +180,39 @@ This can be useful when your work project has a complex boilerplate module.
 =cut
 
 sub new {
-	local $_; # An extra one, just in case
+	local $_;    # An extra one, just in case
 	my $class = ref $_[0] ? ref shift : shift;
 
-	unless ( @_ ) {
+	unless (@_) {
 		my $self = $class->SUPER::new;
-		$self->{readonly}  = ! 1;
+		$self->{readonly}  = !1;
 		$self->{tab_width} = 1;
 		return $self;
 	}
 
 	# Check constructor attributes
-	my $source  = shift;
-	my %attr    = @_;
+	my $source = shift;
+	my %attr   = @_;
 
 	# Check the data source
-	if ( ! defined $source ) {
+	if ( !defined $source ) {
 		$class->_error("An undefined value was passed to PPI::Document::new");
 
-	} elsif ( ! ref $source ) {
+	}
+	elsif ( !ref $source ) {
 		# Catch people using the old API
 		if ( $source =~ /(?:\012|\015)/ ) {
-			Carp::croak("API CHANGE: Source code should only be passed to PPI::Document->new as a SCALAR reference");
+			Carp::croak(
+"API CHANGE: Source code should only be passed to PPI::Document->new as a SCALAR reference"
+			);
 		}
 
 		# Save the filename
 		$attr{filename} ||= $source;
 
 		# When loading from a filename, use the caching layer if it exists.
-		if ( $CACHE ) {
-			my $file_contents = PPI::Util::_slurp( $source );
+		if ($CACHE) {
+			my $file_contents = PPI::Util::_slurp($source);
 
 			# Errors returned as plain string
 			return $class->_error($file_contents) if !ref $file_contents;
@@ -223,47 +222,57 @@ sub new {
 			return $class->_setattr( $document, %attr ) if $document;
 
 			$document = PPI::Lexer->lex_source( $$file_contents, %attr );
-			if ( $document ) {
+			if ($document) {
 				# Save in the cache
-				$CACHE->store_document( $document );
+				$CACHE->store_document($document);
 				return $document;
 			}
-		} else {
+		}
+		else {
 			my $document = PPI::Lexer->lex_file( $source, %attr );
 			return $document if $document;
 		}
 
-	} elsif ( _SCALAR0($source) ) {
+	}
+	elsif ( _SCALAR0($source) ) {
 		my $document = PPI::Lexer->lex_source( $$source, %attr );
 		return $document if $document;
 
-	} elsif ( _ARRAY0($source) ) {
+	}
+	elsif ( _ARRAY0($source) ) {
 		$source = join '', map { "$_\n" } @$source;
 		my $document = PPI::Lexer->lex_source( $source, %attr );
 		return $document if $document;
 
-	} else {
-		$class->_error("Unknown object or reference was passed to PPI::Document::new");
+	}
+	else {
+		$class->_error(
+			"Unknown object or reference was passed to PPI::Document::new");
 	}
 
 	# Pull and store the error from the lexer
 	my $errstr;
-	if ( _INSTANCE($@, 'PPI::Exception') ) {
+	if ( _INSTANCE( $@, 'PPI::Exception' ) ) {
 		$errstr = $@->message;
-	} elsif ( $@ ) {
+	}
+	elsif ($@) {
 		$errstr = $@;
 		$errstr =~ s/\sat line\s.+$//;
-	} elsif ( PPI::Lexer->errstr ) {
+	}
+	elsif ( PPI::Lexer->errstr ) {
 		$errstr = PPI::Lexer->errstr;
-	} else {
+	}
+	else {
 		$errstr = "Unknown error parsing Perl document";
 	}
 	PPI::Lexer->_clear;
-	$class->_error( $errstr );
+	$class->_error($errstr);
 }
 
 sub load {
-	Carp::croak("API CHANGE: File names should now be passed to PPI::Document->new to load a file");
+	Carp::croak(
+"API CHANGE: File names should now be passed to PPI::Document->new to load a file"
+	);
 }
 
 sub _setattr {
@@ -308,13 +317,14 @@ Returns true on success, or C<undef> if not passed a valid param.
 =cut
 
 sub set_cache {
-	my $class  = ref $_[0] ? ref shift : shift;
+	my $class = ref $_[0] ? ref shift : shift;
 
 	if ( defined $_[0] ) {
 		# Enable the cache
-		my $object = _INSTANCE(shift, 'PPI::Cache') or return undef;
+		my $object = _INSTANCE( shift, 'PPI::Cache' ) or return undef;
 		$CACHE = $object;
-	} else {
+	}
+	else {
 		# Disable the cache
 		$CACHE = undef;
 	}
@@ -335,12 +345,8 @@ currently set for C<PPI::Document>.
 =cut
 
 sub get_cache {
-	$CACHE;	
+	$CACHE;
 }
-
-
-
-
 
 #####################################################################
 # PPI::Document Instance Methods
@@ -442,7 +448,7 @@ or write to the file.
 sub save {
 	my $self = shift;
 	local *FILE;
-	open( FILE, '>', $_[0] )    or return undef;
+	open( FILE, '>', $_[0] ) or return undef;
 	binmode FILE;
 	print FILE $self->serialize or return undef;
 	close FILE                  or return undef;
@@ -496,7 +502,8 @@ sub serialize {
 			if ( $content eq "\n" ) {
 				# Shortcut the most common case for speed
 				$output .= $content . $heredoc;
-			} else {
+			}
+			else {
 				# Slower and more general version
 				$content =~ s/\n/\n$heredoc/;
 				$output .= $content;
@@ -541,8 +548,9 @@ sub serialize {
 			# content part of the file
 			my $last_line = List::Util::none {
 				$tokens[$_] and $tokens[$_]->{content} =~ /\n/
-				} (($i + 1) .. $last_index);
-			if ( ! defined $last_line ) {
+			}
+			( ( $i + 1 ) .. $last_index );
+			if ( !defined $last_line ) {
 				# Handles the null list case
 				$last_line = 1;
 			}
@@ -551,20 +559,18 @@ sub serialize {
 			# (with content or a terminator)
 			my $any_after = List::Util::any {
 				$tokens[$_]->isa('PPI::Token::HereDoc')
-				and (
-					scalar(@{$tokens[$_]->{_heredoc}})
-					or
-					defined $tokens[$_]->{_terminator_line}
-					)
-				} (($i + 1) .. $#tokens);
-			if ( ! defined $any_after ) {
+				  and ( scalar( @{ $tokens[$_]->{_heredoc} } )
+					or defined $tokens[$_]->{_terminator_line} )
+			}
+			( ( $i + 1 ) .. $#tokens );
+			if ( !defined $any_after ) {
 				# Handles the null list case
 				$any_after = '';
 			}
 
 			# We don't need to repair the last here-doc on the
 			# last line. But we do need to repair anything else.
-			unless ( $last_line and ! $any_after ) {
+			unless ( $last_line and !$any_after ) {
 				# Add a terminating string if it didn't have one
 				unless ( defined $Token->{_terminator_line} ) {
 					$Token->{_terminator_line} = $Token->{_terminator};
@@ -619,7 +625,7 @@ Returns a 32 character hexadecimal string.
 =cut
 
 sub hex_id {
-	PPI::Util::md5hex($_[0]->serialize);
+	PPI::Util::md5hex( $_[0]->serialize );
 }
 
 =pod
@@ -651,7 +657,7 @@ sub index_locations {
 	my $heredoc = 0;
 
 	# Find the first Token without a location
-	my ($first, $location) = ();
+	my ( $first, $location ) = ();
 	foreach ( 0 .. $#tokens ) {
 		my $Token = $tokens[$_];
 		next if $Token->{_location};
@@ -695,24 +701,21 @@ sub location {
 }
 
 sub _add_location {
-	my ($self, $start, $Token, $heredoc) = @_;
+	my ( $self, $start, $Token, $heredoc ) = @_;
 	my $content = $Token->{content};
 
 	# Does the content contain any newlines
-	my $newlines =()= $content =~ /\n/g;
-	my ($logical_line, $logical_file) =
-		$self->_logical_line_and_file($start, $Token, $newlines);
+	my $newlines = () = $content =~ /\n/g;
+	my ( $logical_line, $logical_file ) =
+	  $self->_logical_line_and_file( $start, $Token, $newlines );
 
-	unless ( $newlines ) {
+	unless ($newlines) {
 		# Handle the simple case
 		return [
 			$start->[LOCATION_LINE],
 			$start->[LOCATION_CHARACTER] + length($content),
-			$start->[LOCATION_COLUMN]
-				+ $self->_visual_length(
-					$content,
-					$start->[LOCATION_COLUMN]
-				),
+			$start->[LOCATION_COLUMN] +
+			  $self->_visual_length( $content, $start->[LOCATION_COLUMN] ),
 			$logical_line,
 			$logical_file,
 		];
@@ -721,7 +724,7 @@ sub _add_location {
 	# This is the more complex case where we hit or
 	# span a newline boundary.
 	my $physical_line = $start->[LOCATION_LINE] + $newlines;
-	my $location = [ $physical_line, 1, 1, $logical_line, $logical_file ];
+	my $location      = [ $physical_line, 1, 1, $logical_line, $logical_file ];
 	if ( $heredoc and $$heredoc ) {
 		$location->[LOCATION_LINE]         += $$heredoc;
 		$location->[LOCATION_LOGICAL_LINE] += $$heredoc;
@@ -733,20 +736,18 @@ sub _add_location {
 	if ( $content =~ /\n([^\n]+?)\z/ ) {
 		$location->[LOCATION_CHARACTER] += length($1);
 		$location->[LOCATION_COLUMN] +=
-			$self->_visual_length(
-				$1, $location->[LOCATION_COLUMN],
-			);
+		  $self->_visual_length( $1, $location->[LOCATION_COLUMN], );
 	}
 
 	$location;
 }
 
 sub _logical_line_and_file {
-	my ($self, $start, $Token, $newlines) = @_;
+	my ( $self, $start, $Token, $newlines ) = @_;
 
 	# Regex taken from perlsyn, with the correction that there's no space
 	# required between the line number and the file name.
-	if ($start->[LOCATION_CHARACTER] == 1) {
+	if ( $start->[LOCATION_CHARACTER] == 1 ) {
 		if ( $Token->isa('PPI::Token::Comment') ) {
 			if (
 				$Token->content =~ m<
@@ -758,8 +759,9 @@ sub _logical_line_and_file {
 					\s*
 					\z
 				>xms
-			) {
-				return $1, ($3 || $start->[LOCATION_LOGICAL_FILE]);
+			  )
+			{
+				return $1, ( $3 || $start->[LOCATION_LOGICAL_FILE] );
 			}
 		}
 		elsif ( $Token->isa('PPI::Token::Pod') ) {
@@ -777,37 +779,39 @@ sub _logical_line_and_file {
 					\s*?
 					$
 				>xmsg
-			) {
-				($line, $file) = ($1, ( $3 || $file ) );
+			  )
+			{
+				( $line, $file ) = ( $1, ( $3 || $file ) );
 				$end_of_directive = pos $content;
 			}
 
-			if (defined $line) {
+			if ( defined $line ) {
 				pos $content = $end_of_directive;
-				my $post_directive_newlines =()= $content =~ m< \G [^\n]* \n >xmsg;
+				my $post_directive_newlines = () =
+				  $content =~ m< \G [^\n]* \n >xmsg;
 				return $line + $post_directive_newlines - 1, $file;
 			}
 		}
 	}
 
 	return
-		$start->[LOCATION_LOGICAL_LINE] + $newlines,
-		$start->[LOCATION_LOGICAL_FILE];
+	  $start->[LOCATION_LOGICAL_LINE] + $newlines,
+	  $start->[LOCATION_LOGICAL_FILE];
 }
 
 sub _visual_length {
-	my ($self, $content, $pos) = @_;
+	my ( $self, $content, $pos ) = @_;
 
 	my $tab_width = $self->tab_width;
-	my ($length, $vis_inc);
+	my ( $length, $vis_inc );
 
 	return length $content if $content !~ /\t/;
 
 	# Split the content in tab and non-tab parts and calculate the
 	# "visual increase" of each part.
-	for my $part ( split(/(\t)/, $content) ) {
-		if ($part eq "\t") {
-			$vis_inc = $tab_width - ($pos-1) % $tab_width;
+	for my $part ( split( /(\t)/, $content ) ) {
+		if ( $part eq "\t" ) {
+			$vis_inc = $tab_width - ( $pos - 1 ) % $tab_width;
 		}
 		else {
 			$vis_inc = length $part;
@@ -874,12 +878,12 @@ sub complete {
 	my $self = shift;
 
 	# Every structure has to be complete
-	$self->find_any( sub {
-		$_[1]->isa('PPI::Structure')
-		and
-		! $_[1]->complete
-	} )
-	and return '';
+	$self->find_any(
+		sub {
+			$_[1]->isa('PPI::Structure')
+			  and !$_[1]->complete;
+		}
+	) and return '';
 
 	# Strip anything that isn't a statement off the end
 	my @child = $self->children;
@@ -894,20 +898,12 @@ sub complete {
 	return $child[-1]->_complete;
 }
 
-
-
-
-
 #####################################################################
 # PPI::Node Methods
 
 # We are a scope boundary
 ### XS -> PPI/XS.xs:_PPI_Document__scope 0.903+
 sub scope() { 1 }
-
-
-
-
 
 #####################################################################
 # PPI::Element Methods
@@ -926,10 +922,6 @@ sub replace {
 	return undef;
 	# die "Cannot replace a PPI::Document";
 }
-
-
-
-
 
 #####################################################################
 # Error Handling
@@ -962,10 +954,6 @@ sub errstr {
 	$errstr;
 }
 
-
-
-
-
 #####################################################################
 # Native Storable Support
 
@@ -973,11 +961,11 @@ sub STORABLE_freeze {
 	my $self  = shift;
 	my $class = ref $self;
 	my %hash  = %$self;
-	return ($class, \%hash);
+	return ( $class, \%hash );
 }
 
 sub STORABLE_thaw {
-	my ($self, undef, $class, $hash) = @_;
+	my ( $self, undef, $class, $hash ) = @_;
 	bless $self, $class;
 	foreach ( keys %$hash ) {
 		$self->{$_} = delete $hash->{$_};

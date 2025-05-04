@@ -47,10 +47,6 @@ our $VERSION = '1.282';
 
 our @ISA = "PPI::Token";
 
-
-
-
-
 #####################################################################
 # Tokenizer Methods
 
@@ -74,11 +70,13 @@ sub __TOKENIZER__on_line_start {
 		# This is an error, but one we'll ignore
 		# Don't go into Pod mode, since =cut normally
 		# signals the end of Pod mode
-	} else {
+	}
+	else {
 		if ( defined $t->{token} ) {
 			# Add to existing token
 			$t->{token}->{content} .= $t->{line};
-		} else {
+		}
+		else {
 			$t->_new_token( 'End', $t->{line} );
 		}
 	}

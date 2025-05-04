@@ -56,10 +56,6 @@ my %CLOSES = (
 	ord ')' => 1,
 );
 
-
-
-
-
 #####################################################################
 # Tokenizer Methods
 
@@ -76,21 +72,13 @@ sub __TOKENIZER__commit {
 	0;
 }
 
-
-
-
-
 #####################################################################
 # Lexer Methods
 
 # For a given brace, find its opposing pair
 sub __LEXER__opposite {
-	$MATCH{ord $_[0]->{content}};
+	$MATCH{ ord $_[0]->{content} };
 }
-
-
-
-
 
 #####################################################################
 # PPI::Element Methods
@@ -137,10 +125,11 @@ sub next_token {
 	# structure, if it has children.
 	if ( $OPENS{ ord $self->{content} } ) {
 		my $child = $structure->child(0);
-		if ( $child ) {
+		if ($child) {
 			# Decend deeper, or return if it is a token
 			return $child->isa('PPI::Token') ? $child : $child->first_token;
-		} elsif ( $structure->finish ) {
+		}
+		elsif ( $structure->finish ) {
 			# Empty structure, so next is closing brace
 			return $structure->finish;
 		}
@@ -165,10 +154,11 @@ sub previous_token {
 	# structure, if it has children.
 	if ( $CLOSES{ ord $self->{content} } ) {
 		my $child = $structure->child(-1);
-		if ( $child ) {
+		if ($child) {
 			# Decend deeper, or return if it is a token
 			return $child->isa('PPI::Token') ? $child : $child->last_token;
-		} elsif ( $structure->start ) {
+		}
+		elsif ( $structure->start ) {
 			# Empty structure, so next is closing brace
 			return $structure->start;
 		}

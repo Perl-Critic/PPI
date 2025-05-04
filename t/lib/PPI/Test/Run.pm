@@ -19,7 +19,8 @@ sub run_testdir {
 	my $testdir = catdir(@_);
 
 	# Does the test directory exist?
-	ok( (-e $testdir and -d $testdir and -r $testdir), "Test directory $testdir found" );
+	ok( ( -e $testdir and -d $testdir and -r $testdir ),
+		"Test directory $testdir found" );
 
 	# Find the .code test files
 	my @code = do {
@@ -28,7 +29,7 @@ sub run_testdir {
 	};
 	ok( scalar @code, 'Found at least one code file' );
 
-	foreach my $codefile ( @code ) {
+	foreach my $codefile (@code) {
 		# Does the .code file have a matching .dump file
 		my $dumpfile = $codefile;
 		$dumpfile =~ s/\.code$/\.dump/;
@@ -41,18 +42,21 @@ sub run_testdir {
 		my $document = safe_new $codefile;
 		ok( $document, "$codename: Lexer->Document returns true" );
 
-		SKIP: {
+	  SKIP: {
 			skip "No Document to test", 12 unless $document;
 
 			# Index locations
 			ok( $document->index_locations, "$codename: ->index_locations ok" );
 
 			# Check standard things
-			object_ok( $document ); # 7 tests contained within
+			object_ok($document);    # 7 tests contained within
 
 			# Get the dump array ref for the Document object
-			my $Dumper = PPI::Dumper->new( $document );
-			ok( _INSTANCE($Dumper, 'PPI::Dumper'), "$codename: Object isa PPI::Dumper" );
+			my $Dumper = PPI::Dumper->new($document);
+			ok(
+				_INSTANCE( $Dumper, 'PPI::Dumper' ),
+				"$codename: Object isa PPI::Dumper"
+			);
 			my @dump_list = $Dumper->list;
 			ok( scalar @dump_list, "$codename: Got dump content from dumper" );
 
@@ -66,27 +70,32 @@ sub run_testdir {
 
 			# Compare the two
 			{
-			local $TODO = $ENV{TODO} if $ENV{TODO};
-			is_deeply( \@dump_list, \@content, "$codename: Generated dump matches stored dump" )
-			  or diag map "$_\n", @dump_list;
+				local $TODO = $ENV{TODO} if $ENV{TODO};
+				is_deeply( \@dump_list, \@content,
+					"$codename: Generated dump matches stored dump" )
+				  or diag map "$_\n", @dump_list;
 			}
 		}
-		SKIP: {
+	  SKIP: {
 			# Also, do a round-trip check
-			skip "No roundtrip check: Couldn't parse code file before", 1 if !$document;
-			skip "No roundtrip check: Couldn't open code file '$codename', $!", 1 unless #
-			  my $source = do { open my $CODEFILE, '<', $codefile; binmode $CODEFILE; local $/; <$CODEFILE> };
+			skip "No roundtrip check: Couldn't parse code file before", 1
+			  if !$document;
+			skip "No roundtrip check: Couldn't open code file '$codename', $!",
+			  1
+			  unless    #
+			  my $source = do {
+				open my $CODEFILE, '<', $codefile;
+				binmode $CODEFILE;
+				local $/;
+				<$CODEFILE>;
+			  };
 			$source =~ s/(?:\015{1,2}\012|\015|\012)/\n/g;
 
-			is( $document->serialize, $source, "$codename: Round-trip back to source was ok" );
+			is( $document->serialize, $source,
+				"$codename: Round-trip back to source was ok" );
 		}
 	}
 }
-
-
-
-
-
 
 #####################################################################
 # Process a .code/.dump file pair
@@ -97,7 +106,8 @@ sub increment_testdir {
 	my $testdir = catdir(@_);
 
 	# Does the test directory exist?
-	ok( (-e $testdir and -d $testdir and -r $testdir), "Test directory $testdir found" );
+	ok( ( -e $testdir and -d $testdir and -r $testdir ),
+		"Test directory $testdir found" );
 
 	# Find the .code test files
 	my @code = do {
@@ -106,7 +116,7 @@ sub increment_testdir {
 	};
 	ok( scalar @code, 'Found at least one code file' );
 
-	for my $codefile ( @code ) {
+	for my $codefile (@code) {
 		# Does the .code file have a matching .dump file
 		my $codename = $codefile;
 		$codename =~ s/\.code$//;
@@ -125,7 +135,10 @@ sub increment_testdir {
 			my $string   = substr $buffer, 0, $chars;
 			my $document = eval { safe_new \$string };
 			is( $@ => '', "$codename: $chars chars ok" );
-			is( $document->serialize => $string, "$codename: $chars char roundtrip" );
+			is(
+				$document->serialize => $string,
+				"$codename: $chars char roundtrip"
+			);
 		}
 	}
 }

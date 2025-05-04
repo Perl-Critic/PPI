@@ -33,13 +33,9 @@ use PPI::Token::_QuoteEngine::Full ();
 our $VERSION = '1.282';
 
 our @ISA = qw{
-	PPI::Token::_QuoteEngine::Full
-	PPI::Token::Quote
+  PPI::Token::_QuoteEngine::Full
+  PPI::Token::Quote
 };
-
-
-
-
 
 #####################################################################
 # PPI::Token::Quote Methods
@@ -51,7 +47,6 @@ sub string {
 	  my $str = $sections[0];
 	substr( $self->{content}, $str->{position}, $str->{size} );
 }
-
 
 # Use the same implementation as another module
 *literal = *PPI::Token::Quote::Single::literal;
