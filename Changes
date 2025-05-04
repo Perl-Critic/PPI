@@ -1,6 +1,6 @@
 Revision history for Perl extension PPI
 
-{{$NEXT}}
+1.283   2025-05-04 09:52:43Z
 	- Allow zero byte documents to have a location
 	- handle simple lists in feature arg decomposing
 	- warn on unknown feature arg decompose instead of die
