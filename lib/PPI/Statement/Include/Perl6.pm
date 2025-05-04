@@ -41,7 +41,7 @@ string and will not be parsed by PPI.
 use strict;
 use PPI::Statement::Include ();
 
-our $VERSION = '1.282';
+our $VERSION = '1.284';
 
 our @ISA = "PPI::Statement::Include";
 

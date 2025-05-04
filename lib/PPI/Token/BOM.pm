@@ -42,7 +42,7 @@ L<PPI::Token> and L<PPI::Element> classes.
 use strict;
 use PPI::Token ();
 
-our $VERSION = '1.282';
+our $VERSION = '1.284';
 
 our @ISA = "PPI::Token";
 
