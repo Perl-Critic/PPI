@@ -749,9 +749,10 @@ Adam Kennedy E<lt>adamk@cpan.orgE<gt>
 
 =head1 ACKNOWLEDGMENTS
 
-A huge thank you to Phase N Australia (L<http://phase-n.com/>) for
-permitting the original open sourcing and release of this distribution
-from what was originally several thousand hours of commercial work.
+A huge thank you to Phase N Australia
+(L<https://web.archive.org/web/20240304122957/http://www.phase-n.com/>) for
+permitting the original open sourcing and release of this distribution from
+what was originally several thousand hours of commercial work.
 
 Another big thank you to The Perl Foundation
 (L<http://www.perlfoundation.org/>) for funding for the final big
