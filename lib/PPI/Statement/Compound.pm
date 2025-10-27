@@ -119,7 +119,7 @@ sub type {
 	if ( $content =~ /^for(?:each)?\z/ ) {
 		$Element = $self->schild(++$p) or return $content;
 		if ( $Element->isa('PPI::Token') ) {
-			return 'foreach' if $Element->content =~ /^my|our|state\z/;
+			return 'foreach' if $Element->content =~ /^(?:my|our|state)\z/;
 			return 'foreach' if $Element->isa('PPI::Token::Symbol');
 			return 'foreach' if $Element->isa('PPI::Token::QuoteLike::Words');
 		}
