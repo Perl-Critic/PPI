@@ -1,6 +1,6 @@
 Revision history for Perl extension PPI
 
-{{$NEXT}}
+1.284   2025-10-28 16:56:25Z
     - fix author tests: pod-no404s.t (GH#315) (Lukas Mai)
     - fix regex anchors in PPI::Statement::Compound->type (GH#316) (Lukas Mai)
 
