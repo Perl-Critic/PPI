@@ -7,7 +7,7 @@ use Clone                    ();
 use Carp                     ();
 use PPI::Token::_QuoteEngine ();
 
-our $VERSION = '1.284';
+our $VERSION = '1.285';
 
 our @ISA = 'PPI::Token::_QuoteEngine';
 
