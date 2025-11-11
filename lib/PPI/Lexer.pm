@@ -417,11 +417,11 @@ sub _statement {
 
 	# Is it a token in our known classes list
 	my $content = $Token->content;
-	my $class = {
-		%STATEMENT_CLASSES,
-		( try => 'PPI::Statement::Compound' ) x
-		  !!( $Parent->schild(-1) || $Parent )->presumed_features->{try},
-	}->{ $content };
+	my $class =
+	  ( $content eq 'try'
+		  and ( $Parent->schild(-1) || $Parent )->presumed_features->{try} )
+	  ? 'PPI::Statement::Compound'
+	  : $STATEMENT_CLASSES{$content};
 
 	if ( $class ) {
 		# Is the next significant token a =>
