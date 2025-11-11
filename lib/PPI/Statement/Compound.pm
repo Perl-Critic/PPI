@@ -133,7 +133,7 @@ sub type {
 			if $content eq 'try' && $self->presumed_features->{try};
 		return $TYPES{$content};
 	}
-	return 'continue'       if $Element->isa('PPI::Structure::Block');
+	return 'continue' if $Element->isa('PPI::Structure::Block');
 
 	# Unknown (shouldn't exist?)
 	undef;
