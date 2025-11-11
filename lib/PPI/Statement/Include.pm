@@ -274,7 +274,7 @@ sub feature_mods {
 		  if version::->parse($perl_version) >= 5.035;
 	}
 
-	my $module = $self->module;
+	my $module = $self->module or return;
 
 	my %known     = ( signatures => 1, try => 1 );
 	my $on_or_off = $type eq "use";
