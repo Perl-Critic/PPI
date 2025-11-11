@@ -447,7 +447,7 @@ sub _statement {
 
 			# Lexical subroutine
 			if (
-				$content =~ /^(?:my|our|state)$/
+				$content =~ /^(?:my|our|state)\z/
 				and $Next->isa( 'PPI::Token::Word' ) and $Next->content eq 'sub'
 			) {
 				# This should be PPI::Statement::Sub rather than PPI::Statement::Variable
