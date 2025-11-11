@@ -172,6 +172,7 @@ sub new {
 		token        => undef,
 		class        => 'PPI::Token::BOM',
 		zone         => 'PPI::Token::Whitespace',
+		feature_set  => undef,
 
 		# Output token buffer
 		tokens       => [],
@@ -851,23 +852,12 @@ sub __current_token_is_forced_word {
 	return '';
 }
 
-sub _current_token_has_signatures_active {
-	my ($t) = @_;
-
-	# Get at least the three previous significant tokens, and extend the
-	# retrieval range to include at least one token that can walk the
-	# already generated tree. (i.e. has a parent)
-	my ( $tokens_to_get, @tokens ) = (3);
-	while ( !@tokens or ( $tokens[-1] and !$tokens[-1]->parent ) ) {
-		@tokens = $t->_previous_significant_tokens($tokens_to_get);
-		last if @tokens < $tokens_to_get;
-		$tokens_to_get++;
-	}
-
-	my ($closest_parented_token) = grep $_->parent, @tokens;
-	$closest_parented_token ||= $t->_document || $t->_document(PPI::Document->new);
-	return $closest_parented_token->presumed_features->{signatures}, @tokens;
+sub _features {
+	my ( $self, $arg ) = @_;
+	return $arg ? $self->{feature_set} = $arg : $self->{feature_set} || {};
 }
+
+sub _current_token_has_signatures_active { shift->{feature_set}{signatures} }
 
 1;
 

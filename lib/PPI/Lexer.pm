@@ -111,9 +111,10 @@ Returns a new C<PPI::Lexer> object
 sub new {
 	my $class = shift->_clear;
 	bless {
-		Tokenizer => undef, # Where we store the tokenizer for a run
-		buffer    => [],    # The input token buffer
-		delayed   => [],    # The "delayed insignificant tokens" buffer
+		Tokenizer      => undef,    # Where we store the tokenizer for a run
+		buffer         => [],       # The input token buffer
+		delayed        => [],       # The "delayed insignificant tokens" buffer
+		features_stack => [],       # Stack of features in scope
 	}, $class;
 }
 
@@ -196,6 +197,10 @@ sub lex_tokenizer {
 	my $Document = PPI::Document->new;
 	ref($Document)->_setattr( $Document, %args );
 	$Tokenizer->_document($Document);
+	if (my $feat = $Document->feature_mods) {
+		push @{$self->{features_stack}}, $feat;
+		$Tokenizer->_features($feat);
+	}
 
 	# Lex the token stream into the document
 	$self->{Tokenizer} = $Tokenizer;
@@ -418,8 +423,7 @@ sub _statement {
 	# Is it a token in our known classes list
 	my $content = $Token->content;
 	my $class =
-	  ( $content eq 'try'
-		  and ( $Parent->schild(-1) || $Parent )->presumed_features->{try} )
+	  ( $content eq 'try' and ( $self->{features_stack}[-1] || {} )->{try} )
 	  ? 'PPI::Statement::Compound'
 	  : $STATEMENT_CLASSES{$content};
 
@@ -613,6 +617,20 @@ sub _statement {
 	return 'PPI::Statement';
 }
 
+sub _update_features {
+	my ( $self, $statement ) = @_;
+
+	return if ref $statement ne 'PPI::Statement::Include';
+	return unless    #
+	  my $new_features = $statement->feature_mods;
+	push @{ $self->{features_stack} }, {}
+	  if not @{ $self->{features_stack} };
+	my $current_features = $self->{features_stack}[-1];
+	$self->{Tokenizer}->_features    #
+	  ( $self->{features_stack}[-1] =
+		  { %{$current_features}, %{$new_features} } );
+}
+
 sub _lex_statement {
 	my ($self, $Statement) = @_;
 	# my $self      = shift;
@@ -641,6 +659,7 @@ sub _lex_statement {
 			$Token->isa('PPI::Token::Separator')
 		) {
 			# Rollback and end the statement
+			$self->_update_features( $Statement );
 			return $self->_rollback( $Token );
 		}
 
@@ -649,6 +668,7 @@ sub _lex_statement {
 			# Have we hit an implicit end to the statement
 			unless ( $self->_continues( $Statement, $Token ) ) {
 				# Rollback and finish the statement
+				$self->_update_features( $Statement );
 				return $self->_rollback( $Token );
 			}
 		}
@@ -662,6 +682,7 @@ sub _lex_statement {
 		# Handle normal statement terminators
 		if ( $Token->content eq ';' ) {
 			$self->_add_element( $Statement, $Token );
+			$self->_update_features( $Statement );
 			return 1;
 		}
 
@@ -684,6 +705,7 @@ sub _lex_statement {
 
 	# No, it's just the end of the file...
 	# Roll back any insignificant tokens, they'll get added at the Document level
+	$self->_update_features( $Statement );
 	$self->_rollback;
 }
 
@@ -1279,6 +1301,8 @@ sub _lex_structure {
 	# my $self      = shift;
 	# my $Structure = _INSTANCE(shift, 'PPI::Structure') or die "Bad param 1";
 
+	push @{$self->{features_stack}}, $self->{features_stack}[-1] || {};
+
 	# Start the processing loop
 	my $Token;
 	while ( ref($Token = $self->_get_token) ) {
@@ -1317,6 +1341,8 @@ sub _lex_structure {
 
 		# Is this the close of a structure ( which would be an error )
 		if ( $Token->__LEXER__closes ) {
+			pop @{$self->{features_stack}};
+
 			# Is this OUR closing structure
 			if ( $Token->content eq $Structure->start->__LEXER__opposite ) {
 				# Add any delayed tokens, and the finishing token (the ugly way)
@@ -1360,6 +1386,8 @@ sub _lex_structure {
 	unless ( defined $Token ) {
 		PPI::Exception->throw;
 	}
+
+	pop @{$self->{features_stack}};
 
 	# No, it's just the end of file.
 	# Add any insignificant trailing tokens.

@@ -116,12 +116,10 @@ sub __TOKENIZER__on_char {
 		}
 
 		# Is it a nameless arg in a signature?
-		if ( $char eq ')' or $char eq '=' or $char eq ',' ) {
-			my ($has_sig) = $t->_current_token_has_signatures_active;
-			if ($has_sig) {
-				$t->{class} = $t->{token}->set_class('Symbol');
-				return $t->_finalize_token->__TOKENIZER__on_char($t);
-			}
+		my %noname = ( ')' => 1, '=' => 1, ',' => 1 );
+		if ( $noname{$char} and $t->_current_token_has_signatures_active ) {
+			$t->{class} = $t->{token}->set_class('Symbol');
+			return $t->_finalize_token->__TOKENIZER__on_char($t);
 		}
 
 		if ( $MAGIC{ $c . $char } ) {
@@ -163,12 +161,9 @@ sub __TOKENIZER__on_char {
 		}
 
 		# Is it a nameless arg in a signature?
-		if ( $char eq ')' ) {
-			my ($has_sig) = $t->_current_token_has_signatures_active;
-			if ($has_sig) {
-				$t->{class} = $t->{token}->set_class('Symbol');
-				return $t->_finalize_token->__TOKENIZER__on_char($t);
-			}
+		if ( $char eq ')' and $t->_current_token_has_signatures_active ) {
+			$t->{class} = $t->{token}->set_class('Symbol');
+			return $t->_finalize_token->__TOKENIZER__on_char($t);
 		}
 
 		if ( $MAGIC{ $c . $char } ) {
@@ -217,12 +212,9 @@ sub __TOKENIZER__on_char {
 		}
 
 		# Is it a nameless arg in a signature?
-		if ( $char eq ')' ) {
-			my ($has_sig) = $t->_current_token_has_signatures_active;
-			if ($has_sig) {
-				$t->{class} = $t->{token}->set_class('Symbol');
-				return $t->_finalize_token->__TOKENIZER__on_char($t);
-			}
+		if ( $char eq ')' and $t->_current_token_has_signatures_active ) {
+			$t->{class} = $t->{token}->set_class('Symbol');
+			return $t->_finalize_token->__TOKENIZER__on_char($t);
 		}
 
 		# Is it a magic variable?
