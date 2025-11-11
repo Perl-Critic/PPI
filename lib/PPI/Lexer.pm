@@ -416,11 +416,12 @@ sub _statement {
 	my $is_lexsub = 0;
 
 	# Is it a token in our known classes list
+	my $content = $Token->content;
 	my $class = {
 		%STATEMENT_CLASSES,
 		( try => 'PPI::Statement::Compound' ) x
 		  !!( $Parent->schild(-1) || $Parent )->presumed_features->{try},
-	}->{ $Token->content };
+	}->{ $content };
 
 	if ( $class ) {
 		# Is the next significant token a =>
@@ -446,7 +447,7 @@ sub _statement {
 
 			# Lexical subroutine
 			if (
-				$Token->content =~ /^(?:my|our|state)$/
+				$content =~ /^(?:my|our|state)$/
 				and $Next->isa( 'PPI::Token::Word' ) and $Next->content eq 'sub'
 			) {
 				# This should be PPI::Statement::Sub rather than PPI::Statement::Variable
@@ -507,7 +508,7 @@ sub _statement {
 	return $class if $class;
 
 	# Handle the more in-depth sub detection
-	if ( $is_lexsub || $Token->content eq 'sub' ) {
+	if ( $is_lexsub || $content eq 'sub' ) {
 		# Read ahead to the next significant token
 		my $Next;
 		while ( $Next = $self->_get_token ) {
@@ -549,7 +550,7 @@ sub _statement {
 		return 'PPI::Statement::Sub';
 	}
 
-	if ( $Token->content eq 'use' ) {
+	if ( $content eq 'use' ) {
 		# Add a special case for "use v6" lines.
 		my $Next;
 		while ( $Next = $self->_get_token ) {
