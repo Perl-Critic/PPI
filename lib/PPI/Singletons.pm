@@ -21,8 +21,10 @@ our %OPERATOR = map { $_ => 1 } (
 	< > <= >= lt gt le ge
 	== != <=> eq ne cmp ~~
 	& | ^ && || // .. ...
+	&. |. ^. ~.
 	? :
 	= **= += -= .= *= /= %= x= &= |= ^= <<= >>= &&= ||= //=
+	&.= |.= ^.= ~.=
 	=> <> <<>>
 	and or xor not
 	}, ',' 	# Avoids "comma in qw{}" warning

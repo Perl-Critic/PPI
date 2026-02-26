@@ -1,0 +1,6 @@
+PPI::Document
+  PPI::Statement
+    PPI::Token::Symbol  	'$x'
+    PPI::Token::Operator  	'|.'
+    PPI::Token::Symbol  	'$y'
+  PPI::Token::Whitespace  	'\n'
