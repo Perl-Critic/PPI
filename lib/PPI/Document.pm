@@ -653,7 +653,10 @@ sub index_locations {
 	my ($first, $location) = ();
 	foreach ( 0 .. $#tokens ) {
 		my $Token = $tokens[$_];
-		next if $Token->{_location};
+		if ($Token->{_location}) {
+			$location = $Token->{_location};
+			next;
+		}
 
 		# Found the first Token without a location
 		# Calculate the new location if needed.

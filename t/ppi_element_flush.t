@@ -128,7 +128,6 @@ EOSTM
 	is $@,   "", 'no warning or exception from index_locations';
 	is $res, 1,  '.. and returns 1';
 
-	local $TODO = "to be fixed";
 	is_deeply $nextsib->location, [ 9, 3, 3, 9, $file ],
 	  'next token location is now fresh';
 
