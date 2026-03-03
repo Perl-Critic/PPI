@@ -76,7 +76,6 @@ EOSTM
 	  'location of 3rd include stale';
 
 	my $res = eval { $nextsib->_flush_locations };
-	local $TODO = "to be fixed";
 	is $@,   "", '_flush_locations lives';
 	is $res, 1,  '.. and returns 1';
 

@@ -801,7 +801,7 @@ sub _flush_locations {
 			next unless refaddr($Token) == refaddr($start);
 
 			# Found the start. Flush its location
-			delete $$Token->{_location};
+			delete $Token->{_location};
 			last;
 		}
 	}
