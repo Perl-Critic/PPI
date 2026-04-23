@@ -4,7 +4,7 @@
 
 use lib 't/lib';
 use PPI::Test::pragmas;
-use Test::More tests => 22 + ( $ENV{AUTHOR_TESTING} ? 1 : 0 );
+use Test::More tests => 24 + ( $ENV{AUTHOR_TESTING} ? 1 : 0 );
 
 use File::Spec::Functions qw( catfile );
 use PPI ();
@@ -64,4 +64,12 @@ NEW_EMPTY: {
 	ok $doc1->location;
 	ok $doc2->location;
 	ok $doc3->location;
+}
+
+MISSING_FILE: {
+	my $doc = PPI::Document->new('this_file_should_not_exist_12345.pl');
+	is( $doc, undef, 'Document load returns undef for non-existent file' );
+	is( PPI::Document->errstr,
+			"open(this_file_should_not_exist_12345.pl) failed: "
+		  . "No such file or directory" );
 }

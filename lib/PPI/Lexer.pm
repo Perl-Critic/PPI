@@ -157,7 +157,9 @@ sub lex_file {
 		return $self->_error( $errstr );
 	}
 
-	$self->lex_tokenizer( $Tokenizer, %args );
+	return _INSTANCE( $Tokenizer, 'PPI::Tokenizer' )
+	  ? $self->lex_tokenizer( $Tokenizer, %args )
+	  : $self->_error($Tokenizer);
 }
 
 =pod
