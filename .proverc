@@ -1,3 +1,5 @@
 --state=hot,slow,save
 --recurse
+-l
+-j 9
 t
