@@ -162,7 +162,8 @@ ERROR_HANDLING: {
 	is $test_lexer->lex_file(undef), undef, "lex_file fails without a filename";
 	is(
 		PPI::Lexer->errstr,
-		"Lexer failed: Did not pass a filename to PPI::Lexer::lex_file",
+		"Lexer failed: Tokenizer failed to open file: "
+		  . "_slurp() failed: no filename provided",
 		"error can be gotten from class attribute"
 	);
 }

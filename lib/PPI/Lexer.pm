@@ -139,28 +139,7 @@ Returns a L<PPI::Document> object, or C<undef> on error.
 
 =cut
 
-sub lex_file {
-	my $self = ref $_[0] ? shift : shift->new;
-	my $file = _STRING(shift);
-	unless ( defined $file ) {
-		return $self->_error("Did not pass a filename to PPI::Lexer::lex_file");
-	}
-	my %args = @_;
-
-	# Create the Tokenizer
-	my $Tokenizer = eval {
-		X_TOKENIZER->new($file);
-	};
-	if ( _INSTANCE($@, 'PPI::Exception') ) {
-		return $self->_error( $@->message );
-	} elsif ( $@ ) {
-		return $self->_error( $errstr );
-	}
-
-	return _INSTANCE( $Tokenizer, 'PPI::Tokenizer' )
-	  ? $self->lex_tokenizer( $Tokenizer, %args )
-	  : $self->_error($Tokenizer);
-}
+sub lex_file { shift->_lex_input(@_) }
 
 =pod
 
@@ -176,25 +155,20 @@ Returns a L<PPI::Document> object, or C<undef> on error.
 
 =cut
 
-sub lex_source {
-	my $self   = ref $_[0] ? shift : shift->new;
-	my $source = shift;
-	unless ( defined $source and not ref $source ) {
-		return $self->_error("Did not pass a string to PPI::Lexer::lex_source");
-	}
-	my %args = @_;
+sub lex_source { shift->_lex_input( \shift, @_ ) }
 
-	# Create the Tokenizer and hand off to the next method
-	my $Tokenizer = eval {
-		X_TOKENIZER->new(\$source);
-	};
-	if ( _INSTANCE($@, 'PPI::Exception') ) {
-		return $self->_error( $@->message );
-	} elsif ( $@ ) {
-		return $self->_error( $errstr );
-	}
+sub _lex_input {
+	my ( $self, $input, %args ) = @_;
+	$self = ref $self ? $self : $self->new;
 
-	$self->lex_tokenizer( $Tokenizer, %args );
+	# Create the Tokenizer
+	my $Tokenizer = eval { X_TOKENIZER->new($input) };
+	return    #
+	  $@
+	  ? $self->_error( _INSTANCE( $@, 'PPI::Exception' ) ? $@->message : $@ )
+	  : !_INSTANCE( $Tokenizer, 'PPI::Tokenizer' )
+	  ? $self->_error($Tokenizer)
+	  : $self->lex_tokenizer( $Tokenizer, %args );
 }
 
 =pod

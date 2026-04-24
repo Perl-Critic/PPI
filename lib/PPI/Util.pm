@@ -43,7 +43,7 @@ sub _Document {
 
 # Provide a simple _slurp implementation
 sub _slurp {
-	my $file = shift;
+	my $file = shift or return "_slurp() failed: no filename provided";
 	local $/ = undef;
 	local *FILE;
 	open( FILE, '<', $file ) or return "open($file) failed: $!";

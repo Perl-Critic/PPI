@@ -182,19 +182,11 @@ sub new {
 		perl6        => [],
 	}, $class;
 
-	if ( ! defined $_[1] ) {
-		# We weren't given anything
-		PPI::Exception->throw("No source provided to Tokenizer");
-
-	} elsif ( ! ref $_[1] ) {
+	if ( ! ref $_[1] ) {
 		my $source = PPI::Util::_slurp($_[1]);
-		if ( ref $source ) {
-			# Content returned by reference
-			$self->{source} = $$source;
-		} else {
-			# Errors returned as a string
-			PPI::Exception->throw("Tokenizer failed to open file: $source");
-		}
+		PPI::Exception->throw("Tokenizer failed to open file: $source")
+		  if not ref $source;
+		$self->{source} = $$source;
 
 	} elsif ( _SCALAR0($_[1]) ) {
 		$self->{source} = ${$_[1]};
