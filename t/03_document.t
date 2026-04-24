@@ -70,5 +70,6 @@ MISSING_FILE: {
 	my $f   = "this_file_should_not_exist_12345.pl";
 	my $doc = PPI::Document->new($f);
 	is( $doc, undef, 'Document load returns undef for non-existent file' );
-	like( PPI::Document->errstr, qr/open\($f\) failed: / );
+	like( PPI::Document->errstr,
+		qr/Tokenizer failed to open file: open\($f\) failed: / );
 }

@@ -193,7 +193,7 @@ sub new {
 			$self->{source} = $$source;
 		} else {
 			# Errors returned as a string
-			return( $source );
+			PPI::Exception->throw("Tokenizer failed to open file: $source");
 		}
 
 	} elsif ( _SCALAR0($_[1]) ) {
