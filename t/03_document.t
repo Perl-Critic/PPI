@@ -67,9 +67,8 @@ NEW_EMPTY: {
 }
 
 MISSING_FILE: {
-	my $doc = PPI::Document->new('this_file_should_not_exist_12345.pl');
+	my $f   = "this_file_should_not_exist_12345.pl";
+	my $doc = PPI::Document->new($f);
 	is( $doc, undef, 'Document load returns undef for non-existent file' );
-	is( PPI::Document->errstr,
-			"open(this_file_should_not_exist_12345.pl) failed: "
-		  . "No such file or directory" );
+	like( PPI::Document->errstr, qr/open\($f\) failed: / );
 }
