@@ -37,7 +37,7 @@ use strict;
 use Carp           ();
 use PPI::Structure ();
 
-our $VERSION = '1.286';
+our $VERSION = '1.287';
 
 our @ISA = "PPI::Structure";
 

@@ -47,7 +47,7 @@ L<PPI::Element>.
 use strict;
 use PPI::Statement ();
 
-our $VERSION = '1.286';
+our $VERSION = '1.287';
 
 our @ISA = "PPI::Statement";
 

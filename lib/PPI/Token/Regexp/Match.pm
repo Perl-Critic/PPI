@@ -44,7 +44,7 @@ use strict;
 use PPI::Token::Regexp             ();
 use PPI::Token::_QuoteEngine::Full ();
 
-our $VERSION = '1.286';
+our $VERSION = '1.287';
 
 our @ISA = qw{
 	PPI::Token::_QuoteEngine::Full
