@@ -11,7 +11,7 @@ jobs:
     container:
       image: perldocker/perl-tester:5.36
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - name: Run Tests
         env:
           AUTHOR_TESTING: 0
