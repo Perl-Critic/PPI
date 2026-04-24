@@ -5,12 +5,21 @@ updates:
   schedule:
     # Check for updates to GitHub Actions every week
     interval: "weekly"
+  groups:
+    github-actions:
+      patterns:
+      - "*"
 - package-ecosystem: npm
   directory: "/"
   schedule:
     interval: daily
     time: "10:00"
   open-pull-requests-limit: 10
+  groups:
+    npm-minor-and-patch:
+      update-types:
+      - "minor"
+      - "patch"
   ignore:
   - dependency-name: acorn
     versions:
