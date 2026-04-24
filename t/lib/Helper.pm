@@ -21,6 +21,7 @@ easier testing.
 =cut
 
 sub safe_new {
+	local $Test::Builder::Level = $Test::Builder::Level + 1;
 	my $Document = PPI::Document->new(@_);
 	my $errstr   = PPI::Document->errstr;
 	PPI::Document->_clear;
