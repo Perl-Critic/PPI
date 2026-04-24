@@ -1,6 +1,9 @@
 Revision history for Perl extension PPI
 
-{{$NEXT}}
+1.286   2026-04-24 13:35:14Z
+	- fix for performance degradation on initial parse
+	  (GH#318) (Lukas Mai (mauke))
+	- better reporting of Document->new input errors
 
 1.285   2026-04-23 15:30:36Z
 	- add support for dotted bitwise operators (GH#322) (Philippe Bruhat (BooK))
