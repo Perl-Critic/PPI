@@ -1515,7 +1515,7 @@ sub _buffer {
 
 # Set the error message
 sub _error {
-	$errstr = $_[1];
+	$errstr = "Lexer failed: $_[1]";
 	undef;
 }
 

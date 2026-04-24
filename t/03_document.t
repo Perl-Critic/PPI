@@ -71,5 +71,5 @@ MISSING_FILE: {
 	my $doc = PPI::Document->new($f);
 	is( $doc, undef, 'Document load returns undef for non-existent file' );
 	like( PPI::Document->errstr,
-		qr/Tokenizer failed to open file: open\($f\) failed: / );
+		qr/Lexer failed: Tokenizer failed to open file: open\($f\) failed: / );
 }

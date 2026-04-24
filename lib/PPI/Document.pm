@@ -248,13 +248,13 @@ sub new {
 
 	# Pull and store the error from the lexer
 	my $errstr;
-	if ( _INSTANCE($@, 'PPI::Exception') ) {
+	if ( PPI::Lexer->errstr ) {
+		$errstr = PPI::Lexer->errstr;
+	} elsif ( _INSTANCE($@, 'PPI::Exception') ) {
 		$errstr = $@->message;
 	} elsif ( $@ ) {
 		$errstr = $@;
 		$errstr =~ s/\sat line\s.+$//;
-	} elsif ( PPI::Lexer->errstr ) {
-		$errstr = PPI::Lexer->errstr;
 	} else {
 		$errstr = "Unknown error parsing Perl document";
 	}

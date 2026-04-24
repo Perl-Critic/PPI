@@ -159,6 +159,10 @@ LEX_STRUCTURE: {
 ERROR_HANDLING: {
 	my $test_lexer = PPI::Lexer->new;
 	is $test_lexer->errstr, "", "errstr is an empty string at the start";
-	is $test_lexer->lex_file( undef ), undef, "lex_file fails without a filename";
-	is( PPI::Lexer->errstr, "Did not pass a filename to PPI::Lexer::lex_file", "error can be gotten from class attribute" );
+	is $test_lexer->lex_file(undef), undef, "lex_file fails without a filename";
+	is(
+		PPI::Lexer->errstr,
+		"Lexer failed: Did not pass a filename to PPI::Lexer::lex_file",
+		"error can be gotten from class attribute"
+	);
 }
