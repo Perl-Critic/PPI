@@ -1,5 +1,7 @@
 Revision history for Perl extension PPI
 
+{{$NEXT}}
+
 1.285   2026-04-23 15:30:36Z
 	- add support for dotted bitwise operators (GH#322) (Philippe Bruhat (BooK))
 	- file opening errors are now reported usefully by PPI::Document
