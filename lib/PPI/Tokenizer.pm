@@ -200,7 +200,7 @@ sub new {
 		$self->{source} = ${$_[1]};
 
 	} elsif ( _ARRAY0($_[1]) ) {
-		$self->{source} = join '', map { "\n" } @{$_[1]};
+		$self->{source} = join '', map "$_\n", @{$_[1]};
 
 	} else {
 		# We don't support whatever this is
