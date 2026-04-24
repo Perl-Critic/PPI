@@ -82,7 +82,7 @@ jobs:
           name: build_dir
           path: .
       - name: install deps using cpanm
-        uses: perl-actions/install-with-cpanm@v1
+        uses: perl-actions/install-with-cpanm@v2
         with:
           args: " --installdeps ."
       - name: Run tests
@@ -124,7 +124,7 @@ jobs:
           name: build_dir
           path: .
       - name: install deps using cpanm
-        uses: perl-actions/install-with-cpanm@v1
+        uses: perl-actions/install-with-cpanm@v2
         with:
           args: " --verbose --installdeps ."
       - run: prove -lr t
@@ -160,7 +160,7 @@ jobs:
           name: build_dir
           path: .
       - name: install deps using cpanm
-        uses: perl-actions/install-with-cpanm@v1
+        uses: perl-actions/install-with-cpanm@v2
         with:
           args: " --installdeps ."
       - run: prove -lr t
