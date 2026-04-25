@@ -15,7 +15,7 @@ use Safe::Isa '$_call_if_object';
 
 __PACKAGE__->run unless caller;
 
-sub exclusions {
+sub exclusions {    # this lists USERs of ppi, their DEPs go below
     qr@^(
         # don't remember why i excluded these
         Apache2-SSI|Devel-IPerl|Padre
@@ -25,7 +25,7 @@ sub exclusions {
         |Devel-ebug-HTTP|Padre-Plugin-ParserTool|Devel-PerlySense|PPI-Tester
         |Acme-ReturnValue|Bot-BasicBot-Pluggable-Module-Gitbot|Pinwheel
         |Dist-Zilla-Plugin-MetaProvides-Package|Dist-Zilla-Plugin-Readme-Brief
-        |Apache2-PPI-HTML
+        |Apache2-PPI-HTML|Net-Kafka-Producer-Avro|App-DrivePlayer
         # author parsing issue
         |Spellunker-Perl
         # takes too long
@@ -74,7 +74,7 @@ sub exclusions {
     )$@x
 }
 
-sub cpm_install_fails {
+sub cpm_install_fails {    # this lists first-level DEPs of USERs
     qr@^(
         Apache2::Const | AptPkg::Cache | AptPkg::Config | BSON::XS | Code::Splice
         | Config::ApacheFile | Data::Dump::Steamer | Devel::MyDebugger
