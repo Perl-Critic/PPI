@@ -60,7 +60,7 @@ use PPI             ();
 use PPI::Exception  ();
 use PPI::Singletons '%_PARENT';
 
-our $VERSION = '1.289';
+our $VERSION = '1.290';
 
 our $errstr = "";
 
