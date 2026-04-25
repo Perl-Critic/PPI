@@ -55,7 +55,7 @@ use Params::Util    qw{_INSTANCE _CLASS _CODELIKE _NUMBER};
 use PPI::Element    ();
 use PPI::Singletons '%_PARENT', '%_POSITION_CACHE';
 
-our $VERSION = '1.288';
+our $VERSION = '1.289';
 
 our @ISA = "PPI::Element";
 

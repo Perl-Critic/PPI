@@ -1,5 +1,7 @@
 Revision history for Perl extension PPI
 
+{{$NEXT}}
+
 1.288   2026-04-25 13:50:04Z
 	- fix two misbehaviors of location indexing code (GH#326) (myrrhlin)
 
