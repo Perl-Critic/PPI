@@ -4,7 +4,7 @@
 
 use lib 't/lib';
 use PPI::Test::pragmas;
-use Test::More tests => 24 + ( $ENV{AUTHOR_TESTING} ? 1 : 0 );
+use Test::More tests => 25 + ( $ENV{AUTHOR_TESTING} ? 1 : 0 );
 
 use File::Spec::Functions qw( catfile );
 use PPI ();
@@ -72,4 +72,8 @@ MISSING_FILE: {
 	is( $doc, undef, 'Document load returns undef for non-existent file' );
 	like( PPI::Document->errstr,
 		qr/Lexer failed: Tokenizer failed to open file: open\($f\) failed: / );
+}
+
+DOUBLE_REF: {
+	ok !PPI::Document->new( \\"3" ), "double-referenced input fails";
 }
