@@ -146,10 +146,10 @@ Setting feature_mods with a hashref allows defining perl parsing features to be
 enabled for the whole document. (e.g. when the code is assumed to be run as a
 oneliner)
 
-=head3 custom_feature_includes
+=head3 custom_feature_includes { custom_pragma => { feature => provider } }
 
   custom_feature_includes =>
-    { MyStrict => { signatures => "Syntax::Keyword::Try" } }
+    { MyStrict => { try => "Syntax::Keyword::Try" } }
 
 Setting custom_feature_includes with a hashref allows defining include names
 which act like pragmas that enable parsing features within their scope.
