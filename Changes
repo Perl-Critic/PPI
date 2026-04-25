@@ -1,6 +1,7 @@
 Revision history for Perl extension PPI
 
-{{$NEXT}}
+1.288   2026-04-25 13:50:04Z
+	- fix two misbehaviors of location indexing code (GH#326) (myrrhlin)
 
 1.287   2026-04-25 09:50:16Z
 	- improve parse performance impact of feature tracking even more with
