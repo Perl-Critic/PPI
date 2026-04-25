@@ -25,7 +25,7 @@ sub exclusions {
         |Devel-ebug-HTTP|Padre-Plugin-ParserTool|Devel-PerlySense|PPI-Tester
         |Acme-ReturnValue|Bot-BasicBot-Pluggable-Module-Gitbot|Pinwheel
         |Dist-Zilla-Plugin-MetaProvides-Package|Dist-Zilla-Plugin-Readme-Brief
-        |Apache2-PPI-HTML
+        |Apache2-PPI-HTML|Glib-Object-Introspection|Net-Kafka
         # author parsing issue
         |Spellunker-Perl
         # takes too long
