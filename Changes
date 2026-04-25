@@ -1,6 +1,7 @@
 Revision history for Perl extension PPI
 
-{{$NEXT}}
+1.291   2026-04-25 21:05:04Z
+	- fail parse on double-referenced input
 
 1.290   2026-04-25 14:12:21Z
 	- docs fix
