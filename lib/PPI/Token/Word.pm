@@ -39,7 +39,7 @@ use strict;
 use PPI::Token ();
 use PPI::Singletons qw' %OPERATOR %QUOTELIKE %KEYWORDS ';
 
-our $VERSION = '1.291';
+our $VERSION = '1.292';
 
 our @ISA = "PPI::Token";
 
