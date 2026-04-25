@@ -1,6 +1,8 @@
 Revision history for Perl extension PPI
 
-{{$NEXT}}
+1.287   2026-04-25 09:50:16Z
+	- improve parse performance impact of feature tracking even more with
+	  a parse stack cache (GH#318) (Lukas Mai (mauke))
 
 1.286   2026-04-24 13:35:14Z
 	- fix for performance degradation on initial parse
