@@ -149,7 +149,7 @@ oneliner)
 =head3 custom_feature_includes
 
   custom_feature_includes =>
-    { strEct => { signatures => "Syntax::Keyword::Try" } }
+    { MyStrict => { signatures => "Syntax::Keyword::Try" } }
 
 Setting custom_feature_includes with a hashref allows defining include names
 which act like pragmas that enable parsing features within their scope.
@@ -159,17 +159,17 @@ This is mostly useful when your work project has its own boilerplate module.
 It can also be provided as JSON or YAML in the environment variable
 PPI_CUSTOM_FEATURE_INCLUDES, like so:
 
-  PPI_CUSTOM_FEATURE_INCLUDES='strEct: {signatures: perl}' \
+  PPI_CUSTOM_FEATURE_INCLUDES='MyStrict: {signatures: perl}' \
     perlcritic lib/OurModule.pm
 
-  PPI_CUSTOM_FEATURE_INCLUDES='{"strEct":{"signatures":"perl"}}' \
+  PPI_CUSTOM_FEATURE_INCLUDES='{"MyStrict":{"signatures":"perl"}}' \
     perlcritic lib/OurModule.pm
 
 =head3 custom_feature_include_cb
 
   custom_feature_include_cb => sub {
     my ($statement) = @_;
-    return $statement->module eq "strEct" ? { signatures => "perl" } : ();
+    return $statement->module eq "MyStrict" ? { signatures => "perl" } : ();
   },
 
 Setting custom_feature_include_cb with a code reference causes all inspections

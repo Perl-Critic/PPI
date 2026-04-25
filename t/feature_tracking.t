@@ -204,16 +204,16 @@ END_PERL
 
 HOMEBREW_ARGS: {
 	test_document
-	  [ custom_feature_includes => { strEct => { signatures => 1 } } ],
+	  [ custom_feature_includes => { MyStrict => { signatures => 1 } } ],
 	  <<'END_PERL',
-		use strEct;
+		use MyStrict;
 		sub meep($) {}
 		sub marp($left, $right) {}
 END_PERL
 	  [
-		'PPI::Statement::Include',    'use strEct;',
+		'PPI::Statement::Include',    'use MyStrict;',
 		'PPI::Token::Word',           'use',
-		'PPI::Token::Word',           'strEct',
+		'PPI::Token::Word',           'MyStrict',
 		'PPI::Token::Structure',      ';',
 		'PPI::Statement::Sub',        'sub meep($) {}',
 		'PPI::Token::Word',           'sub',
@@ -244,17 +244,17 @@ END_PERL
 }
 
 ENV_HOMEBREW_ARGS: {
-	local $ENV{PPI_CUSTOM_FEATURE_INCLUDES} = "strEct: {signatures: perl}";
+	local $ENV{PPI_CUSTOM_FEATURE_INCLUDES} = "MyStrict: {signatures: perl}";
 	test_document
 	  <<'END_PERL',
-		use strEct;
+		use MyStrict;
 		sub meep($) {}
 		sub marp($left, $right) {}
 END_PERL
 	  [
-		'PPI::Statement::Include',    'use strEct;',
+		'PPI::Statement::Include',    'use MyStrict;',
 		'PPI::Token::Word',           'use',
-		'PPI::Token::Word',           'strEct',
+		'PPI::Token::Word',           'MyStrict',
 		'PPI::Token::Structure',      ';',
 		'PPI::Statement::Sub',        'sub meep($) {}',
 		'PPI::Token::Word',           'sub',
@@ -290,20 +290,20 @@ HOMEBREW_CB: {
 		custom_feature_include_cb => sub {
 			my ($inc) = @_;
 			my ($arg) = $inc->arguments;
-			return ( $inc->module eq "strEct" and $arg->string eq "sigg" )
+			return ( $inc->module eq "MyStrict" and $arg->string eq "sigg" )
 			  ? { signatures => 1 }
 			  : ();
 		}
 	  ],
 	  <<'END_PERL',
-		use strEct "sigg";
+		use MyStrict "sigg";
 		sub meep($) {}
 		sub marp($left, $right) {}
 END_PERL
 	  [
-		'PPI::Statement::Include',    'use strEct "sigg";',
+		'PPI::Statement::Include',    'use MyStrict "sigg";',
 		'PPI::Token::Word',           'use',
-		'PPI::Token::Word',           'strEct',
+		'PPI::Token::Word',           'MyStrict',
 		'PPI::Token::Quote::Double',  '"sigg"',
 		'PPI::Token::Structure',      ';',
 		'PPI::Statement::Sub',        'sub meep($) {}',
