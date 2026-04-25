@@ -40,7 +40,7 @@ to, or the structure to break out of.
 use strict;
 use PPI::Statement ();
 
-our $VERSION = '1.290';
+our $VERSION = '1.291';
 
 our @ISA = "PPI::Statement";
 

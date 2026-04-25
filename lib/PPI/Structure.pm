@@ -95,7 +95,7 @@ use PPI::Node      ();
 use PPI::Exception ();
 use PPI::Singletons '%_PARENT';
 
-our $VERSION = '1.290';
+our $VERSION = '1.291';
 
 our @ISA = "PPI::Node";
 
