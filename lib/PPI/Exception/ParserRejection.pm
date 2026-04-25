@@ -3,7 +3,7 @@ package PPI::Exception::ParserRejection;
 use strict;
 use PPI::Exception ();
 
-our $VERSION = '1.287';
+our $VERSION = '1.288';
 
 our @ISA = 'PPI::Exception';
 

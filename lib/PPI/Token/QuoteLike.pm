@@ -48,7 +48,7 @@ PPI's quote engine.
 use strict;
 use PPI::Token ();
 
-our $VERSION = '1.287';
+our $VERSION = '1.288';
 
 our @ISA = "PPI::Token";
 
