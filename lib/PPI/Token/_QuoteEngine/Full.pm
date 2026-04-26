@@ -379,6 +379,99 @@ sub _fill_braced {
 
 
 #####################################################################
+# Overrides PPI::Token::set_content to reparse section metadata
+
+sub set_content {
+	my ( $self, $content ) = @_;
+	$self->{content} = $content;
+
+	my $sections = $self->{sections} or return;
+	my $pos = 0;
+
+	if ( defined $self->{operator} ) {
+		$pos += length $self->{operator};
+		$pos++ while $pos < length($content)
+			&& substr( $content, $pos, 1 ) =~ /\s/;
+	}
+
+	my $need_skip_delim = 1;
+
+	for my $i ( 0 .. $self->{_sections} - 1 ) {
+		my $section = $sections->[$i] or next;
+		my ( $open, $close, $is_braced );
+		if ( defined $section->{type} && length $section->{type} >= 2 ) {
+			( $open, $close ) = split //, $section->{type};
+			$is_braced = $open ne $close;
+		}
+		else {
+			$open = $close = $self->{separator};
+			$is_braced = 0;
+		}
+
+		if ( $is_braced ) {
+			$pos++;
+			my $sec_start = $pos;
+
+			my $depth = 1;
+			while ( $pos < length($content) && $depth > 0 ) {
+				my $ch = substr( $content, $pos, 1 );
+				if ( $ch eq '\\' ) {
+					$pos += 2;
+					next;
+				}
+				if ( $ch eq $open ) {
+					$depth++;
+				}
+				elsif ( $ch eq $close ) {
+					$depth--;
+					last if $depth == 0;
+				}
+				$pos++;
+			}
+
+			$section->{position} = $sec_start;
+			$section->{size}     = $pos - $sec_start;
+			$pos++;
+
+			$pos++ while $pos < length($content)
+				&& substr( $content, $pos, 1 ) =~ /\s/;
+
+			$need_skip_delim = 1;
+		}
+		else {
+			$pos++ if $need_skip_delim;
+			my $sec_start = $pos;
+
+			while ( $pos < length($content) ) {
+				my $ch = substr( $content, $pos, 1 );
+				if ( $ch eq '\\' ) {
+					$pos += 2;
+					next;
+				}
+				last if $ch eq $open;
+				$pos++;
+			}
+
+			$section->{position} = $sec_start;
+			$section->{size}     = $pos - $sec_start;
+			$pos++;
+
+			$need_skip_delim = 0;
+		}
+	}
+
+	if ( $self->{modifiers} ) {
+		$self->{modifiers} = {};
+		while ( $pos < length($content) ) {
+			my $ch = substr( $content, $pos, 1 );
+			last unless $ch =~ /[^\W\d_]/;
+			$self->{modifiers}->{ lc $ch } = 1;
+			$pos++;
+		}
+	}
+}
+
+#####################################################################
 # Additional methods to find out about the quote
 
 # In a scalar context, get the number of sections
