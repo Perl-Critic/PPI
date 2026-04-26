@@ -7,7 +7,7 @@
 use if !(-e 'META.yml'), "Test::InDistDir";
 use lib 't/lib';
 use PPI::Test::pragmas;
-use Test::More tests => 1121 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+use Test::More tests => 1193 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use PPI ();
 use PPI::Test qw( pause );
