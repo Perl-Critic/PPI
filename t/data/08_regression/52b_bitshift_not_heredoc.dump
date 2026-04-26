@@ -1,0 +1,27 @@
+PPI::Document
+  PPI::Statement
+    PPI::Token::Symbol  	'$num'
+    PPI::Token::Whitespace  	' '
+    PPI::Token::Operator  	'|='
+    PPI::Token::Whitespace  	' '
+    PPI::Structure::List  	( ... )
+      PPI::Statement::Expression
+        PPI::Token::Number  	'1'
+        PPI::Token::Operator  	'<<'
+        PPI::Token::Word  	'index'
+        PPI::Structure::List  	( ... )
+          PPI::Statement::Expression
+            PPI::Token::Symbol  	'$D_flags'
+            PPI::Token::Operator  	','
+            PPI::Token::Whitespace  	' '
+            PPI::Token::Magic  	'$_'
+    PPI::Token::Whitespace  	' '
+    PPI::Token::Word  	'for'
+    PPI::Token::Whitespace  	' '
+    PPI::Token::Word  	'split'
+    PPI::Token::Whitespace  	' '
+    PPI::Token::Regexp::Match  	'//'
+    PPI::Token::Operator  	','
+    PPI::Token::Whitespace  	' '
+    PPI::Token::Symbol  	'$on'
+    PPI::Token::Structure  	';'

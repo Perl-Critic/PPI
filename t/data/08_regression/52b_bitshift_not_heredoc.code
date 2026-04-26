@@ -1,0 +1,1 @@
+$num |= (1<<index($D_flags, $_)) for split //, $on;

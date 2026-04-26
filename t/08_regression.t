@@ -7,7 +7,7 @@
 use if !(-e 'META.yml'), "Test::InDistDir";
 use lib 't/lib';
 use PPI::Test::pragmas;
-use Test::More tests => 1133 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+use Test::More tests => 1187 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use PPI ();
 use PPI::Test qw( pause );
@@ -376,7 +376,6 @@ END_PERL
 # GitHub #183: << after a number should be bit shift, not heredoc
 
 {
-	local $TODO = "GitHub #183: 1<<bar() incorrectly parsed as heredoc";
 	my $doc = safe_new \"1<<bar()";
 	my $heredocs = $doc->find('PPI::Token::HereDoc');
 	is( $heredocs, '', '1<<bar() has no HereDoc token' );
@@ -385,7 +384,6 @@ END_PERL
 }
 
 {
-	local $TODO = "GitHub #183: 1<<index(...) incorrectly parsed as heredoc";
 	my $doc = safe_new \'$num |= (1<<index($D_flags, $_)) for split //, $on;';
 	my $heredocs = $doc->find('PPI::Token::HereDoc');
 	is( $heredocs, '', '1<<index() in expression has no HereDoc token' );
@@ -394,7 +392,6 @@ END_PERL
 }
 
 {
-	local $TODO = "GitHub #183: 1<<bar() inside sub incorrectly parsed as heredoc";
 	my $doc = safe_new \"sub foo {\n    1<<bar();\n}";
 	my $heredocs = $doc->find('PPI::Token::HereDoc');
 	is( $heredocs, '', '1<<bar() inside sub has no HereDoc token' );
