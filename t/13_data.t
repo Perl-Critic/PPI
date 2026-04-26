@@ -4,7 +4,7 @@
 
 use lib 't/lib';
 use PPI::Test::pragmas;
-use Test::More tests => 8 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+use Test::More tests => 9 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use File::Spec::Functions qw( catfile );
 use PPI ();
@@ -23,6 +23,11 @@ isa_ok( $Token, 'PPI::Token::Data' );
 # Get the handle
 my $handle = $Token->handle;
 isa_ok( $handle, "$]" < 5.008 ? 'IO::String' : 'GLOB' );
+
+TODO: {
+	local $TODO = "bump minimum Perl version to 5.008 and remove IO::String support";
+	ok( !$INC{'IO/String.pm'}, 'IO::String is not loaded' );
+}
 
 # Try to read a line off the handle
 my $line = <$handle>;
