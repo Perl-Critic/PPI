@@ -33,11 +33,7 @@ plan skip_all => 'No distribution metadata files found (not running in build dir
 
 plan tests => scalar @files;
 
-TODO: {
-	local $TODO = 'GH #167: file permissions not yet normalized in dist';
-
-	for my $file (@files) {
-		my $mode = (stat $file)[2] & 07777;
-		ok( !($mode & 0111), "$file is not executable (mode " . sprintf('%04o', $mode) . ")" );
-	}
+for my $file (@files) {
+	my $mode = (stat $file)[2] & 07777;
+	ok( !($mode & 0111), "$file is not executable (mode " . sprintf('%04o', $mode) . ")" );
 }
