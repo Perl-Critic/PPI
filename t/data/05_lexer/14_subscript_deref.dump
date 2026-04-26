@@ -1,0 +1,37 @@
+PPI::Document
+  PPI::Statement
+    PPI::Token::Cast  	'$'
+    PPI::Token::Symbol  	'$arr'
+    PPI::Structure::Subscript  	[ ... ]
+      PPI::Statement::Expression
+        PPI::Token::Number  	'0'
+    PPI::Token::Structure  	';'
+  PPI::Token::Whitespace  	'\n'
+  PPI::Statement
+    PPI::Token::Cast  	'$'
+    PPI::Structure::Block  	{ ... }
+      PPI::Statement
+        PPI::Token::Symbol  	'$arr'
+    PPI::Structure::Subscript  	[ ... ]
+      PPI::Statement::Expression
+        PPI::Token::Number  	'0'
+    PPI::Token::Structure  	';'
+  PPI::Token::Whitespace  	'\n'
+  PPI::Statement
+    PPI::Token::Cast  	'@'
+    PPI::Token::Symbol  	'$arr'
+    PPI::Structure::Subscript  	[ ... ]
+      PPI::Statement::Expression
+        PPI::Token::Number  	'0'
+    PPI::Token::Structure  	';'
+  PPI::Token::Whitespace  	'\n'
+  PPI::Statement
+    PPI::Token::Cast  	'@'
+    PPI::Structure::Block  	{ ... }
+      PPI::Statement
+        PPI::Token::Symbol  	'$arr'
+    PPI::Structure::Subscript  	[ ... ]
+      PPI::Statement::Expression
+        PPI::Token::Number  	'0'
+    PPI::Token::Structure  	';'
+  PPI::Token::Whitespace  	'\n'
