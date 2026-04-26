@@ -4,11 +4,26 @@
 
 use lib 't/lib';
 use PPI::Test::pragmas;
-use Test::More tests => 9 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+use Test::More tests => 9 + 11 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use PPI ();
 use Helper 'safe_new';
 
+
+GET_DELIMITERS: {
+	my $Document = safe_new \"print qq{foo}, qq!bar!, qq <foo>;";
+	my $Interpolate = $Document->find('Token::Quote::Interpolate');
+	ok $Interpolate->[0]->can('get_delimiters'), 'get_delimiters method exists';
+	is( ( $Interpolate->[0]->get_delimiters )[0], "{}", "qq{} delimiters" );
+	is( ( $Interpolate->[1]->get_delimiters )[0], "!!", "qq!! delimiters" );
+	is( ( $Interpolate->[2]->get_delimiters )[0], "<>", "qq<> delimiters" );
+	is scalar( $Interpolate->[0]->get_delimiters ), 1, "qq returns exactly one delimiter pair";
+
+	my $d2 = safe_new \"qq/foo/";
+	my $qq = $d2->find_first('Token::Quote::Interpolate');
+	ok $qq, 'found qq/.../ token';
+	is( ( $qq->get_delimiters )[0], "//", "qq// delimiters" );
+}
 
 STRING: {
 	my $Document = safe_new \"print qq{foo}, qq!bar!, qq <foo>;";

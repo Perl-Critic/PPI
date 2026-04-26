@@ -4,10 +4,10 @@
 
 use lib 't/lib';
 use PPI::Test::pragmas;
-use Test::More tests => 2425 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+use Test::More tests => 2425 + 24 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use PPI ();
-use Helper 'safe_new';
+use Helper qw( safe_new check_with );
 
 sub permute_test;
 sub assemble_and_run;
@@ -95,6 +95,40 @@ LITERAL: {
 	assemble_and_run '',   ['a'], $bs, '',   ' ',  $bs, ['a'];
 	assemble_and_run ' ',  ['a'], $bs, '',   ' ',  $bs, ['a'];
 	assemble_and_run "\n", ['a'], $bs, '',   ' ',  $bs, ['a'];
+}
+
+GET_DELIMITERS: {
+	check_with 'qw(a b c)', sub {
+		my $qw = $_->find_first( 'Token::QuoteLike::Words' );
+		ok $qw, 'found qw token with parens';
+		ok $qw->can('get_delimiters'), 'get_delimiters method exists';
+		is( ( $qw->get_delimiters )[0], "()", "qw() delimiters" );
+	};
+	check_with 'qw{a b c}', sub {
+		my $qw = $_->find_first( 'Token::QuoteLike::Words' );
+		is( ( $qw->get_delimiters )[0], "{}", "qw{} delimiters" );
+	};
+	check_with 'qw[a b c]', sub {
+		my $qw = $_->find_first( 'Token::QuoteLike::Words' );
+		is( ( $qw->get_delimiters )[0], "[]", "qw[] delimiters" );
+	};
+	check_with 'qw<a b c>', sub {
+		my $qw = $_->find_first( 'Token::QuoteLike::Words' );
+		is( ( $qw->get_delimiters )[0], "<>", "qw<> delimiters" );
+	};
+	check_with 'qw/a b c/', sub {
+		my $qw = $_->find_first( 'Token::QuoteLike::Words' );
+		is( ( $qw->get_delimiters )[0], "//", "qw// delimiters" );
+	};
+	check_with 'qw!a b c!', sub {
+		my $qw = $_->find_first( 'Token::QuoteLike::Words' );
+		is( ( $qw->get_delimiters )[0], "!!", "qw!! delimiters" );
+	};
+	check_with 'my @a = qw(a b c);', sub {
+		my $qw = $_->find_first( 'Token::QuoteLike::Words' );
+		is( ( $qw->get_delimiters )[0], "()", "qw() delimiters in statement" );
+		is scalar( $qw->get_delimiters ), 1, "qw returns exactly one delimiter pair";
+	};
 }
 
 sub execute_test {

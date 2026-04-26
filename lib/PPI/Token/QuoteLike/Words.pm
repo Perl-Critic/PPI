@@ -38,6 +38,19 @@ our @ISA = qw{
 
 =pod
 
+=head2 get_delimiters
+
+The C<get_delimiters> method returns the delimiters of the word list as an
+array. The first and only element is the delimiters of the word list content.
+
+=cut
+
+sub get_delimiters {
+	return $_[0]->_delimiters();
+}
+
+=pod
+
 =head2 literal
 
 Returns the words contained as a list.  Note that this method does not check the
