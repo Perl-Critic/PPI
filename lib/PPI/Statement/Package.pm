@@ -48,6 +48,17 @@ our @ISA = "PPI::Statement";
 # Lexer clues
 sub __LEXER__normal() { '' }
 
+sub _complete {
+	my $child = $_[0]->schild(-1);
+	return '' if !defined $child;
+	return 1 if $child->isa('PPI::Structure::Block') and $child->complete;
+	return !! (
+		$child->isa('PPI::Token::Structure')
+		and
+		$child->content eq ';'
+	);
+}
+
 =pod
 
 =head2 namespace

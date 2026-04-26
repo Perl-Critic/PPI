@@ -130,8 +130,6 @@ BLOCK_FORM_PACKAGE_COMPLETE: {
 	my $pkg_semi = $doc_semi->find_first('PPI::Statement::Package');
 	ok( $pkg_semi->_complete, 'semicolon-form package is _complete' );
 
-	local $TODO = "block-form package _complete not yet implemented";
-
 	my $doc_block = safe_new \"package Foo { 1 }";
 	my $pkg_block = $doc_block->find_first('PPI::Statement::Package');
 	ok( $pkg_block->_complete, 'block-form package is _complete' );
