@@ -79,7 +79,6 @@ DOUBLE_REF: {
 }
 
 NON_STRING_IN_SCALAR_REF: {
-	local $TODO = "ref check incomplete, only catches scalar refs";
 	my $aref = [1, 2, 3];
 	ok !PPI::Document->new( \$aref ), "array ref inside scalar ref fails";
 	my $href = { a => 1 };
