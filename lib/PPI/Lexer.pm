@@ -1342,6 +1342,7 @@ sub _lex_structure {
 		# Is this the close of a structure ( which would be an error )
 		if ( $Token->__LEXER__closes ) {
 			pop @{$self->{features_stack}};
+			$self->{Tokenizer}->_features( $self->{features_stack}[-1] || {} );
 
 			# Is this OUR closing structure
 			if ( $Token->content eq $Structure->start->__LEXER__opposite ) {
@@ -1388,6 +1389,7 @@ sub _lex_structure {
 	}
 
 	pop @{$self->{features_stack}};
+	$self->{Tokenizer}->_features( $self->{features_stack}[-1] || {} );
 
 	# No, it's just the end of file.
 	# Add any insignificant trailing tokens.

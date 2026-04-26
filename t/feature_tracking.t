@@ -434,7 +434,6 @@ SIMPLE_LIST: {
 }
 
 FEATURE_SCOPING_ACROSS_BLOCKS: {
-	local $TODO = "features_stack pop does not update Tokenizer";
 	test_document
 	  "use feature 'signatures';\nsub foo (\$x) {}\n{\nno feature 'signatures';\nsub bar (\$x) {}\n}\nsub baz (\$x) {}\n",
 	  [
