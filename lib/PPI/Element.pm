@@ -505,22 +505,25 @@ sub clone {
 
 =pod
 
-=head2 insert_before @Elements
+=head2 insert_before $Element
 
-The C<insert_before> method allows you to insert lexical perl content, in
-the form of C<PPI::Element> objects, before the calling C<Element>. You
-need to be very careful when modifying perl code, as it's easy to break
-things.
+The C<insert_before> method allows you to insert a single C<PPI::Element>
+object before the calling C<Element>. You need to be very careful when
+modifying perl code, as it's easy to break things.
 
-In its initial incarnation, this method allows you to insert a single
-Element, and will perform some basic checking to prevent you inserting
-something that would be structurally wrong (in PDOM terms).
+Some basic checking is performed to prevent you inserting something that
+would be structurally wrong (in PDOM terms). The allowed element types
+depend on the class of the calling element (e.g. a L<PPI::Statement>
+will accept another Statement or a non-significant L<PPI::Token> such as
+whitespace).
 
-In future, this method may be enhanced to allow the insertion of multiple
-Elements, inline-parsed code strings or L<PPI::Document::Fragment> objects.
+The C<$Element> to be inserted must be a detached element (not already part
+of a PDOM tree). If you want to move an existing element, call
+C<< $element->remove >> on it first, then insert the return value.
 
-Returns true if the Element was inserted, false if it can not be inserted,
-or C<undef> if you do not provide a C<PPI::Element> object as a parameter.
+Returns C<1> if the C<Element> was inserted, C<''> (empty string) if the
+element type is not allowed at this location, or C<undef> if you do not
+provide a L<PPI::Element> object as a parameter.
 
 =cut
 
@@ -531,21 +534,25 @@ sub __insert_before {
 
 =pod
 
-=head2 insert_after @Elements
+=head2 insert_after $Element
 
-The C<insert_after> method allows you to insert lexical perl content, in
-the form of C<PPI::Element> objects, after the calling C<Element>. You need
-to be very careful when modifying perl code, as it's easy to break things.
+The C<insert_after> method allows you to insert a single C<PPI::Element>
+object after the calling C<Element>. You need to be very careful when
+modifying perl code, as it's easy to break things.
 
-In its initial incarnation, this method allows you to insert a single
-Element, and will perform some basic checking to prevent you inserting
-something that would be structurally wrong (in PDOM terms).
+Some basic checking is performed to prevent you inserting something that
+would be structurally wrong (in PDOM terms). The allowed element types
+depend on the class of the calling element (e.g. a L<PPI::Statement>
+will accept another Statement or a non-significant L<PPI::Token> such as
+whitespace).
 
-In future, this method may be enhanced to allow the insertion of multiple
-Elements, inline-parsed code strings or L<PPI::Document::Fragment> objects.
+The C<$Element> to be inserted must be a detached element (not already part
+of a PDOM tree). If you want to move an existing element, call
+C<< $element->remove >> on it first, then insert the return value.
 
-Returns true if the Element was inserted, false if it can not be inserted,
-or C<undef> if you do not provide a C<PPI::Element> object as a parameter.
+Returns C<1> if the C<Element> was inserted, C<''> (empty string) if the
+element type is not allowed at this location, or C<undef> if you do not
+provide a L<PPI::Element> object as a parameter.
 
 =cut
 
