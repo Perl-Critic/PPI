@@ -4,7 +4,7 @@
 
 use lib 't/lib';
 use PPI::Test::pragmas;
-use Test::More tests => 8 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+use Test::More tests => 9 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use File::Spec::Functions qw( catfile );
 use PPI ();
@@ -22,7 +22,7 @@ isa_ok( $Token, 'PPI::Token::Data' );
 
 # Get the handle
 my $handle = $Token->handle;
-isa_ok( $handle, "$]" < 5.008 ? 'IO::String' : 'GLOB' );
+isa_ok( $handle, 'GLOB' );
 
 # Try to read a line off the handle
 my $line = <$handle>;
@@ -32,3 +32,14 @@ is( $line, "This is data\n", "Reading off a handle works as expected" );
 ok( $handle->print("Foo bar\n"), "handle->print returns ok" );
 is( $Token->content, "This is data\nFoo bar\nis\n",
 	"handle->print modifies the content as expected" );
+
+{
+	my $has_io_string_prereq = 0;
+	if ( open my $fh, '<', 'dist.ini' ) {
+		while ( my $line = <$fh> ) {
+			$has_io_string_prereq = 1 if $line =~ /IO::String/;
+		}
+	}
+	ok( !$has_io_string_prereq,
+		"dist.ini does not declare IO::String as a dynamic prereq" );
+}
