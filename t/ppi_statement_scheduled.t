@@ -48,8 +48,6 @@ sub test_sub_as {
 
 
 BAREWORD_FILEHANDLE: {
-	local $TODO = "GH #246 - scheduled keywords as bareword filehandles";
-
 	for my $name ( qw( BEGIN CHECK UNITCHECK INIT END ) ) {
 		my $code     = "open($name, '/foo');";
 		my $Document = safe_new \$code;
