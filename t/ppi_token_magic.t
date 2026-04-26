@@ -48,7 +48,6 @@ END_PERL
 }
 
 HASH_SLASH: {
-	local $TODO = '%/ not yet recognized as magic variable (GH #174)';
 	my $doc = safe_new \q{is_deeply \%/, $target;};
 	my $magic = $doc->find('PPI::Token::Magic');
 	is( ref $magic, 'ARRAY', '%/ is parsed as PPI::Token::Magic' );
