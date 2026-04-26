@@ -163,11 +163,8 @@ GH236_CURLY_IN_ARGLIST: {
 	my @curlies = grep { $_->braces eq '{}' }
 		@{ $doc->find('PPI::Structure') || [] };
 
-	{
-		local $TODO = "GH #236: curlies without => in function args should be Block";
-		isa_ok( $curlies[0], 'PPI::Structure::Block',
-			'{ bar() } in function args is Block' );
-	}
+	isa_ok( $curlies[0], 'PPI::Structure::Block',
+		'{ bar() } in function args is Block' );
 
 	isa_ok( $curlies[1], 'PPI::Structure::Constructor',
 		'{} in function args is Constructor' );

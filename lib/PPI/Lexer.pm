@@ -1255,9 +1255,33 @@ sub _curly {
 		return 'PPI::Structure::Block'
 			if $function and $function->content =~ /^(?:map|grep|sort|eval|do)$/;
 
-		# If not part of a block print, list-embedded curlies are most likely constructors
-		return 'PPI::Structure::Constructor'
-			if not $function or $function->content !~ /^(?:print|say)$/;
+		# For non-print/say functions, scan ahead for a fat comma (=>)
+		# at the top nesting level, which definitively indicates a hash
+		# constructor.  Without =>, fall through to the normal lookahead
+		# which defaults to Block for ambiguous cases (GH #236).
+		if ( not $function or $function->content !~ /^(?:print|say)$/ ) {
+			my @tokens;
+			my $depth = 0;
+			while ( my $tok = $self->_get_token ) {
+				push @tokens, $tok;
+				next unless $tok->significant;
+				my $c = $tok->content;
+				if ( $tok->isa('PPI::Token::Structure') ) {
+					if ( $c eq '{' or $c eq '(' or $c eq '[' ) {
+						$depth++;
+					}
+					elsif ( $c eq '}' or $c eq ')' or $c eq ']' ) {
+						last if $depth <= 0;
+						$depth--;
+					}
+				}
+				if ( $depth == 0 and $c eq '=>' ) {
+					$self->_buffer( splice @tokens );
+					return 'PPI::Structure::Constructor';
+				}
+			}
+			$self->_buffer( splice @tokens );
+		}
 	}
 
 	# We need to scan ahead.
