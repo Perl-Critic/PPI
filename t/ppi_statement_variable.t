@@ -61,17 +61,14 @@ VARIABLE_IN_BUILTIN_NO_PARENS: {
 	my $code = 'open my $fh, "<", "/etc/motd";';
 	my $doc = safe_new \$code;
 	is( $doc->serialize, $code, 'open my without parens: round-trip' );
-	{
-		local $TODO = 'GH #225: Variable not detected in open() without parens';
-		my $vars = $doc->find('Statement::Variable');
-		ok( ref $vars eq 'ARRAY' && @$vars == 1,
-			'open my without parens: found one Statement::Variable' );
-		is( ( ref $vars eq 'ARRAY' && @$vars ) ? $vars->[0]->type : undef,
-			'my', 'open my without parens: type is my' );
-		is_deeply(
-			( ref $vars eq 'ARRAY' && @$vars ) ? [ $vars->[0]->variables ] : [],
-			['$fh'], 'open my without parens: found $fh' );
-	}
+	my $vars = $doc->find('Statement::Variable');
+	ok( ref $vars eq 'ARRAY' && @$vars == 1,
+		'open my without parens: found one Statement::Variable' );
+	is( ( ref $vars eq 'ARRAY' && @$vars ) ? $vars->[0]->type : undef,
+		'my', 'open my without parens: type is my' );
+	is_deeply(
+		( ref $vars eq 'ARRAY' && @$vars ) ? [ $vars->[0]->variables ] : [],
+		['$fh'], 'open my without parens: found $fh' );
 }
 
 
@@ -80,14 +77,11 @@ VARIABLE_PRINT_MY: {
 	my $code = 'print my $x = 1;';
 	my $doc = safe_new \$code;
 	is( $doc->serialize, $code, 'print my: round-trip' );
-	{
-		local $TODO = 'GH #225: Variable not detected in print my';
-		my $vars = $doc->find('Statement::Variable');
-		ok( ref $vars eq 'ARRAY' && @$vars == 1,
-			'print my: found one Statement::Variable' );
-		is( ( ref $vars eq 'ARRAY' && @$vars ) ? $vars->[0]->type : undef,
-			'my', 'print my: type is my' );
-	}
+	my $vars = $doc->find('Statement::Variable');
+	ok( ref $vars eq 'ARRAY' && @$vars == 1,
+		'print my: found one Statement::Variable' );
+	is( ( ref $vars eq 'ARRAY' && @$vars ) ? $vars->[0]->type : undef,
+		'my', 'print my: type is my' );
 }
 
 

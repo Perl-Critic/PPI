@@ -58,6 +58,11 @@ Returns a string of the type, or C<undef> if the type cannot be detected
 
 =cut
 
+sub __LEXER__normal {
+	my $parent = $_[0]->parent;
+	return !( $parent and $parent->isa('PPI::Statement') );
+}
+
 sub type {
 	my $self = shift;
 

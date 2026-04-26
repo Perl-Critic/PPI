@@ -675,6 +675,22 @@ sub _lex_statement {
 
 		# Any normal character just gets added
 		unless ( $Token->isa('PPI::Token::Structure') ) {
+			# Detect variable declarations inside plain statements
+			# e.g. open my $fh, "<", $path;
+			if (
+				ref $Statement eq 'PPI::Statement'
+				and $Statement->schildren
+				and $Token->isa('PPI::Token::Word')
+				and $STATEMENT_CLASSES{$Token->content}
+				and $STATEMENT_CLASSES{$Token->content} eq 'PPI::Statement::Variable'
+				and $self->_peek_is_variable_declaration
+			) {
+				$self->_add_delayed( $Statement );
+				my $child = PPI::Statement::Variable->new($Token);
+				$self->_add_element( $Statement, $child );
+				$self->_lex_statement( $child );
+				next;
+			}
 			$self->_add_element( $Statement, $Token );
 			next;
 		}
@@ -752,6 +768,14 @@ sub _continues {
 		$Statement->schild(0)->isa('PPI::Structure::Block')
 	) {
 		return '';
+	}
+
+	# Variable statements nested inside other statements end at ';'
+	# (the ';' is rolled back so the parent statement can consume it)
+	if ( $Statement->isa('PPI::Statement::Variable')
+		and $Statement->parent
+		and $Statement->parent->isa('PPI::Statement') ) {
+		return !( $Token->isa('PPI::Token::Structure') and $Token->content eq ';' );
 	}
 
 	# Alrighty then, there are six implied-end statement types:
@@ -1511,6 +1535,32 @@ sub _buffer {
 
 
 
+
+
+# Peek at the next significant token to confirm a variable declaration
+# follows (symbol or open paren). Preserves the token stream state.
+sub _peek_is_variable_declaration {
+	my $self = shift;
+	my $saved_delayed = $self->{delayed};
+	$self->{delayed} = [];
+
+	my $result = 0;
+	my $Next;
+	while ( $Next = $self->_get_token ) {
+		unless ( $Next->significant ) {
+			push @{$self->{delayed}}, $Next;
+			next;
+		}
+		$result = 1 if
+			$Next->isa('PPI::Token::Symbol')
+			or ( $Next->isa('PPI::Token::Structure') and $Next->content eq '(' );
+		last;
+	}
+
+	$self->_rollback( $Next );
+	$self->{delayed} = $saved_delayed;
+	return $result;
+}
 
 
 #####################################################################
