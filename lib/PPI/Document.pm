@@ -243,7 +243,8 @@ sub new {
 		return $document if $document;
 
 	} elsif ( _ARRAY0($source) ) {
-		my $document = PPI::Lexer->lex_file( $source, %attr );
+		$source = join '', map { "$_\n" } @$source;
+		my $document = PPI::Lexer->lex_source( $source, %attr );
 		return $document if $document;
 
 	} else {
