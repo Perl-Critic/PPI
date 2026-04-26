@@ -1111,6 +1111,15 @@ sub _square {
 				return 'PPI::Structure::Subscript';
 			}
 		}
+		if ( $Element->isa('PPI::Structure::Block') ) {
+			if ( my $prior = $Parent->schild(-2) ) {
+				my $prior_content = $prior->content();
+				$prior->isa( 'PPI::Token::Cast' )
+					and ( $prior_content eq '@' ||
+						$prior_content eq '$' )
+					and return 'PPI::Structure::Subscript';
+			}
+		}
 		# FIXME - More cases to catch
 	}
 
