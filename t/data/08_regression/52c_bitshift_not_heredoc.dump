@@ -1,0 +1,16 @@
+PPI::Document
+  PPI::Statement::Sub
+    PPI::Token::Word  	'sub'
+    PPI::Token::Whitespace  	' '
+    PPI::Token::Word  	'foo'
+    PPI::Token::Whitespace  	' '
+    PPI::Structure::Block  	{ ... }
+      PPI::Token::Whitespace  	'\n'
+      PPI::Token::Whitespace  	'    '
+      PPI::Statement
+        PPI::Token::Number  	'1'
+        PPI::Token::Operator  	'<<'
+        PPI::Token::Word  	'bar'
+        PPI::Structure::List  	( ... )
+        PPI::Token::Structure  	';'
+      PPI::Token::Whitespace  	'\n'
