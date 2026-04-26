@@ -415,7 +415,6 @@ sub h {
 			}
 			SKIP: {
 				skip 'Damaged document', 1 if $test->{expected}{_damaged};
-				local $TODO = 'content() does not include heredoc body (GH #288)';
 				is( $document->content(), $test->{content}, 'Document content round-trips correctly' );
 			}
 
@@ -447,7 +446,6 @@ subtest 'GH #288: Document stringification preserves heredoc content' => sub {
 	my $content = "my \$heredoc = <<~HERE;\n\tLine 1\n\n\tLine 3\n\tHERE\n";
 	my $doc = safe_new \$content;
 
-	local $TODO = 'content() does not include heredoc body (GH #288)';
 	is( $doc->content, $content, 'content() round-trips heredoc document' );
 	is( "$doc", $content, 'stringification round-trips heredoc document' );
 };

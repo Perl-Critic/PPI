@@ -455,19 +455,25 @@ sub save {
 
 =pod
 
+=head2 content
+
+The C<content> method for C<PPI::Document> is equivalent to C<serialize>.
+This ensures that stringification of a Document produces valid Perl,
+including the bodies of any here-docs.
+
+=cut
+
+sub content { $_[0]->serialize }
+
+=pod
+
 =head2 serialize
-
-Unlike the C<content> method, which shows only the immediate content
-within an element, Document objects also have to be able to be written
-out to a file again.
-
-When doing this we need to take into account some additional factors.
-
-Primarily, we need to handle here-docs correctly, so that are written
-to the file in the expected place.
 
 The C<serialize> method generates the actual file content for a given
 Document object. The resulting string can be written straight to a file.
+
+Here-docs are handled correctly, so that their bodies are written to the
+file in the expected place.
 
 Returns the serialized document as a string.
 
