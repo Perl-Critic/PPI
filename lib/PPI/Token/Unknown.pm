@@ -58,7 +58,7 @@ sub __TOKENIZER__on_char {
 			return $t->_finalize_token->__TOKENIZER__on_char( $t );
 		}
 
-		if ( $char =~ /[\w:]/ ) {
+		if ( $char =~ /[\w:\x80-\xff]/ ) {
 			# Symbol (unless the thing before it is a number
 			my ( $prev ) = $t->_previous_significant_tokens(1);
 			if ( not $prev or not $prev->isa('PPI::Token::Number') ) {
@@ -109,7 +109,7 @@ sub __TOKENIZER__on_char {
 			}
 		}
 
-		if ( $char =~ /[a-z_]/i ) {
+		if ( $char =~ /[a-z_\x80-\xff]/i ) {
 			# Symbol
 			$t->{class} = $t->{token}->set_class( 'Symbol' );
 			return 1;
@@ -154,7 +154,7 @@ sub __TOKENIZER__on_char {
 			}
 		}
 
-		if ( $char =~ /[\w:]/ ) {
+		if ( $char =~ /[\w:\x80-\xff]/ ) {
 			# Symbol
 			$t->{class} = $t->{token}->set_class( 'Symbol' );
 			return 1;
@@ -223,7 +223,7 @@ sub __TOKENIZER__on_char {
 			return 1;
 		}
 
-		if ( $char =~ /[\w:]/ ) {
+		if ( $char =~ /[\w:\x80-\xff]/ ) {
 			# Symbol (unless the thing before it is a number
 			my ( $prev ) = $t->_previous_significant_tokens(1);
 			if ( not $prev or not $prev->isa('PPI::Token::Number') ) {
@@ -267,7 +267,7 @@ sub __TOKENIZER__on_char {
 			return $t->_finalize_token->__TOKENIZER__on_char( $t );
 		}
 
-		if ( $char =~ /[\w:]/ ) {
+		if ( $char =~ /[\w:\x80-\xff]/ ) {
 			# Symbol (unless the thing before it is a number
 			my ( $prev ) = $t->_previous_significant_tokens(1);
 			if ( not $prev or not $prev->isa('PPI::Token::Number') ) {

@@ -82,39 +82,35 @@ SKIP: {
 
 	use Encode ();
 
-	{
-		local $TODO = 'Non-latin characters in byte strings (GitHub #226)';
+	my $bytes = Encode::encode('utf8', 'use utf8; my %h = ( κλειδί => "Clé" );');
+	ok(!utf8::is_utf8($bytes), "utf8 flag not set on greek byte string");
+	good_ok( $bytes, "Hash with greek key in bytes string" );
 
-		my $bytes = Encode::encode('utf8', 'use utf8; my %h = ( κλειδί => "Clé" );');
-		ok(!utf8::is_utf8($bytes), "utf8 flag not set on greek byte string");
-		good_ok( $bytes, "Hash with greek key in bytes string" );
+	my $cyrillic_var = Encode::encode('utf8', 'my $дом = 1;');
+	ok(!utf8::is_utf8($cyrillic_var), "utf8 flag not set on cyrillic var byte string");
+	good_ok( $cyrillic_var, "Cyrillic scalar variable in bytes string" );
 
-		my $cyrillic_var = Encode::encode('utf8', 'my $дом = 1;');
-		ok(!utf8::is_utf8($cyrillic_var), "utf8 flag not set on cyrillic var byte string");
-		good_ok( $cyrillic_var, "Cyrillic scalar variable in bytes string" );
+	my $czech_fat = Encode::encode('utf8', 'my %h = ( kůň => "horse" );');
+	ok(!utf8::is_utf8($czech_fat), "utf8 flag not set on czech byte string");
+	good_ok( $czech_fat, "Czech fat comma key in bytes string" );
 
-		my $czech_fat = Encode::encode('utf8', 'my %h = ( kůň => "horse" );');
-		ok(!utf8::is_utf8($czech_fat), "utf8 flag not set on czech byte string");
-		good_ok( $czech_fat, "Czech fat comma key in bytes string" );
+	my $umlaut_func = Encode::encode('utf8', 'rätselhaft();');
+	ok(!utf8::is_utf8($umlaut_func), "utf8 flag not set on umlaut func byte string");
+	good_ok( $umlaut_func, "Function with umlaut in bytes string" );
 
-		my $umlaut_func = Encode::encode('utf8', 'rätselhaft();');
-		ok(!utf8::is_utf8($umlaut_func), "utf8 flag not set on umlaut func byte string");
-		good_ok( $umlaut_func, "Function with umlaut in bytes string" );
+	my $orig_issue = Encode::encode('utf8', 'my $дом = $_[0]; $дом =~ s/(\:\d+)$//; return $дом;');
+	ok(!utf8::is_utf8($orig_issue), "utf8 flag not set on original issue byte string");
+	good_ok( $orig_issue, "Original issue Cyrillic code in bytes string" );
 
-		my $orig_issue = Encode::encode('utf8', 'my $дом = $_[0]; $дом =~ s/(\:\d+)$//; return $дом;');
-		ok(!utf8::is_utf8($orig_issue), "utf8 flag not set on original issue byte string");
-		good_ok( $orig_issue, "Original issue Cyrillic code in bytes string" );
+	my $array_var = Encode::encode('utf8', 'my @données = (1, 2, 3);');
+	ok(!utf8::is_utf8($array_var), "utf8 flag not set on array byte string");
+	good_ok( $array_var, "Non-ASCII array variable in bytes string" );
 
-		my $array_var = Encode::encode('utf8', 'my @données = (1, 2, 3);');
-		ok(!utf8::is_utf8($array_var), "utf8 flag not set on array byte string");
-		good_ok( $array_var, "Non-ASCII array variable in bytes string" );
+	my $hash_var = Encode::encode('utf8', 'my %données = (a => 1);');
+	ok(!utf8::is_utf8($hash_var), "utf8 flag not set on hash byte string");
+	good_ok( $hash_var, "Non-ASCII hash variable in bytes string" );
 
-		my $hash_var = Encode::encode('utf8', 'my %données = (a => 1);');
-		ok(!utf8::is_utf8($hash_var), "utf8 flag not set on hash byte string");
-		good_ok( $hash_var, "Non-ASCII hash variable in bytes string" );
-
-		my $chinese_bytes = Encode::encode('utf8', '一();');
-		ok(!utf8::is_utf8($chinese_bytes), "utf8 flag not set on chinese byte string");
-		good_ok( $chinese_bytes, "Chinese function call in bytes string" );
-	}
+	my $chinese_bytes = Encode::encode('utf8', '一();');
+	ok(!utf8::is_utf8($chinese_bytes), "utf8 flag not set on chinese byte string");
+	good_ok( $chinese_bytes, "Chinese function call in bytes string" );
 }
