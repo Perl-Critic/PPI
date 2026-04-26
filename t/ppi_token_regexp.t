@@ -28,17 +28,14 @@ sub run {
 		is $qr->get_substitute_string, "b", "substitute string can be extracted";
 	};
 
-	TODO: {
-		local $TODO = "GitHub #177: repeated modifiers not yet tracked";
-		check_with 's/a/b/ee', sub {
-			my $qr = $_->find_first( 'Token::Regexp' );
-			ok $qr, 'found s///ee regexp token';
-			is $qr->get_match_string, "a", "s///ee match string";
-			is $qr->get_substitute_string, "b", "s///ee substitute string";
-			is_deeply scalar($qr->get_modifiers), { e => 2 }, "s///ee tracks repeated e modifier";
-			is( ( $qr->get_delimiters )[0], "//", "s///ee delimiters" );
-		};
-	}
+	check_with 's/a/b/ee', sub {
+		my $qr = $_->find_first( 'Token::Regexp' );
+		ok $qr, 'found s///ee regexp token';
+		is $qr->get_match_string, "a", "s///ee match string";
+		is $qr->get_substitute_string, "b", "s///ee substitute string";
+		is_deeply scalar($qr->get_modifiers), { e => 2 }, "s///ee tracks repeated e modifier";
+		is( ( $qr->get_delimiters )[0], "//", "s///ee delimiters" );
+	};
 }
 
 1;

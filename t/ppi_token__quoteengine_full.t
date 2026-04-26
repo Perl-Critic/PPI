@@ -96,8 +96,7 @@ OTHER: {
 }
 
 # Repeated modifiers (GitHub #177: 'ee' modifier not recognized)
-TODO: {
-	local $TODO = "GitHub #177: repeated modifiers not yet tracked";
+REPEATED_MODIFIERS: {
 	foreach (
 		[ 's/foo/bar/ee',  'foo', 'bar', { e => 2 },             [ '//', '//' ] ],
 		[ 's/foo/bar/gee', 'foo', 'bar', { g => 1, e => 2 },     [ '//', '//' ] ],

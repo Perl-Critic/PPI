@@ -131,7 +131,7 @@ sub _fill {
 	while ( ($char = substr( $t->{line}, $t->{line_cursor} + 1, 1 )) =~ /[^\W\d_]/ ) {
 		$len++;
 		$self->{content} .= $char;
-		$self->{modifiers}->{lc $char} = 1;
+		$self->{modifiers}->{lc $char}++;
 		$t->{line_cursor}++;
 	}
 }
