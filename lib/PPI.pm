@@ -743,10 +743,6 @@ small code snippets, and for providing information for bug reports.
 For other issues, questions, or commercial or media-related enquiries,
 contact the author.
 
-=head1 AUTHOR
-
-Adam Kennedy E<lt>adamk@cpan.orgE<gt>
-
 =head1 ACKNOWLEDGMENTS
 
 A huge thank you to Phase N Australia
@@ -809,15 +805,5 @@ and without his support this project genuinely could never have been
 completed.
 
 So for my schooling in the Deep Magiks, you have my deepest gratitude Randal.
-
-=head1 COPYRIGHT
-
-Copyright 2001 - 2011 Adam Kennedy.
-
-This program is free software; you can redistribute
-it and/or modify it under the same terms as Perl itself.
-
-The full text of the license can be found in the
-LICENSE file included with this module.
 
 =cut
