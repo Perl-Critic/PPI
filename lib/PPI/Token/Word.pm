@@ -123,7 +123,7 @@ sub __TOKENIZER__on_char {
 
 	# Suck in till the end of the bareword
 	pos $t->{line} = $t->{line_cursor};
-	if ( $t->{line} =~ m/\G(\w+(?:(?:\'|::)\w+)*(?:::)?)/gc ) {
+	if ( $t->{line} =~ m/\G([\w\x80-\xff]+(?:(?:\'|::)[\w\x80-\xff]+)*(?:::)?)/gc ) {
 		my $word = $1;
 		# Special Case: If we accidentally treat eq'foo' like
 		# the word "eq'foo", then just make 'eq' (or whatever
@@ -197,7 +197,7 @@ sub __TOKENIZER__commit {
 	# Our current position is the first character of the bareword.
 	# Capture the bareword.
 	pos $t->{line} = $t->{line_cursor};
-	unless ( $t->{line} =~ m/\G((?!\d)\w+(?:(?:\'|::)\w+)*(?:::)?)/gc ) {
+	unless ( $t->{line} =~ m/\G((?!\d)[\w\x80-\xff]+(?:(?:\'|::)[\w\x80-\xff]+)*(?:::)?)/gc ) {
 		# Programmer error
 		die sprintf "Fatal error... regex failed to match in '%s' when expected", substr $t->{line}, $t->{line_cursor};
 	}

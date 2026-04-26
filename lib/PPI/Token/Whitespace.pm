@@ -418,6 +418,7 @@ sub __TOKENIZER__on_char {
 	} elsif ( $char >= 128 ) { # Outside ASCII
 		return 'PPI::Token::Word'->__TOKENIZER__commit($t) if $c =~ /\w/;
 		return 'Whitespace' if $c =~ /\s/;
+		return 'PPI::Token::Word'->__TOKENIZER__commit($t);
 	}
 
 

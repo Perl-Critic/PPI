@@ -162,7 +162,7 @@ sub __TOKENIZER__on_char {
 
 	# Suck in till the end of the symbol
 	pos $t->{line} = $t->{line_cursor};
-	if ( $t->{line} =~ m/\G([\w:\']+)/gc ) {
+	if ( $t->{line} =~ m/\G([\w:\'\x80-\xff]+)/gc ) {
 		$t->{token}->{content} .= $1;
 		$t->{line_cursor}      += length $1;
 	}
@@ -185,7 +185,7 @@ sub __TOKENIZER__on_char {
 		}
 		return $t->_finalize_token->__TOKENIZER__on_char( $t );
 	}
-	if ( $content =~ /^[\$%*@&]::(?:[^\w]|$)/ ) {
+	if ( $content =~ /^[\$%*@&]::(?:[^\w\x80-\xff]|$)/ ) {
 		my $current = substr( $content, 0, 3, '' );
 		$t->{token}->{content} = $current;
 		$t->{line_cursor} -= length( $content );
@@ -205,8 +205,8 @@ sub __TOKENIZER__on_char {
 				: (?! : )			# allow single-colon non-magic variables
 			|
 				$sep?				# optional separator
-				\w+					# a word
-				(?: $sep \w+ )* 	# optionally more separator+word pairs
+				[\w\x80-\xff]+		# a word
+				(?: $sep [\w\x80-\xff]+ )* 	# optionally more separator+word pairs
 				(?: ::		 )?		# optionally what's technically a
 									# compiler-magic hash, but keep it here
 		)
