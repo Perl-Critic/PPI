@@ -1,0 +1,7 @@
+1;
+__DATA__
+some data
+=head1 POD
+some pod
+=cut
+more data

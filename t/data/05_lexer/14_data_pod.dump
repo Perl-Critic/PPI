@@ -1,0 +1,11 @@
+PPI::Document
+  PPI::Statement
+    PPI::Token::Number  	'1'
+    PPI::Token::Structure  	';'
+  PPI::Token::Whitespace  	'\n'
+  PPI::Statement::Data
+    PPI::Token::Separator  	'__DATA__'
+    PPI::Token::Whitespace  	'\n'
+    PPI::Token::Data  	'some data\n'
+    PPI::Token::Pod  	'=head1 POD\nsome pod\n=cut\n'
+    PPI::Token::Data  	'more data\n'
