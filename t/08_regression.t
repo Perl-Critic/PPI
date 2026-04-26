@@ -378,6 +378,5 @@ SCOPE: {
 	my @warnings;
 	local $SIG{__WARN__} = sub { push @warnings, @_ };
 	my $doc = PPI::Document->new( \"sub x {" );
-	local $TODO = "gh#206: __current_token_is_forced_word called without word parameter";
 	is( scalar @warnings, 0, "no warnings when parsing 'sub x {'" );
 }

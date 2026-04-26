@@ -808,6 +808,7 @@ sub _current_x_is_operator {
 # during tokenization.
 sub __current_token_is_forced_word {
 	my ( $t, $word ) = @_;
+	$word = '' if !defined $word;
 
 	# Check if forced by preceding tokens.
 
