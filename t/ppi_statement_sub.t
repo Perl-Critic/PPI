@@ -4,7 +4,7 @@
 
 use lib 't/lib';
 use PPI::Test::pragmas;
-use Test::More tests => 1297 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+use Test::More tests => 1297 + 8 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use PPI ();
 use PPI::Singletons qw( %KEYWORDS );
@@ -240,6 +240,91 @@ KEYWORDS_AS_SUB_NAMES: {
 			test_subs( @test );
 		}
 	}
+}
+
+REGISTER_STATEMENT_CLASS: {
+	use PPI::Lexer ();
+
+	subtest "register_statement_class API" => sub {
+		ok( PPI::Lexer->can('register_statement_class'),
+			"register_statement_class method exists" );
+		ok( PPI::Lexer->register_statement_class( 'async', 'PPI::Statement::Sub' ),
+			"register returns true" );
+		ok( PPI::Lexer->unregister_statement_class( 'async' ),
+			"unregister returns true" );
+	};
+}
+
+PREFIX_SUB: {
+	use PPI::Lexer ();
+
+	subtest "async sub hello {}" => sub {
+		PPI::Lexer->register_statement_class( 'async', 'PPI::Statement::Sub' );
+		my $Document = safe_new \"async sub hello {}";
+		my ( $sub_statement ) = $Document->schildren;
+		isa_ok( $sub_statement, 'PPI::Statement::Sub', "async sub is a Sub statement" );
+		is( $sub_statement->name, 'hello', "name() returns 'hello'" );
+		is( $sub_statement->type, undef, "type() is undef (no my/our/state)" );
+		isa_ok( $sub_statement->block, 'PPI::Structure::Block', "has a block" );
+		ok( !$sub_statement->forward, "not a forward declaration" );
+		PPI::Lexer->unregister_statement_class( 'async' );
+	};
+
+	subtest "async sub hello;" => sub {
+		PPI::Lexer->register_statement_class( 'async', 'PPI::Statement::Sub' );
+		my $Document = safe_new \"async sub hello;";
+		my ( $sub_statement ) = $Document->schildren;
+		isa_ok( $sub_statement, 'PPI::Statement::Sub', "async forward decl is a Sub" );
+		is( $sub_statement->name, 'hello', "name() returns 'hello'" );
+		ok( $sub_statement->forward, "is a forward declaration" );
+		PPI::Lexer->unregister_statement_class( 'async' );
+	};
+
+	subtest "async sub hello (\$) {}" => sub {
+		PPI::Lexer->register_statement_class( 'async', 'PPI::Statement::Sub' );
+		my $Document = safe_new \'async sub hello ($) {}';
+		my ( $sub_statement ) = $Document->schildren;
+		isa_ok( $sub_statement, 'PPI::Statement::Sub', "async sub with proto is a Sub" );
+		is( $sub_statement->name, 'hello', "name() returns 'hello'" );
+		is( $sub_statement->prototype, '$', "prototype() correct" );
+		PPI::Lexer->unregister_statement_class( 'async' );
+	};
+
+	subtest "async sub hello : method {}" => sub {
+		PPI::Lexer->register_statement_class( 'async', 'PPI::Statement::Sub' );
+		my $Document = safe_new \'async sub hello : method {}';
+		my ( $sub_statement ) = $Document->schildren;
+		isa_ok( $sub_statement, 'PPI::Statement::Sub', "async sub with attr is a Sub" );
+		is( $sub_statement->name, 'hello', "name() returns 'hello'" );
+		isa_ok( $sub_statement->block, 'PPI::Structure::Block', "has a block" );
+		PPI::Lexer->unregister_statement_class( 'async' );
+	};
+
+	subtest "method hello {} (sub-like keyword without sub)" => sub {
+		PPI::Lexer->register_statement_class( 'method', 'PPI::Statement::Sub' );
+		my $Document = safe_new \"method hello {}";
+		my ( $sub_statement ) = $Document->schildren;
+		isa_ok( $sub_statement, 'PPI::Statement::Sub', "method is a Sub statement" );
+		is( $sub_statement->name, 'hello', "name() returns 'hello'" );
+		isa_ok( $sub_statement->block, 'PPI::Structure::Block', "has a block" );
+		PPI::Lexer->unregister_statement_class( 'method' );
+	};
+
+	subtest "async sub {} (anonymous)" => sub {
+		PPI::Lexer->register_statement_class( 'async', 'PPI::Statement::Sub' );
+		my $Document = safe_new \"async sub {}";
+		my ( $sub_statement ) = $Document->schildren;
+		isa_ok( $sub_statement, 'PPI::Statement::Sub', "async anon sub is a Sub" );
+		is( $sub_statement->name, '', "name() returns empty string for anonymous" );
+		PPI::Lexer->unregister_statement_class( 'async' );
+	};
+
+	subtest "cleanup: unregistered keywords don't affect parsing" => sub {
+		my $Document = safe_new \"async sub hello {}";
+		my ( $statement ) = $Document->schildren;
+		ok( !$statement->isa('PPI::Statement::Sub'),
+			"without registration, async sub is not PPI::Statement::Sub" );
+	};
 }
 
 sub strip_ws_padding {
