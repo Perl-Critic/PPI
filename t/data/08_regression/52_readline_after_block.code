@@ -1,0 +1,4 @@
+@lines = map { $_ } <$fh>;
+@lines = grep { 1 } <$fh>;
+@lines = sort { $a cmp $b } <$fh>;
+@lines = map { $_ } <FILE>;
