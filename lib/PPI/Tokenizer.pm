@@ -808,6 +808,7 @@ sub _current_x_is_operator {
 # during tokenization.
 sub __current_token_is_forced_word {
 	my ( $t, $word ) = @_;
+	$word = '' if !defined $word;
 
 	# Check if forced by preceding tokens.
 
@@ -836,7 +837,7 @@ sub __current_token_is_forced_word {
 		# We also have to make sure that the sub/package/etc doing the forcing
 		# is not a method call.
 		if( $USUALLY_FORCES{$content}) {
-			return if defined $word and $word =~ /^v[0-9]+$/ and ( $content eq "use" or $content eq "no" );
+			return if $word =~ /^v[0-9]+$/ and ( $content eq "use" or $content eq "no" );
 			return 1 if not $prevprev;
 			return 1 if not $USUALLY_FORCES{$prevprev->content} and $prevprev->content ne '->';
 			return;

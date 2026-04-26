@@ -7,7 +7,7 @@
 use if !(-e 'META.yml'), "Test::InDistDir";
 use lib 't/lib';
 use PPI::Test::pragmas;
-use Test::More tests => 1121 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+use Test::More tests => 1140 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use PPI ();
 use PPI::Test qw( pause );
@@ -367,4 +367,16 @@ print "Hello" if /regex/;
 END_PERL
 	my $match = $doc->find('PPI::Token::Regexp::Match');
 	is( scalar(@$match), 3, 'Found expected number of matches' );
+}
+
+
+
+#####################################################################
+# gh#206: __current_token_is_forced_word with undef $word
+
+SCOPE: {
+	my @warnings;
+	local $SIG{__WARN__} = sub { push @warnings, @_ };
+	my $doc = PPI::Document->new( \"sub x {" );
+	is( scalar @warnings, 0, "no warnings when parsing 'sub x {'" );
 }

@@ -1,0 +1,7 @@
+PPI::Document
+  PPI::Statement::Sub
+    PPI::Token::Word  	'sub'
+    PPI::Token::Whitespace  	' '
+    PPI::Token::Word  	'x'
+    PPI::Token::Whitespace  	' '
+    PPI::Structure::Block  	{ ... ???
