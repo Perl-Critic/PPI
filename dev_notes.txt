@@ -1,3 +1,6 @@
+perl xt/author/todo-report.pl          # full test run + categorized release readiness report
+perl xt/author/todo-report.pl --scan   # quick inventory of TODO markers (no test run)
+
 prove -l -v t | grep '^^[ \t]*ok.*TODO'
 prove -l -v t | grep '^^not ok'
 
