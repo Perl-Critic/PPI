@@ -296,8 +296,8 @@ sub feature_mods {
 		return { signatures => $v >= 2023 ? "perl" : 0 };
 	}
 	elsif ( $module eq "experimental" ) {
-		my $wants_signatures = grep /signatures/, $self->_decompose_arguments;
-		return { signatures => $wants_signatures ? "perl" : 0 };
+		my @features = grep $known{$_}, $self->_decompose_arguments;
+		return { map +( $_ => $on_or_off ? "perl" : 0 ), @features };
 	}
 	elsif ( $module eq "Syntax::Keyword::Try" ) {
 		return { try => $on_or_off ? "Syntax::Keyword::Try" : 0 };

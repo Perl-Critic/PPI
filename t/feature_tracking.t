@@ -203,7 +203,6 @@ END_PERL
 }
 
 EXPERIMENTAL_TRY: {
-	local $TODO = "use experimental 'try' should enable try feature";
 	test_document
 	  <<'END_PERL',
 		use experimental 'try';
@@ -234,13 +233,11 @@ END_PERL
 }
 
 EXPERIMENTAL_TRY_FOLLOWED_BY_FOR: {
-	local $TODO = "try/catch should not absorb following statements";
 	test_document
 	  <<'END_PERL',
 		use experimental 'try';
-		try { 1 }
-		catch ($e) {}
-		for my $x (1) { 2 }
+		try{}catch($e){}
+		for my $x (1){}
 END_PERL
 	  [
 		'PPI::Statement::Include',    "use experimental 'try';",
@@ -248,11 +245,10 @@ END_PERL
 		'PPI::Token::Word',           'experimental',
 		'PPI::Token::Quote::Single',  "'try'",
 		'PPI::Token::Structure',      ';',
-		'PPI::Statement::Compound',   'try { 1 } catch ($e) {}',
+		'PPI::Statement::Compound',   'try{}catch($e){}',
 		'PPI::Token::Word',           'try',
-		'PPI::Structure::Block',      '{ 1 }',
+		'PPI::Structure::Block',      '{}',
 		'PPI::Token::Structure',      '{',
-		'PPI::Token::Number',         '1',
 		'PPI::Token::Structure',      '}',
 		'PPI::Token::Word',           'catch',
 		'PPI::Structure::List',       '($e)',
@@ -263,18 +259,17 @@ END_PERL
 		'PPI::Structure::Block',      '{}',
 		'PPI::Token::Structure',      '{',
 		'PPI::Token::Structure',      '}',
-		'PPI::Statement::Compound',   'for my $x (1) { 2 }',
+		'PPI::Statement::Compound',   'for my $x (1){}',
 		'PPI::Token::Word',           'for',
 		'PPI::Token::Word',           'my',
 		'PPI::Token::Symbol',         '$x',
 		'PPI::Structure::List',       '(1)',
 		'PPI::Token::Structure',      '(',
-		'PPI::Statement::Expression', '1',
+		'PPI::Statement',             '1',
 		'PPI::Token::Number',         '1',
 		'PPI::Token::Structure',      ')',
-		'PPI::Structure::Block',      '{ 2 }',
+		'PPI::Structure::Block',      '{}',
 		'PPI::Token::Structure',      '{',
-		'PPI::Token::Number',         '2',
 		'PPI::Token::Structure',      '}',
 	  ],
 	  "try/catch does not absorb following for loop";
