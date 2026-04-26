@@ -301,7 +301,7 @@ sub __TOKENIZER__on_char {
 			# $foo->{bar} < 2;
 			# grep { .. } <foo>;
 			pos $t->{line} = $t->{line_cursor};
-			if ( $t->{line} =~ m/\G<(?!\d)\w+>/gc ) {
+			if ( $t->{line} =~ m/\G<(?!\d)\$?\w+>/gc ) {
 				# Almost definitely readline
 				return 'QuoteLike::Readline';
 			}
