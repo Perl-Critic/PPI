@@ -76,7 +76,21 @@ sub name {
 
 	# Usually the second token is the name.
 	# The third token is the name if this is a lexical subroutine.
-	my $token = $self->schild(defined $self->type ? 2 : 1);
+	my $idx = defined $self->type ? 2 : 1;
+	my $token = $self->schild($idx);
+
+	# When a prefix keyword precedes 'sub' (e.g. "async sub hello"),
+	# the expected position holds 'sub' itself — skip past it.
+	if ( defined $token
+		and $token->isa('PPI::Token::Word')
+		and $token->content eq 'sub'
+	) {
+		$token = $self->schild($idx + 1);
+		return $token->content
+			if defined $token and $token->isa('PPI::Token::Word');
+		return '';
+	}
+
 	return $token->content
 	  if defined $token and $token->isa('PPI::Token::Word');
 

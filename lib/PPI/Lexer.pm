@@ -376,6 +376,58 @@ my %STATEMENT_CLASSES = (
 	'__END__'   => 'PPI::Statement::End',
 );
 
+=pod
+
+=head2 register_statement_class $keyword, $class
+
+  PPI::Lexer->register_statement_class( 'async', 'PPI::Statement::Sub' );
+  PPI::Lexer->register_statement_class( 'method', 'PPI::Statement::Sub' );
+
+The C<register_statement_class> method allows you to extend PPI's grammar
+by registering a custom keyword that should be mapped to a particular
+statement class during lexing.
+
+This is useful for modules that introduce new keywords (such as C<async>,
+C<method>, C<around>, etc.) which should be parsed into specific statement
+types rather than generic L<PPI::Statement> objects.
+
+When the registered keyword is followed by C<sub> (e.g., C<async sub foo {}>),
+the resulting statement will be a L<PPI::Statement::Sub> and the C<name>,
+C<block>, C<forward>, C<prototype>, and other methods will work correctly.
+
+When the registered keyword is used without C<sub> (e.g., C<method foo {}>)
+and mapped to C<PPI::Statement::Sub>, the keyword itself acts as the sub
+declaration keyword and the usual Sub methods will work.
+
+Returns true on success.
+
+=cut
+
+sub register_statement_class {
+	my ($class, $keyword, $statement_class) = @_;
+	$STATEMENT_CLASSES{$keyword} = $statement_class;
+	return 1;
+}
+
+=pod
+
+=head2 unregister_statement_class $keyword
+
+  PPI::Lexer->unregister_statement_class( 'async' );
+
+The C<unregister_statement_class> method removes a previously registered
+keyword-to-class mapping.
+
+Returns the removed class name, or C<undef> if the keyword was not
+registered.
+
+=cut
+
+sub unregister_statement_class {
+	my ($class, $keyword) = @_;
+	return delete $STATEMENT_CLASSES{$keyword};
+}
+
 sub _statement {
 	my ($self, $Parent, $Token) = @_;
 	# my $self   = shift;
