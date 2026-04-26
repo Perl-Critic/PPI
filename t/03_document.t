@@ -4,7 +4,7 @@
 
 use lib 't/lib';
 use PPI::Test::pragmas;
-use Test::More tests => 25 + ( $ENV{AUTHOR_TESTING} ? 1 : 0 );
+use Test::More tests => 28 + ( $ENV{AUTHOR_TESTING} ? 1 : 0 );
 
 use File::Spec::Functions qw( catfile );
 use PPI ();
@@ -64,6 +64,12 @@ NEW_EMPTY: {
 	ok $doc1->location;
 	ok $doc2->location;
 	ok $doc3->location;
+}
+
+ARRAYREF_SERIALIZATION: {
+	my $doc = safe_new [ "my \$x = 1;", "print \$x;" ];
+	is( $doc->serialize, "my \$x = 1;\nprint \$x;\n",
+		'Arrayref form serializes with newlines appended to each line' );
 }
 
 MISSING_FILE: {
