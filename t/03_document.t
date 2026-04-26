@@ -4,7 +4,7 @@
 
 use lib 't/lib';
 use PPI::Test::pragmas;
-use Test::More tests => 25 + ( $ENV{AUTHOR_TESTING} ? 1 : 0 );
+use Test::More tests => 28 + ( $ENV{AUTHOR_TESTING} ? 1 : 0 );
 
 use File::Spec::Functions qw( catfile );
 use PPI ();
@@ -76,4 +76,14 @@ MISSING_FILE: {
 
 DOUBLE_REF: {
 	ok !PPI::Document->new( \\"3" ), "double-referenced input fails";
+}
+
+NON_STRING_IN_SCALAR_REF: {
+	local $TODO = "ref check incomplete, only catches scalar refs";
+	my $aref = [1, 2, 3];
+	ok !PPI::Document->new( \$aref ), "array ref inside scalar ref fails";
+	my $href = { a => 1 };
+	ok !PPI::Document->new( \$href ), "hash ref inside scalar ref fails";
+	my $cref = sub { 1 };
+	ok !PPI::Document->new( \$cref ), "code ref inside scalar ref fails";
 }
