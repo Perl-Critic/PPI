@@ -4,7 +4,7 @@
 
 use lib 't/lib';
 use PPI::Test::pragmas;
-use Test::More tests => 49 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+use Test::More tests => 56 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use PPI ();
 use Helper 'safe_new';
@@ -155,6 +155,27 @@ LEX_STRUCTURE: {
 	# Validate the creation of an empty statement
 	new_ok( 'PPI::Statement' => [ ] );
 }
+
+GH236_CURLY_IN_ARGLIST: {
+	# GH #236: list-embedded curlies without => should not blindly
+	# be classified as constructors
+	my $doc = safe_new \"foo( { bar() }, {}, 'blah' )";
+	my @curlies = grep { $_->braces eq '{}' }
+		@{ $doc->find('PPI::Structure') || [] };
+
+	isa_ok( $curlies[0], 'PPI::Structure::Block',
+		'{ bar() } in function args is Block' );
+
+	isa_ok( $curlies[1], 'PPI::Structure::Constructor',
+		'{} in function args is Constructor' );
+
+	my $doc2 = safe_new \"foo({ key => 'val' })";
+	my @curlies2 = grep { $_->braces eq '{}' }
+		@{ $doc2->find('PPI::Structure') || [] };
+	isa_ok( $curlies2[0], 'PPI::Structure::Constructor',
+		'{ key => val } in function args is Constructor' );
+}
+
 
 ERROR_HANDLING: {
 	my $test_lexer = PPI::Lexer->new;
