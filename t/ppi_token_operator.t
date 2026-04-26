@@ -4,10 +4,10 @@
 
 use lib 't/lib';
 use PPI::Test::pragmas;
-use Test::More tests => 3073 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+use Test::More tests => 3194 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use PPI ();
-use PPI::Singletons qw( %KEYWORDS %OPERATOR );
+use PPI::Singletons qw( %KEYWORDS %KEYWORDS_FUN0 %OPERATOR );
 use Helper 'safe_new';
 
 FIND_ONE_OP: {
@@ -727,4 +727,81 @@ OPERATORS_PLUS_MINUS: {
         local $TODO = "(1)-2 not parsed correctly";
         is( ref $ops, 'ARRAY', "found operator $op" );
     }
+}
+
+
+LESSTHAN_AFTER_WORD: {
+	# FUN0 keywords: < after them is a comparison operator, not readline.
+	foreach my $fun0 ( sort keys %KEYWORDS_FUN0 ) {
+		my $code = "$fun0 < 1";
+		my $doc = safe_new \$code;
+		my $tokens = $doc->find( sub { 1; } );
+		$tokens = [ map { ref($_), $_->content() } @$tokens ];
+		my @expected = (
+			'PPI::Statement' => $code,
+			'PPI::Token::Word' => $fun0,
+			'PPI::Token::Whitespace' => ' ',
+			'PPI::Token::Operator' => '<',
+			'PPI::Token::Whitespace' => ' ',
+			'PPI::Token::Number' => '1',
+		);
+		my $ok = is_deeply( $tokens, \@expected,
+			"FUN0 builtin '$fun0' followed by < is operator" );
+		if ( !$ok ) {
+			diag "$code";
+			diag explain $tokens;
+		}
+	}
+
+	# Non-FUN0 keywords: < after them starts a readline.
+	my @readline_keywords = qw(
+		print printf say warn die chomp chop return
+		grep eval defined do close eof
+	);
+	foreach my $kw ( @readline_keywords ) {
+		my $code = "$kw <STDIN>;";
+		my $doc = safe_new \$code;
+		my $tokens = $doc->find( sub { 1; } );
+		$tokens = [ map { ref($_), $_->content() } @$tokens ];
+		my $ok = ok(
+			( grep { $_ eq 'PPI::Token::QuoteLike::Readline' } @$tokens ),
+			"keyword '$kw' followed by < is readline"
+		);
+		if ( !$ok ) {
+			diag "$code";
+			diag explain $tokens;
+		}
+	}
+
+	# Non-keyword words (user-defined subs): < is operator.
+	for my $word ( qw( pi foo my_func ) ) {
+		my $code = "$word < 1";
+		my $doc = safe_new \$code;
+		my $tokens = $doc->find( sub { 1; } );
+		$tokens = [ map { ref($_), $_->content() } @$tokens ];
+		my @expected = (
+			'PPI::Statement' => $code,
+			'PPI::Token::Word' => $word,
+			'PPI::Token::Whitespace' => ' ',
+			'PPI::Token::Operator' => '<',
+			'PPI::Token::Whitespace' => ' ',
+			'PPI::Token::Number' => '1',
+		);
+		my $ok = is_deeply( $tokens, \@expected,
+			"non-keyword '$word' followed by < is operator" );
+		if ( !$ok ) {
+			diag "$code";
+			diag explain $tokens;
+		}
+	}
+
+	# Original issue #304: pi < 1 inside condition
+	{
+		my $code = 'if (pi < 1) { }';
+		my $doc = safe_new \$code;
+		my $ops = $doc->find( 'Token::Operator' );
+		is( ref $ops, 'ARRAY', "issue #304: found operator in 'if (pi < 1) { }'" );
+		ok( ( grep { $_->content eq '<' } @$ops ),
+			"issue #304: < is operator after non-keyword 'pi'" );
+	}
 }
