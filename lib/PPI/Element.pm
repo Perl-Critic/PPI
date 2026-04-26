@@ -859,6 +859,7 @@ sub _clear {
 # Therefore we don't need to remove ourselves from our parent,
 # just the index ( just in case ).
 sub DESTROY {
+  return if (${^GLOBAL_PHASE} || '') eq 'DESTRUCT';
   delete $_PARENT{refaddr $_[0]};
   delete $_POSITION_CACHE{refaddr $_[0]};
 }

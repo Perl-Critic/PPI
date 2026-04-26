@@ -687,6 +687,7 @@ sub location {
 # Internal Methods
 
 sub DESTROY {
+	return if (${^GLOBAL_PHASE} || '') eq 'DESTRUCT';
 	local $_;
 	if ( $_[0]->{children} ) {
 		my @queue = $_[0];

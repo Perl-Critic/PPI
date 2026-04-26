@@ -282,6 +282,7 @@ sub _equal_IO {
 }
 
 sub DESTROY {
+	return if (${^GLOBAL_PHASE} || '') eq 'DESTRUCT';
 	# Take the screw up Document with us
 	if ( $_[0]->{Document} ) {
 		$_[0]->{Document}->DESTROY;
