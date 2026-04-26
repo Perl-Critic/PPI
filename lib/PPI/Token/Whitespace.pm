@@ -132,14 +132,47 @@ my %CLASSMAP = (
 );
 
 # Words (functions and keywords) after which a following / is
-# almost certainly going to be a regex
+# almost certainly going to be a regex.
+# This list includes Perl builtins that expect an argument (named unary
+# operators, list operators, control flow keywords), where Perl's
+# tokenizer would treat / as starting a regex, not as division.
+# Excludes: nullary builtins (time, fork, wait, etc.), operators
+# (and, or, not, etc.), quote-likes (m, s, tr, etc.), and
+# declaration keywords (my, our, sub, package, etc.).
 my %MATCHWORD = map { $_ => 1 } qw{
-  return
-  split
-  if
-  unless
-  grep
-  map
+  abs accept alarm atan2
+  bind binmode bless
+  caller chdir chmod chomp chop chown chr chroot close closedir
+  connect cos crypt
+  dbmclose dbmopen defined delete die do dump
+  each elsif eof eval evalbytes exec exists exit exp
+  fc fcntl fileno flock for foreach formline
+  getc getgrgid getgrnam gethostbyaddr gethostbyname getnetbyaddr
+  getnetbyname getpeername getpgrp getpriority getprotobyname
+  getprotobynumber getpwnam getpwuid getservbyname getservbyport
+  getsockname getsockopt given glob gmtime goto grep
+  hex
+  if index int ioctl
+  join
+  keys kill
+  last lc lcfirst length link listen localtime lock log lstat
+  map mkdir msgctl msgget msgrcv msgsnd
+  next
+  oct open opendir ord
+  pack pipe pop pos print printf prototype push
+  quotemeta
+  rand read readdir readline readlink readpipe recv redo ref rename
+  require reset return reverse rewinddir rindex rmdir
+  say scalar seek seekdir select semctl semget semop send sethostent
+  setnetent setpgrp setpriority setprotoent setservent setsockopt
+  shift shmctl shmget shmread shmwrite shutdown sin sleep socket
+  socketpair sort splice split sprintf sqrt srand stat study substr
+  symlink syscall sysopen sysread sysseek system syswrite
+  tell telldir tie tied truncate
+  uc ucfirst umask undef unless unlink unpack unshift untie until
+  utime
+  values vec
+  waitpid warn when while write
 };
 
 sub __TOKENIZER__on_line_start {

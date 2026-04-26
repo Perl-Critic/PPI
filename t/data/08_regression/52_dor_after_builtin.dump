@@ -1,0 +1,9 @@
+PPI::Document
+  PPI::Statement
+    PPI::Token::Word  	'ref'
+    PPI::Token::Whitespace  	' '
+    PPI::Token::Regexp::Match  	'//'
+    PPI::Token::Whitespace  	' '
+    PPI::Token::Number  	'1'
+    PPI::Token::Structure  	';'
+  PPI::Token::Whitespace  	'\n'
