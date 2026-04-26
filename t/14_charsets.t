@@ -8,7 +8,7 @@ BEGIN {
 		Test::More->import( skip_all => "Unicode support requires perl 5.8.7" );
 		exit(0);
 	}
-	plan( tests => 44 + ($ENV{AUTHOR_TESTING} ? 1 : 0) );
+	plan( tests => 59 + ($ENV{AUTHOR_TESTING} ? 1 : 0) );
 }
 
 use utf8;  # perl version check above says this is okay
@@ -76,6 +76,43 @@ END_CODE
 	ok(!utf8::is_utf8($bytes), "utf8 flag not set on byte string");
 	{
 	    local $TODO = "Fix CRASH";
-	    good_ok( $bytes, "Hash with greek key in bytes string"          );
+	    good_ok( $bytes, "Hash with greek key in bytes string" );
 	}
+
+	# Issue #258: Cyrillic bare hash key with "use utf8" dies with
+	# "Encountered unexpected character '208'"
+	my $cyrillic_bytes = Encode::encode('utf8', 'use utf8; my %x = (Привет => 1);');
+	ok(!utf8::is_utf8($cyrillic_bytes), "utf8 flag not set on Cyrillic byte string");
+	{
+	    local $TODO = "Fix issue #258: unicode bare key name";
+	    good_ok( $cyrillic_bytes, "Cyrillic bare hash key in byte string with use utf8" );
+	}
+
+	# More byte-string cases that should work after the fix
+	{
+	    local $TODO = "Fix issue #258: unicode bare key name";
+	    my $cyrillic_var = Encode::encode('utf8', 'use utf8; my $Привет = 1;');
+	    good_ok( $cyrillic_var, "Cyrillic variable name in byte string with use utf8" );
+
+	    my $cyrillic_sub = Encode::encode('utf8', 'use utf8; sub Привет { return 1; }');
+	    good_ok( $cyrillic_sub, "Cyrillic sub name in byte string with use utf8" );
+
+	    my $accented_bytes = Encode::encode('utf8', 'use utf8; my %hétéroclite = (bergère => 888);');
+	    good_ok( $accented_bytes, "Accented identifiers in byte string with use utf8" );
+	}
+
+	# Round-trip: serialized output should match the decoded input
+	{
+	    local $TODO = "Fix issue #258: unicode bare key name";
+	    my $rt_source = Encode::encode('utf8', 'use utf8; my $café = 1;');
+	    my $rt_doc = PPI::Document->new(\$rt_source);
+	    ok( _INSTANCE($rt_doc, 'PPI::Document'), "Round-trip: parsed accented byte string" );
+	    SKIP: {
+	        skip( "parse failed", 1 ) if !_INSTANCE($rt_doc, 'PPI::Document');
+	        my $rt_got = $rt_doc->serialize;
+	        my $rt_expected = Encode::decode('utf8', $rt_source);
+	        is( $rt_got, $rt_expected, "Round-trip: serialized matches decoded source" );
+	    }
+	}
+
 }
