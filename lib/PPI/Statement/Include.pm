@@ -276,7 +276,7 @@ sub feature_mods {
 
 	my $module = $self->module or return;
 
-	my %known     = ( signatures => 1, try => 1 );
+	my %known     = ( signatures => 1, try => 1, class => 1 );
 	my $on_or_off = $type eq "use";
 
 	if ( $on_or_off

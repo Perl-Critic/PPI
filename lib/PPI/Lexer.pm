@@ -419,12 +419,20 @@ sub _statement {
 	}
 
 	my $is_lexsub = 0;
+	my $is_corinna_method = 0;
 
 	# Is it a token in our known classes list
 	my $content = $Token->content;
+	my $has_class_feature = ( $self->{features_stack}[-1] || {} )->{class};
 	my $class =
 	  ( $content eq 'try' and ( $self->{features_stack}[-1] || {} )->{try} )
 	  ? 'PPI::Statement::Compound'
+	  : $has_class_feature
+	    && $content eq 'class'  ? 'PPI::Statement::Package'
+	  : $has_class_feature
+	    && $content eq 'field'  ? 'PPI::Statement::Variable'
+	  : $has_class_feature
+	    && $content eq 'ADJUST' ? 'PPI::Statement::Scheduled'
 	  : $STATEMENT_CLASSES{$content};
 
 	if ( $class ) {
@@ -511,8 +519,9 @@ sub _statement {
 	# If it's a token in our list, use that class
 	return $class if $class;
 
-	# Handle the more in-depth sub detection
-	if ( $is_lexsub || $content eq 'sub' ) {
+	# Handle the more in-depth sub/method detection
+	$is_corinna_method = $has_class_feature && $content eq 'method';
+	if ( $is_lexsub || $content eq 'sub' || $is_corinna_method ) {
 		# Read ahead to the next significant token
 		my $Next;
 		while ( $Next = $self->_get_token ) {
@@ -524,7 +533,7 @@ sub _statement {
 
 			# Got the next significant token
 			my $sclass = $STATEMENT_CLASSES{$Next->content};
-			if ( $sclass and $sclass eq 'PPI::Statement::Scheduled' ) {
+			if ( !$is_corinna_method and $sclass and $sclass eq 'PPI::Statement::Scheduled' ) {
 				$self->_rollback( $Next );
 				return 'PPI::Statement::Scheduled';
 			}
@@ -1121,8 +1130,10 @@ sub _square {
 # Keyword -> Structure class maps
 my %CURLY_CLASSES = (
 	# Blocks
-	'sub'  => 'PPI::Structure::Block',
-	'grep' => 'PPI::Structure::Block',
+	'sub'    => 'PPI::Structure::Block',
+	'method' => 'PPI::Structure::Block',
+	'class'  => 'PPI::Structure::Block',
+	'grep'   => 'PPI::Structure::Block',
 	'map'  => 'PPI::Structure::Block',
 	'sort' => 'PPI::Structure::Block',
 	'do'   => 'PPI::Structure::Block',

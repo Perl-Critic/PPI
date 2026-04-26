@@ -438,39 +438,40 @@ sub __TOKENIZER__is_an_attribute {
 	# If we just had a prototype, then we are an attribute
 	return 1 if $p0->isa('PPI::Token::Prototype');
 
+	# 'field $var :attr' — attribute after a symbol preceded by 'field'
+	if ( $p0->isa('PPI::Token::Symbol') ) {
+		my $p1 = $tokens[1];
+		return 1
+		  if $p1
+		  and $p1->isa('PPI::Token::Word')
+		  and $p1->content eq 'field';
+	}
+
 	# Other than that, we would need to have had a bareword
 	return '' unless $p0->isa('PPI::Token::Word');
 
-	# We could be an anonymous subroutine
-	if ( $p0->isa('PPI::Token::Word') and $p0->content eq 'sub' ) {
+	# We could be an anonymous subroutine (or method)
+	if ( $p0->content =~ /\A(?:sub|method)\z/ ) {
 		return 1;
 	}
 
-	# Or, we could be a named subroutine
+	# Or, we could be a named subroutine, method, or class
 	my $p1 = $tokens[1];
 	my $p2 = $tokens[2];
-	if (
+	my $is_sub_like =
 		$p1
-		and
-		$p1->isa('PPI::Token::Word')
-		and
-		$p1->content eq 'sub'
-		and (
-			not $p2
-			or
-			$p2->isa('PPI::Token::Structure')
-			or (
-				$p2->isa('PPI::Token::Whitespace')
-				and
-				$p2->content eq ''
-			)
-		)
-	) {
-		return 1;
-	}
+		&& $p1->isa('PPI::Token::Word')
+		&& $p1->content =~ /\A(?:sub|class|method)\z/
+		&& (
+			!$p2
+			|| $p2->isa('PPI::Token::Structure')
+			|| ( $p2->isa('PPI::Token::Whitespace')
+				&& $p2->content eq '' )
+		);
+	return 1 if $is_sub_like;
 
 	# We aren't an attribute
-	'';	
+	'';
 }
 
 1;

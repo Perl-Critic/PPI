@@ -294,16 +294,8 @@ sub __TOKENIZER__commit {
 		# If the next character is a ':' then it's a label...
 		pos $t->{line} = $t->{line_cursor};
 		if ( $t->{line} =~ m/\G(\s*:)(?!:)/gc ) {
-			if ( $tokens[0] and $tokens[0]->{content} eq 'sub' ) {
-				# ... UNLESS it's after 'sub' in which
-				# case it is a sub name and an attribute
-				# operator.
-				# We COULD have checked this at the top
-				# level of checks, but this would impose
-				# an additional performance per-word
-				# penalty, and every other case where the
-				# attribute operator doesn't directly
-				# touch the object name already works.
+			if ( $tokens[0]
+				and $tokens[0]->{content} =~ /\A(?:sub|class|method)\z/ ) {
 				$token_class = 'Word';
 			} elsif ( !($tokens[0] and $tokens[0]->isa('PPI::Token::Operator')) ) {
 				$word .= $1;
