@@ -34,6 +34,8 @@ sub exclusions {    # this lists USERs of ppi, their DEPs go below
         |Acme-VarMess|Module-Checkstyle|MooseX-Documenter|Perl-Achievements
         |Perl-Metrics|Ravenel|Test-LocalFunctions|UML-Class-Simple
         |Test2-Plugin-DBBreak|Catalyst-View-EmbeddedPerl-PerRequest-ValiantRole
+        # GH #342 - creates empty DB when GITHUB_ACTION is set, then tests query it
+        |Ham-DXCC-Lookup
         # maybe broken on cpan
         |App-Grepl|App-Midgen|App-PRT|Pod-Weaver-Section-SQL
         # investigate
