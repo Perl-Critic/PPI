@@ -190,8 +190,9 @@ sub new {
 		$self->{source} = $$source;
 
 	} elsif ( _SCALAR0($_[1]) ) {
-		PPI::Exception->throw("Did not pass a string: ${$_[1]}")
-			if _SCALAR0( $self->{source} = ${$_[1]} );
+		$self->{source} = ${$_[1]};
+		PPI::Exception->throw("Did not pass a string to PPI::Tokenizer::new")
+			if ref $self->{source};
 
 	} elsif ( _ARRAY0($_[1]) ) {
 		$self->{source} = join '', map "$_\n", @{$_[1]};
