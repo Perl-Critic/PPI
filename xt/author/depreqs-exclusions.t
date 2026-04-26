@@ -20,7 +20,6 @@ my @should_exclude = (
 );
 
 for my $mod (@should_exclude) {
-    local $TODO = "needs to be added to exclusions";
     like( $mod, $excl, "$mod is excluded from dependents testing" );
 }
 
