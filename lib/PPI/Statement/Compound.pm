@@ -131,6 +131,9 @@ sub type {
 	if ($Element->isa('PPI::Token::Word')) {
 		return 'try'
 			if $content eq 'try' && $self->presumed_features->{try};
+		my $features = $self->presumed_features || {};
+		return $content
+			if ($features->{custom_keywords} || {})->{$content};
 		return $TYPES{$content};
 	}
 	return 'continue' if $Element->isa('PPI::Structure::Block');

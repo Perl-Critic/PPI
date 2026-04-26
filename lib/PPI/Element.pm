@@ -479,8 +479,20 @@ sub presumed_features {
 		$walker = $walker->parent;
 	}
 
-	my %feature_mods = map %{$_}, reverse grep defined, map $_->feature_mods,
-	  @feature_mods;
+	my %feature_mods;
+	for my $fm ( reverse grep defined, map $_->feature_mods, @feature_mods ) {
+		if ( $fm->{custom_keywords} and $feature_mods{custom_keywords} ) {
+			my $merged_kw = {
+				%{ $feature_mods{custom_keywords} },
+				%{ $fm->{custom_keywords} },
+			};
+			%feature_mods = ( %feature_mods, %{$fm} );
+			$feature_mods{custom_keywords} = $merged_kw;
+		}
+		else {
+			%feature_mods = ( %feature_mods, %{$fm} );
+		}
+	}
 
 	return \%feature_mods;
 }

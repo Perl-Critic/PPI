@@ -12,7 +12,6 @@ use PPI::Dumper;
 sub test_document;
 
 SIMPLE_BLOCK_KEYWORD: {
-	local $TODO = "custom_keywords not yet implemented";
 	test_document
 	  [ custom_keywords => { defer => {} } ],
 	  <<'END_PERL',
@@ -32,7 +31,6 @@ END_PERL
 }
 
 KEYWORD_WITH_CONTINUATION: {
-	local $TODO = "custom_keywords not yet implemented";
 	test_document
 	  [ custom_keywords => { try => { continuation => ['catch', 'finally'] } } ],
 	  <<'END_PERL',
@@ -72,7 +70,6 @@ END_PERL
 }
 
 CONTINUATION_WITH_PARENS: {
-	local $TODO = "custom_keywords not yet implemented";
 	test_document
 	  [ custom_keywords => { try => { continuation => ['catch'] } } ],
 	  <<'END_PERL',
@@ -83,7 +80,7 @@ END_PERL
 		'PPI::Token::Word',           'try',
 		'PPI::Structure::Block',      '{ die "oops" }',
 		'PPI::Token::Structure',      '{',
-		'PPI::Statement::Break',      'die "oops"',
+		'PPI::Statement',             'die "oops"',
 		'PPI::Token::Word',           'die',
 		'PPI::Token::Quote::Double',  '"oops"',
 		'PPI::Token::Structure',      '}',
@@ -104,7 +101,6 @@ END_PERL
 }
 
 KEYWORD_FOLLOWED_BY_NORMAL: {
-	local $TODO = "custom_keywords not yet implemented";
 	test_document
 	  [ custom_keywords => { defer => {} } ],
 	  <<'END_PERL',
@@ -130,7 +126,6 @@ END_PERL
 }
 
 ENV_CUSTOM_KEYWORDS: {
-	local $TODO = "custom_keywords not yet implemented";
 	local $ENV{PPI_CUSTOM_KEYWORDS} = 'defer: {}';
 	test_document
 	  <<'END_PERL',
@@ -149,7 +144,6 @@ END_PERL
 }
 
 CUSTOM_INCLUDE_ENABLES_KEYWORD: {
-	local $TODO = "custom_keywords not yet implemented";
 	test_document
 	  [ custom_feature_includes =>
 		  { 'Syntax::Keyword::Defer' =>
@@ -175,7 +169,6 @@ END_PERL
 }
 
 CUSTOM_CB_ENABLES_KEYWORD: {
-	local $TODO = "custom_keywords not yet implemented";
 	test_document
 	  [
 		custom_feature_include_cb => sub {

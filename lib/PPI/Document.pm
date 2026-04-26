@@ -186,6 +186,52 @@ L<PPI::Statement::Include> object.
 
 This can be useful when your work project has a complex boilerplate module.
 
+=head3 custom_keywords
+
+  custom_keywords =>
+    { $keyword_name => { continuation => [$continuation_keyword, ...] } }
+
+  # e.g.
+  custom_keywords =>
+    { defer => {},
+      try   => { continuation => ['catch', 'finally'] } }
+
+Setting custom_keywords with a hashref allows defining keywords that PPI does
+not natively understand. Each keyword will be parsed as a
+C<PPI::Statement::Compound> (a block-based statement with implicit end).
+
+The value for each keyword is a hashref of options:
+
+=over
+
+=item continuation
+
+An arrayref of keyword names that can follow the block to continue the compound
+statement. For example, C<catch> and C<finally> after C<try>.
+
+=back
+
+This is useful for modules that extend Perl's syntax with new keywords, such as
+C<Syntax::Keyword::Try>, C<Syntax::Keyword::Defer>, C<Future::AsyncAwait>, etc.
+
+Custom keywords can also be activated per-scope via C<custom_feature_includes>
+or C<custom_feature_include_cb>, by returning a hashref containing a
+C<custom_keywords> key in the feature set:
+
+  custom_feature_includes => {
+    'Syntax::Keyword::Defer' => {
+      custom_keywords => { defer => {} }
+    }
+  }
+
+It can also be provided as JSON or YAML in the environment variable
+PPI_CUSTOM_KEYWORDS, like so:
+
+  PPI_CUSTOM_KEYWORDS='defer: {}' perlcritic lib/MyModule.pm
+
+  PPI_CUSTOM_KEYWORDS='{"try":{"continuation":["catch","finally"]}}' \
+    perlcritic lib/MyModule.pm
+
 =cut
 
 sub new {
@@ -277,6 +323,22 @@ sub _setattr {
 	$document->{feature_mods}              = $attr{feature_mods};
 	$document->{custom_feature_includes}   = $attr{custom_feature_includes};
 	$document->{custom_feature_include_cb} = $attr{custom_feature_include_cb};
+	$document->{custom_keywords}           = $attr{custom_keywords};
+	if ( $ENV{PPI_CUSTOM_KEYWORDS} ) {
+		my $keywords = YAML::PP::Load $ENV{PPI_CUSTOM_KEYWORDS};
+		die "\$ENV{PPI_CUSTOM_KEYWORDS} "
+		  . "does not contain valid YAML/JSON:\n"
+		  . "val: '$ENV{PPI_CUSTOM_KEYWORDS}'\nerr: $@"
+		  if $@;
+		$document->{custom_keywords} =
+		  { %{ $document->{custom_keywords} || {} }, %{$keywords} };
+	}
+	if ( $document->{custom_keywords} ) {
+		$document->{feature_mods} ||= {};
+		$document->{feature_mods}{custom_keywords} =
+		  { %{ $document->{feature_mods}{custom_keywords} || {} },
+			%{ $document->{custom_keywords} } };
+	}
 	if ( $ENV{PPI_CUSTOM_FEATURE_INCLUDES} ) {
 		my $includes = YAML::PP::Load $ENV{PPI_CUSTOM_FEATURE_INCLUDES};
 		die "\$ENV{PPI_CUSTOM_FEATURE_INCLUDES} "
@@ -419,6 +481,16 @@ sub custom_feature_includes {
 	my $self = shift;
 	return $self->{custom_feature_includes} unless @_;
 	$self->{custom_feature_includes} = shift;
+}
+
+=head2 custom_keywords { keyword_name => { continuation => [...] } }
+
+=cut
+
+sub custom_keywords {
+	my $self = shift;
+	return $self->{custom_keywords} unless @_;
+	$self->{custom_keywords} = shift;
 }
 
 =head2 custom_feature_include_cb sub { ... }

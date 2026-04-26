@@ -201,6 +201,12 @@ sub lex_tokenizer {
 		push @{$self->{features_stack}}, $feat;
 		$Tokenizer->_features($feat);
 	}
+	if (my $kw = $Document->custom_keywords) {
+		push @{$self->{features_stack}}, {}
+		  if not @{$self->{features_stack}};
+		$self->{features_stack}[-1] =
+		  { %{$self->{features_stack}[-1]}, custom_keywords => $kw };
+	}
 
 	# Lex the token stream into the document
 	$self->{Tokenizer} = $Tokenizer;
@@ -421,9 +427,12 @@ sub _statement {
 	my $is_lexsub = 0;
 
 	# Is it a token in our known classes list
-	my $content = $Token->content;
+	my $content  = $Token->content;
+	my $features = $self->{features_stack}[-1] || {};
 	my $class =
-	  ( $content eq 'try' and ( $self->{features_stack}[-1] || {} )->{try} )
+	  ( $content eq 'try' and $features->{try} )
+	  ? 'PPI::Statement::Compound'
+	  : ( $features->{custom_keywords} and $features->{custom_keywords}{$content} )
 	  ? 'PPI::Statement::Compound'
 	  : $STATEMENT_CLASSES{$content};
 
@@ -626,9 +635,16 @@ sub _update_features {
 	push @{ $self->{features_stack} }, {}
 	  if not @{ $self->{features_stack} };
 	my $current_features = $self->{features_stack}[-1];
+	my $merged = { %{$current_features}, %{$new_features} };
+	if ( $current_features->{custom_keywords}
+		and $new_features->{custom_keywords} ) {
+		$merged->{custom_keywords} = {
+			%{ $current_features->{custom_keywords} },
+			%{ $new_features->{custom_keywords} },
+		};
+	}
 	$self->{Tokenizer}->_features    #
-	  ( $self->{features_stack}[-1] =
-		  { %{$current_features}, %{$new_features} } );
+	  ( $self->{features_stack}[-1] = $merged );
 }
 
 sub _lex_statement {
@@ -923,6 +939,24 @@ sub _continues {
 		  if $Token->isa('PPI::Token::Word') and $Token->content eq 'catch';
 
 		return '';
+	}
+
+	# Handle custom keyword compound statements
+	{
+		my $features = $Statement->presumed_features || {};
+		if (my $kw_def = ($features->{custom_keywords} || {})->{$type}) {
+			return 1 if not $LastChild->isa('PPI::Structure::Block');
+
+			my $continuations = $kw_def->{continuation};
+			if ( $continuations and @{$continuations} ) {
+				my %cont = map { $_ => 1 } @{$continuations};
+				return 1
+				  if $Token->isa('PPI::Token::Word')
+				  and $cont{$Token->content};
+			}
+
+			return '';
+		}
 	}
 
 	# Handle the common continuable block case
