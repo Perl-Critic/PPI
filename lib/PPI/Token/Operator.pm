@@ -23,7 +23,7 @@ PPI::Token::Operator - Token class for operators
   ?    :    **=  +=   -=   .=   *=   /=
   %=   x=   &=   |=   ^=   <<=  >>=  &&=
   ||=  //=  <    >    <=   >=   <>   =>   ->
-  and  or   xor  not  eq   ne   <<>>
+  and  or   xor  not  eq   ne   isa  <<>>
 
 
 =head1 DESCRIPTION

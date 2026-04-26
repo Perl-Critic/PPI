@@ -54,13 +54,12 @@ Test::More::plan( tests => scalar(@files) * 16 + 4 + ($ENV{AUTHOR_TESTING} ? 1 :
 
 # Check this actually finds something bad
 my $sample = safe_new \<<'END_PERL';
-isa($foo, 'Bad::Class1');
-isa($foo, 'PPI::Document');
+UNIVERSAL::isa($foo, 'Bad::Class1');
+$foo->isa('PPI::Document');
 $foo->isa('Bad::Class2');
 $foo->isa("Bad::Class3");
-isa($foo, 'ARRAY'); # Not bad
-isa($foo->thing, qq <Bad::Class4> # ok?
-);
+$foo->isa('ARRAY'); # Not bad
+$bar->isa('Bad::Class4');
 END_PERL
 
 my $bad = $sample->find( \&bug_bad_isa_class_name );

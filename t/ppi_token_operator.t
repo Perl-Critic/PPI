@@ -4,7 +4,7 @@
 
 use lib 't/lib';
 use PPI::Test::pragmas;
-use Test::More tests => 3088 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+use Test::More tests => 3105 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use PPI ();
 use PPI::Singletons qw( %KEYWORDS %OPERATOR );
@@ -804,11 +804,7 @@ OPERATOR_ISA: {
         if ( $expected->[0] !~ /^PPI::Statement/ ) {
             unshift @$expected, 'PPI::Statement', $test->{code};
         }
-        my $ok;
-        TODO: {
-            local $TODO = "isa operator not yet supported" if $test->{desc} =~ /infix/;
-            $ok = is_deeply( $tokens, $expected, $test->{desc} );
-        }
+        my $ok = is_deeply( $tokens, $expected, $test->{desc} );
         if ( !$ok ) {
             diag "$test->{code} ($test->{desc})\n";
             diag explain $tokens;

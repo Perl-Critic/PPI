@@ -26,7 +26,7 @@ our %OPERATOR = map { $_ => 1 } (
 	= **= += -= .= *= /= %= x= &= |= ^= <<= >>= &&= ||= //=
 	&.= |.= ^.= ~.=
 	=> <> <<>>
-	and or xor not
+	and or xor not isa
 	}, ',' 	# Avoids "comma in qw{}" warning
 );
 
@@ -74,7 +74,7 @@ our %KEYWORDS = map { $_ => 1 } qw{
 	getnetbyname getnetent getpeername getpgrp getppid getpriority
 	getprotobyname getprotobynumber getprotoent getpwent getpwnam
 	getpwuid getservbyname getservbyport getservent getsockname
-	getsockopt given glob gmtime goto grep gt hex if index int ioctl join
+	getsockopt given glob gmtime goto grep gt hex if index int ioctl isa join
 	keys kill last lc lcfirst le length link listen local localtime lock
 	log lstat lt m map mkdir msgctl msgget msgrcv msgsnd my ne next no
 	not oct open opendir or ord our pack package pipe pop pos print
