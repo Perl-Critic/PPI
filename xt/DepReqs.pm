@@ -25,7 +25,7 @@ sub exclusions {    # this lists USERs of ppi, their DEPs go below
         |Devel-ebug-HTTP|Padre-Plugin-ParserTool|Devel-PerlySense|PPI-Tester
         |Acme-ReturnValue|Bot-BasicBot-Pluggable-Module-Gitbot|Pinwheel
         |Dist-Zilla-Plugin-MetaProvides-Package|Dist-Zilla-Plugin-Readme-Brief
-        |Apache2-PPI-HTML|Net-Kafka-Producer-Avro|App-DrivePlayer
+        |Apache2-PPI-HTML|Net-Kafka-Producer-Avro|App-DrivePlayer|Dist-Zilla-Plugin-Subversion
         # author parsing issue
         |Spellunker-Perl
         # takes too long
