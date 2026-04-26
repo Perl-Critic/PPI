@@ -249,9 +249,6 @@ DOCUMENT_INSERT: {
 
 
 INSERT_AFTER_ACCEPTS_SINGLE_ELEMENT: {
-	# $TODO: The documentation signature says insert_after(@Elements) implying
-	# multiple elements, but the method only processes a single element.
-	# The docs should use $Element (singular) instead.
 	my $Document = safe_new \"my \$x = 1;";
 	my $number = $Document->find_first('Token::Number');
 
@@ -266,9 +263,6 @@ INSERT_AFTER_ACCEPTS_SINGLE_ELEMENT: {
 
 
 INSERT_BEFORE_ACCEPTS_SINGLE_ELEMENT: {
-	# $TODO: The documentation signature says insert_before(@Elements) implying
-	# multiple elements, but the method only processes a single element.
-	# The docs should use $Element (singular) instead.
 	my $Document = safe_new \"my \$x = 1;";
 	my $semi = $Document->find_first('Token::Structure');
 
