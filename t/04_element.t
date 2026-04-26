@@ -7,7 +7,7 @@
 
 use lib 't/lib';
 use PPI::Test::pragmas;
-use Test::More tests => 227 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+use Test::More tests => 228 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use PPI ();
 use PPI::Singletons qw( %_PARENT );
@@ -463,8 +463,17 @@ SCOPE: {
 	is( $k3, $k1, 'PARENT keys returns to original on implicit Document DESTROY' );
 }
 
-
-
+# Documents stored in globals must not crash during global destruction.
+# PPI DESTROY methods access package globals (%_PARENT, %_POSITION_CACHE)
+# which may already be freed during global destruction, causing SEGFAULT.
+# https://github.com/Perl-Critic/PPI/issues/344
+TODO: {
+	local $TODO = 'DESTROY not yet safe during global destruction';
+	my $code = qq{use PPI;\nour \@d;\npush \@d, PPI::Document->new(\\"my \\\$x = 1; { foo() }") for 1..20;\nexit 0;\n};
+	my $exit = system $^X, '-Ilib', '-e', $code;
+	my $sig  = $exit & 127;
+	is( $sig, 0, 'no signal during global destruction of PPI documents' );
+}
 
 
 #####################################################################
