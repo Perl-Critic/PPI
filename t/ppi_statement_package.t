@@ -4,7 +4,7 @@
 
 use lib 't/lib';
 use PPI::Test::pragmas;
-use Test::More tests => 2508 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+use Test::More tests => 2526 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use PPI ();
 use PPI::Singletons qw( %KEYWORDS );
@@ -102,6 +102,43 @@ PERL_5_12_SYNTAX: {
 			}
 		}
 	}
+}
+
+MULTIPLE_BLOCK_FORM_PACKAGES_ISSUE_191: {
+	my $Document = safe_new \<<'END_PERL';
+package Foo;
+package Bar { }
+package Baz { }
+print 'hello';
+END_PERL
+
+	my $packages = $Document->find('PPI::Statement::Package');
+	is( scalar @$packages, 3, 'found 3 package statements' );
+	is( $packages->[0]->namespace, 'Foo', 'first package is Foo' );
+	is( $packages->[1]->namespace, 'Bar', 'second package is Bar' );
+	is( $packages->[2]->namespace, 'Baz', 'third package is Baz' );
+
+	my @stmts = $Document->schildren;
+	is( scalar @stmts, 4, 'document has 4 statements' );
+	isa_ok( $stmts[3], 'PPI::Statement', 'print is a separate statement' );
+	is( eval { $stmts[3]->schild(0)->content }, 'print',
+		'print statement not swallowed by package block' );
+}
+
+BLOCK_FORM_PACKAGE_COMPLETE: {
+	my $doc_semi = safe_new \"package Foo;";
+	my $pkg_semi = $doc_semi->find_first('PPI::Statement::Package');
+	ok( $pkg_semi->_complete, 'semicolon-form package is _complete' );
+
+	local $TODO = "block-form package _complete not yet implemented";
+
+	my $doc_block = safe_new \"package Foo { 1 }";
+	my $pkg_block = $doc_block->find_first('PPI::Statement::Package');
+	ok( $pkg_block->_complete, 'block-form package is _complete' );
+
+	my $doc_ver = safe_new \"package Foo 1.0 { 1 }";
+	my $pkg_ver = $doc_ver->find_first('PPI::Statement::Package');
+	ok( $pkg_ver->_complete, 'block-form package with version is _complete' );
 }
 
 sub strip_ws_padding {
