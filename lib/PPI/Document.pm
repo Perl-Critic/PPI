@@ -106,10 +106,15 @@ use constant LOCATION_LOGICAL_FILE => 4;
   # Simple construction
   $doc = PPI::Document->new( $filename );
   $doc = PPI::Document->new( \$source  );
-  
+
   # With the readonly attribute set
   $doc = PPI::Document->new( $filename,
           readonly => 1,
+  );
+
+  # With an explicit filename for string refs
+  $doc = PPI::Document->new( \$source,
+          filename => 'lib/Foo.pm',
   );
 
 The C<new> constructor takes as argument a variety of different sources of
@@ -117,22 +122,31 @@ Perl code, and creates a single cohesive Perl C<PPI::Document>
 for it.
 
 If passed a file name as a normal string, it will attempt to load the
-document from the file.
+document from the file. The document will remember its source filename,
+accessible via the L</filename> method.
 
 If passed a reference to a C<SCALAR>, this is taken to be source code and
-parsed directly to create the document.
+parsed directly to create the document. You can associate a filename
+with the document by passing the C<filename> attribute (see below).
 
 If passed zero arguments, a "blank" document will be created that contains
 no content at all.
-
-In all cases, the document is considered to be "anonymous" and not tied back
-to where it was created from. Specifically, if you create a PPI::Document from
-a filename, the document will B<not> remember where it was created from.
 
 Returns a C<PPI::Document> object, or C<undef> if parsing fails.
 L<PPI::Exception> objects can also be thrown if there are parsing problems.
 
 The constructor also takes attribute flags.
+
+=head3 filename
+
+Setting C<filename> stores a file name in the document, accessible via
+the L</filename> method. When loading from a file name, this defaults to
+the source path. When loading from a string reference, it defaults to
+C<undef>.
+
+The filename is also used as the default L<PPI::Element/logical_filename>
+for all elements in the document, unless overridden by a C<#line> directive
+in the source.
 
 =head3 readonly
 
@@ -353,8 +367,12 @@ sub get_cache {
 
 =head2 filename
 
-The C<filename> accessor returns the name of the file in which the document
-is stored.
+The C<filename> accessor returns the file name associated with the document.
+
+When the document was loaded from a file, this defaults to that file's path.
+When the document was created from a string reference, this returns the value
+of the C<filename> attribute passed to the constructor, or C<undef> if none
+was given.
 
 =cut
 
