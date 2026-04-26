@@ -19,8 +19,5 @@ ALL_TOKENS_EXCEPTION_MESSAGE: {
 
 	ok( !$ok, "all_tokens dies on error" );
 
-	TODO: {
-		local $TODO = 'all_tokens wraps PPI::Exception in another PPI::Exception';
-		ok( !ref $err->message, "all_tokens exception message is a plain string" );
-	}
+	ok( !ref $err->message, "all_tokens exception message is a plain string" );
 }

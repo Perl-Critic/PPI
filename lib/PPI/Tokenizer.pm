@@ -376,9 +376,13 @@ sub all_tokens {
 		1;
 	};
 	if ( !$ok ) {
-		my $errstr = $@;
-		$errstr =~ s/^(.*) at line .+$/$1/;
-		PPI::Exception->throw( $errstr );
+		if ( _INSTANCE($@, 'PPI::Exception') ) {
+			$@->throw;
+		} else {
+			my $errstr = $@;
+			$errstr =~ s/^(.*) at line .+$/$1/;
+			PPI::Exception->throw( $errstr );
+		}
 	}
 
 	# End of file, return a copy of the token array.
