@@ -4,7 +4,7 @@
 
 use lib 't/lib';
 use PPI::Test::pragmas;
-use Test::More tests => 1297 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+use Test::More tests => 1328 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use PPI ();
 use PPI::Singletons qw( %KEYWORDS );
@@ -136,6 +136,74 @@ PROTOTYPE_LEXSUB: {
 		is( $dummy, undef, "$proto_text document has exactly one child" );
 		is( $sub_statement->prototype, $expected, "$proto_text: prototype matches" );
 	}
+}
+
+SIGNATURE: {
+	for my $test (
+		{
+			code     => 'sub foo ($left, $right) {}',
+			has_sig  => 1,
+			sig_text => '($left, $right)',
+		},
+		{
+			code     => 'sub foo ($x = 0) {}',
+			has_sig  => 1,
+			sig_text => '($x = 0)',
+		},
+		{
+			code     => 'sub foo () {}',
+			has_sig  => 1,
+			sig_text => '()',
+		},
+		{
+			code    => 'sub foo {}',
+			has_sig => 0,
+		},
+		{
+			code    => 'sub foo;',
+			has_sig => 0,
+		},
+	) {
+		my $code = $test->{code};
+
+		my $Document = PPI::Document->new(
+			\$code,
+			feature_mods => { signatures => 1 },
+		);
+		isa_ok( $Document, 'PPI::Document', "$code: parsed ok" );
+
+		my ( $sub_statement, $dummy ) = $Document->schildren;
+		isa_ok( $sub_statement, 'PPI::Statement::Sub', "$code: document child is a sub" );
+		is( $dummy, undef, "$code: document has exactly one child" );
+
+		if ( $test->{has_sig} ) {
+			isa_ok( $sub_statement->signature, 'PPI::Structure::Signature',
+				"$code: signature() returns a Signature object" );
+			is( $sub_statement->signature->content, $test->{sig_text},
+				"$code: signature content matches" );
+			ok( $sub_statement->signature, "$code: signature is true" );
+		}
+		else {
+			is( $sub_statement->signature, undef, "$code: signature() returns undef" );
+		}
+	}
+}
+
+SIGNATURE_WITH_ATTRIBUTE: {
+	my $code = 'sub foo :prototype($) ($left) {}';
+	my $Document = PPI::Document->new(
+		\$code,
+		feature_mods => { signatures => 1 },
+	);
+	isa_ok( $Document, 'PPI::Document', "$code: parsed ok" );
+
+	my ( $sub_statement, $dummy ) = $Document->schildren;
+	isa_ok( $sub_statement, 'PPI::Statement::Sub', "$code: document child is a sub" );
+	is( $dummy, undef, "$code: document has exactly one child" );
+	isa_ok( $sub_statement->signature, 'PPI::Structure::Signature',
+		"$code: signature() returns a Signature object" );
+	is( $sub_statement->signature->content, '($left)',
+		"$code: signature content matches" );
 }
 
 BLOCK_AND_FORWARD: {
