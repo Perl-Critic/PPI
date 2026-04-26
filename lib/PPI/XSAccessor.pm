@@ -3,7 +3,7 @@ package PPI::XSAccessor;
 # This is an experimental prototype, use at your own risk.
 # Provides optional enhancement of PPI with Class::XSAccessor (if installed)
 
-use 5.006;
+use 5.008;
 use strict;
 use PPI ();
 

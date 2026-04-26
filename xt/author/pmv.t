@@ -28,7 +28,6 @@ all_minimum_version_from_metayml_ok( {
 	paths => [
 		grep
           { !/14_charsets\.t/ and !/24_v6\// and !/xt\// }
-          # $TODO: Token/Data.pm exclusion removed — needs minimum Perl bump to 5.008
           File::Find::Rule->perl_file->in('.')
 	],
 } );
