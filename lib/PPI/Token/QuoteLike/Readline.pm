@@ -20,12 +20,22 @@ line from a file, or all the lines from a file, as follows.
 
   # Read in a single line
   $line = <FILE>;
-  
+
   # From a scalar handle
   $line = <$filehandle>;
-  
+
   # Read all the lines
   @lines = <FILE>;
+
+The null filehandle (diamond operator) C<< <> >> and the double diamond
+operator C<<< <<>> >>> (introduced in Perl 5.22) are also represented by
+this class.
+
+  # Read from ARGV or STDIN (diamond)
+  while (<>) { ... }
+
+  # Read from ARGV or STDIN without shell globbing (double diamond)
+  while (<<>>) { ... }
 
 =head1 METHODS
 

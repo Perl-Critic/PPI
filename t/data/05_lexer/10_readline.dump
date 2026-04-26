@@ -61,6 +61,36 @@ PPI::Document
     PPI::Token::Structure  	';'
   PPI::Token::Whitespace  	'\n'
   PPI::Statement::Compound
+    PPI::Token::Word  	'while'
+    PPI::Token::Whitespace  	' '
+    PPI::Structure::Condition  	( ... )
+      PPI::Statement::Expression
+        PPI::Token::QuoteLike::Readline  	'<<>>'
+    PPI::Token::Whitespace  	' '
+    PPI::Structure::Block  	{ ... }
+  PPI::Token::Whitespace  	'\n'
+  PPI::Statement
+    PPI::Token::Symbol  	'$x'
+    PPI::Token::Whitespace  	' '
+    PPI::Token::Operator  	'='
+    PPI::Token::Whitespace  	' '
+    PPI::Token::QuoteLike::Readline  	'<<>>'
+    PPI::Token::Structure  	';'
+  PPI::Token::Whitespace  	'\n'
+  PPI::Statement
+    PPI::Token::Symbol  	'@a'
+    PPI::Token::Whitespace  	' '
+    PPI::Token::Operator  	'='
+    PPI::Token::Whitespace  	' '
+    PPI::Structure::List  	( ... )
+      PPI::Statement::Expression
+        PPI::Token::QuoteLike::Readline  	'<<>>'
+        PPI::Token::Operator  	','
+        PPI::Token::Whitespace  	' '
+        PPI::Token::QuoteLike::Readline  	'<<>>'
+    PPI::Token::Structure  	';'
+  PPI::Token::Whitespace  	'\n'
+  PPI::Statement::Compound
     PPI::Token::Word  	'for'
     PPI::Token::Whitespace  	' '
     PPI::Structure::For  	( ... )
