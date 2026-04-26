@@ -59,6 +59,7 @@ use Params::Util    qw{_STRING _INSTANCE};
 use PPI             ();
 use PPI::Exception  ();
 use PPI::Singletons '%_PARENT';
+use PPI::Lexer::FeatureSetStack ();
 
 our $VERSION = '1.292';
 
@@ -110,11 +111,12 @@ Returns a new C<PPI::Lexer> object
 
 sub new {
 	my $class = shift->_clear;
+	my $features_stack = PPI::Lexer::FeatureSetStack->new;
 	bless {
-		Tokenizer      => undef,    # Where we store the tokenizer for a run
-		buffer         => [],       # The input token buffer
-		delayed        => [],       # The "delayed insignificant tokens" buffer
-		features_stack => [],       # Stack of features in scope
+		Tokenizer      => undef,            # Where we store the tokenizer for a run
+		buffer         => [],               # The input token buffer
+		delayed        => [],               # The "delayed insignificant tokens" buffer
+		features_stack => $features_stack,  # Stack of features in scope
 	}, $class;
 }
 
@@ -198,7 +200,7 @@ sub lex_tokenizer {
 	ref($Document)->_setattr( $Document, %args );
 	$Tokenizer->_document($Document);
 	if (my $feat = $Document->feature_mods) {
-		push @{$self->{features_stack}}, $feat;
+		$self->{features_stack}->push_new($feat);
 		$Tokenizer->_features($feat);
 	}
 
@@ -423,7 +425,7 @@ sub _statement {
 	# Is it a token in our known classes list
 	my $content = $Token->content;
 	my $class =
-	  ( $content eq 'try' and ( $self->{features_stack}[-1] || {} )->{try} )
+	  ( $content eq 'try' and $self->{features_stack}->current->{try} )
 	  ? 'PPI::Statement::Compound'
 	  : $STATEMENT_CLASSES{$content};
 
@@ -623,12 +625,8 @@ sub _update_features {
 	return if ref $statement ne 'PPI::Statement::Include';
 	return unless    #
 	  my $new_features = $statement->feature_mods;
-	push @{ $self->{features_stack} }, {}
-	  if not @{ $self->{features_stack} };
-	my $current_features = $self->{features_stack}[-1];
 	$self->{Tokenizer}->_features    #
-	  ( $self->{features_stack}[-1] =
-		  { %{$current_features}, %{$new_features} } );
+	  ( $self->{features_stack}->extend_current($new_features) );
 }
 
 sub _lex_statement {
@@ -1301,7 +1299,7 @@ sub _lex_structure {
 	# my $self      = shift;
 	# my $Structure = _INSTANCE(shift, 'PPI::Structure') or die "Bad param 1";
 
-	push @{$self->{features_stack}}, $self->{features_stack}[-1] || {};
+	$self->{features_stack}->clone_current;
 
 	# Start the processing loop
 	my $Token;
@@ -1341,7 +1339,7 @@ sub _lex_structure {
 
 		# Is this the close of a structure ( which would be an error )
 		if ( $Token->__LEXER__closes ) {
-			pop @{$self->{features_stack}};
+			$self->{features_stack}->pop;
 
 			# Is this OUR closing structure
 			if ( $Token->content eq $Structure->start->__LEXER__opposite ) {
@@ -1387,7 +1385,7 @@ sub _lex_structure {
 		PPI::Exception->throw;
 	}
 
-	pop @{$self->{features_stack}};
+	$self->{features_stack}->pop;
 
 	# No, it's just the end of file.
 	# Add any insignificant trailing tokens.
