@@ -4,7 +4,7 @@
 
 use lib 't/lib';
 use PPI::Test::pragmas;
-use Test::More tests => 39 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+use Test::More tests => 44 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use PPI ();
 use Helper 'safe_new';
@@ -45,4 +45,13 @@ END_PERL
 		isa_ok( $token, "PPI::Token::$class" );
 		is( $token->symbol, $name, $remk || "The symbol is $name" );
 	}
+}
+
+HASH_SLASH: {
+	my $doc = safe_new \q{is_deeply \%/, $target;};
+	my $magic = $doc->find('PPI::Token::Magic');
+	is( ref $magic, 'ARRAY', '%/ is parsed as PPI::Token::Magic' );
+	is( $magic && $magic->[0], '%/', '%/ has the correct content' );
+	my $regexps = $doc->find('PPI::Token::Regexp::Match');
+	is( $regexps, '', 'No regexp tokens when parsing %/' );
 }

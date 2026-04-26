@@ -34,7 +34,7 @@ our %OPERATOR = map { $_ => 1 } (
 # Several things added separately to avoid warnings.
 our %MAGIC = map { $_ => 1 } qw{
 	$1 $2 $3 $4 $5 $6 $7 $8 $9
-	$_ $& $` $' $+ @+ %+ $* $. $/ $|
+	$_ $& $` $' $+ @+ %+ $* $. $/ $| %/
 	$\\ $" $; $% $= $- @- %- $)
 	$~ $^ $: $? $! %! $@ $$ $< $>
 	$( $0 $[ $] @_ @*
