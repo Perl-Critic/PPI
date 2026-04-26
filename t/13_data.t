@@ -42,7 +42,6 @@ is( $Token->content, "This is data\nFoo bar\nis\n",
 	my @data = @{ $doc->find( 'Token::Data' ) || [] };
 	my @pods = @{ $doc->find( 'Token::Pod' )  || [] };
 
-	local $TODO = "POD within __DATA__ not yet recognized (issue #15)";
 	is( scalar @pods, 1, '__DATA__: found 1 Pod token' );
 	is( scalar @data, 2, '__DATA__: found 2 Data tokens (before and after pod)' );
 	is( $pods[0] && $pods[0]->content, "=head1 DESCRIPTION\nSome pod text\n=cut\n",
@@ -62,7 +61,6 @@ is( $Token->content, "This is data\nFoo bar\nis\n",
 
 	my @pods = @{ $doc->find( 'Token::Pod' ) || [] };
 
-	local $TODO = "POD within __DATA__ not yet recognized (issue #15)";
 	is( scalar @pods, 1, '__DATA__: pod at start of data section is recognized' );
 	is( $doc->serialize, $code, '__DATA__ pod at start: round-trip serialization' );
 }

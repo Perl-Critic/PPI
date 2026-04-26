@@ -80,8 +80,13 @@ sub handle {
 sub __TOKENIZER__on_line_start {
 	my ( $self, $t ) = @_;
 
-	# Add the line
-	if ( defined $t->{token} ) {
+	if ( $t->{line} =~ /^=(\w+)/ ) {
+		$t->_new_token( 'Pod', $t->{line} );
+		unless ( $1 eq 'cut' ) {
+			$t->{class} = 'PPI::Token::Pod';
+		}
+	}
+	elsif ( defined $t->{token} ) {
 		$t->{token}->{content} .= $t->{line};
 	}
 	else {
