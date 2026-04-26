@@ -4,7 +4,7 @@
 
 use lib 't/lib';
 use PPI::Test::pragmas;
-use Test::More tests => 53 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+use Test::More tests => 58 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use PPI ();
 use Helper 'safe_new';
@@ -87,4 +87,18 @@ END_PERL
 		my $statement = $statements->[$index];
 		is( $statement->type, 'for', qq<Type is "for": $statement> );
 	}
+}
+
+CONTINUE: {
+	my $Document = safe_new \<<'END_PERL';
+{ foo(); next; bar(); }
+while (1) { } continue { }
+LABEL: { next; }
+END_PERL
+
+	my $statements = $Document->find('Statement::Compound');
+	is( scalar @{$statements}, 3, 'Found the 3 continue-related compound statements' );
+
+	is( $statements->[0]->type, 'continue', q<Type of bare block is "continue"> );
+	is( $statements->[2]->type, 'continue', q<Type of labelled bare block is "continue"> );
 }
