@@ -99,10 +99,6 @@ sub name {
 
 =pod
 
-=head1 TO DO
-
-- Write unit tests for this package
-
 =head1 SUPPORT
 
 See the L<support section|PPI/SUPPORT> in the main module.
