@@ -1,0 +1,5 @@
+PPI::Document
+  PPI::Statement
+    PPI::Token::Quote::Double  	'"a"'
+    PPI::Token::Operator  	'.'
+    PPI::Token::Number  	'1'
