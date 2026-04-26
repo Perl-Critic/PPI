@@ -8,7 +8,7 @@ BEGIN {
 		Test::More->import( skip_all => "Unicode support requires perl 5.8.7" );
 		exit(0);
 	}
-	plan( tests => 44 + ($ENV{AUTHOR_TESTING} ? 1 : 0) );
+	plan( tests => 59 + ($ENV{AUTHOR_TESTING} ? 1 : 0) );
 }
 
 use utf8;  # perl version check above says this is okay
@@ -74,8 +74,29 @@ END_CODE
 	use Encode ();
 	my $bytes = Encode::encode('utf8', 'use utf8; my %h = ( κλειδί => "Clé" );');
 	ok(!utf8::is_utf8($bytes), "utf8 flag not set on byte string");
-	{
-	    local $TODO = "Fix CRASH";
-	    good_ok( $bytes, "Hash with greek key in bytes string"          );
-	}
+	good_ok( $bytes, "Hash with greek key in bytes string" );
+
+	# Byte strings with "use utf8" are auto-decoded by the tokenizer (issue #310)
+	my $accented_bytes = Encode::encode('utf8', 'use utf8; my %hétéroclite = (bergère => 888);');
+	ok(!utf8::is_utf8($accented_bytes), "utf8 flag not set on accented byte string");
+	good_ok( $accented_bytes, "Accented identifiers in byte string with use utf8" );
+
+	my $hash_access_bytes = Encode::encode('utf8', 'use utf8; $hétéroclite{bergère}++;');
+	good_ok( $hash_access_bytes, "Accented hash access in byte string with use utf8" );
+
+	my $sub_bytes = Encode::encode('utf8', 'use utf8; sub résumé { return 1; }');
+	good_ok( $sub_bytes, "Accented sub name in byte string with use utf8" );
+
+	# Round-trip: serialized output should match the decoded input
+	my $rt_source = Encode::encode('utf8', 'use utf8; my $café = 1;');
+	my $rt_doc = PPI::Document->new(\$rt_source);
+	ok( _INSTANCE($rt_doc, 'PPI::Document'), "Round-trip: parsed accented byte string" );
+	my $rt_got = $rt_doc->serialize;
+	my $rt_expected = Encode::decode('utf8', $rt_source);
+	is( $rt_got, $rt_expected, "Round-trip: serialized matches decoded source" );
+
+	# Without "use utf8", byte strings with accented chars should still
+	# parse (as individual bytes), not crash
+	my $no_utf8_bytes = Encode::encode('utf8', 'my $x = "café";');
+	good_ok( $no_utf8_bytes, "Byte string without use utf8 still parses" );
 }

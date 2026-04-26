@@ -201,6 +201,17 @@ sub new {
 		PPI::Exception->throw(ref($_[1]) . " is not supported as a source provider");
 	}
 
+	# Decode UTF-8 byte strings when a "use utf8" pragma is present,
+	# so that \w matches Unicode word characters in identifiers.
+	if ( defined $self->{source} && !utf8::is_utf8($self->{source})
+	  && $self->{source} =~ /^[ \t]*use[ \t]+utf8\b/m )
+	{
+		my $tmp = $self->{source};
+		if ( utf8::decode($tmp) ) {
+			$self->{source} = $tmp;
+		}
+	}
+
 	# We can't handle a null string
 	$self->{source_bytes} = length $self->{source};
 	if ( $self->{source_bytes} ) {
