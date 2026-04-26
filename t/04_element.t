@@ -467,8 +467,7 @@ SCOPE: {
 # PPI DESTROY methods access package globals (%_PARENT, %_POSITION_CACHE)
 # which may already be freed during global destruction, causing SEGFAULT.
 # https://github.com/Perl-Critic/PPI/issues/344
-TODO: {
-	local $TODO = 'DESTROY not yet safe during global destruction';
+SCOPE: {
 	my $code = qq{use PPI;\nour \@d;\npush \@d, PPI::Document->new(\\"my \\\$x = 1; { foo() }") for 1..20;\nexit 0;\n};
 	my $exit = system $^X, '-Ilib', '-e', $code;
 	my $sig  = $exit & 127;
