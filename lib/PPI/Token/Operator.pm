@@ -67,12 +67,15 @@ sub __TOKENIZER__on_char {
 	}
 	return 1 if $OPERATOR{ $content . $char };
 
-	# Handle the special case of a .1234 decimal number
+	# Handle the special case of a .1234 decimal number,
+	# but only when not preceded by a value-producing token
 	if ( $content eq '.' ) {
 		if ( $char =~ /^[0-9]$/ ) {
-			# This is a decimal number
-			$t->{class} = $t->{token}->set_class('Number::Float');
-			return $t->{class}->__TOKENIZER__on_char( $t );
+			my $prev = $t->_last_significant_token;
+			if ( !$prev or !_dot_is_concat_after($prev) ) {
+				$t->{class} = $t->{token}->set_class('Number::Float');
+				return $t->{class}->__TOKENIZER__on_char( $t );
+			}
 		}
 	}
 
@@ -97,6 +100,37 @@ sub __TOKENIZER__on_char {
 
 	# Finalize normally
 	$t->_finalize_token->__TOKENIZER__on_char( $t );
+}
+
+my %_PRODUCES_VALUE = map { $_ => 1 }
+	'PPI::Token::Symbol',
+	'PPI::Token::Magic',
+	'PPI::Token::Number',
+	'PPI::Token::Number::Binary',
+	'PPI::Token::Number::Octal',
+	'PPI::Token::Number::Hex',
+	'PPI::Token::Number::Float',
+	'PPI::Token::Number::Exp',
+	'PPI::Token::Number::Version',
+	'PPI::Token::ArrayIndex',
+	'PPI::Token::Quote::Double',
+	'PPI::Token::Quote::Interpolate',
+	'PPI::Token::Quote::Literal',
+	'PPI::Token::Quote::Single',
+	'PPI::Token::QuoteLike::Backtick',
+	'PPI::Token::QuoteLike::Command',
+	'PPI::Token::QuoteLike::Readline',
+	'PPI::Token::QuoteLike::Regexp',
+	'PPI::Token::QuoteLike::Words',
+	'PPI::Token::HereDoc',
+;
+
+sub _dot_is_concat_after {
+	my $prev = shift;
+	return 1 if $_PRODUCES_VALUE{ ref $prev };
+	return 1 if $prev->isa('PPI::Token::Structure')
+		and ( $prev->content eq ')' or $prev->content eq ']' or $prev->content eq '}' );
+	return '';
 }
 
 1;
