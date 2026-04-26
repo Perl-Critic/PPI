@@ -4,7 +4,7 @@
 
 use lib 't/lib';
 use PPI::Test::pragmas;
-use Test::More tests => 123 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+use Test::More tests => 147 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use PPI ();
 use Helper 'safe_new';
@@ -83,6 +83,25 @@ OTHER: {
 		[ 'tr/fo/ba/',    'fo',  'ba',  {},         [ '//', '//' ] ],
 		[ 'qr{foo}smx',   'foo', undef, { s => 1, m => 1, x => 1 },
 							    [ '{}' ] ],
+	) {
+		my ( $code, $match, $subst, $mods, $delims ) = @{ $_ };
+		my $doc = safe_new \$code;
+		$doc or warn "'$code' did not create a document";
+		my $obj = $doc->child( 0 )->child( 0 );
+		is( $obj->_section_content( 0 ), $match, "$code correct match" );
+		is( $obj->_section_content( 1 ), $subst, "$code correct subst" );
+		is_deeply( { $obj->_modifiers() }, $mods, "$code correct modifiers" );
+		is_deeply( [ $obj->_delimiters() ], $delims, "$code correct delimiters" );
+	}
+}
+
+# Repeated modifiers (GitHub #177: 'ee' modifier not recognized)
+REPEATED_MODIFIERS: {
+	foreach (
+		[ 's/foo/bar/ee',  'foo', 'bar', { e => 2 },             [ '//', '//' ] ],
+		[ 's/foo/bar/gee', 'foo', 'bar', { g => 1, e => 2 },     [ '//', '//' ] ],
+		[ 's/foo/bar/exe', 'foo', 'bar', { e => 2, x => 1 },     [ '//', '//' ] ],
+		[ 'tr/a-z/A-Z/ss', 'a-z', 'A-Z', { s => 2 },            [ '//', '//' ] ],
 	) {
 		my ( $code, $match, $subst, $mods, $delims ) = @{ $_ };
 		my $doc = safe_new \$code;
