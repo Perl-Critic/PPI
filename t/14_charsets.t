@@ -8,7 +8,7 @@ BEGIN {
 		Test::More->import( skip_all => "Unicode support requires perl 5.8.7" );
 		exit(0);
 	}
-	plan( tests => 44 + ($ENV{AUTHOR_TESTING} ? 1 : 0) );
+	plan( tests => 48 + ($ENV{AUTHOR_TESTING} ? 1 : 0) );
 }
 
 use utf8;  # perl version check above says this is okay
@@ -74,8 +74,9 @@ END_CODE
 	use Encode ();
 	my $bytes = Encode::encode('utf8', 'use utf8; my %h = ( κλειδί => "Clé" );');
 	ok(!utf8::is_utf8($bytes), "utf8 flag not set on byte string");
-	{
-	    local $TODO = "Fix CRASH";
-	    good_ok( $bytes, "Hash with greek key in bytes string"          );
-	}
+	good_ok( $bytes, "Hash with greek key in bytes string" );
+
+	my $hash_bytes = Encode::encode('utf8', 'my $hash = { réd => 1 };');
+	ok(!utf8::is_utf8($hash_bytes), "utf8 flag not set on hash key byte string");
+	good_ok( $hash_bytes, "Hash with accented key in bytes string" );
 }
