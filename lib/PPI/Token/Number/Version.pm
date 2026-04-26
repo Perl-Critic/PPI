@@ -147,18 +147,4 @@ See L<http://perlmonks.org/?node_id=574573>
 
 See the L<support section|PPI/SUPPORT> in the main module.
 
-=head1 AUTHOR
-
-Chris Dolan E<lt>cdolan@cpan.orgE<gt>
-
-=head1 COPYRIGHT
-
-Copyright 2006 Chris Dolan.
-
-This program is free software; you can redistribute
-it and/or modify it under the same terms as Perl itself.
-
-The full text of the license can be found in the
-LICENSE file included with this module.
-
 =cut
