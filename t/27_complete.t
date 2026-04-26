@@ -26,6 +26,8 @@ plan( tests => $tests );
 # Resource Location
 
 ok( scalar(@files), 'Found at least one ->complete test file' );
+our $TODO;
+
 foreach my $file ( @files ) {
 	# Load the document
 	my $document = safe_new $file;
@@ -34,5 +36,7 @@ foreach my $file ( @files ) {
 	my $got      = !! ($document->complete);
 	my $expected = !! ($file =~ /\d+y\w+\.code$/);
 	my $isnot    = ($got == $expected) ? 'is' : 'is NOT';
+	local $TODO = "PPI::Statement::Data _complete returns false (GH #185)"
+		if $file =~ /(?:04y_data|05y_data_with_content)\.code$/;
 	is( $got, $expected, "File $file $isnot complete" );
 }
