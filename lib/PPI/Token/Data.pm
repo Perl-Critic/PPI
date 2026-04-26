@@ -30,13 +30,7 @@ our parent L<PPI::Token> and L<PPI::Element> classes.
 use strict;
 use PPI::Token ();
 
-# IO::String emulates file handles using in memory strings. Perl can do this
-# directly on perl 5.8+
-use constant USE_IO_STRING => $] < '5.008000';
-use if USE_IO_STRING, 'IO::String';
-# code may expect methods to be available on all file handles, so make sure
-# IO is loaded
-use if !USE_IO_STRING, 'IO::File';
+use IO::File ();
 
 our $VERSION = '1.292';
 
@@ -53,28 +47,21 @@ our @ISA = "PPI::Token";
 
 =head2 handle
 
-The C<handle> method returns a L<IO::String> handle that allows you
-to do all the normal handle-y things to the contents of the __DATA__
-section of the file.
+The C<handle> method returns a handle that allows you to do all the
+normal handle-y things to the contents of the __DATA__ section of the file.
 
 Unlike in perl itself, this means you can also do things like C<print>
 new data onto the end of the __DATA__ section, or modify it with
 any other process that can accept an L<IO::Handle> as input or output.
 
-Returns an L<IO::String> object.
+Returns a file handle opened on the in-memory content string.
 
 =cut
 
 sub handle {
 	my $self = shift;
-	# perl 5.6 compatibility
-	if (USE_IO_STRING) {
-		return IO::String->new( \$self->{content} );
-	}
-	else {
-		open my $fh, '+<', \$self->{content};
-		return $fh;
-	}
+	open my $fh, '+<', \$self->{content};
+	return $fh;
 }
 
 sub __TOKENIZER__on_line_start {

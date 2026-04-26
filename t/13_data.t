@@ -22,7 +22,7 @@ isa_ok( $Token, 'PPI::Token::Data' );
 
 # Get the handle
 my $handle = $Token->handle;
-isa_ok( $handle, "$]" < 5.008 ? 'IO::String' : 'GLOB' );
+isa_ok( $handle, 'GLOB' );
 
 # Try to read a line off the handle
 my $line = <$handle>;
@@ -33,8 +33,7 @@ ok( $handle->print("Foo bar\n"), "handle->print returns ok" );
 is( $Token->content, "This is data\nFoo bar\nis\n",
 	"handle->print modifies the content as expected" );
 
-TODO: {
-	local $TODO = "IO::String prereq should be removed from dist.ini (gh #166)";
+{
 	my $has_io_string_prereq = 0;
 	if ( open my $fh, '<', 'dist.ini' ) {
 		while ( my $line = <$fh> ) {
