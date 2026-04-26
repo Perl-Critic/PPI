@@ -83,7 +83,7 @@ sub __LEXER__normal() { '' }
 
 The C<type> method returns the syntactic type of the compound statement.
 
-There are four basic compound statement types.
+There are five basic compound statement types.
 
 The C<'if'> type includes all variations of the if and unless statements,
 including any C<'elsif'> or C<'else'> parts of the compound statement.
@@ -97,10 +97,13 @@ were declared using C<'for'> or C<'foreach'>.
 The C<'foreach'> type covers loops that iterate over collections,
 regardless of whether they were declared using C<'for'> or C<'foreach'>.
 
-All of the compounds are a variation on one of these four.
+The C<'continue'> type covers bare blocks that may be used with
+C<continue>, such as C<{ ... }> and C<LABEL: { ... }>.
 
-Returns the simple string C<'if'>, C<'for'>, C<'foreach'> or C<'while'>,
-or C<undef> if the type cannot be determined.
+All of the compounds are a variation on one of these five.
+
+Returns the simple string C<'if'>, C<'for'>, C<'foreach'>, C<'while'>
+or C<'continue'>, or C<undef> if the type cannot be determined.
 
 =cut
 
