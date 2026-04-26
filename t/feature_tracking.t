@@ -2,7 +2,7 @@
 
 use lib 't/lib';
 use PPI::Test::pragmas;
-use Test::More tests => 14 + ( $ENV{AUTHOR_TESTING} ? 1 : 0 );
+use Test::More tests => 15 + ( $ENV{AUTHOR_TESTING} ? 1 : 0 );
 
 use B 'perlstring';
 
@@ -431,6 +431,58 @@ SIMPLE_LIST: {
 		'PPI::Token::Structure',    ';',
 	  ],
 	  "simple custom boilerplate modules";
+}
+
+FEATURE_SCOPING_ACROSS_BLOCKS: {
+	local $TODO = "features_stack pop does not update Tokenizer";
+	test_document
+	  "use feature 'signatures';\nsub foo (\$x) {}\n{\nno feature 'signatures';\nsub bar (\$x) {}\n}\nsub baz (\$x) {}\n",
+	  [
+		'PPI::Statement::Include',    "use feature 'signatures';",
+		'PPI::Token::Word',           'use',
+		'PPI::Token::Word',           'feature',
+		'PPI::Token::Quote::Single',  "'signatures'",
+		'PPI::Token::Structure',      ';',
+		'PPI::Statement::Sub',        'sub foo ($x) {}',
+		'PPI::Token::Word',           'sub',
+		'PPI::Token::Word',           'foo',
+		'PPI::Structure::Signature',  '($x)',
+		'PPI::Token::Structure',      '(',
+		'PPI::Statement::Expression', '$x',
+		'PPI::Token::Symbol',         '$x',
+		'PPI::Token::Structure',      ')',
+		'PPI::Structure::Block',      '{}',
+		'PPI::Token::Structure',      '{',
+		'PPI::Token::Structure',      '}',
+		'PPI::Statement::Compound',   "{\nno feature 'signatures';\nsub bar (\$x) {}\n}",
+		'PPI::Structure::Block',      "{\nno feature 'signatures';\nsub bar (\$x) {}\n}",
+		'PPI::Token::Structure',      '{',
+		'PPI::Statement::Include',    "no feature 'signatures';",
+		'PPI::Token::Word',           'no',
+		'PPI::Token::Word',           'feature',
+		'PPI::Token::Quote::Single',  "'signatures'",
+		'PPI::Token::Structure',      ';',
+		'PPI::Statement::Sub',        'sub bar ($x) {}',
+		'PPI::Token::Word',           'sub',
+		'PPI::Token::Word',           'bar',
+		'PPI::Token::Prototype',      '($x)',
+		'PPI::Structure::Block',      '{}',
+		'PPI::Token::Structure',      '{',
+		'PPI::Token::Structure',      '}',
+		'PPI::Token::Structure',      '}',
+		'PPI::Statement::Sub',        'sub baz ($x) {}',
+		'PPI::Token::Word',           'sub',
+		'PPI::Token::Word',           'baz',
+		'PPI::Structure::Signature',  '($x)',
+		'PPI::Token::Structure',      '(',
+		'PPI::Statement::Expression', '$x',
+		'PPI::Token::Symbol',         '$x',
+		'PPI::Token::Structure',      ')',
+		'PPI::Structure::Block',      '{}',
+		'PPI::Token::Structure',      '{',
+		'PPI::Token::Structure',      '}',
+	  ],
+	  "feature scoping: no feature in block does not leak to outer scope";
 }
 
 ok( PPI::Tokenizer->new( \"d()" )->all_tokens, "bare tokenizer auto-vivifies document object" );
