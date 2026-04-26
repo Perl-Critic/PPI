@@ -4,7 +4,7 @@
 
 use lib 't/lib';
 use PPI::Test::pragmas;
-use Test::More tests => 3073 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+use Test::More tests => 3105 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use PPI ();
 use PPI::Singletons qw( %KEYWORDS %OPERATOR );
@@ -726,5 +726,89 @@ OPERATORS_PLUS_MINUS: {
         my $ops = $doc->find('Token::Operator');
         local $TODO = "(1)-2 not parsed correctly";
         is( ref $ops, 'ARRAY', "found operator $op" );
+    }
+}
+
+
+OPERATOR_ISA: {
+    my @tests = (
+        {
+            desc => 'isa infix operator with string',
+            code => q{$foo isa 'Bar'},
+            expected => [
+                'PPI::Token::Symbol' => '$foo',
+                'PPI::Token::Whitespace' => ' ',
+                'PPI::Token::Operator' => 'isa',
+                'PPI::Token::Whitespace' => ' ',
+                'PPI::Token::Quote::Single' => q{'Bar'},
+            ],
+        },
+        {
+            desc => 'isa infix operator with class name',
+            code => '$foo isa Bar::Baz',
+            expected => [
+                'PPI::Token::Symbol' => '$foo',
+                'PPI::Token::Whitespace' => ' ',
+                'PPI::Token::Operator' => 'isa',
+                'PPI::Token::Whitespace' => ' ',
+                'PPI::Token::Word' => 'Bar::Baz',
+            ],
+        },
+        {
+            desc => 'isa as method call stays Word',
+            code => q{$foo->isa('Bar')},
+            expected => [
+                'PPI::Token::Symbol' => '$foo',
+                'PPI::Token::Operator' => '->',
+                'PPI::Token::Word' => 'isa',
+                'PPI::Structure::List' => q{('Bar')},
+                'PPI::Token::Structure' => '(',
+                'PPI::Statement::Expression' => q{'Bar'},
+                'PPI::Token::Quote::Single' => q{'Bar'},
+                'PPI::Token::Structure' => ')',
+            ],
+        },
+        {
+            desc => 'isa as hash key stays Word',
+            code => 'isa => 1',
+            expected => [
+                'PPI::Token::Word' => 'isa',
+                'PPI::Token::Whitespace' => ' ',
+                'PPI::Token::Operator' => '=>',
+                'PPI::Token::Whitespace' => ' ',
+                'PPI::Token::Number' => '1',
+            ],
+        },
+        {
+            desc => 'isa as hash key in constructor stays Word',
+            code => '{isa => 1}',
+            expected => [
+                'PPI::Structure::Constructor' => '{isa => 1}',
+                'PPI::Token::Structure' => '{',
+                'PPI::Statement::Expression' => 'isa => 1',
+                'PPI::Token::Word' => 'isa',
+                'PPI::Token::Whitespace' => ' ',
+                'PPI::Token::Operator' => '=>',
+                'PPI::Token::Whitespace' => ' ',
+                'PPI::Token::Number' => '1',
+                'PPI::Token::Structure' => '}',
+            ],
+        },
+    );
+
+    for my $test ( @tests ) {
+        my $d = safe_new \$test->{code};
+        my $tokens = $d->find( sub { 1; } );
+        $tokens = [ map { ref($_), $_->content() } @$tokens ];
+        my $expected = $test->{expected};
+        if ( $expected->[0] !~ /^PPI::Statement/ ) {
+            unshift @$expected, 'PPI::Statement', $test->{code};
+        }
+        my $ok = is_deeply( $tokens, $expected, $test->{desc} );
+        if ( !$ok ) {
+            diag "$test->{code} ($test->{desc})\n";
+            diag explain $tokens;
+            diag explain $test->{expected};
+        }
     }
 }
