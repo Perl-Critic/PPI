@@ -170,7 +170,11 @@ sub __TOKENIZER__on_char {
 	# Handle magic things
 	my $content = $t->{token}->{content};	
 	if ( $content eq '@_' or $content eq '$_' ) {
-		$t->{class} = $t->{token}->set_class( 'Magic' );
+		my $nextchar = substr( $t->{line}, $t->{line_cursor}, 1 );
+		# @_{} and $_{} access %_, which is not magic
+		if ( $nextchar ne '{' ) {
+			$t->{class} = $t->{token}->set_class( 'Magic' );
+		}
 		return $t->_finalize_token->__TOKENIZER__on_char( $t );
 	}
 

@@ -48,7 +48,6 @@ END_PERL
 }
 
 HASH_SLICE_OF_PERCENT_UNDERSCORE: {
-	local $TODO = 'GH #169: hash slices of %_ misidentified as magic';
 
 	my $document = safe_new \<<'END_PERL';
 @_{qw( foo bar )} = (1, 2);
