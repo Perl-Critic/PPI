@@ -204,6 +204,13 @@ sub new {
 	# We can't handle a null string
 	$self->{source_bytes} = length $self->{source};
 	if ( $self->{source_bytes} ) {
+		# Decode UTF-8 byte strings to character strings so that
+		# Unicode word characters (e.g. in identifiers) are correctly
+		# recognized by \w in the tokenizer's regex patterns.
+		if ( !utf8::is_utf8($self->{source}) ) {
+			utf8::decode($self->{source});
+		}
+
 		# Split on local newlines
 		$self->{source} =~ s/(?:\015{1,2}\012|\015|\012)/\n/g;
 		$self->{source} = [ split /(?<=\n)/, $self->{source} ];

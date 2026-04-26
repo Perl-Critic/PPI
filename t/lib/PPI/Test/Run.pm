@@ -60,7 +60,9 @@ sub run_testdir {
 			my @content = !$has_dumpfile ? () : do {
 				open my $DUMP, '<', $dumpfile or die "open: $!";
 				binmode $DUMP;
-				<$DUMP>;
+				my @lines = <$DUMP>;
+				for (@lines) { utf8::decode($_) unless utf8::is_utf8($_) }
+				@lines;
 			};
 			chomp @content;
 
@@ -76,6 +78,7 @@ sub run_testdir {
 			skip "No roundtrip check: Couldn't parse code file before", 1 if !$document;
 			skip "No roundtrip check: Couldn't open code file '$codename', $!", 1 unless #
 			  my $source = do { open my $CODEFILE, '<', $codefile; binmode $CODEFILE; local $/; <$CODEFILE> };
+			utf8::decode($source) unless utf8::is_utf8($source);
 			$source =~ s/(?:\015{1,2}\012|\015|\012)/\n/g;
 
 			is( $document->serialize, $source, "$codename: Round-trip back to source was ok" );
@@ -118,6 +121,7 @@ sub increment_testdir {
 			binmode $CODEFILE;
 			<$CODEFILE>;
 		};
+		utf8::decode($buffer) unless utf8::is_utf8($buffer);
 
 		# Cover every possible transitional state in
 		# the regression test code fragments.

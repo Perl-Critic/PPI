@@ -61,6 +61,7 @@ my %bom_types = (
    "\xfe\xff"         => 'UTF-16',
    "\xff\xfe"         => 'UTF-16',
    "\xef\xbb\xbf"     => 'UTF-8',
+   "\x{FEFF}"         => 'UTF-8',
 );
 
 sub __TOKENIZER__on_line_start {
@@ -71,7 +72,8 @@ sub __TOKENIZER__on_line_start {
 		\xff\xfe\x00\x00 |  # UTF-32, little-endian
 		\xfe\xff         |  # UTF-16, big-endian
 		\xff\xfe         |  # UTF-16, little-endian
-		\xef\xbb\xbf)       # UTF-8
+		\xef\xbb\xbf    |  # UTF-8 (raw bytes)
+		\x{FEFF})           # UTF-8 BOM (decoded character)
 	    /xs) {
 	   my $bom = $1;
 
