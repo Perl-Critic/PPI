@@ -118,6 +118,7 @@ Configured with `--state=hot,slow,save -j 9 --recurse -l t` — runs slow tests 
 - PPI::XS is optional/experimental — always disabled in tests
 - avoid unless, except for `die unless #\n my $thing = generate;` constructs
 - prefer postfix syntax constructs
+- All PRs should be implemented with at least two commits, one containing failing tests, marked with $TODO, the other containing the fixes and removals of relevant $TODO markers.
 
 ## Dependencies
 
