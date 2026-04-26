@@ -105,14 +105,12 @@ string for example, this is the method that is called.
 
 B<WARNING:>
 
-You should be aware that because of the way that here-docs are handled, any
-here-doc content is not included in C<content>, and as such you should
-B<not> eval or execute the result if it contains any L<PPI::Token::HereDoc>.
+For individual L<PPI::Token::HereDoc> tokens, C<content> returns only the
+here-doc declaration (e.g. C<< <<FOO >>), not the body. However,
+L<PPI::Document> overrides C<content> to call C<serialize>, so stringifying
+a Document produces valid Perl including here-doc bodies.
 
-The L<PPI::Document> method C<serialize> should be used to stringify a PDOM
-document into something that can be executed as expected.
-
-Returns the basic code as a string (excluding here-doc content).
+Returns the basic code as a string.
 
 =cut
 

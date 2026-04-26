@@ -4,7 +4,7 @@
 
 use lib 't/lib';
 use PPI::Test::pragmas;
-use Test::More tests => 30 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+use Test::More tests => 31 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use PPI ();
 use Helper 'safe_new';
@@ -405,13 +405,17 @@ sub h {
 		$test->{name},
 		sub {
 			my $exceptions = grep { $exception{$_} } keys %{ $test->{expected} };
-			plan tests => 8 - $exceptions + keys %{ $test->{expected} };
+			plan tests => 9 - $exceptions + keys %{ $test->{expected} };
 
 			my $document = safe_new \$test->{content};
 
 			SKIP: {
 				skip 'Damaged document', 1 if $test->{expected}{_damaged};
 				is( $document->serialize(), $test->{content}, 'Document serializes correctly' );
+			}
+			SKIP: {
+				skip 'Damaged document', 1 if $test->{expected}{_damaged};
+				is( $document->content(), $test->{content}, 'Document content round-trips correctly' );
 			}
 
 			my $heredocs = $document->find( 'Token::HereDoc' );
@@ -434,3 +438,14 @@ sub h {
 		}
 	);
 }
+
+# GH #288: Stringifying a Document with heredocs must include the body.
+subtest 'GH #288: Document stringification preserves heredoc content' => sub {
+	plan tests => 4;
+
+	my $content = "my \$heredoc = <<~HERE;\n\tLine 1\n\n\tLine 3\n\tHERE\n";
+	my $doc = safe_new \$content;
+
+	is( $doc->content, $content, 'content() round-trips heredoc document' );
+	is( "$doc", $content, 'stringification round-trips heredoc document' );
+};
