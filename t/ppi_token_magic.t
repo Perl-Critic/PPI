@@ -4,7 +4,7 @@
 
 use lib 't/lib';
 use PPI::Test::pragmas;
-use Test::More tests => 39 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+use Test::More tests => 49 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use PPI ();
 use Helper 'safe_new';
@@ -44,5 +44,35 @@ END_PERL
 			split /\s+/, $comments->[$token->line_number - 1], 4;
 		isa_ok( $token, "PPI::Token::$class" );
 		is( $token->symbol, $name, $remk || "The symbol is $name" );
+	}
+}
+
+HASH_SLICE_OF_PERCENT_UNDERSCORE: {
+	local $TODO = 'GH #169: hash slices of %_ misidentified as magic';
+
+	my $document = safe_new \<<'END_PERL';
+@_{qw( foo bar )} = (1, 2);
+END_PERL
+
+	my $symbols = $document->find( 'PPI::Token::Symbol' ) || [];
+	is( scalar(@$symbols), 1, '@_{} found one symbol' );
+	SKIP: {
+		skip '@_ not found as Symbol', 2 unless @$symbols;
+		ok( !$symbols->[0]->isa('PPI::Token::Magic'),
+			'@_{} is Symbol, not Magic' );
+		is( $symbols->[0]->symbol, '%_', '@_{} refers to %_' );
+	}
+
+	$document = safe_new \<<'END_PERL';
+$_{foo} = 1;
+END_PERL
+
+	$symbols = $document->find( 'PPI::Token::Symbol' ) || [];
+	is( scalar(@$symbols), 1, '$_{} found one symbol' );
+	SKIP: {
+		skip '$_ not found as Symbol', 2 unless @$symbols;
+		ok( !$symbols->[0]->isa('PPI::Token::Magic'),
+			'$_{} is Symbol, not Magic' );
+		is( $symbols->[0]->symbol, '%_', '$_{} refers to %_' );
 	}
 }
