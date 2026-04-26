@@ -1,0 +1,69 @@
+PPI::Document
+  PPI::Statement
+    PPI::Token::Symbol  	'@lines'
+    PPI::Token::Whitespace  	' '
+    PPI::Token::Operator  	'='
+    PPI::Token::Whitespace  	' '
+    PPI::Token::Word  	'map'
+    PPI::Token::Whitespace  	' '
+    PPI::Structure::Block  	{ ... }
+      PPI::Token::Whitespace  	' '
+      PPI::Statement
+        PPI::Token::Magic  	'$_'
+      PPI::Token::Whitespace  	' '
+    PPI::Token::Whitespace  	' '
+    PPI::Token::QuoteLike::Readline  	'<$fh>'
+    PPI::Token::Structure  	';'
+  PPI::Token::Whitespace  	'\n'
+  PPI::Statement
+    PPI::Token::Symbol  	'@lines'
+    PPI::Token::Whitespace  	' '
+    PPI::Token::Operator  	'='
+    PPI::Token::Whitespace  	' '
+    PPI::Token::Word  	'grep'
+    PPI::Token::Whitespace  	' '
+    PPI::Structure::Block  	{ ... }
+      PPI::Token::Whitespace  	' '
+      PPI::Statement
+        PPI::Token::Number  	'1'
+      PPI::Token::Whitespace  	' '
+    PPI::Token::Whitespace  	' '
+    PPI::Token::QuoteLike::Readline  	'<$fh>'
+    PPI::Token::Structure  	';'
+  PPI::Token::Whitespace  	'\n'
+  PPI::Statement
+    PPI::Token::Symbol  	'@lines'
+    PPI::Token::Whitespace  	' '
+    PPI::Token::Operator  	'='
+    PPI::Token::Whitespace  	' '
+    PPI::Token::Word  	'sort'
+    PPI::Token::Whitespace  	' '
+    PPI::Structure::Block  	{ ... }
+      PPI::Token::Whitespace  	' '
+      PPI::Statement
+        PPI::Token::Symbol  	'$a'
+        PPI::Token::Whitespace  	' '
+        PPI::Token::Operator  	'cmp'
+        PPI::Token::Whitespace  	' '
+        PPI::Token::Symbol  	'$b'
+      PPI::Token::Whitespace  	' '
+    PPI::Token::Whitespace  	' '
+    PPI::Token::QuoteLike::Readline  	'<$fh>'
+    PPI::Token::Structure  	';'
+  PPI::Token::Whitespace  	'\n'
+  PPI::Statement
+    PPI::Token::Symbol  	'@lines'
+    PPI::Token::Whitespace  	' '
+    PPI::Token::Operator  	'='
+    PPI::Token::Whitespace  	' '
+    PPI::Token::Word  	'map'
+    PPI::Token::Whitespace  	' '
+    PPI::Structure::Block  	{ ... }
+      PPI::Token::Whitespace  	' '
+      PPI::Statement
+        PPI::Token::Magic  	'$_'
+      PPI::Token::Whitespace  	' '
+    PPI::Token::Whitespace  	' '
+    PPI::Token::QuoteLike::Readline  	'<FILE>'
+    PPI::Token::Structure  	';'
+  PPI::Token::Whitespace  	'\n'
