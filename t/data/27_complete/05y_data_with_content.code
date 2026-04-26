@@ -1,0 +1,5 @@
+package Foo;
+1;
+__DATA__
+some: data
+goes: here

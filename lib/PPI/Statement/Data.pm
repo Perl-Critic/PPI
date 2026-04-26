@@ -47,8 +47,8 @@ our $VERSION = '1.292';
 
 our @ISA = "PPI::Statement";
 
-# Data is never complete
-sub _complete () { '' }
+# Once we have a __DATA__ we're done
+sub _complete () { 1 }
 
 1;
 
