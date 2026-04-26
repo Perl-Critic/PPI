@@ -2,7 +2,7 @@
 
 use lib 't/lib';
 use PPI::Test::pragmas;
-use Test::More tests => 14 + ( $ENV{AUTHOR_TESTING} ? 1 : 0 );
+use Test::More tests => 17 + ( $ENV{AUTHOR_TESTING} ? 1 : 0 );
 
 use B 'perlstring';
 
@@ -431,6 +431,62 @@ SIMPLE_LIST: {
 		'PPI::Token::Structure',    ';',
 	  ],
 	  "simple custom boilerplate modules";
+}
+
+COMMA_LIST_ENABLES_SIGNATURES: {
+	test_document
+	  "use feature \"signatures\", \"postderef\";\nsub foo(\$x) {}",
+	  [
+		'PPI::Statement::Include',    'use feature "signatures", "postderef";',
+		'PPI::Token::Word',           'use',
+		'PPI::Token::Word',           'feature',
+		'PPI::Token::Quote::Double',  '"signatures"',
+		'PPI::Token::Operator',       ',',
+		'PPI::Token::Quote::Double',  '"postderef"',
+		'PPI::Token::Structure',      ';',
+		'PPI::Statement::Sub',        'sub foo($x) {}',
+		'PPI::Token::Word',           'sub',
+		'PPI::Token::Word',           'foo',
+		'PPI::Structure::Signature',  '($x)',
+		'PPI::Token::Structure',      '(',
+		'PPI::Statement::Expression', '$x',
+		'PPI::Token::Symbol',         '$x',
+		'PPI::Token::Structure',      ')',
+		'PPI::Structure::Block',      '{}',
+		'PPI::Token::Structure',      '{',
+		'PPI::Token::Structure',      '}',
+	  ],
+	  "comma-separated feature list enables signatures";
+}
+
+PAREN_COMMA_NO_WARNINGS: {
+	my @warnings;
+	local $SIG{__WARN__} = sub { push @warnings, @_ };
+	test_document
+	  "no feature (\"signatures\", \"postderef\");\nsub foo(\$x) {}",
+	  [
+		'PPI::Statement::Include',    'no feature ("signatures", "postderef");',
+		'PPI::Token::Word',           'no',
+		'PPI::Token::Word',           'feature',
+		'PPI::Structure::List',       '("signatures", "postderef")',
+		'PPI::Token::Structure',      '(',
+		'PPI::Statement::Expression', '"signatures", "postderef"',
+		'PPI::Token::Quote::Double',  '"signatures"',
+		'PPI::Token::Operator',       ',',
+		'PPI::Token::Quote::Double',  '"postderef"',
+		'PPI::Token::Structure',      ')',
+		'PPI::Token::Structure',      ';',
+		'PPI::Statement::Sub',        'sub foo($x) {}',
+		'PPI::Token::Word',           'sub',
+		'PPI::Token::Word',           'foo',
+		'PPI::Token::Prototype',      '($x)',
+		'PPI::Structure::Block',      '{}',
+		'PPI::Token::Structure',      '{',
+		'PPI::Token::Structure',      '}',
+	  ],
+	  "parenthesized comma list parses correctly";
+	is_deeply \@warnings, [],
+	  "no warnings from parenthesized comma-separated feature list";
 }
 
 ok( PPI::Tokenizer->new( \"d()" )->all_tokens, "bare tokenizer auto-vivifies document object" );

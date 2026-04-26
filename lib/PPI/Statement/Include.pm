@@ -323,6 +323,7 @@ sub _decompose_argument {
 	my $as_text = $arg->can("literal") || $arg->can("string");
 	return $as_text->($arg) if $as_text;
 	return if $arg->isa("PPI::Token::Operator")
+	  or $arg->isa("PPI::Token::Whitespace")
 	  or $arg->content eq ",";
 	warn "possibly unrecognized feature because of unknown arg decompose"
 	 . " type: '$arg' : " . ref $arg;
