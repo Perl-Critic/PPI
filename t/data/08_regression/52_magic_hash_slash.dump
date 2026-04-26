@@ -1,0 +1,10 @@
+PPI::Document
+  PPI::Statement
+    PPI::Token::Word  	'is_deeply'
+    PPI::Token::Whitespace  	' '
+    PPI::Token::Cast  	'\'
+    PPI::Token::Magic  	'%/'
+    PPI::Token::Operator  	','
+    PPI::Token::Whitespace  	' '
+    PPI::Token::Symbol  	'$target'
+    PPI::Token::Structure  	';'
