@@ -20,8 +20,8 @@ quote-like operator, such as C<q{foo bar}>.
 
 =head1 METHODS
 
-There are no methods available for C<PPI::Token::Quote::Literal> beyond
-those provided by the parent L<PPI::Token::Quote>, L<PPI::Token> and
+The following methods are provided by this class,
+beyond those provided by the parent L<PPI::Token::Quote>, L<PPI::Token> and
 L<PPI::Element> classes.
 
 =cut
@@ -39,6 +39,20 @@ our @ISA = qw{
 
 
 
+
+
+=pod
+
+=head2 get_delimiters
+
+The C<get_delimiters> method returns the delimiters of the literal string as an
+array. The first and only element is the delimiters of the string content.
+
+=cut
+
+sub get_delimiters {
+	return $_[0]->_delimiters();
+}
 
 
 #####################################################################

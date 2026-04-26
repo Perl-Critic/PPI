@@ -98,37 +98,36 @@ LITERAL: {
 }
 
 GET_DELIMITERS: {
-	local $TODO = "get_delimiters not yet implemented for QuoteLike::Words";
 	check_with 'qw(a b c)', sub {
 		my $qw = $_->find_first( 'Token::QuoteLike::Words' );
 		ok $qw, 'found qw token with parens';
 		ok $qw->can('get_delimiters'), 'get_delimiters method exists';
-		is( ( eval { $qw->get_delimiters } )[0], "()", "qw() delimiters" );
+		is( ( $qw->get_delimiters )[0], "()", "qw() delimiters" );
 	};
 	check_with 'qw{a b c}', sub {
 		my $qw = $_->find_first( 'Token::QuoteLike::Words' );
-		is( ( eval { $qw->get_delimiters } )[0], "{}", "qw{} delimiters" );
+		is( ( $qw->get_delimiters )[0], "{}", "qw{} delimiters" );
 	};
 	check_with 'qw[a b c]', sub {
 		my $qw = $_->find_first( 'Token::QuoteLike::Words' );
-		is( ( eval { $qw->get_delimiters } )[0], "[]", "qw[] delimiters" );
+		is( ( $qw->get_delimiters )[0], "[]", "qw[] delimiters" );
 	};
 	check_with 'qw<a b c>', sub {
 		my $qw = $_->find_first( 'Token::QuoteLike::Words' );
-		is( ( eval { $qw->get_delimiters } )[0], "<>", "qw<> delimiters" );
+		is( ( $qw->get_delimiters )[0], "<>", "qw<> delimiters" );
 	};
 	check_with 'qw/a b c/', sub {
 		my $qw = $_->find_first( 'Token::QuoteLike::Words' );
-		is( ( eval { $qw->get_delimiters } )[0], "//", "qw// delimiters" );
+		is( ( $qw->get_delimiters )[0], "//", "qw// delimiters" );
 	};
 	check_with 'qw!a b c!', sub {
 		my $qw = $_->find_first( 'Token::QuoteLike::Words' );
-		is( ( eval { $qw->get_delimiters } )[0], "!!", "qw!! delimiters" );
+		is( ( $qw->get_delimiters )[0], "!!", "qw!! delimiters" );
 	};
 	check_with 'my @a = qw(a b c);', sub {
 		my $qw = $_->find_first( 'Token::QuoteLike::Words' );
-		is( ( eval { $qw->get_delimiters } )[0], "()", "qw() delimiters in statement" );
-		is scalar( eval { $qw->get_delimiters } ), 1, "qw returns exactly one delimiter pair";
+		is( ( $qw->get_delimiters )[0], "()", "qw() delimiters in statement" );
+		is scalar( $qw->get_delimiters ), 1, "qw returns exactly one delimiter pair";
 	};
 }
 

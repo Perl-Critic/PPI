@@ -34,20 +34,19 @@ LITERAL: {
 }
 
 GET_DELIMITERS: {
-	local $TODO = "get_delimiters not yet implemented for Quote::Literal";
 	my $Document = safe_new \"print q{foo}, q!bar!, q <foo>, q((foo));";
 	my $literal = $Document->find('Token::Quote::Literal');
 	ok $literal->[0]->can('get_delimiters'), 'get_delimiters method exists';
-	is( ( eval { $literal->[0]->get_delimiters } )[0], "{}", "q{} delimiters" );
-	is( ( eval { $literal->[1]->get_delimiters } )[0], "!!", "q!! delimiters" );
-	is( ( eval { $literal->[2]->get_delimiters } )[0], "<>", "q<> delimiters" );
-	is( ( eval { $literal->[3]->get_delimiters } )[0], "()", "q() delimiters" );
-	is scalar( eval { $literal->[0]->get_delimiters } ), 1, "q returns exactly one delimiter pair";
+	is( ( $literal->[0]->get_delimiters )[0], "{}", "q{} delimiters" );
+	is( ( $literal->[1]->get_delimiters )[0], "!!", "q!! delimiters" );
+	is( ( $literal->[2]->get_delimiters )[0], "<>", "q<> delimiters" );
+	is( ( $literal->[3]->get_delimiters )[0], "()", "q() delimiters" );
+	is scalar( $literal->[0]->get_delimiters ), 1, "q returns exactly one delimiter pair";
 
 	my $d2 = safe_new \"q/foo/";
 	my $q = $d2->find_first('Token::Quote::Literal');
 	ok $q, 'found q/.../ token';
-	is( ( eval { $q->get_delimiters } )[0], "//", "q// delimiters" );
+	is( ( $q->get_delimiters )[0], "//", "q// delimiters" );
 }
 
 test_statement(

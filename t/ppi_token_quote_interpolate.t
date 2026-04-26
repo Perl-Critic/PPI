@@ -11,19 +11,18 @@ use Helper 'safe_new';
 
 
 GET_DELIMITERS: {
-	local $TODO = "get_delimiters not yet implemented for Quote::Interpolate";
 	my $Document = safe_new \"print qq{foo}, qq!bar!, qq <foo>;";
 	my $Interpolate = $Document->find('Token::Quote::Interpolate');
 	ok $Interpolate->[0]->can('get_delimiters'), 'get_delimiters method exists';
-	is( ( eval { $Interpolate->[0]->get_delimiters } )[0], "{}", "qq{} delimiters" );
-	is( ( eval { $Interpolate->[1]->get_delimiters } )[0], "!!", "qq!! delimiters" );
-	is( ( eval { $Interpolate->[2]->get_delimiters } )[0], "<>", "qq<> delimiters" );
-	is scalar( eval { $Interpolate->[0]->get_delimiters } ), 1, "qq returns exactly one delimiter pair";
+	is( ( $Interpolate->[0]->get_delimiters )[0], "{}", "qq{} delimiters" );
+	is( ( $Interpolate->[1]->get_delimiters )[0], "!!", "qq!! delimiters" );
+	is( ( $Interpolate->[2]->get_delimiters )[0], "<>", "qq<> delimiters" );
+	is scalar( $Interpolate->[0]->get_delimiters ), 1, "qq returns exactly one delimiter pair";
 
 	my $d2 = safe_new \"qq/foo/";
 	my $qq = $d2->find_first('Token::Quote::Interpolate');
 	ok $qq, 'found qq/.../ token';
-	is( ( eval { $qq->get_delimiters } )[0], "//", "qq// delimiters" );
+	is( ( $qq->get_delimiters )[0], "//", "qq// delimiters" );
 }
 
 STRING: {

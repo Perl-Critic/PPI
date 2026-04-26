@@ -20,7 +20,7 @@ interpolation quote-like operator, such as C<qq{$foo bar $baz}>.
 
 =head1 METHODS
 
-There are no methods available for C<PPI::Token::Quote::Interpolate>
+The following methods are provided by this class,
 beyond those provided by the parent L<PPI::Token::Quote>, L<PPI::Token> and
 L<PPI::Element> classes.
 
@@ -39,6 +39,21 @@ our @ISA = qw{
 
 
 
+
+
+=pod
+
+=head2 get_delimiters
+
+The C<get_delimiters> method returns the delimiters of the interpolated string
+as an array. The first and only element is the delimiters of the string
+content.
+
+=cut
+
+sub get_delimiters {
+	return $_[0]->_delimiters();
+}
 
 
 #####################################################################
