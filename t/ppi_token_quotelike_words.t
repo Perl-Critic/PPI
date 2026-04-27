@@ -4,7 +4,7 @@
 
 use lib 't/lib';
 use PPI::Test::pragmas;
-use Test::More tests => 2425 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+use Test::More tests => 2430 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use PPI ();
 use Helper 'safe_new';
@@ -90,6 +90,7 @@ LITERAL: {
 
 	# even backslash can be a delimiter, in when it is, backslashes
 	# can't be embedded or escaped.
+	assemble_and_run '',   [],    $bs, '',   '',   $bs, [];
 	assemble_and_run '',   [],    $bs, ' ',  ' ',  $bs, [];
 	assemble_and_run '',   [],    $bs, "\n", "\n", $bs, [];
 	assemble_and_run '',   ['a'], $bs, '',   ' ',  $bs, ['a'];
