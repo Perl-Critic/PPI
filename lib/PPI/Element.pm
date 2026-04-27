@@ -458,6 +458,44 @@ sub previous_token {
 	}
 }
 
+=head2 namespace
+
+Determines the effective package namespace for the Element by walking
+backwards through siblings and upward through the PDOM tree, looking for
+C<PPI::Statement::Package> declarations.
+
+Block-form packages (C<package Foo { ... }>) only affect their contents,
+not subsequent siblings. Semicolon-form packages (C<package Foo;>) affect
+all subsequent siblings until the next package declaration or end of scope.
+
+Returns C<'main'> if no enclosing package is found.
+
+=cut
+
+sub namespace {
+	my $cursor = shift;
+	while ( $cursor ) {
+		my $sib = $cursor;
+		while ( $sib = $sib->sprevious_sibling ) {
+			next unless $sib->isa('PPI::Statement::Package');
+			next if $sib->block;
+			return $sib->namespace;
+		}
+		my $parent = $cursor->parent or last;
+		if (
+			$parent->isa('PPI::Structure::Block')
+			and $parent->parent
+			and $parent->parent->isa('PPI::Statement::Package')
+		) {
+			return $parent->parent->namespace;
+		}
+		$cursor = $parent;
+	}
+	'main';
+}
+
+=pod
+
 =head2 presumed_features
 
 Returns a hash that indicates which features appear to be active for the given

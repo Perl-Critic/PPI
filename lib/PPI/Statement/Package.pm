@@ -21,15 +21,8 @@ starting with 'package', it converts it to a C<PPI::Statement::Package>
 object.
 
 When working with package statements, please remember that packages only
-exist within their scope, and proper support for scoping has yet to be
-completed in PPI.
-
-However, if the immediate parent of the package statement is the
-top level L<PPI::Document> object, then it can be considered to define
-everything found until the next top-level "file scoped" package statement.
-
-A file may, however, contain nested temporary package, in which case you
-are mostly on your own :)
+exist within their scope. To determine the effective package for any
+element in the document, use the L<PPI::Element/namespace> method.
 
 =head1 METHODS
 
@@ -92,6 +85,37 @@ sub version {
 	$version->isa('PPI::Token::Structure')
 		? ''
 		: $version->content;
+}
+
+=pod
+
+=head2 block
+
+If the package declaration uses the block syntax (C<package Foo { ... }>),
+the C<block> method returns the L<PPI::Structure::Block> for the body of
+the package.
+
+Returns false if the package declaration uses the semicolon syntax
+(C<package Foo;>).
+
+=cut
+
+sub block {
+	my $self = shift;
+	my $last = $self->schild(-1) or return '';
+	$last->isa('PPI::Structure::Block')
+		? $last
+		: '';
+}
+
+sub _complete {
+	my $self = shift;
+	my $last = $self->schild(-1) or return '';
+	return !! (
+		$last->isa('PPI::Structure::Block')
+		? $last->complete
+		: $last->isa('PPI::Token::Structure') && $last->content eq ';'
+	);
 }
 
 =pod
