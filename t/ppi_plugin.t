@@ -7,11 +7,7 @@ use Test::More tests => 12 + ( $ENV{AUTHOR_TESTING} ? 1 : 0 );
 use PPI ();
 use PPI::Dumper;
 
-our $TODO;
-my $todo_msg = "Plugin system not yet implemented";
-
 PLUGIN_BASE_CLASS: {
-	local $TODO = $todo_msg;
 	require_ok('PPI::Plugin');
 	my $plugin = eval { PPI::Plugin->new };
 	isa_ok( $plugin, 'PPI::Plugin' );
@@ -19,23 +15,18 @@ PLUGIN_BASE_CLASS: {
 }
 
 PLUGIN_PASSED_TO_DOCUMENT: {
-	local $TODO = $todo_msg;
-	my $plugin = eval { PPI::Plugin->new } || bless {}, 'PPI::Plugin';
+	my $plugin = PPI::Plugin->new;
 	my $doc = PPI::Document->new( \"my \$x = 1;", plugins => [$plugin] );
 	ok( $doc, "Document created with plugins attribute" );
-	my $plugins = eval { $doc->plugins };
+	my $plugins = $doc->plugins;
 	is( ref $plugins, 'ARRAY', "plugins accessor returns arrayref" );
-	is( $plugins ? scalar @$plugins : 0, 1, "plugins list has one entry" );
+	is( scalar @$plugins, 1, "plugins list has one entry" );
 }
 
 STATEMENT_CLASS_HOOK: {
-	local $TODO = $todo_msg;
-
 	{
 		package TestPlugin::StatementClass;
-		our @ISA;
-		BEGIN { @ISA = eval { require PPI::Plugin; 1 } ? ('PPI::Plugin') : () }
-		sub new { bless {}, shift }
+		use parent 'PPI::Plugin';
 		sub statement_class {
 			my ( $self, $token, $parent ) = @_;
 			return 'PPI::Statement::Expression'
@@ -52,18 +43,14 @@ STATEMENT_CLASS_HOOK: {
 	);
 	ok( $doc, "Document parsed with statement_class plugin" );
 
-	my $stmts = $doc ? $doc->find('PPI::Statement::Expression') : undef;
+	my $stmts = $doc->find('PPI::Statement::Expression');
 	ok( $stmts && @$stmts, "plugin's statement_class hook was invoked" );
 }
 
 MODIFY_TOKEN_HOOK: {
-	local $TODO = $todo_msg;
-
 	{
 		package TestPlugin::ModifyToken;
-		our @ISA;
-		BEGIN { @ISA = eval { require PPI::Plugin; 1 } ? ('PPI::Plugin') : () }
-		sub new { bless {}, shift }
+		use parent 'PPI::Plugin';
 		sub modify_token {
 			my ( $self, $token ) = @_;
 			if ( $token->isa('PPI::Token::Word')
@@ -82,20 +69,16 @@ MODIFY_TOKEN_HOOK: {
 	);
 	ok( $doc, "Document parsed with modify_token plugin" );
 
-	my $words = $doc ? $doc->find('PPI::Token::Word') : undef;
-	my ($method_word) = $words ? grep { $_->content eq 'method' } @$words : ();
+	my $words = $doc->find('PPI::Token::Word');
+	my ($method_word) = grep { $_->content eq 'method' } @$words;
 	ok( $method_word && $method_word->{_plugin_seen},
 		"plugin's modify_token hook was called" );
 }
 
 FEATURE_INCLUDES_HOOK: {
-	local $TODO = $todo_msg;
-
 	{
 		package TestPlugin::FeatureIncludes;
-		our @ISA;
-		BEGIN { @ISA = eval { require PPI::Plugin; 1 } ? ('PPI::Plugin') : () }
-		sub new { bless {}, shift }
+		use parent 'PPI::Plugin';
 		sub feature_includes {
 			my ( $self, $include ) = @_;
 			return { signatures => 1 }
@@ -112,6 +95,6 @@ FEATURE_INCLUDES_HOOK: {
 	);
 	ok( $doc, "Document parsed with feature_includes plugin" );
 
-	my $sigs = $doc ? $doc->find('PPI::Structure::Signature') : undef;
+	my $sigs = $doc->find('PPI::Structure::Signature');
 	ok( $sigs && @$sigs, "plugin's feature_includes hook enabled signatures" );
 }

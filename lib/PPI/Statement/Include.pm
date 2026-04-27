@@ -264,6 +264,11 @@ sub feature_mods {
 	if ( my $cb_features = $self->_custom_feature_include_cb->($self) )    #
 	{ return $cb_features; }
 
+	for my $plugin ( @{ $self->_plugins } ) {
+		my $pfeatures = $plugin->feature_includes($self);
+		return $pfeatures if $pfeatures;
+	}
+
 	if ( my $perl_version = $self->version ) {
 		## tried using feature.pm, but it is impossible to install future
 		## versions of it, so e.g. a 5.20 install cannot know about
@@ -341,6 +346,13 @@ sub _custom_feature_include_cb {
 	return unless                                                             #
 	  my $document = $self->document;
 	return $document->custom_feature_include_cb || sub { };
+}
+
+sub _plugins {
+	my ($self) = @_;
+	return unless                                                             #
+	  my $document = $self->document;
+	return $document->plugins;
 }
 
 1;

@@ -202,6 +202,11 @@ sub lex_tokenizer {
 		$Tokenizer->_features($feat);
 	}
 
+	# Propagate plugins to both Lexer and Tokenizer
+	my $plugins = $Document->plugins;
+	$self->{plugins} = $plugins;
+	$Tokenizer->_plugins($plugins) if @$plugins;
+
 	# Lex the token stream into the document
 	$self->{Tokenizer} = $Tokenizer;
 	if ( !eval { $self->_lex_document($Document); 1 } ) {
@@ -419,6 +424,12 @@ sub _statement {
 	}
 
 	my $is_lexsub = 0;
+
+	# Give plugins first chance to classify the statement
+	for my $plugin ( @{ $self->{plugins} || [] } ) {
+		my $pclass = $plugin->statement_class( $Token, $Parent );
+		return $pclass if defined $pclass;
+	}
 
 	# Is it a token in our known classes list
 	my $content = $Token->content;
