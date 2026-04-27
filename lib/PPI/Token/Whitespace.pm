@@ -285,26 +285,41 @@ sub __TOKENIZER__on_char {
 
 		return 'Operator' if not $prev;
 
-		# The most common group of readlines are used like
+		# Determine whether the content looks like a readline
+		# (bareword filehandle or simple scalar) or a glob
+		# (anything else). Per perlop, <FOO> and <$fh> are readline;
+		# <*.c>, <$path/*.v>, etc. are glob.
+		# <>, <<>> are the null filehandle / double-diamond (readline).
+		my $line = substr( $t->{line}, $t->{line_cursor} );
+		my $quotelike_class;
+		if ( $line =~ m/ \A <? <> /x ) {
+			$quotelike_class = 'QuoteLike::Readline';
+		}
+		elsif ( $line =~ m/ \A < (?: (?!\d)\w+ | \$\^?\w+ | \$\{\w+\} ) > /x ) {
+			$quotelike_class = 'QuoteLike::Readline';
+		}
+		elsif ( $line =~ m/ \A < .+? > /sx ) {
+			$quotelike_class = 'QuoteLike::Glob';
+		}
+
+		# The most common group of readlines/globs are used like
 		# while ( <...> )
 		# while <>;
 		my $prec = $prev->content;
-		return 'QuoteLike::Readline'
-			if ( $prev->isa('PPI::Token::Structure') and $prec eq '(' )
-			or ( $prev->isa('PPI::Token::Structure') and $prec eq ';' )
-			or ( $prev->isa('PPI::Token::Word')      and $prec eq 'while' )
-			or ( $prev->isa('PPI::Token::Operator')  and $prec eq '=' )
-			or ( $prev->isa('PPI::Token::Operator')  and $prec eq ',' );
+		return $quotelike_class
+			if $quotelike_class
+			and (  ( $prev->isa('PPI::Token::Structure') and $prec eq '(' )
+				or ( $prev->isa('PPI::Token::Structure') and $prec eq ';' )
+				or ( $prev->isa('PPI::Token::Word')      and $prec eq 'while' )
+				or ( $prev->isa('PPI::Token::Operator')  and $prec eq '=' )
+				or ( $prev->isa('PPI::Token::Operator')  and $prec eq ',' ) );
 
 		if ( $prev->isa('PPI::Token::Structure') and $prec eq '}' ) {
 			# Could go either way... do a regex check
 			# $foo->{bar} < 2;
 			# grep { .. } <foo>;
-			pos $t->{line} = $t->{line_cursor};
-			if ( $t->{line} =~ m/\G<(?!\d)\w+>/gc ) {
-				# Almost definitely readline
-				return 'QuoteLike::Readline';
-			}
+			return $quotelike_class if $quotelike_class
+				and $line =~ m/\A<.*?>/s;
 		}
 
 		# Otherwise, we guess operator, which has been the default up

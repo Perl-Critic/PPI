@@ -39,8 +39,10 @@ PPI::Document
     PPI::Token::Word  	'grep'
     PPI::Token::Whitespace  	' '
     PPI::Structure::Block  	{ ... }
+      PPI::Token::Whitespace  	' '
       PPI::Statement
         PPI::Token::Regexp::Match  	'/foo/'
+      PPI::Token::Whitespace  	' '
     PPI::Token::Whitespace  	' '
     PPI::Token::QuoteLike::Glob  	'<$path/*.v>'
     PPI::Token::Structure  	';'

@@ -33,6 +33,8 @@ The subclasses of C<PPI::Token::QuoteLike> are:
 
 =item <FOO> - L<PPI::Token::QuoteLike::Readline>
 
+=item <*.c> - L<PPI::Token::QuoteLike::Glob>
+
 =back
 
 The names are hopefully obvious enough not to have to explain what
