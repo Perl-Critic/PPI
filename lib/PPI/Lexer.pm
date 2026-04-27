@@ -370,6 +370,7 @@ my %STATEMENT_CLASSES = (
 	'last'      => 'PPI::Statement::Break',
 	'return'    => 'PPI::Statement::Break',
 	'goto'      => 'PPI::Statement::Break',
+	'...'       => 'PPI::Statement::Break',
 
 	# Special sections of the file
 	'__DATA__'  => 'PPI::Statement::Data',

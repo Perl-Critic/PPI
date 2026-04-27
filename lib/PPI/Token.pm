@@ -62,6 +62,7 @@ use PPI::Token::Regexp::Match         ();
 use PPI::Token::Regexp::Substitute    ();
 use PPI::Token::Regexp::Transliterate ();
 use PPI::Token::Operator              ();
+use PPI::Token::Ellipsis              ();
 use PPI::Token::Cast                  ();
 use PPI::Token::Structure             ();
 use PPI::Token::Label                 ();

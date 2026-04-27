@@ -18,7 +18,7 @@ PPI::Token::Operator - Token class for operators
   ++   --   **   !    ~    +    -
   =~   !~   *    /    %    x
   <<   >>   lt   gt   le   ge   cmp  ~~
-  ==   !=   <=>  .    ..   ...  ,
+  ==   !=   <=>  .    ..   ,
   &    |    ^    &&   ||   //
   ?    :    **=  +=   -=   .=   *=   /=
   %=   x=   &=   |=   ^=   <<=  >>=  &&=
@@ -94,6 +94,10 @@ sub __TOKENIZER__on_char {
 	# Handle the special case of the null Readline
 	$t->{class} = $t->{token}->set_class('QuoteLike::Readline')
 		if $content eq '<>' or $content eq '<<>>';
+
+	# Handle the ellipsis (yada yada) statement
+	$t->{class} = $t->{token}->set_class('Ellipsis')
+		if $content eq '...';
 
 	# Finalize normally
 	$t->_finalize_token->__TOKENIZER__on_char( $t );

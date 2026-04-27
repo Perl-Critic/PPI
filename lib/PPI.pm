@@ -423,6 +423,7 @@ based on inheritance.
             PPI::Token::Magic
          PPI::Token::ArrayIndex
          PPI::Token::Operator
+         PPI::Token::Ellipsis
          PPI::Token::Quote
             PPI::Token::Quote::Single
             PPI::Token::Quote::Double

@@ -9,12 +9,8 @@ use Test::More tests => 38 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 use PPI ();
 use Helper 'safe_new';
 
-our $TODO;
-
 ELLIPSIS_TOKEN_TYPE: {
 	my $doc = safe_new \'...;';
-
-	local $TODO = "ellipsis token type not yet implemented";
 
 	my $tokens = $doc->find( sub { $_[1]->isa('PPI::Token') and $_[1]->content eq '...' } );
 	is( ref $tokens, 'ARRAY', "'...' token found" );
@@ -25,8 +21,6 @@ ELLIPSIS_TOKEN_TYPE: {
 
 ELLIPSIS_IN_SUB: {
 	my $doc = safe_new \'sub foo { ... }';
-
-	local $TODO = "ellipsis token type not yet implemented";
 
 	my $tokens = $doc->find( sub { $_[1]->isa('PPI::Token') and $_[1]->content eq '...' } );
 	is( ref $tokens, 'ARRAY', "ellipsis found in sub body" );
@@ -44,21 +38,17 @@ ELLIPSIS_SIGNIFICANT: {
 ELLIPSIS_STATEMENT_BREAK: {
 	my $doc = safe_new \'...;';
 
-	local $TODO = "ellipsis token type not yet implemented";
-
 	my $stmts = $doc->find('Statement::Break');
 	is( ref $stmts, 'ARRAY', "'...' creates a Statement::Break" );
-	is( ref $stmts eq 'ARRAY' ? scalar @$stmts : 0, 1, "exactly one Statement::Break" );
+	is( @$stmts, 1, "exactly one Statement::Break" );
 }
 
 ELLIPSIS_IN_SUB_STATEMENT: {
 	my $doc = safe_new \'sub foo { ... }';
 
-	local $TODO = "ellipsis token type not yet implemented";
-
 	my $stmts = $doc->find('Statement::Break');
 	is( ref $stmts, 'ARRAY', "ellipsis in sub creates Statement::Break" );
-	is( ref $stmts eq 'ARRAY' ? scalar @$stmts : 0, 1, "exactly one Statement::Break in sub body" );
+	is( @$stmts, 1, "exactly one Statement::Break in sub body" );
 }
 
 RANGE_OPERATOR_UNCHANGED: {
@@ -85,8 +75,6 @@ ROUND_TRIP: {
 
 ELLIPSIS_WITH_SEMICOLON: {
 	my $doc = safe_new \'...; print "hello\n";';
-
-	local $TODO = "ellipsis token type not yet implemented";
 
 	my $tokens = $doc->find( sub { $_[1]->isa('PPI::Token') and $_[1]->content eq '...' } );
 	is( ref $tokens, 'ARRAY', "ellipsis found before semicolon" );
