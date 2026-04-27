@@ -6,15 +6,10 @@
 
 use lib 't/lib';
 use PPI::Test::pragmas;
-use Test::More tests => 22 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+use Test::More tests => 21 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use PPI ();
 use Helper 'safe_new';
-
-{
-	local $TODO = "best-effort parsing behavior not yet documented (GH #135)";
-	fail "PPI::Document should document best-effort parsing of broken code";
-}
 
 # Unmatched closing brace produces a document, not undef
 {

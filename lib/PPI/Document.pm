@@ -132,6 +132,45 @@ a filename, the document will B<not> remember where it was created from.
 Returns a C<PPI::Document> object, or C<undef> if parsing fails.
 L<PPI::Exception> objects can also be thrown if there are parsing problems.
 
+=head3 Best-effort parsing of broken code
+
+PPI parses Perl I<documents>, not Perl I<code>. Because it is impossible to
+fully parse Perl without also executing it (see L<PPI/Background>), PPI treats
+every byte sequence as a potentially valid document and makes a best-effort
+attempt to build a parse tree, even when the input is syntactically broken or
+incomplete.
+
+This means C<new> will almost always return a C<PPI::Document> object, even
+for code that would not compile under C<perl>. The resulting tree may contain
+elements that indicate structural problems:
+
+=over 4
+
+=item *
+
+L<PPI::Statement::UnmatchedBrace> — a stray closing brace that does not
+match any opening brace.
+
+=item *
+
+Incomplete L<PPI::Structure> objects — an opening brace with no matching
+close (C<< $structure->complete >> returns false).
+
+=item *
+
+L<PPI::Token::Unknown> — a token the Tokenizer could not classify.
+
+=back
+
+This is intentional. Returning a best-effort tree rather than failing allows
+PPI to be used in IDEs, editors, and analysis tools that routinely work with
+code that is mid-edit and not yet valid. Round-trip safety is preserved: even
+a broken document will serialize back to the exact string that was parsed.
+
+If you need to verify that a document is well-formed, call the L</complete>
+method, or search for the indicator elements listed above. Downstream tools
+that require valid input should validate the parse tree before operating on it.
+
 The constructor also takes attribute flags.
 
 =head3 readonly
