@@ -37,8 +37,8 @@ PPI::Document
     PPI::Token::Structure  	';'
   PPI::Token::Whitespace  	'\n'
   PPI::Statement
-    PPI::Token::Magic  	'$::|'
-    PPI::Token::Operator  	'='
+    PPI::Token::Symbol  	'$::'
+    PPI::Token::Operator  	'|='
     PPI::Token::Number  	'1'
     PPI::Token::Structure  	';'
   PPI::Token::Whitespace  	'\n'

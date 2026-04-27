@@ -42,8 +42,6 @@ our %MAGIC = map { $_ => 1 } qw{
 	$^L $^A $^E $^C $^D $^F $^H
 	$^I $^M $^N $^O $^P $^R $^S
 	$^T $^V $^W $^X %^H
-
-	$::|
 }, '$}', '$,', '$#', '$#+', '$#-';
 
 our %LAYER = ( 1 => [], 2 => [] );    # Registered function store

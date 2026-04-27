@@ -50,9 +50,6 @@ END_PERL
 }
 
 DOLLAR_COLON_COLON_PIPE: {
-	# GitHub #155: $::|=1; should NOT parse $::| as a magic variable.
-	# $::| is not valid Perl syntax. The correct parse is $:: (Symbol)
-	# followed by |= (Operator).
 	my $TODO = "GitHub #155: \$::| is not a magic variable";
 	my $doc = safe_new \q{$::|=1;};
 	my @tokens = grep { $_->significant } $doc->child(0)->children;
