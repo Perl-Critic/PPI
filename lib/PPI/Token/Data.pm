@@ -80,6 +80,27 @@ sub handle {
 sub __TOKENIZER__on_line_start {
 	my ( $self, $t ) = @_;
 
+	if ( $t->{line} =~ /^__END__\b/ ) {
+		$t->_new_token( 'Separator', '__END__' );
+		$t->_finalize_token;
+
+		$t->{zone} = 'PPI::Token::End';
+
+		my $end_rest = substr( $t->{line}, 7 );
+		if ( length $end_rest ) {
+			if ( $end_rest =~ /\n$/ ) {
+				chomp $end_rest;
+				$t->_new_token( 'Comment', $end_rest ) if length $end_rest;
+				$t->_new_token( 'Whitespace', "\n" );
+			} else {
+				$t->_new_token( 'Comment', $end_rest ) if length $end_rest;
+			}
+		}
+		$t->_finalize_token;
+
+		return 0;
+	}
+
 	# Add the line
 	if ( defined $t->{token} ) {
 		$t->{token}->{content} .= $t->{line};
