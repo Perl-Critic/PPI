@@ -289,6 +289,38 @@ arbitrary newlines would make some of the code more complicated)
 Better control of the newline type is on the wish list though, and
 anyone wanting to help out is encouraged to contact the author.
 
+=head2 Incomplete Documents
+
+PPI was designed from the start to handle incomplete and syntactically
+incorrect documents gracefully.  This is a deliberate design choice, not a
+limitation.
+
+Because PPI parses Perl I<documents> rather than Perl I<code>, it never
+attempts to determine whether a document is syntactically valid.  In fact,
+it is mathematically impossible to do so without executing the code (see
+L</Background>).  PPI can sometimes detect that a document is I<incorrect>,
+but even then there may be false positives, as source filters or other
+compile-time mechanisms could make seemingly broken syntax valid.
+
+Rather than dying or returning C<undef> when it encounters something
+unexpected, PPI always returns a PDOM tree representing its best-effort
+parse of the input.  Any sequence of bytes can be turned into a valid
+PDOM, even if that sequence would never compile as Perl.  Unmatched closing
+braces receive their own L<PPI::Statement::UnmatchedBrace> objects, and
+L<PPI::Structure> objects may have no closing brace (their C<finish>
+method returns C<undef>).
+
+This behaviour is essential for tools like IDEs and editors, which must work
+with code that is actively being written and is therefore frequently
+incomplete.  It is also important for static analysis tools like
+L<Perl::Critic>, which need to provide useful results even when the input
+contains errors.
+
+If you need to check whether a document appears structurally complete (all
+braces closed, the final statement terminated, and all heredocs fully
+entered), use the L<PPI::Document/complete> method.  For true syntax
+validation, use C<perl -c>.
+
 =head1 IMPLEMENTATION
 
 =head2 General Layout
