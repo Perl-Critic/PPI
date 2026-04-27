@@ -502,10 +502,32 @@ may not seem obvious at first) C<E<lt>READLINEE<gt>> braces.
 Each Structure contains none, one, or many Tokens and Structures (the rules
 for which vary for the different Structure subclasses)
 
-Under the PDOM structure rules, a Statement can B<never> directly contain
-another child Statement, a Structure can B<never> directly contain another
-child Structure, and a Document can B<never> contain another Document
-anywhere in the tree.
+Under the PDOM structure rules:
+
+=over 4
+
+=item *
+
+A L<Statement|PPI::Statement> can B<never> directly contain another child
+Statement.
+
+=item *
+
+A L<Structure|PPI::Structure> can B<never> directly contain another child
+Structure.
+
+=item *
+
+A L<Document|PPI::Document> can B<never> contain another Document anywhere
+in the tree.
+
+=back
+
+These rules are enforced by the L<insert_before|PPI::Element/insert_before>
+and L<insert_after|PPI::Element/insert_after> methods. When you call these
+methods, PPI checks that the element you are inserting is structurally valid
+for that position in the tree. See L<PPI::Element/insert_before> for
+details on which element types each class accepts.
 
 Aside from these three rules, the PDOM tree is extremely flexible.
 

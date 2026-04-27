@@ -299,7 +299,27 @@ sub _complete {
 	!! ( defined $_[0]->{finish} );
 }
 
-# You can insert either another structure, or a token
+=pod
+
+=head2 insert_before $Element
+
+For a C<PPI::Structure>, the C<insert_before> method accepts either
+another L<PPI::Structure> or any L<PPI::Token> (significant or not).
+
+Statements are rejected, because under the PDOM rules a Structure can
+never directly contain another Structure (see
+L<PPI/"The Document, Statement and Structure">), and the siblings of a
+Structure must therefore be other Structures or Tokens.
+
+Returns C<1> on success, C<''> if the element type is not allowed, or
+C<undef> if the argument is not a L<PPI::Element>.
+
+=head2 insert_after $Element
+
+Same rules as C<insert_before>. See above.
+
+=cut
+
 sub insert_before {
 	my $self    = shift;
 	my $Element = _INSTANCE(shift, 'PPI::Element') or return undef;
