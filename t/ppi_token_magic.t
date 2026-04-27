@@ -4,11 +4,33 @@
 
 use lib 't/lib';
 use PPI::Test::pragmas;
-use Test::More tests => 39 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+use Test::More tests => 79 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use PPI ();
 use Helper 'safe_new';
 
+
+MAGIC_SYMBOL_BOUNDARY: {
+	my @cases = (
+		[ '$_;',     'PPI::Token::Magic',  '$_'     ],
+		[ '@_;',     'PPI::Token::Magic',  '@_'     ],
+		[ '$_foo;',  'PPI::Token::Symbol', '$_foo'  ],
+		[ '@_bar;',  'PPI::Token::Symbol', '@_bar'  ],
+		[ '$::;',    'PPI::Token::Symbol', '$::'    ],
+		[ '$::|;',   'PPI::Token::Magic',  '$::|'   ],
+		[ '$::foo;', 'PPI::Token::Symbol', '$::foo' ],
+		[ '@10;',    'PPI::Token::Magic',  '@10'    ],
+	);
+
+	for my $case (@cases) {
+		my ($code, $expected_class, $expected_content) = @$case;
+		my $doc = safe_new \$code;
+		my $tokens = $doc->find( 'PPI::Token::Symbol' ) || [];
+		is( scalar @$tokens, 1, "$expected_content: found one symbol-like token" );
+		is( ref $tokens->[0], $expected_class, "$expected_content: correct class" );
+		is( $tokens->[0]->content, $expected_content, "$expected_content: correct content" );
+	}
+}
 
 __TOKENIZER_ON_CHAR: {
 	my $document = safe_new \<<'END_PERL';
