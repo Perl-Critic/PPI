@@ -41,6 +41,8 @@ our $VERSION = '1.292';
 
 our @ISA = "PPI::Structure";
 
+sub _default_open { '(' }
+
 # Highly special custom isa method that will continue to respond
 # positively to ->isa('PPI::Structure::ForLoop') but warns.
 my $has_warned = 0;

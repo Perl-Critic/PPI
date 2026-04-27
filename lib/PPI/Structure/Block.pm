@@ -47,6 +47,7 @@ our $VERSION = '1.292';
 
 our @ISA = "PPI::Structure";
 
+sub _default_open { '{' }
 
 
 
