@@ -4,7 +4,7 @@
 
 use lib 't/lib';
 use PPI::Test::pragmas;
-use Test::More tests => 6070 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+use Test::More tests => 6085 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use PPI ();
 use PPI::Singletons qw( %KEYWORDS );
@@ -53,6 +53,40 @@ END_PERL
 	is( $statements->[6]->module_version, undef, 'Version include, no module' );
 	is( $statements->[7]->module_version, 'v10', 'Version string' );
 	is( $statements->[8]->module_version, 'v1.5', 'Version string with decimal' );
+}
+
+
+MODULE_FIRST_ARG: {
+	my $document = safe_new \<<'END_PERL';
+use No::Args;
+use No::Args::With::Version 1.5;
+use Foo 'bar';
+use Foo 1.5 'bar';
+use Foo qw< bar baz >;
+use Foo 1.5 qw< bar baz >;
+use constant FOO => 'Foo';
+use Test::More tests => 5;
+use 5.006;
+use Foo 1, 2;
+use Foo ();
+use Foo 1.5 ();
+END_PERL
+	my $statements = $document->find('PPI::Statement::Include');
+	is( scalar @{$statements}, 12, 'module_first_arg: Found expected include statements.' );
+
+	local $TODO = 'module_first_arg not yet implemented';
+	is( eval { $statements->[0]->module_first_arg }, undef, 'module_first_arg: no arguments' );
+	is( eval { $statements->[1]->module_first_arg }, undef, 'module_first_arg: version only, no arguments' );
+	is( eval { $statements->[2]->module_first_arg }, q<'bar'>, 'module_first_arg: single quoted argument' );
+	is( eval { $statements->[3]->module_first_arg }, q<'bar'>, 'module_first_arg: version + single quoted argument' );
+	is( eval { $statements->[4]->module_first_arg }, q<qw< bar baz >>, 'module_first_arg: qw argument' );
+	is( eval { $statements->[5]->module_first_arg }, q<qw< bar baz >>, 'module_first_arg: version + qw argument' );
+	is( eval { $statements->[6]->module_first_arg }, 'FOO', 'module_first_arg: constant first arg' );
+	is( eval { $statements->[7]->module_first_arg }, 'tests', 'module_first_arg: Test::More first arg' );
+	is( eval { $statements->[8]->module_first_arg }, undef, 'module_first_arg: perl version, no module' );
+	is( eval { $statements->[9]->module_first_arg }, '1', 'module_first_arg: number as first arg (not version due to comma)' );
+	is( eval { $statements->[10]->module_first_arg }, '()', 'module_first_arg: empty parens is first arg' );
+	is( eval { $statements->[11]->module_first_arg }, '()', 'module_first_arg: version + empty parens is first arg' );
 }
 
 
