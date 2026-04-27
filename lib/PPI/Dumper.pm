@@ -262,7 +262,9 @@ sub _element_string {
 		# Add the content
 		if ( $self->{display}->{content} ) {
 			my $content = $Element->content;
+			$content =~ s/\0/\\0/g;
 			$content =~ s/\n/\\n/g;
+			$content =~ s/\x0b/\\v/g;
 			$content =~ s/\t/\\t/g;
 			$content =~ s/\f/\\f/g;
 			$string .= "  \t'$content'";

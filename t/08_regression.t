@@ -373,40 +373,27 @@ END_PERL
 ######################################################################
 # GitHub #69: PPI should parse source containing NUL
 
-TODO: {
-	local $TODO = "NUL character not yet handled (GitHub #69)";
+SCOPE: {
+	my $code = "my \$a;\0 my \$b;";
+	my $doc = safe_new \$code;
+	is( $doc->serialize, $code, 'NUL between statements: round-trip' );
+	my $ws = $doc->find('PPI::Token::Whitespace');
+	ok( $ws, 'NUL between statements: found whitespace tokens' );
+	ok( (grep { $_->content =~ /\0/ } @{ $ws || [] }), 'NUL parsed as whitespace' );
+}
 
-	SCOPE: {
-		my $code = "my \$a;\0 my \$b;";
-		my $doc = safe_new \$code;
-		SKIP: {
-			skip "Parsing failed", 3 unless $doc;
-			is( $doc->serialize, $code, 'NUL between statements: round-trip' );
-			my $ws = $doc->find('PPI::Token::Whitespace');
-			ok( $ws, 'NUL between statements: found whitespace tokens' );
-			ok( (grep { $_->content =~ /\0/ } @{ $ws || [] }), 'NUL parsed as whitespace' );
-		}
-	}
+SCOPE: {
+	my $code = "\0my \$a;";
+	my $doc = safe_new \$code;
+	is( $doc->serialize, $code, 'NUL at start: round-trip' );
+	isa_ok( $doc->first_element, 'PPI::Token::Whitespace', 'NUL at start: first element' );
+}
 
-	SCOPE: {
-		my $code = "\0my \$a;";
-		my $doc = safe_new \$code;
-		SKIP: {
-			skip "Parsing failed", 2 unless $doc;
-			is( $doc->serialize, $code, 'NUL at start: round-trip' );
-			isa_ok( $doc->first_element, 'PPI::Token::Whitespace', 'NUL at start: first element' );
-		}
-	}
-
-	SCOPE: {
-		my $code = "my \$a;\x0b my \$b;";
-		my $doc = safe_new \$code;
-		SKIP: {
-			skip "Parsing failed", 3 unless $doc;
-			is( $doc->serialize, $code, 'Vertical tab between statements: round-trip' );
-			my $ws = $doc->find('PPI::Token::Whitespace');
-			ok( $ws, 'VT between statements: found whitespace tokens' );
-			ok( (grep { $_->content =~ /\x0b/ } @{ $ws || [] }), 'VT parsed as whitespace' );
-		}
-	}
+SCOPE: {
+	my $code = "my \$a;\x0b my \$b;";
+	my $doc = safe_new \$code;
+	is( $doc->serialize, $code, 'Vertical tab between statements: round-trip' );
+	my $ws = $doc->find('PPI::Token::Whitespace');
+	ok( $ws, 'VT between statements: found whitespace tokens' );
+	ok( (grep { $_->content =~ /\x0b/ } @{ $ws || [] }), 'VT parsed as whitespace' );
 }
