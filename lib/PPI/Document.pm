@@ -91,6 +91,7 @@ use constant LOCATION_CHARACTER    => 1;
 use constant LOCATION_COLUMN       => 2;
 use constant LOCATION_LOGICAL_LINE => 3;
 use constant LOCATION_LOGICAL_FILE => 4;
+use constant LOCATION_OFFSET       => 5;
 
 
 
@@ -654,6 +655,10 @@ sub index_locations {
 	# encounter the next token with a newline in it.
 	my $heredoc = 0;
 
+	# Similarly, track the character length of heredoc content
+	# so the document offset can account for it.
+	my $heredoc_chars = 0;
+
 	# Find the first Token without a location
 	my ($first, $location) = ();
 	foreach ( 0 .. $#tokens ) {
@@ -667,7 +672,7 @@ sub index_locations {
 		# Calculate the new location if needed.
 		$location =
 			$_
-		  ? $self->_add_location( $location, $tokens[ $_ - 1 ], \$heredoc )
+		  ? $self->_add_location( $location, $tokens[ $_ - 1 ], \$heredoc, \$heredoc_chars )
 		  : $self->_default_location;
 		$first = $_;
 		last;
@@ -678,11 +683,17 @@ sub index_locations {
 		foreach ( $first .. $#tokens ) {
 			my $Token = $tokens[$_];
 			$Token->{_location} = $location;
-			$location = $self->_add_location( $location, $Token, \$heredoc );
+			$location = $self->_add_location( $location, $Token, \$heredoc, \$heredoc_chars );
 
-			# Add any here-doc lines to the counter
+			# Add any here-doc lines and characters to the counters
 			if ( $Token->isa('PPI::Token::HereDoc') ) {
 				$heredoc += $Token->heredoc + 1;
+				my $indent = $Token->indentation || '';
+				foreach my $line ( $Token->heredoc ) {
+					$heredoc_chars += length( $line eq "\n" ? $line : $indent . $line );
+				}
+				$heredoc_chars += length( $indent . $Token->{_terminator_line} )
+					if defined $Token->{_terminator_line};
 			}
 		}
 	}
@@ -693,7 +704,7 @@ sub index_locations {
 sub _default_location {
 	my ($self) = @_;
 	my $logical_file = $self->can('filename') ? $self->filename : undef;
-	return [ 1, 1, 1, 1, $logical_file ];
+	return [ 1, 1, 1, 1, $logical_file, 1 ];
 }
 
 sub location {
@@ -702,13 +713,15 @@ sub location {
 }
 
 sub _add_location {
-	my ($self, $start, $Token, $heredoc) = @_;
+	my ($self, $start, $Token, $heredoc, $heredoc_chars) = @_;
 	my $content = $Token->{content};
 
 	# Does the content contain any newlines
 	my $newlines =()= $content =~ /\n/g;
 	my ($logical_line, $logical_file) =
 		$self->_logical_line_and_file($start, $Token, $newlines);
+
+	my $offset = $start->[LOCATION_OFFSET] + length($content);
 
 	unless ( $newlines ) {
 		# Handle the simple case
@@ -722,17 +735,20 @@ sub _add_location {
 				),
 			$logical_line,
 			$logical_file,
+			$offset,
 		];
 	}
 
 	# This is the more complex case where we hit or
 	# span a newline boundary.
 	my $physical_line = $start->[LOCATION_LINE] + $newlines;
-	my $location = [ $physical_line, 1, 1, $logical_line, $logical_file ];
+	my $location = [ $physical_line, 1, 1, $logical_line, $logical_file, $offset ];
 	if ( $heredoc and $$heredoc ) {
 		$location->[LOCATION_LINE]         += $$heredoc;
 		$location->[LOCATION_LOGICAL_LINE] += $$heredoc;
+		$location->[LOCATION_OFFSET]       += $$heredoc_chars;
 		$$heredoc = 0;
+		$$heredoc_chars = 0;
 	}
 
 	# Does the token have additional characters
