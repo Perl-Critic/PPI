@@ -69,6 +69,7 @@ use PPI::Token::HereDoc               ();
 use PPI::Token::Separator             ();
 use PPI::Token::Data                  ();
 use PPI::Token::End                   ();
+use PPI::Token::Preamble              ();
 use PPI::Token::Prototype             ();
 use PPI::Token::Attribute             ();
 use PPI::Token::Unknown               ();

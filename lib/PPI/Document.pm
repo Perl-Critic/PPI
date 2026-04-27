@@ -186,6 +186,20 @@ L<PPI::Statement::Include> object.
 
 This can be useful when your work project has a complex boilerplate module.
 
+=head3 perl_x
+
+  $doc = PPI::Document->new( $filename, perl_x => 1 );
+
+Setting C<perl_x> to true emulates the C<perl -x> command line option.
+When enabled, any text before the first C<#!...perl> shebang line is
+collected into a L<PPI::Token::Preamble> (non-significant) token. The
+actual Perl parsing begins at the shebang line. This is useful for
+parsing Perl scripts embedded in larger files such as shell springboards
+or batch file wrappers.
+
+If no C<#!...perl> line is found, the entire file is parsed normally
+with no preamble token created.
+
 =cut
 
 sub new {
