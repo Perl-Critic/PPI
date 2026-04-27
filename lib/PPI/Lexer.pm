@@ -673,6 +673,23 @@ sub _lex_statement {
 			}
 		}
 
+		# Variable declarations in simple form (my $x, not my (...))
+		# end at a comma so they don't consume sibling arguments
+		if (
+			$Statement->isa('PPI::Statement::Variable')
+			and $Token->isa('PPI::Token::Operator')
+			and $Token->content eq ','
+		) {
+			my @schildren = $Statement->schildren;
+			if (
+				@schildren >= 2
+				and $schildren[1]->isa('PPI::Token::Symbol')
+			) {
+				$self->_update_features( $Statement );
+				return $self->_rollback( $Token );
+			}
+		}
+
 		# Any normal character just gets added
 		unless ( $Token->isa('PPI::Token::Structure') ) {
 			$self->_add_element( $Statement, $Token );
