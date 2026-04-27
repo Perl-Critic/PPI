@@ -25,13 +25,9 @@ format of a class, function, etc.
 
 =head1 METHODS
 
-There are no methods available for C<PPI::Token::Word> beyond those
-provided by its L<PPI::Token> and L<PPI::Element> parent
-classes.
-
-We expect to add additional methods to help further resolve a Word as
-a function, method, etc over time.  If you need such a thing right
-now, look at L<Perl::Critic::Utils>.
+Several classification methods are available to help determine the role
+a Word plays in the document.  See also L<PPIx::Utils> for additional
+classification functions beyond those provided here.
 
 =cut
 
@@ -114,6 +110,139 @@ sub method_call {
 	}
 
 	return;
+}
+
+=pod
+
+=head2 hash_key
+
+Returns true if this Word is a hash key. PPI does not distinguish between
+barewords used as hash subscript keys and other barewords, so this method is
+useful for filtering. Both C<< $hash{foo} >> and C<< foo => bar >> styles
+are detected. Returns false if followed by parentheses (function call).
+
+=cut
+
+sub hash_key {
+	my $self = shift;
+
+	my $sibling = $self->snext_sibling;
+	return undef if $sibling and $sibling->isa('PPI::Structure::List');
+
+	my $parent = $self->parent;
+	return undef if !$parent;
+	my $grandparent = $parent->parent;
+	return 1 if $grandparent and $grandparent->isa('PPI::Structure::Subscript');
+
+	return undef if !$sibling;
+	return 1 if $sibling->isa('PPI::Token::Operator') and $sibling eq '=>';
+
+	return undef;
+}
+
+=pod
+
+=head2 class_name
+
+Returns true if this Word is a class name, i.e. the element immediately after
+it is the dereference operator C<< -> >> and the element before it is not.
+For example, in C<< Foo->new >>, C<Foo> is a class name.
+
+=cut
+
+sub class_name {
+	my $self = shift;
+
+	my $next = $self->snext_sibling;
+	return undef if !$next;
+	return undef if !$next->isa('PPI::Token::Operator');
+	return undef if $next->content ne '->';
+
+	my $prev = $self->sprevious_sibling;
+	return undef if $prev and $prev->isa('PPI::Token::Operator') and $prev->content eq '->';
+
+	return 1;
+}
+
+=pod
+
+=head2 subroutine_name
+
+Returns true if this Word is the name of a subroutine being declared, e.g.
+C<mysub> in C<sub mysub { }>.
+
+=cut
+
+sub subroutine_name {
+	my $self = shift;
+
+	my $prev = $self->sprevious_sibling;
+	return undef if !$prev;
+
+	my $stmnt = $self->statement;
+	return undef if !$stmnt;
+
+	return $stmnt->isa('PPI::Statement::Sub') && $prev eq 'sub' ? 1 : undef;
+}
+
+=pod
+
+=head2 included_module_name
+
+Returns true if this Word is the module name in a C<use>, C<require>, or
+C<no> statement.
+
+=cut
+
+sub included_module_name {
+	my $self = shift;
+
+	my $stmnt = $self->statement;
+	return undef if !$stmnt;
+	return undef if !$stmnt->isa('PPI::Statement::Include');
+
+	return $stmnt->schild(1) == $self ? 1 : undef;
+}
+
+=pod
+
+=head2 label_pointer
+
+Returns true if this Word is a label target in a C<next>, C<last>, C<redo>,
+or C<goto> statement. This is not the same as a label declaration.
+
+=cut
+
+sub label_pointer {
+	my $self = shift;
+
+	my $stmnt = $self->statement;
+	return undef if !$stmnt;
+
+	my $prev = $self->sprevious_sibling;
+	return undef if !$prev;
+
+	return $stmnt->isa('PPI::Statement::Break')
+		&& $prev =~ m/\A(?:redo|goto|next|last)\z/
+		? 1 : undef;
+}
+
+=pod
+
+=head2 package_declaration
+
+Returns true if this Word is the package name in a C<package> declaration.
+
+=cut
+
+sub package_declaration {
+	my $self = shift;
+
+	my $stmnt = $self->statement;
+	return undef if !$stmnt;
+	return undef if !$stmnt->isa('PPI::Statement::Package');
+
+	return $stmnt->schild(1) == $self ? 1 : undef;
 }
 
 
@@ -352,7 +481,7 @@ sub __current_token_is_attribute {
 
 =head1 TO DO
 
-- Add C<function>, C<method> etc detector methods
+- Add C<function_call> detector (requires builtin/bareword word lists)
 
 =head1 SUPPORT
 
