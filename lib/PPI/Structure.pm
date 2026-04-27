@@ -117,23 +117,56 @@ use PPI::Structure::Signature   ();
 #####################################################################
 # Constructor
 
+my %MATCH_BRACE = (
+	'(' => ')',
+	'[' => ']',
+	'{' => '}',
+);
+
 sub new {
 	my $class = shift;
-	my $Token = PPI::Token::__LEXER__opens($_[0]) ? shift : return undef;
 
-	# Create the object
+	if ( PPI::Token::__LEXER__opens($_[0]) ) {
+		my $Token = shift;
+		my $self = bless {
+			children => [],
+			start    => $Token,
+			}, $class;
+		Scalar::Util::weaken(
+			$_PARENT{Scalar::Util::refaddr $Token} = $self
+		);
+		return $self;
+	}
+
+	my $open;
+	if ( @_ && defined $_[0] && !ref $_[0] && $MATCH_BRACE{$_[0]} ) {
+		$open = shift;
+	} elsif ( !@_ ) {
+		$open = $class->_default_open or return undef;
+	} else {
+		return undef;
+	}
+
+	my $start  = PPI::Token::Structure->new($open);
+	my $finish = PPI::Token::Structure->new($MATCH_BRACE{$open});
+
 	my $self = bless {
 		children => [],
-		start    => $Token,
+		start    => $start,
+		finish   => $finish,
 		}, $class;
 
-	# Set the start braces parent link
 	Scalar::Util::weaken(
-		$_PARENT{Scalar::Util::refaddr $Token} = $self
+		$_PARENT{Scalar::Util::refaddr $start} = $self
+	);
+	Scalar::Util::weaken(
+		$_PARENT{Scalar::Util::refaddr $finish} = $self
 	);
 
 	$self;
 }
+
+sub _default_open { undef }
 
 
 
