@@ -1436,7 +1436,7 @@ sub _add_element {
 	if ( ref $Parent eq 'PPI::Statement'
 		   and my $first = $Parent->schild(0) ) {
 		if ( $first->isa('PPI::Token::Label')
-			   and !(my $second = $Parent->schild(1)) ) {
+			   and my $second = $Parent->schild(1) ) {
 			my $new_class = $STATEMENT_CLASSES{$second->content};
 			# It's a labelled statement
 			bless $Parent, $new_class if $new_class;
