@@ -4,7 +4,7 @@
 
 use lib 't/lib';
 use PPI::Test::pragmas;
-use Test::More tests => 23 + ( $ENV{AUTHOR_TESTING} ? 1 : 0 );
+use Test::More tests => 26 + ( $ENV{AUTHOR_TESTING} ? 1 : 0 );
 use B qw( perlstring );
 
 use PPI ();
@@ -23,6 +23,13 @@ STRING: {
 	is( $literal->[2]->string, 'foo',   '->string returns as expected' );
 	is( $literal->[3]->string, '(foo)', '->string returns as expected' );
 }
+
+INTERPOLATIONS: {
+	my $Document = safe_new \"print q{foo};";
+	my $Literal = $Document->find_first('Token::Quote::Literal');
+	is( $Literal->interpolations, '', 'Literal quotes have no interpolations' );
+}
+
 
 LITERAL: {
 	my $Document = safe_new \"print q{foo}, q!bar!, q <foo>, q((foo));";

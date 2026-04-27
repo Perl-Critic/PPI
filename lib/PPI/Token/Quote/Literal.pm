@@ -20,8 +20,8 @@ quote-like operator, such as C<q{foo bar}>.
 
 =head1 METHODS
 
-There are no methods available for C<PPI::Token::Quote::Literal> beyond
-those provided by the parent L<PPI::Token::Quote>, L<PPI::Token> and
+There are several methods available for C<PPI::Token::Quote::Literal>,
+beyond those provided by the parent L<PPI::Token::Quote>, L<PPI::Token> and
 L<PPI::Element> classes.
 
 =cut
@@ -53,8 +53,9 @@ sub string {
 }
 
 
-# Use the same implementation as another module
-*literal = *PPI::Token::Quote::Single::literal;
+# Use the same implementations as another module
+*interpolations = *PPI::Token::Quote::Single::interpolations;
+*literal        = *PPI::Token::Quote::Single::literal;
 
 1;
 

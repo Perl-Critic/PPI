@@ -83,6 +83,13 @@ of the quotes.
 
 =pod
 
+=head2 interpolations
+
+The C<interpolations> method is provided by all four ::Quote classes.
+For ::Quote::Double and ::Quote::Interpolate, it checks whether the
+string contains any interpolated variables and returns true or false.
+For ::Quote::Single and ::Quote::Literal, it always returns false.
+
 =head2 literal
 
 The C<literal> method is provided by ::Quote::Literal and

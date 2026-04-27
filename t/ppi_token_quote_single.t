@@ -4,7 +4,7 @@
 
 use lib 't/lib';
 use PPI::Test::pragmas;
-use Test::More tests => 32 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+use Test::More tests => 35 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use PPI ();
 use Helper 'safe_new';
@@ -15,6 +15,13 @@ STRING: {
 	my $Single = $Document->find_first('Token::Quote::Single');
 	isa_ok( $Single, 'PPI::Token::Quote::Single' );
 	is( $Single->string, 'foo', '->string returns as expected' );
+}
+
+
+INTERPOLATIONS: {
+	my $Document = safe_new \"print 'foo';";
+	my $Single = $Document->find_first('Token::Quote::Single');
+	is( $Single->interpolations, '', 'Single quotes have no interpolations' );
 }
 
 

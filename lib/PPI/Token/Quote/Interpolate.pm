@@ -20,15 +20,16 @@ interpolation quote-like operator, such as C<qq{$foo bar $baz}>.
 
 =head1 METHODS
 
-There are no methods available for C<PPI::Token::Quote::Interpolate>
+There are several methods available for C<PPI::Token::Quote::Interpolate>,
 beyond those provided by the parent L<PPI::Token::Quote>, L<PPI::Token> and
 L<PPI::Element> classes.
 
 =cut
 
 use strict;
-use PPI::Token::Quote ();
-use PPI::Token::_QuoteEngine::Full ();
+use Params::Util                     qw{_INSTANCE};
+use PPI::Token::Quote                ();
+use PPI::Token::_QuoteEngine::Full   ();
 
 our $VERSION = '1.292';
 
@@ -42,13 +43,65 @@ our @ISA = qw{
 
 
 #####################################################################
+# PPI::Token::Quote::Interpolate Methods
+
+=pod
+
+=head2 interpolations
+
+The C<interpolations> method checks to see if the interpolation
+quote-like operator actually contains any interpolated variables.
+
+Returns true if the string contains interpolations, or false if not.
+
+=cut
+
+sub interpolations {
+	!! ($_[0]->content =~ /(?<!\\)(?:\\\\)*[\$\@]/);
+}
+
+=pod
+
+=head2 simplify
+
+The C<simplify> method will, if possible, modify an interpolation
+quote-like operator in place, turning it into the equivalent literal
+quote-like operator. If the token is modified, it is reblessed into
+the L<PPI::Token::Quote::Literal> package.
+
+Because the content changes length (C<qq> becomes C<q>), you should
+call the document's C<flush_locations> method if you need accurate
+location data after simplification.
+
+The object itself is returned as a convenience.
+
+=cut
+
+sub simplify {
+	my $self = _INSTANCE(shift, 'PPI::Token::Quote::Interpolate') or return undef;
+
+	my $value = $self->string;
+	return $self if $value =~ /[\\\$\@]/;
+
+	(my $content = $self->{content}) =~ s/\Aqq/q/ or return $self;
+	$self->{content} = $content;
+
+	$_->{position}-- for @{$self->{sections}};
+
+	$self->{operator} = 'q';
+
+	bless $self, 'PPI::Token::Quote::Literal';
+}
+
+
+#####################################################################
 # PPI::Token::Quote Methods
 
 sub string {
 	my $self     = shift;
 	my @sections = $self->_sections;
 	my $str      = $sections[0];
-	substr( $self->{content}, $str->{position}, $str->{size} );	
+	substr( $self->{content}, $str->{position}, $str->{size} );
 }
 
 1;
