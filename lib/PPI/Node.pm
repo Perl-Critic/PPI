@@ -688,17 +688,6 @@ sub location {
 
 sub DESTROY {
 	local $_;
-	if ( $_[0]->{children} ) {
-		my @queue = $_[0];
-		while ( defined($_ = shift @queue) ) {
-			unshift @queue, @{delete $_->{children}} if $_->{children};
-
-			# Remove all internal/private weird crosslinking so that
-			# the cascading DESTROY calls will get called properly.
-			%$_ = ();
-		}
-	}
-
 	$_[0]->SUPER::DESTROY;
 }
 

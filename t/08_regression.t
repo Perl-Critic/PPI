@@ -376,8 +376,6 @@ END_PERL
 # Nodes extracted from a document must survive the document's destruction.
 
 SCOPE: {
-	my $todo_reason = "Node::DESTROY aggressively clears children of still-referenced nodes";
-
 	my $sample = "package Foo::Bar;\n\n1;\n";
 
 	# Case 1: node from a temporary document
@@ -386,11 +384,8 @@ SCOPE: {
 		$doc->find_first('PPI::Statement::Package');
 	};
 	isa_ok( $pkg_node, 'PPI::Statement::Package' );
-	TODO: {
-		local $TODO = $todo_reason;
-		is( $pkg_node->namespace, 'Foo::Bar',
-			'node extracted from expired document retains namespace' );
-	}
+	is( $pkg_node->namespace, 'Foo::Bar',
+		'node extracted from expired document retains namespace' );
 
 	# Case 2: creating a temporary PPI::Node with a borrowed child must
 	# not corrupt the original tree (the "funbags" scenario).
@@ -399,9 +394,6 @@ SCOPE: {
 	{
 		my $fake = bless { children => [$stmt] }, 'PPI::Node';
 	}
-	TODO: {
-		local $TODO = $todo_reason;
-		is( $stmt->namespace, 'Foo::Bar',
-			'node survives destruction of a foreign parent' );
-	}
+	is( $stmt->namespace, 'Foo::Bar',
+		'node survives destruction of a foreign parent' );
 }
