@@ -10,12 +10,16 @@ PPI::Dumper - Dumping of PDOM trees
 
   # Load a document
   my $Module = PPI::Document->new( 'MyModule.pm' );
-  
+
   # Create the dumper
   my $Dumper = PPI::Dumper->new( $Module );
-  
+
   # Dump the document
   $Dumper->print;
+
+  # Or create the dumper directly from source
+  my $Dumper2 = PPI::Dumper->new( \'my $foo = 1;' );
+  $Dumper2->print;
 
 =head1 DESCRIPTION
 
@@ -33,7 +37,7 @@ generate the dump content itself.
 =cut
 
 use strict;
-use Params::Util qw{_INSTANCE};
+use Params::Util qw{_INSTANCE _SCALAR0};
 
 our $VERSION = '1.292';
 
@@ -48,13 +52,19 @@ our $VERSION = '1.292';
 
 =head2 new $Element, param => value, ...
 
+=head2 new \$source, param => value, ...
+
 The C<new> constructor creates a dumper, and takes as argument a single
 L<PPI::Element> object of any type to serve as the root of the tree to
 be dumped, and a number of key-E<gt>value parameters to control the output
 format of the Dumper. Details of the parameters are listed below.
 
+As a convenience, you may also pass a reference to a string of Perl
+source code. The string will be parsed into a L<PPI::Document> and
+used as the root element.
+
 Returns a new C<PPI::Dumper> object, or C<undef> if the constructor
-is not passed a correct L<PPI::Element> root object.
+is not passed a correct L<PPI::Element> root object or valid source string.
 
 =over
 
@@ -103,7 +113,12 @@ what these values really are. True/false value, off by default.
 
 sub new {
 	my $class   = shift;
-	my $Element = _INSTANCE(shift, 'PPI::Element') or return undef;
+	my $param   = shift;
+	if ( _SCALAR0($param) ) {
+		require PPI::Document;
+		$param = PPI::Document->new($param) or return undef;
+	}
+	my $Element = _INSTANCE($param, 'PPI::Element') or return undef;
 
 	# Create the object
 	my $self = bless {
