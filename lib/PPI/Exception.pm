@@ -63,11 +63,8 @@ This method never returns.
 sub throw {
 	my $it = shift;
 	if ( _INSTANCE($it, 'PPI::Exception') ) {
-		if ( $it->{callers} ) {
-			push @{ $it->{callers} }, [ caller(0) ];
-		} else {
-			$it->{callers} ||= [];
-		}
+		$it->{callers} ||= [];
+		push @{ $it->{callers} }, [ caller(0) ];
 	} else {
 		my $message = $_[0] || 'Unknown Exception';
 		$it = $it->new(

@@ -22,10 +22,7 @@ my $e2 = $@;
 isa_ok( $e2, 'PPI::Exception' );
 is( $e2->message, 'object throw', 'object throw preserves message' );
 my @callers2 = $e2->callers;
-TODO: {
-	local $TODO = "throw on object with empty callers does not populate caller info";
-	is( scalar @callers2, 1, 'object throw with no prior callers populates callers' );
-}
+is( scalar @callers2, 1, 'object throw with no prior callers populates callers' );
 
 # Object with existing callers: throw should append
 eval { PPI::Exception->throw( 'first throw' ) };
