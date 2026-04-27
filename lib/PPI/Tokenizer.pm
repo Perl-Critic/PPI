@@ -85,7 +85,6 @@ use PPI::Util       ();
 use PPI::Element    ();
 use PPI::Token      ();
 use PPI::Exception  ();
-use PPI::Exception::ParserRejection ();
 use PPI::Document ();
 
 our $VERSION = '1.292';
