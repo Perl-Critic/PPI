@@ -26,10 +26,18 @@ FIND_ONE_OP: {
 
 PARSE_ALL_OPERATORS: {
 	foreach my $op ( sort keys %OPERATOR ) {
-		my $source = $op eq '<>' || $op eq '<<>>' ? $op . ';' : "\$foo $op 2;";
+		my $source = $op eq '<>' || $op eq '<<>>'
+			? $op . ';'
+			: $op eq '...'
+			? '...;'
+			: "\$foo $op 2;";
 		my $doc = safe_new \$source;
-		my $ops = $doc->find( $op eq '<<>>' || $op eq '<>'
-			? 'Token::QuoteLike::Readline' : 'Token::Operator' );
+		my $find_class = $op eq '<<>>' || $op eq '<>'
+			? 'Token::QuoteLike::Readline'
+			: $op eq '...'
+			? 'Token::Ellipsis'
+			: 'Token::Operator';
+		my $ops = $doc->find( $find_class );
 		is( ref $ops, 'ARRAY', "operator $op found operators" );
 		is( @$ops, 1, "operator $op found exactly once" );
 		is( $ops->[0]->content(), $op, "operator $op operator text matches" );
@@ -519,8 +527,12 @@ OPERATOR_X: {
 		}
 
 		$code .= $operator;
-		push @expected, ( ($operator eq '<<>>' || $operator eq '<>' ?
-			'PPI::Token::QuoteLike::Readline' : 'PPI::Token::Operator') => $operator );
+		my $op_class = $operator eq '<<>>' || $operator eq '<>'
+			? 'PPI::Token::QuoteLike::Readline'
+			: $operator eq '...'
+			? 'PPI::Token::Ellipsis'
+			: 'PPI::Token::Operator';
+		push @expected, ( $op_class => $operator );
 
 		if ( $operator =~ /\w$/ || $operator eq '<<' ) {  # want << operator, not heredoc
 			$code .= ' ';
@@ -528,7 +540,7 @@ OPERATOR_X: {
 		}
 		$code .= 'x3';
 		my $desc;
-		if ( $operator eq '--' || $operator eq '++' || $operator eq '<>' || $operator eq '<<>>' ) {
+		if ( $operator eq '--' || $operator eq '++' || $operator eq '<>' || $operator eq '<<>>' || $operator eq '...' ) {
 			push @expected, ( 'PPI::Token::Operator' => 'x' );
 			push @expected, ( 'PPI::Token::Number' => '3' );
 			$desc = "operator $operator does not imply following 'x' is a word";

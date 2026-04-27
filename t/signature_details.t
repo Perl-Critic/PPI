@@ -411,8 +411,8 @@ END_PERL
 		'PPI::Token::Structure',      ')',
 		'PPI::Structure::Block',      '{ ... }',
 		'PPI::Token::Structure',      '{',
-		'PPI::Statement',             '...',
-		'PPI::Token::Operator',       '...',
+		'PPI::Statement::Break',      '...',
+		'PPI::Token::Ellipsis',       '...',
 		'PPI::Token::Structure',      '}',
 	  ],
 	  "complex signature example";

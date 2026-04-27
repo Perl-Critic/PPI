@@ -26,8 +26,8 @@ PPI::Document
     PPI::Token::Whitespace  	' '
     PPI::Structure::Block  	{ ... }
       PPI::Token::Whitespace  	' '
-      PPI::Statement
-        PPI::Token::Operator  	'...'
+      PPI::Statement::Break
+        PPI::Token::Ellipsis  	'...'
       PPI::Token::Whitespace  	' '
   PPI::Token::Whitespace  	'\n'
   PPI::Statement::Sub
