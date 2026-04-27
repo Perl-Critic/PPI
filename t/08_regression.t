@@ -7,7 +7,7 @@
 use if !(-e 'META.yml'), "Test::InDistDir";
 use lib 't/lib';
 use PPI::Test::pragmas;
-use Test::More tests => 1121 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+use Test::More tests => 1128 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use PPI ();
 use PPI::Test qw( pause );
@@ -367,4 +367,41 @@ print "Hello" if /regex/;
 END_PERL
 	my $match = $doc->find('PPI::Token::Regexp::Match');
 	is( scalar(@$match), 3, 'Found expected number of matches' );
+}
+
+
+
+######################################################################
+# Regression test for GitHub #112 / rt.cpan.org #73344
+# Nodes extracted from a document must survive the document's destruction.
+
+SCOPE: {
+	my $todo_reason = "Node::DESTROY aggressively clears children of still-referenced nodes";
+
+	my $sample = "package Foo::Bar;\n\n1;\n";
+
+	# Case 1: node from a temporary document
+	my $pkg_node = do {
+		my $doc = safe_new \$sample;
+		$doc->find_first('PPI::Statement::Package');
+	};
+	isa_ok( $pkg_node, 'PPI::Statement::Package' );
+	TODO: {
+		local $TODO = $todo_reason;
+		is( $pkg_node->namespace, 'Foo::Bar',
+			'node extracted from expired document retains namespace' );
+	}
+
+	# Case 2: creating a temporary PPI::Node with a borrowed child must
+	# not corrupt the original tree (the "funbags" scenario).
+	my $doc = safe_new \$sample;
+	my $stmt = $doc->find_first('PPI::Statement::Package');
+	{
+		my $fake = bless { children => [$stmt] }, 'PPI::Node';
+	}
+	TODO: {
+		local $TODO = $todo_reason;
+		is( $stmt->namespace, 'Foo::Bar',
+			'node survives destruction of a foreign parent' );
+	}
 }
