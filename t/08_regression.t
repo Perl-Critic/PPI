@@ -7,7 +7,7 @@
 use if !(-e 'META.yml'), "Test::InDistDir";
 use lib 't/lib';
 use PPI::Test::pragmas;
-use Test::More tests => 1121 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+use Test::More tests => 1135 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use PPI ();
 use PPI::Test qw( pause );
@@ -367,4 +367,33 @@ print "Hello" if /regex/;
 END_PERL
 	my $match = $doc->find('PPI::Token::Regexp::Match');
 	is( scalar(@$match), 3, 'Found expected number of matches' );
+}
+
+
+######################################################################
+# GitHub #69: PPI should parse source containing NUL
+
+SCOPE: {
+	my $code = "my \$a;\0 my \$b;";
+	my $doc = safe_new \$code;
+	is( $doc->serialize, $code, 'NUL between statements: round-trip' );
+	my $ws = $doc->find('PPI::Token::Whitespace');
+	ok( $ws, 'NUL between statements: found whitespace tokens' );
+	ok( (grep { $_->content =~ /\0/ } @{ $ws || [] }), 'NUL parsed as whitespace' );
+}
+
+SCOPE: {
+	my $code = "\0my \$a;";
+	my $doc = safe_new \$code;
+	is( $doc->serialize, $code, 'NUL at start: round-trip' );
+	isa_ok( $doc->first_element, 'PPI::Token::Whitespace', 'NUL at start: first element' );
+}
+
+SCOPE: {
+	my $code = "my \$a;\x0b my \$b;";
+	my $doc = safe_new \$code;
+	is( $doc->serialize, $code, 'Vertical tab between statements: round-trip' );
+	my $ws = $doc->find('PPI::Token::Whitespace');
+	ok( $ws, 'VT between statements: found whitespace tokens' );
+	ok( (grep { $_->content =~ /\x0b/ } @{ $ws || [] }), 'VT parsed as whitespace' );
 }
