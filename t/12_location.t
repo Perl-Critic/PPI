@@ -4,7 +4,7 @@
 
 use lib 't/lib';
 use PPI::Test::pragmas;
-use Test::More tests => 683 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+use Test::More tests => 691 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use PPI ();
 use Helper 'safe_new';
@@ -194,7 +194,8 @@ my @test_locations = (
 	[  17, 41, 49,   17, undef ],		# # contains 3 tabs
 	[  17, 58, 66,   17, undef ],		# \n
 
-	[  18,  1,  1,   18, undef ],		# \n\t
+	[  18,  1,  1,   18, undef ],		# \n
+	[  19,  1,  1,   19, undef ],		# \t
 
 	[  19,  2,  5,   19, undef ],		# foo
 	[  19,  5,  8,   19, undef ],		# (
@@ -226,7 +227,8 @@ my @test_locations = (
 
 	[  25,  1,  1,   25, undef ],		# #Note that there are leading 4 x space, ...
 
-	[  26,  1,  1,   26, undef ],		# '\n    '
+	[  26,  1,  1,   26, undef ],		# \n
+	[  27,  1,  1,   27, undef ],		# '    '
 
 	[  27,  5,  5,   27, undef ],		# bas
 	[  27,  8,  8,   27, undef ],		# (

@@ -150,6 +150,7 @@ sub __TOKENIZER__on_line_start {
 	if ( $line =~ /^\s*$/ ) {
 		# A whitespace line
 		$t->_new_token( 'Whitespace', $line );
+		$t->_finalize_token;
 		return 0;
 
 	} elsif ( $line =~ /^\s*#/ ) {

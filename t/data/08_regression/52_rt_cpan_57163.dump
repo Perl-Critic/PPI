@@ -1,0 +1,15 @@
+PPI::Document
+  PPI::Statement::Variable
+    PPI::Token::Word  	'my'
+    PPI::Token::Whitespace  	' '
+    PPI::Token::Symbol  	'$x'
+    PPI::Token::Structure  	';'
+  PPI::Token::Whitespace  	'\n'
+  PPI::Token::Whitespace  	'    \n'
+  PPI::Token::Whitespace  	'    '
+  PPI::Statement::Variable
+    PPI::Token::Word  	'my'
+    PPI::Token::Whitespace  	' '
+    PPI::Token::Symbol  	'$y'
+    PPI::Token::Structure  	';'
+  PPI::Token::Whitespace  	'\n'

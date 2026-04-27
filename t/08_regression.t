@@ -7,7 +7,7 @@
 use if !(-e 'META.yml'), "Test::InDistDir";
 use lib 't/lib';
 use PPI::Test::pragmas;
-use Test::More tests => 1127 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+use Test::More tests => 1145 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use PPI ();
 use PPI::Test qw( pause );
@@ -376,7 +376,6 @@ END_PERL
 # Whitespace-only line should not concatenate with next line's leading whitespace
 
 SCOPE: {
-	local $TODO = 'rt.cpan.org #57163: whitespace-only line concatenation';
 	my $code = "my \$x;\n    \n    my \$y;\n";
 	my $Document = safe_new \$code;
 	my @ws = grep { $_->isa('PPI::Token::Whitespace') && $_->content =~ /\n./ } $Document->tokens;
@@ -384,7 +383,6 @@ SCOPE: {
 }
 
 SCOPE: {
-	local $TODO = 'rt.cpan.org #57163: whitespace-only line concatenation';
 	my $code = "my \$x;\n\n    my \$y;\n";
 	my $Document = safe_new \$code;
 	my @ws = grep { $_->isa('PPI::Token::Whitespace') && $_->content =~ /\n./ } $Document->tokens;
