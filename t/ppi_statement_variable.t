@@ -42,7 +42,6 @@ END_PERL
 }
 
 VARIABLE_IN_LIST_CONTEXT: {
-	local $TODO = "variable declaration too greedy in list context (GH #25)";
 
 	# open( my $fh, ">", $filename ) - Variable should only contain 'my $fh'
 	my $doc = safe_new \"open( my \$fh, \">\", \$filename );";
