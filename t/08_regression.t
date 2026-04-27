@@ -375,9 +375,7 @@ END_PERL
 # Regression Test for GitHub #59 / RT #30037
 # Minus operator should not split namespaced function names
 
-TODO: {
-	local $TODO = 'GitHub #59: minus splits namespaced word';
-
+SCOPE: {
 	my $doc = safe_new \'$a=-xx::cc()';
 	my @words = grep { $_->isa('PPI::Token::Word') } $doc->tokens;
 	is( scalar @words, 1, '-xx::cc() has a single Word token' );
@@ -392,5 +390,5 @@ TODO: {
 	my $word3 = $doc3->find_first('Token::Word');
 	is( $word3 && $word3->content, "-foo'bar", "-foo'bar is a single Word token" );
 	my $quote = $doc3->find_first('Token::Quote::Single');
-	is( $quote, undef, "-foo'bar produces no Quote::Single tokens" );
+	is( $quote, '', "-foo'bar produces no Quote::Single tokens" );
 }

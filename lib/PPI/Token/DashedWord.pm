@@ -54,7 +54,7 @@ sub __TOKENIZER__on_char {
 
 	# Suck to the end of the dashed bareword
 	pos $t->{line} = $t->{line_cursor};
-	if ( $t->{line} =~ m/\G(\w+)/gc ) {
+	if ( $t->{line} =~ m/\G(\w+(?:(?:\'|::)\w+)*(?:::)?)/gc ) {
 		$t->{token}->{content} .= $1;
 		$t->{line_cursor} += length $1;
 	}
