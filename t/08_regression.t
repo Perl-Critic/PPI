@@ -390,7 +390,6 @@ SCOPE: {
 		my $doc = safe_new \$code;
 		my $found = $doc->find('PPI::Structure');
 		ok( $found && @$found, "GH#34: found structure in '$code'" );
-		local $TODO = "GH#34: hashref after '$op' operator treated as code block";
 		isa_ok( $found->[0], 'PPI::Structure::Constructor',
 			"GH#34: '{...}' after '$op' is a Constructor" );
 	}

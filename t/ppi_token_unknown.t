@@ -37,11 +37,9 @@ OPERATOR_CAST: {
 	my @hashctor1 = (
 		'{2}',
 		[
-#			'PPI::Structure::Constructor' => '{2}',
-			'PPI::Structure::Block' => '{2}',  # should be constructor
+			'PPI::Structure::Constructor' => '{2}',
 			'PPI::Token::Structure' => '{',
-#			'PPI::Statement::Expression' => '2',
-			'PPI::Statement' => '2',  # should be expression
+			'PPI::Statement' => '2',
 			'PPI::Token::Number' => '2',
 			'PPI::Token::Structure' => '}',
 		]
@@ -49,11 +47,9 @@ OPERATOR_CAST: {
 	my @hashctor2 = (
 		'{x=>2}',
 		[
-#			'PPI::Structure::Constructor' => '{x=>2}',
-			'PPI::Structure::Block' => '{x=>2}',  # should be constructor
+			'PPI::Structure::Constructor' => '{x=>2}',
 			'PPI::Token::Structure' => '{',
-#			'PPI::Statement::Expression' => 'x=>2',
-			'PPI::Statement' => 'x=>2',  # should be expression
+			'PPI::Statement::Expression' => 'x=>2',
 			'PPI::Token::Word' => 'x',
 			'PPI::Token::Operator' => '=>',
 			'PPI::Token::Number' => '2',
@@ -63,11 +59,19 @@ OPERATOR_CAST: {
 	my @hashctor3 = (
 		'{$args}',
 		[
-#			'PPI::Structure::Constructor' => '{$args}',
-			'PPI::Structure::Block' => '{$args}',  # should be constructor
+			'PPI::Structure::Block' => '{$args}',
 			'PPI::Token::Structure' => '{',
-#			'PPI::Statement::Expression' => '$args',
-			'PPI::Statement' => '$args',  # should be expression
+			'PPI::Statement' => '$args',
+			'PPI::Token::Symbol' => '$args',
+			'PPI::Token::Structure' => '}',
+		]
+	);
+	my @hashctor3_ctor = (
+		'{$args}',
+		[
+			'PPI::Structure::Constructor' => '{$args}',
+			'PPI::Token::Structure' => '{',
+			'PPI::Statement' => '$args',
 			'PPI::Token::Symbol' => '$args',
 			'PPI::Token::Structure' => '}',
 		]
@@ -89,11 +93,11 @@ OPERATOR_CAST: {
 	test_varying_whitespace( @number, @asterisk_op, @hash );
 	test_varying_whitespace( @number, @asterisk_op, @hashctor1 );
 	test_varying_whitespace( @number, @asterisk_op, @hashctor2 );
-	test_varying_whitespace( @number, @asterisk_op, @hashctor3 );
+	test_varying_whitespace( @number, @asterisk_op, @hashctor3_ctor );
 	test_varying_whitespace( @number, @exp_op, @bareword );
-	test_varying_whitespace( @number, @exp_op, @hashctor3 );  # doesn't compile, but make sure ** is operator
+	test_varying_whitespace( @number, @exp_op, @hashctor3_ctor );  # doesn't compile, but make sure ** is operator
 	test_varying_whitespace( @number, @asteriskeq_op, @bareword );
-	test_varying_whitespace( @number, @asteriskeq_op, @hashctor3 );  # doesn't compile, but make sure it's an operator
+	test_varying_whitespace( @number, @asteriskeq_op, @hashctor3_ctor );  # doesn't compile, but make sure it's an operator
 {
 	local %known_bad_seps = map { $_ => 1 } qw( space );
 	test_varying_whitespace( @nothing, @asterisk_cast, @scalar );
@@ -105,9 +109,9 @@ OPERATOR_CAST: {
 	test_varying_whitespace( @number, @percent_op, @glob );
 	test_varying_whitespace( @number, @percent_op, @hashctor1 );
 	test_varying_whitespace( @number, @percent_op, @hashctor2 );
-	test_varying_whitespace( @number, @percent_op, @hashctor3 );
+	test_varying_whitespace( @number, @percent_op, @hashctor3_ctor );
 	test_varying_whitespace( @number, @percenteq_op, @bareword );
-	test_varying_whitespace( @number, @percenteq_op, @hashctor3 );  # doesn't compile, but make sure it's an operator
+	test_varying_whitespace( @number, @percenteq_op, @hashctor3_ctor );  # doesn't compile, but make sure it's an operator
 {
 	local %known_bad_seps = map { $_ => 1 } qw( space );
 	test_varying_whitespace( @nothing, @percent_cast, @scalar );
@@ -120,9 +124,9 @@ OPERATOR_CAST: {
 	test_varying_whitespace( @number, @ampersand_op, @glob );
 	test_varying_whitespace( @number, @ampersand_op, @hashctor1 );
 	test_varying_whitespace( @number, @ampersand_op, @hashctor2 );
-	test_varying_whitespace( @number, @ampersand_op, @hashctor3 );
+	test_varying_whitespace( @number, @ampersand_op, @hashctor3_ctor );
 	test_varying_whitespace( @number, @ampersandeq_op, @bareword );
-	test_varying_whitespace( @number, @ampersandeq_op, @hashctor3 );  # doesn't compile, but make sure it's an operator
+	test_varying_whitespace( @number, @ampersandeq_op, @hashctor3_ctor );  # doesn't compile, but make sure it's an operator
 {
 	local %known_bad_seps = map { $_ => 1 } qw( space );
 	test_varying_whitespace( @nothing, @ampersand_cast, @scalar );
@@ -148,19 +152,19 @@ OPERATOR_CAST: {
 
 	my @single = ( "'3'", [ 'PPI::Token::Quote::Single' => "'3'", ] );
 	test_varying_whitespace( @single, @asterisk_op, @scalar );
-	test_varying_whitespace( @single, @asterisk_op, @hashctor3 );
+	test_varying_whitespace( @single, @asterisk_op, @hashctor3_ctor );
 	test_varying_whitespace( @single, @percent_op, @scalar );
-	test_varying_whitespace( @single, @percent_op, @hashctor3 );
+	test_varying_whitespace( @single, @percent_op, @hashctor3_ctor );
 	test_varying_whitespace( @single, @ampersand_op, @scalar );
-	test_varying_whitespace( @single, @ampersand_op, @hashctor3 );
+	test_varying_whitespace( @single, @ampersand_op, @hashctor3_ctor );
 
 	my @double = ( '"3"', [ 'PPI::Token::Quote::Double' => '"3"', ] );
 	test_varying_whitespace( @double, @asterisk_op, @scalar );
-	test_varying_whitespace( @double, @asterisk_op, @hashctor3 );
+	test_varying_whitespace( @double, @asterisk_op, @hashctor3_ctor );
 	test_varying_whitespace( @double, @percent_op, @scalar );
-	test_varying_whitespace( @double, @percent_op, @hashctor3 );
+	test_varying_whitespace( @double, @percent_op, @hashctor3_ctor );
 	test_varying_whitespace( @double, @ampersand_op, @scalar );
-	test_varying_whitespace( @double, @ampersand_op, @hashctor3 );
+	test_varying_whitespace( @double, @ampersand_op, @hashctor3_ctor );
 
 	test_varying_whitespace( @scalar, @asterisk_op, @scalar );
 	test_varying_whitespace( @scalar, @percent_op, @scalar );
@@ -286,11 +290,11 @@ OPERATOR_CAST: {
 		]
 	);
 	test_varying_whitespace( @evalblock, @asterisk_op, @scalar );
-	test_varying_whitespace( @double, @asterisk_op, @hashctor3 );
+	test_varying_whitespace( @double, @asterisk_op, @hashctor3_ctor );
 	test_varying_whitespace( @evalblock, @percent_op, @scalar );
-	test_varying_whitespace( @evalblock, @percent_op, @hashctor3 );
+	test_varying_whitespace( @evalblock, @percent_op, @hashctor3_ctor );
 	test_varying_whitespace( @evalblock, @ampersand_op, @scalar );
-	test_varying_whitespace( @evalblock, @ampersand_op, @hashctor3 );
+	test_varying_whitespace( @evalblock, @ampersand_op, @hashctor3_ctor );
 
 	my @evalstring = (
 		'eval "2"',
@@ -300,11 +304,11 @@ OPERATOR_CAST: {
 		]
 	);
 	test_varying_whitespace( @evalstring, @asterisk_op, @scalar );
-	test_varying_whitespace( @evalstring, @asterisk_op, @hashctor3 );
+	test_varying_whitespace( @evalstring, @asterisk_op, @hashctor3_ctor );
 	test_varying_whitespace( @evalstring, @percent_op, @scalar );
-	test_varying_whitespace( @evalstring, @percent_op, @hashctor3 );
+	test_varying_whitespace( @evalstring, @percent_op, @hashctor3_ctor );
 	test_varying_whitespace( @evalstring, @ampersand_op, @scalar );
-	test_varying_whitespace( @evalstring, @ampersand_op, @hashctor3 );
+	test_varying_whitespace( @evalstring, @ampersand_op, @hashctor3_ctor );
 
 	my @curly_subscript1 = (
 		'$y->{x}',
@@ -624,7 +628,7 @@ OPERATOR_CAST: {
 			'PPI::Token::Structure' => '}',
 		]
 	);
-	local $TODO = "hash constructors are currently mistaken for blocks";
+}
 	test_statement(
 		'1 * {2}',
 		[
@@ -636,8 +640,7 @@ OPERATOR_CAST: {
 			'PPI::Token::Number' => '2',
 			'PPI::Token::Structure' => '}',
 		]
-	)
-}
+	);
 }
 
 sub one_line_explain {

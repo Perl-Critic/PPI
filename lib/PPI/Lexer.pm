@@ -1220,6 +1220,11 @@ sub _curly {
 			# Known type
 			return $CURLY_CLASSES{$content};
 		}
+
+		# After any operator, { } is a hash constructor.
+		# -> is already handled above as Subscript.
+		return 'PPI::Structure::Constructor'
+			if $Element->isa('PPI::Token::Operator');
 	}
 
 	# Are we in a compound statement
