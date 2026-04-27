@@ -1,0 +1,10 @@
+PPI::Document
+  PPI::Statement
+    PPI::Token::Cast  	'$'
+    PPI::Token::Cast  	'$'
+    PPI::Token::Symbol  	'$a'
+    PPI::Token::Whitespace  	' '
+    PPI::Token::Operator  	'='
+    PPI::Token::Whitespace  	' '
+    PPI::Token::Number  	'3'
+    PPI::Token::Structure  	';'
