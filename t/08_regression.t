@@ -7,7 +7,7 @@
 use if !(-e 'META.yml'), "Test::InDistDir";
 use lib 't/lib';
 use PPI::Test::pragmas;
-use Test::More tests => 1121 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+use Test::More tests => 1133 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use PPI ();
 use PPI::Test qw( pause );
@@ -367,4 +367,30 @@ print "Hello" if /regex/;
 END_PERL
 	my $match = $doc->find('PPI::Token::Regexp::Match');
 	is( scalar(@$match), 3, 'Found expected number of matches' );
+}
+
+
+
+#####################################################################
+# Regression Test for GitHub #59 / RT #30037
+# Minus operator should not split namespaced function names
+
+TODO: {
+	local $TODO = 'GitHub #59: minus splits namespaced word';
+
+	my $doc = safe_new \'$a=-xx::cc()';
+	my @words = grep { $_->isa('PPI::Token::Word') } $doc->tokens;
+	is( scalar @words, 1, '-xx::cc() has a single Word token' );
+	is( $words[0] && $words[0]->content, '-xx::cc', '-xx::cc content is correct' );
+
+	my $doc2 = safe_new \'-foo::bar';
+	my @words2 = grep { $_->isa('PPI::Token::Word') } $doc2->tokens;
+	is( scalar @words2, 1, '-foo::bar is a single Word token' );
+	is( $words2[0] && $words2[0]->content, '-foo::bar', '-foo::bar content is correct' );
+
+	my $doc3 = safe_new \"-foo'bar";
+	my $word3 = $doc3->find_first('Token::Word');
+	is( $word3 && $word3->content, "-foo'bar", "-foo'bar is a single Word token" );
+	my $quote = $doc3->find_first('Token::Quote::Single');
+	is( $quote, undef, "-foo'bar produces no Quote::Single tokens" );
 }
