@@ -33,6 +33,7 @@ use strict;
 use Params::Util                     qw{_INSTANCE};
 use PPI::Token::Quote                ();
 use PPI::Token::_QuoteEngine::Simple ();
+use PPI::Token::_Interpolations      ();
 
 our $VERSION = '1.292';
 
@@ -59,11 +60,29 @@ Returns true if the string contains interpolations, or false if not.
 
 =cut
 
-# Upgrade: Return the interpolated substrings.
-# Upgrade: Returns parsed expressions.
 sub interpolations {
 	# Are there any unescaped $things in the string
 	!! ($_[0]->content =~ /(?<!\\)(?:\\\\)*[\$\@]/);
+}
+
+=pod
+
+=head2 interpolated_fragments
+
+The C<interpolated_fragments> method locates each interpolated expression
+within the double-quoted string and parses it as a
+L<PPI::Document::Fragment>.
+
+Returns a list of L<PPI::Document::Fragment> objects, one for each
+interpolation found (simple variables, subscript accesses, dereference
+expressions, magic variables, etc.).
+
+Returns an empty list when the string contains no interpolations.
+
+=cut
+
+sub interpolated_fragments {
+	PPI::Token::_Interpolations::_interpolated_fragments($_[0]->string);
 }
 
 =pod

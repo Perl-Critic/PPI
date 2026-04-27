@@ -85,6 +85,7 @@ have a relatively large number of unique methods all of their own.
 =cut
 
 use strict;
+use PPI::Token::_Interpolations ();
 
 our $VERSION = '1.292';
 
@@ -161,7 +162,25 @@ sub _is_match_indent {
 	return (grep { /^$indent/ || $_ eq "\n" } @{$token->{_heredoc}}) == @{$token->{_heredoc}};
 }
 
+=pod
 
+=head2 interpolated_fragments
+
+The C<interpolated_fragments> method locates each interpolated expression
+within the here-doc body and parses it as a L<PPI::Document::Fragment>.
+
+Returns a list of L<PPI::Document::Fragment> objects, one for each
+interpolation found. Returns an empty list for literal (single-quoted)
+here-docs.
+
+=cut
+
+sub interpolated_fragments {
+	my $self = shift;
+	return () unless $self->{_mode} eq 'interpolate' or $self->{_mode} eq 'command';
+	my $string = join '', $self->heredoc;
+	return PPI::Token::_Interpolations::_interpolated_fragments($string);
+}
 
 
 #####################################################################

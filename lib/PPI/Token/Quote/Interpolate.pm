@@ -27,8 +27,9 @@ L<PPI::Element> classes.
 =cut
 
 use strict;
-use PPI::Token::Quote ();
+use PPI::Token::Quote           ();
 use PPI::Token::_QuoteEngine::Full ();
+use PPI::Token::_Interpolations ();
 
 our $VERSION = '1.292';
 
@@ -48,7 +49,23 @@ sub string {
 	my $self     = shift;
 	my @sections = $self->_sections;
 	my $str      = $sections[0];
-	substr( $self->{content}, $str->{position}, $str->{size} );	
+	substr( $self->{content}, $str->{position}, $str->{size} );
+}
+
+=pod
+
+=head2 interpolated_fragments
+
+The C<interpolated_fragments> method locates each interpolated expression
+within the C<qq{}> string and parses it as a L<PPI::Document::Fragment>.
+
+Returns a list of L<PPI::Document::Fragment> objects, one for each
+interpolation found.
+
+=cut
+
+sub interpolated_fragments {
+	PPI::Token::_Interpolations::_interpolated_fragments($_[0]->string);
 }
 
 1;
