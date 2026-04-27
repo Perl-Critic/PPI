@@ -271,9 +271,7 @@ sub _element_string {
 	} elsif ( $Element->isa('PPI::Structure') ) {
 		# Add the content
 		if ( $self->{display}->{content} ) {
-			my $start = $Element->start
-				? $Element->start->content
-				: '???';
+			my $start = $Element->start->content;
 			my $finish = $Element->finish
 				? $Element->finish->content
 				: '???';

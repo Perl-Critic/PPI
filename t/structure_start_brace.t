@@ -46,10 +46,7 @@ FIRST_ELEMENT: {
 	my $s = $doc->find_first('PPI::Structure');
 	ok $s, 'found structure';
 
-	TODO: {
-		local $TODO = "start brace guards are dead code to be removed";
-		is $s->first_element, $s->start, 'first_element is always the start brace';
-	}
+	is $s->first_element, $s->start, 'first_element is always the start brace';
 }
 
 # braces() never returns undef for a parsed structure
@@ -58,10 +55,7 @@ BRACES: {
 		my $doc = safe_new \$code;
 		my $s = $doc->find_first('PPI::Structure') or next;
 
-		TODO: {
-			local $TODO = "start brace guards are dead code to be removed";
-			ok defined $s->braces, "braces() defined for: $code";
-		}
+		ok defined $s->braces, "braces() defined for: $code";
 	}
 }
 
