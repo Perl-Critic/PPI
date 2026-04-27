@@ -277,6 +277,7 @@ sub _setattr {
 	$document->{feature_mods}              = $attr{feature_mods};
 	$document->{custom_feature_includes}   = $attr{custom_feature_includes};
 	$document->{custom_feature_include_cb} = $attr{custom_feature_include_cb};
+	$document->{plugins}                   = $attr{plugins};
 	if ( $ENV{PPI_CUSTOM_FEATURE_INCLUDES} ) {
 		my $includes = YAML::PP::Load $ENV{PPI_CUSTOM_FEATURE_INCLUDES};
 		die "\$ENV{PPI_CUSTOM_FEATURE_INCLUDES} "
@@ -429,6 +430,21 @@ sub custom_feature_include_cb {
 	my $self = shift;
 	return $self->{custom_feature_include_cb} unless @_;
 	$self->{custom_feature_include_cb} = shift;
+}
+
+=head2 plugins
+
+  my $plugins = $document->plugins;
+
+Returns an array reference of L<PPI::Plugin> objects registered for this
+document, or an empty array reference if none are set.
+
+=cut
+
+sub plugins {
+	my $self = shift;
+	return $self->{plugins} || [] unless @_;
+	$self->{plugins} = shift;
 }
 
 =pod

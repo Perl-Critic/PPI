@@ -633,6 +633,13 @@ sub _finalize_token {
 	my $self = shift;
 	return $self->{class} unless defined $self->{token};
 
+	# Let plugins inspect/modify the token
+	if ( my $plugins = $self->{plugins} ) {
+		for my $plugin ( @$plugins ) {
+			$plugin->modify_token( $self->{token} );
+		}
+	}
+
 	# Add the token to the token buffer
 	push @{ $self->{tokens} }, $self->{token};
 	$self->{token} = undef;
@@ -856,6 +863,11 @@ sub __current_token_is_forced_word {
 sub _features {
 	my ( $self, $arg ) = @_;
 	return $arg ? $self->{feature_set} = $arg : $self->{feature_set} || {};
+}
+
+sub _plugins {
+	my ( $self, $arg ) = @_;
+	return $arg ? $self->{plugins} = $arg : $self->{plugins} || [];
 }
 
 sub _current_token_has_signatures_active { shift->{feature_set}{signatures} }

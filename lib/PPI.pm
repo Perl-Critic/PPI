@@ -24,6 +24,7 @@ use PPI::Document::Normalized ();
 use PPI::Normal               ();
 use PPI::Tokenizer            ();
 use PPI::Lexer                ();
+use PPI::Plugin               ();
 
 # If it is installed, load in PPI::XS
 die
