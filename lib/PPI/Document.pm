@@ -186,6 +186,22 @@ L<PPI::Statement::Include> object.
 
 This can be useful when your work project has a complex boilerplate module.
 
+=head3 encoding
+
+  $doc = PPI::Document->new( $filename, encoding => 'UTF-8' );
+
+When loading from a file, specifying C<encoding> causes the file to be read
+with the given encoding. Without this, file content is read using Perl's
+default IO layers (typically raw bytes). The encoding name should be any
+encoding recognized by L<Encode>, e.g. C<'UTF-8'>, C<'ISO-8859-1'>.
+
+When the document is saved via L</save>, the same encoding is applied to
+the output file.
+
+When loading from a string reference, the string is assumed to already
+contain decoded characters. The C<encoding> value is still stored and used
+by L</save>.
+
 =cut
 
 sub new {
@@ -216,8 +232,19 @@ sub new {
 		# Save the filename
 		$attr{filename} ||= $source;
 
+		# When an encoding is specified, always slurp with that encoding
+		# and pass the decoded string to the lexer.
+		if ( $attr{encoding} ) {
+			my $file_contents = PPI::Util::_slurp(
+				$source, encoding => $attr{encoding}
+			);
+			return $class->_error($file_contents) if !ref $file_contents;
+
+			my $document = PPI::Lexer->lex_source( $$file_contents, %attr );
+			return $document if $document;
+
 		# When loading from a filename, use the caching layer if it exists.
-		if ( $CACHE ) {
+		} elsif ( $CACHE ) {
 			my $file_contents = PPI::Util::_slurp( $source );
 
 			# Errors returned as plain string
@@ -274,6 +301,7 @@ sub _setattr {
 	my ( $class, $document, %attr ) = @_;
 	$document->{readonly}                  = !!$attr{readonly};
 	$document->{filename}                  = $attr{filename};
+	$document->{encoding}                  = $attr{encoding};
 	$document->{feature_mods}              = $attr{feature_mods};
 	$document->{custom_feature_includes}   = $attr{custom_feature_includes};
 	$document->{custom_feature_include_cb} = $attr{custom_feature_include_cb};
@@ -364,6 +392,19 @@ sub filename {
 
 =pod
 
+=head2 encoding
+
+The C<encoding> accessor returns the encoding that was specified when the
+document was created, or C<undef> if no encoding was specified.
+
+=cut
+
+sub encoding {
+	$_[0]->{encoding};
+}
+
+=pod
+
 =head2 readonly
 
 The C<readonly> attribute indicates if the document is intended to be
@@ -438,8 +479,9 @@ sub custom_feature_include_cb {
   $document->save( $file )
  
 The C<save> method serializes the C<PPI::Document> object and saves the
-resulting Perl document to a file. Returns C<undef> on failure to open
-or write to the file.
+resulting Perl document to a file. If the document was created with an
+C<encoding> parameter, the output is encoded accordingly. Returns C<undef>
+on failure to open or write to the file.
 
 =cut
 
@@ -447,7 +489,11 @@ sub save {
 	my $self = shift;
 	local *FILE;
 	open( FILE, '>', $_[0] )    or return undef;
-	binmode FILE;
+	if ( my $encoding = $self->{encoding} ) {
+		binmode( FILE, ":encoding($encoding)" ) or return undef;
+	} else {
+		binmode FILE;
+	}
 	print FILE $self->serialize or return undef;
 	close FILE                  or return undef;
 	return 1;
