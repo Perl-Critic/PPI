@@ -862,7 +862,11 @@ sub normalized {
 	# The normalization process will utterly destroy and mangle
 	# anything passed to it, so we are going to only give it a
 	# clone of ourselves.
-	PPI::Normal->process( $_[0]->clone );
+	my $clone = $_[0]->clone;
+	# Location cache is positional, not semantic — strip it so
+	# normalization compares structure, not source positions.
+	$clone->flush_locations;
+	PPI::Normal->process( $clone );
 }
 
 =pod
