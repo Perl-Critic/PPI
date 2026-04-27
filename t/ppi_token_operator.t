@@ -4,7 +4,7 @@
 
 use lib 't/lib';
 use PPI::Test::pragmas;
-use Test::More tests => 3073 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+use Test::More tests => 3082 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use PPI ();
 use PPI::Singletons qw( %KEYWORDS %OPERATOR );
@@ -111,6 +111,59 @@ OPERATOR_X: {
 				'PPI::Token::Operator' => 'x',
 				'PPI::Token::Whitespace' => ' ',
 				'PPI::Token::Number' => '3',
+			],
+		},
+		{
+			desc => 'method call on variable without parens',  # github #133
+			code => '$a->dat x 2;',
+			expected => [
+				'PPI::Token::Symbol' => '$a',
+				'PPI::Token::Operator' => '->',
+				'PPI::Token::Word' => 'dat',
+				'PPI::Token::Whitespace' => ' ',
+				'PPI::Token::Operator' => 'x',
+				'PPI::Token::Whitespace' => ' ',
+				'PPI::Token::Number' => '2',
+				'PPI::Token::Structure' => ';',
+			],
+		},
+		{
+			desc => 'method call on variable with parens',  # github #133
+			code => '$a->dat() x 2;',
+			expected => [
+				'PPI::Token::Symbol' => '$a',
+				'PPI::Token::Operator' => '->',
+				'PPI::Token::Word' => 'dat',
+				'PPI::Structure::List' => '()',
+				'PPI::Token::Structure' => '(',
+				'PPI::Token::Structure' => ')',
+				'PPI::Token::Whitespace' => ' ',
+				'PPI::Token::Operator' => 'x',
+				'PPI::Token::Whitespace' => ' ',
+				'PPI::Token::Number' => '2',
+				'PPI::Token::Structure' => ';',
+			],
+		},
+		{
+			desc => 'bareword x inside map block',  # github #133
+			code => 'map { LD_H x 3 } @list',
+			expected => [
+				'PPI::Statement' => 'map { LD_H x 3 } @list',
+				'PPI::Token::Word' => 'map',
+				'PPI::Token::Whitespace' => ' ',
+				'PPI::Structure::Block' => '{ LD_H x 3 }',
+				'PPI::Token::Structure' => '{',
+				'PPI::Token::Whitespace' => ' ',
+				'PPI::Statement' => 'LD_H x 3',
+				'PPI::Token::Word' => 'LD_H',
+				'PPI::Token::Whitespace' => ' ',
+				'PPI::Token::Operator' => 'x',
+				'PPI::Token::Whitespace' => ' ',
+				'PPI::Token::Number' => '3',
+				'PPI::Token::Whitespace' => ' ',
+				'PPI::Token::Structure' => '}',
+				'PPI::Token::Whitespace' => ' ',
+				'PPI::Token::Symbol' => '@list',
 			],
 		},
 		{
