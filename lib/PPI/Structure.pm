@@ -299,28 +299,22 @@ sub _complete {
 	!! ( defined $_[0]->{finish} );
 }
 
-# You can insert either another structure, or a token
 sub insert_before {
-	my $self    = shift;
-	my $Element = _INSTANCE(shift, 'PPI::Element') or return undef;
-	if ( $Element->isa('PPI::Structure') ) {
-		return $self->__insert_before($Element);
-	} elsif ( $Element->isa('PPI::Token') ) {
-		return $self->__insert_before($Element);
+	my $self = shift;
+	my @insertions = PPI::Element::_prepare_insertions(@_) or return undef;
+	for my $Element ( @insertions ) {
+		return '' unless $Element->isa('PPI::Structure') or $Element->isa('PPI::Token');
 	}
-	'';
+	$self->__insert_before(@insertions);
 }
 
-# As above, you can insert either another structure, or a token
 sub insert_after {
-	my $self    = shift;
-	my $Element = _INSTANCE(shift, 'PPI::Element') or return undef;
-	if ( $Element->isa('PPI::Structure') ) {
-		return $self->__insert_after($Element);
-	} elsif ( $Element->isa('PPI::Token') ) {
-		return $self->__insert_after($Element);
+	my $self = shift;
+	my @insertions = PPI::Element::_prepare_insertions(@_) or return undef;
+	for my $Element ( @insertions ) {
+		return '' unless $Element->isa('PPI::Structure') or $Element->isa('PPI::Token');
 	}
-	'';
+	$self->__insert_after(@insertions);
 }
 
 1;

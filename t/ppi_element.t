@@ -217,7 +217,6 @@ END_PERL
 
 
 INSERT_BEFORE_MULTIPLE_TOKENS: {
-	local $TODO = "insert_before does not yet accept multiple elements";
 	my $Document = safe_new \"print 'Hello World';";
 	my $string = $Document->find_first('Token::Quote');
 	my $foo = PPI::Token::Word->new('foo');
@@ -230,7 +229,6 @@ INSERT_BEFORE_MULTIPLE_TOKENS: {
 
 
 INSERT_AFTER_MULTIPLE_TOKENS: {
-	local $TODO = "insert_after does not yet accept multiple elements";
 	my $Document = safe_new \"print 'Hello World';";
 	my $string = $Document->find_first('Token::Quote');
 	my $foo = PPI::Token::Word->new('foo');
@@ -243,7 +241,6 @@ INSERT_AFTER_MULTIPLE_TOKENS: {
 
 
 INSERT_BEFORE_MULTIPLE_STATEMENTS: {
-	local $TODO = "insert_before does not yet accept multiple elements";
 	my $Document = safe_new \"my \$x = 1; my \$y = 2;";
 	my @stmts = $Document->schildren;
 	is( scalar @stmts, 2, 'Found two statements' );
@@ -257,7 +254,6 @@ INSERT_BEFORE_MULTIPLE_STATEMENTS: {
 
 
 INSERT_AFTER_MULTIPLE_STATEMENTS: {
-	local $TODO = "insert_after does not yet accept multiple elements";
 	my $Document = safe_new \"my \$x = 1; my \$y = 2;";
 	my @stmts = $Document->schildren;
 	is( scalar @stmts, 2, 'Found two statements' );
@@ -271,7 +267,6 @@ INSERT_AFTER_MULTIPLE_STATEMENTS: {
 
 
 INSERT_BEFORE_STRING: {
-	local $TODO = "insert_before does not yet accept strings";
 	my $Document = safe_new \"my \$x = 1;";
 	my $stmt = $Document->schild(0);
 	my $result = $stmt->insert_before("my \$y = 2; ");
@@ -282,7 +277,6 @@ INSERT_BEFORE_STRING: {
 
 
 INSERT_AFTER_STRING: {
-	local $TODO = "insert_after does not yet accept strings";
 	my $Document = safe_new \"my \$x = 1;";
 	my $stmt = $Document->schild(0);
 	my $result = $stmt->insert_after(" my \$y = 2;");
@@ -293,7 +287,6 @@ INSERT_AFTER_STRING: {
 
 
 INSERT_BEFORE_STRING_TOKEN: {
-	local $TODO = "insert_before does not yet accept strings";
 	my $Document = safe_new \"print 'Hello';";
 	my $string = $Document->find_first('Token::Quote');
 	my $result = $string->insert_before("foo ");
@@ -304,7 +297,6 @@ INSERT_BEFORE_STRING_TOKEN: {
 
 
 INSERT_AFTER_STRING_TOKEN: {
-	local $TODO = "insert_after does not yet accept strings";
 	my $Document = safe_new \"print 'Hello';";
 	my $string = $Document->find_first('Token::Quote');
 	my $result = $string->insert_after(" . 'World'");
@@ -315,7 +307,6 @@ INSERT_AFTER_STRING_TOKEN: {
 
 
 INSERT_BEFORE_FRAGMENT: {
-	local $TODO = "insert_before does not yet accept fragments";
 	my $Document = safe_new \"my \$x = 1;";
 	my $stmt = $Document->schild(0);
 	my $source = PPI::Document->new(\"my \$y = 2; ");
@@ -329,7 +320,6 @@ INSERT_BEFORE_FRAGMENT: {
 
 
 INSERT_AFTER_FRAGMENT: {
-	local $TODO = "insert_after does not yet accept fragments";
 	my $Document = safe_new \"my \$x = 1;";
 	my $stmt = $Document->schild(0);
 	my $source = PPI::Document->new(\" my \$y = 2;");

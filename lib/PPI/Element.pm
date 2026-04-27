@@ -512,15 +512,17 @@ the form of C<PPI::Element> objects, before the calling C<Element>. You
 need to be very careful when modifying perl code, as it's easy to break
 things.
 
-In its initial incarnation, this method allows you to insert a single
-Element, and will perform some basic checking to prevent you inserting
-something that would be structurally wrong (in PDOM terms).
+You may pass one or more L<PPI::Element> objects, a code string, or a
+L<PPI::Document::Fragment> object. A code string will be parsed into a
+L<PPI::Document> and its children will be inserted. A
+L<PPI::Document::Fragment> (or L<PPI::Document>) will have its children
+extracted and inserted. Elements are inserted in the order given.
 
-In future, this method may be enhanced to allow the insertion of multiple
-Elements, inline-parsed code strings or L<PPI::Document::Fragment> objects.
+Some basic checking is performed to prevent you inserting something that
+would be structurally wrong (in PDOM terms).
 
-Returns true if the Element was inserted, false if it can not be inserted,
-or C<undef> if you do not provide a C<PPI::Element> object as a parameter.
+Returns true if the Elements were inserted, false if they can not be
+inserted, or C<undef> if you do not provide valid parameters.
 
 =cut
 
@@ -537,21 +539,50 @@ The C<insert_after> method allows you to insert lexical perl content, in
 the form of C<PPI::Element> objects, after the calling C<Element>. You need
 to be very careful when modifying perl code, as it's easy to break things.
 
-In its initial incarnation, this method allows you to insert a single
-Element, and will perform some basic checking to prevent you inserting
-something that would be structurally wrong (in PDOM terms).
+You may pass one or more L<PPI::Element> objects, a code string, or a
+L<PPI::Document::Fragment> object. A code string will be parsed into a
+L<PPI::Document> and its children will be inserted. A
+L<PPI::Document::Fragment> (or L<PPI::Document>) will have its children
+extracted and inserted. Elements are inserted in the order given.
 
-In future, this method may be enhanced to allow the insertion of multiple
-Elements, inline-parsed code strings or L<PPI::Document::Fragment> objects.
+Some basic checking is performed to prevent you inserting something that
+would be structurally wrong (in PDOM terms).
 
-Returns true if the Element was inserted, false if it can not be inserted,
-or C<undef> if you do not provide a C<PPI::Element> object as a parameter.
+Returns true if the Elements were inserted, false if they can not be
+inserted, or C<undef> if you do not provide valid parameters.
 
 =cut
 
 sub __insert_after {
 	my $self = shift;
 	$self->parent->__insert_after_child( $self, @_ );
+}
+
+sub _prepare_insertions {
+	my @args = @_;
+	return unless @args;
+	require PPI::Document;
+	my @elements;
+	for my $arg ( @args ) {
+		if ( ref $arg and _INSTANCE($arg, 'PPI::Document') ) {
+			my @children = $arg->children;
+			$_->remove for @children;
+			push @elements, @children;
+		} elsif ( ref $arg and _INSTANCE($arg, 'PPI::Element') ) {
+			$arg->remove if $arg->parent;
+			push @elements, $arg;
+		} elsif ( defined $arg and !ref $arg ) {
+			my $doc = PPI::Document->new(\$arg);
+			return unless $doc;
+			my @children = $doc->children;
+			$_->remove for @children;
+			push @elements, @children;
+		} else {
+			return;
+		}
+	}
+	return unless @elements;
+	return @elements;
 }
 
 =pod

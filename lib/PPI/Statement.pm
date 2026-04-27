@@ -291,28 +291,24 @@ sub _complete {
 	);
 }
 
-# You can insert either a statement or a non-significant token.
 sub insert_before {
-	my $self    = shift;
-	my $Element = _INSTANCE(shift, 'PPI::Element') or return undef;
-	if ( $Element->isa('PPI::Statement') ) {
-		return $self->__insert_before($Element);
-	} elsif ( $Element->isa('PPI::Token') and ! $Element->significant ) {
-		return $self->__insert_before($Element);
+	my $self = shift;
+	my @insertions = PPI::Element::_prepare_insertions(@_) or return undef;
+	for my $Element ( @insertions ) {
+		return '' unless $Element->isa('PPI::Statement')
+			or ( $Element->isa('PPI::Token') and ! $Element->significant );
 	}
-	'';
+	$self->__insert_before(@insertions);
 }
 
-# As above, you can insert a statement, or a non-significant token
 sub insert_after {
-	my $self    = shift;
-	my $Element = _INSTANCE(shift, 'PPI::Element') or return undef;
-	if ( $Element->isa('PPI::Statement') ) {
-		return $self->__insert_after($Element);
-	} elsif ( $Element->isa('PPI::Token') and ! $Element->significant ) {
-		return $self->__insert_after($Element);
+	my $self = shift;
+	my @insertions = PPI::Element::_prepare_insertions(@_) or return undef;
+	for my $Element ( @insertions ) {
+		return '' unless $Element->isa('PPI::Statement')
+			or ( $Element->isa('PPI::Token') and ! $Element->significant );
 	}
-	'';
+	$self->__insert_after(@insertions);
 }
 
 1;
