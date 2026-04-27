@@ -757,26 +757,15 @@ sub logical_filename {
 sub _ensure_location_present {
 	my $self = shift;
 
-	unless ( exists $self->{_location} ) {
-		# Are we inside a normal document?
-		my $Document = $self->document or return undef;
-		if ( $Document->isa('PPI::Document::Fragment') ) {
-			# Because they can't be serialized, document fragments
-			# do not support the concept of location.
-			return undef;
-		}
-
-		# Generate the locations. If they need one location, then
-		# the chances are they'll want more, and it's better that
-		# everything is already pre-generated.
-		$Document->index_locations or return undef;
-		unless ( exists $self->{_location} ) {
-			# erm... something went very wrong here
-			return undef;
-		}
+	my $Document = $self->document or return exists $self->{_location} ? 1 : undef;
+	if ( $Document->isa('PPI::Document::Fragment') ) {
+		return undef;
 	}
 
-	return 1;
+	return 1 if exists $self->{_location} and not $Document->{_locations_dirty};
+
+	$Document->index_locations or return undef;
+	return exists $self->{_location} ? 1 : undef;
 }
 
 # Although flush_locations is only publically a Document-level method,

@@ -23,14 +23,11 @@ subtest 'insert_before invalidates locations' => sub {
 	is_deeply $y_stmt->first_token->location, [ 2, 1, 1, 2, undef ],
 		'$y stmt starts at line 2 before insert';
 
-	my $new_ws = PPI::Token::Whitespace->new("\n");
 	my $new_doc = safe_new \"# inserted\n";
 	my $new_comment = $new_doc->find_first('PPI::Token::Comment')->remove;
 
 	$y_stmt->insert_before( $new_comment );
-	$y_stmt->insert_before( $new_ws );
 
-	local $TODO = "location cache not yet auto-invalidated on mutation";
 	is_deeply $y_stmt->first_token->location, [ 3, 1, 1, 3, undef ],
 		'$y stmt location updated after insert_before';
 };
@@ -52,7 +49,7 @@ subtest 'insert_after invalidates locations' => sub {
 	$sep->insert_after( $new_comment );
 	$sep->insert_after( $new_ws );
 
-	local $TODO = "location cache not yet auto-invalidated on mutation";
+
 	is_deeply $y_stmt->first_token->location, [ 4, 1, 1, 4, undef ],
 		'$y stmt location updated after insert_after';
 };
@@ -68,7 +65,7 @@ subtest 'remove invalidates locations' => sub {
 
 	$comment->remove;
 
-	local $TODO = "location cache not yet auto-invalidated on mutation";
+
 	is_deeply $y_stmt->first_token->location, [ 2, 1, 1, 2, undef ],
 		'$y stmt location updated after remove';
 };
@@ -87,7 +84,7 @@ subtest 'replace invalidates locations' => sub {
 	my $replacement = PPI::Token::Number->new('100');
 	$one->replace( $replacement );
 
-	local $TODO = "location cache not yet auto-invalidated on mutation";
+
 	is_deeply $plus->location, [ 1, 13, 13, 1, undef ],
 		'plus column updated after replacing 1 with 100';
 };
@@ -107,7 +104,7 @@ subtest 'add_element invalidates locations' => sub {
 	$block->add_element( $new_stmt );
 	$block->add_element( PPI::Token::Whitespace->new("\n") );
 
-	local $TODO = "location cache not yet auto-invalidated on mutation";
+
 	is_deeply $y_stmt->first_token->location, [ 4, 1, 1, 4, undef ],
 		'$y stmt pushed down after adding lines to block';
 };
@@ -122,7 +119,7 @@ subtest 'prune invalidates locations' => sub {
 
 	$doc->prune('PPI::Token::Comment');
 
-	local $TODO = "location cache not yet auto-invalidated on mutation";
+
 	is_deeply $y_stmt->first_token->location, [ 2, 1, 1, 2, undef ],
 		'$y stmt location updated after prune removes comment';
 };

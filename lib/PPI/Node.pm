@@ -117,6 +117,7 @@ sub add_element {
 		$_PARENT{refaddr $Element} = $self
 	);
 
+	$self->__notify_locations_dirty;
 	1;
 }
 
@@ -516,6 +517,7 @@ sub remove_child {
 	splice( @{$self->{children}}, $p, 1 );
 	delete $_PARENT{$key};
 
+	$self->__notify_locations_dirty;
 	$child;
 }
 
@@ -732,6 +734,7 @@ sub __insert_before_child {
 			);
 	}
 	splice( @{$self->{children}}, $p, 0, @insertions );
+	$self->__notify_locations_dirty;
 	1;
 }
 
@@ -746,6 +749,7 @@ sub __insert_after_child {
 			);
 	}
 	splice( @{$self->{children}}, $p + 1, 0, @insertions );
+	$self->__notify_locations_dirty;
 	1;
 }
 
@@ -770,6 +774,8 @@ sub __replace_child {
 
 	# Uncache parent of old child
 	delete $_PARENT{$old_child_addr};
+
+	$self->__notify_locations_dirty;
 	1;
 }
 
@@ -800,6 +806,11 @@ sub __link_children {
 	}
 
 	1;
+}
+
+sub __notify_locations_dirty {
+	my $doc = $_[0]->document or return;
+	$doc->{_locations_dirty} = 1;
 }
 
 1;
