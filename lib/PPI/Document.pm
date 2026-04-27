@@ -647,6 +647,9 @@ from the file, these indexed locations will be B<wrong>.
 
 sub index_locations {
 	my $self   = shift;
+	if ( delete $self->{_locations_dirty} ) {
+		$self->flush_locations;
+	}
 	my @tokens = $self->tokens;
 
 	# Whenever we hit a heredoc we will need to increment by

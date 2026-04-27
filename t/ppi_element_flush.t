@@ -70,10 +70,10 @@ EOSTM
 	$include2->replace($replacement);
 
 	my $nextsib = $replacement->next_sibling;
-	is_deeply $nextsib->location, [ 4, 91, 91, 4, $file ],
-	  'next token location is stale';
-	is_deeply $include3->location, [ 5, 1, 1, 5, $file ],
-	  'location of 3rd include stale';
+	is_deeply $nextsib->location, [ 9, 3, 3, 9, $file ],
+	  'next token location auto-refreshed after replace';
+	is_deeply $include3->location, [ 10, 1, 1, 10, $file ],
+	  'location of 3rd include auto-refreshed';
 
 	my $res = eval { $nextsib->_flush_locations };
 	is $@,   "", '_flush_locations lives';
@@ -114,13 +114,10 @@ EOSTM
 	$include2->replace($replacement);
 
 	my $nextsib = $replacement->next_sibling;
-	is_deeply $nextsib->location, [ 4, 91, 91, 4, $file ],
-	  'next token location is stale';
+	is_deeply $nextsib->location, [ 9, 3, 3, 9, $file ],
+	  'next token location auto-refreshed after replace';
 
-	# now the $Document has a node without location, and all
-	# subsequent elements have a stale cached location.
-
-	# a partial reindex should fix all location caches:
+	# explicit index_locations is now a no-op (already refreshed):
 	my $res = eval {
 		use warnings 'FATAL';
 		$Document->index_locations;
