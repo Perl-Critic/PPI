@@ -7,7 +7,7 @@
 use if !(-e 'META.yml'), "Test::InDistDir";
 use lib 't/lib';
 use PPI::Test::pragmas;
-use Test::More tests => 1121 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+use Test::More tests => 1153 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use PPI ();
 use PPI::Test qw( pause );
@@ -367,4 +367,31 @@ print "Hello" if /regex/;
 END_PERL
 	my $match = $doc->find('PPI::Token::Regexp::Match');
 	is( scalar(@$match), 3, 'Found expected number of matches' );
+}
+
+
+
+######################################################################
+# GitHub Issue #34: anon hashref after operator treated as code block
+
+SCOPE: {
+	my @cases = (
+		['0 or {b => 1};',    'or'],
+		['0 and {b => 1};',   'and'],
+		['not {b => 1};',     'not'],
+		['0 - {b => 1};',     '-'],
+		['0 == {b => 1};',    '=='],
+		['0 ne {b => 1};',    'ne'],
+		['0 .. {b => 1};',    '..'],
+		['$x += {b => 1};',   '+='],
+	);
+	for my $case (@cases) {
+		my ($code, $op) = @$case;
+		my $doc = safe_new \$code;
+		my $found = $doc->find('PPI::Structure');
+		ok( $found && @$found, "GH#34: found structure in '$code'" );
+		local $TODO = "GH#34: hashref after '$op' operator treated as code block";
+		isa_ok( $found->[0], 'PPI::Structure::Constructor',
+			"GH#34: '{...}' after '$op' is a Constructor" );
+	}
 }
