@@ -4,7 +4,7 @@
 
 use lib 't/lib';
 use PPI::Test::pragmas;
-use Test::More tests => 39 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+use Test::More tests => 39 + 7 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use PPI ();
 use Helper 'safe_new';
@@ -45,4 +45,16 @@ END_PERL
 		isa_ok( $token, "PPI::Token::$class" );
 		is( $token->symbol, $name, $remk || "The symbol is $name" );
 	}
+}
+
+TRIPLE_DOLLAR: {
+	my $document = safe_new \"my \$x = \$\$\$a;";
+	my $casts = $document->find( 'PPI::Token::Cast' ) || [];
+	is( scalar(@$casts), 2, '$$$a produces two Cast tokens' );
+	is( $casts->[0] && $casts->[0]->content, '$', 'first Cast is $' );
+	is( $casts->[1] && $casts->[1]->content, '$', 'second Cast is $' );
+	my $symbols = $document->find( 'PPI::Token::Symbol' ) || [];
+	my @non_x = grep { $_->content ne '$x' } @$symbols;
+	is( scalar(@non_x), 1, '$$$a produces one non-$x Symbol' );
+	is( $non_x[0] && $non_x[0]->content, '$a', 'the Symbol is $a' );
 }

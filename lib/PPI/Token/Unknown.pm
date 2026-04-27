@@ -123,6 +123,14 @@ sub __TOKENIZER__on_char {
 		}
 
 		if ( $MAGIC{ $c . $char } ) {
+			if ( $char eq '$' ) {
+				my $after = substr( $t->{line}, $t->{line_cursor} + 1, 1 );
+				if ( $after ne '' and $after =~ /[\w\$]/ ) {
+					# $$$var or $$$$var: first $ is a dereference cast
+					$t->{class} = $t->{token}->set_class( 'Cast' );
+					return $t->_finalize_token->__TOKENIZER__on_char( $t );
+				}
+			}
 			# Magic variable
 			$t->{class} = $t->{token}->set_class( 'Magic' );
 			return 1;
