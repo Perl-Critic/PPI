@@ -22,7 +22,7 @@ isa_ok( $Token, 'PPI::Token::Data' );
 
 # Get the handle
 my $handle = $Token->handle;
-isa_ok( $handle, "$]" < 5.008 ? 'IO::String' : 'GLOB' );
+isa_ok( $handle, 'GLOB' );
 
 # Try to read a line off the handle
 my $line = <$handle>;
