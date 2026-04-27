@@ -138,6 +138,14 @@ sub __TOKENIZER__on_char {
 			}
 		}
 
+		if ( $char =~ /\s/ ) {
+			my $rest = substr( $t->{line}, $t->{line_cursor} );
+			if ( $rest =~ /^\s+[a-z_]/i ) {
+				$t->{class} = $t->{token}->set_class( 'Symbol' );
+				return 1;
+			}
+		}
+
 		# Must be a cast
 		$t->{class} = $t->{token}->set_class( 'Cast' );
 		return $t->_finalize_token->__TOKENIZER__on_char( $t );
@@ -178,6 +186,14 @@ sub __TOKENIZER__on_char {
 			if ( $t->{line} =~ m/$CURLY_SYMBOL/gc ) {
 				# control-character symbol (e.g. @{^_Foo})
 				$t->{class} = $t->{token}->set_class( 'Magic' );
+				return 1;
+			}
+		}
+
+		if ( $char =~ /\s/ ) {
+			my $rest = substr( $t->{line}, $t->{line_cursor} );
+			if ( $rest =~ /^\s+[\w:]/ ) {
+				$t->{class} = $t->{token}->set_class( 'Symbol' );
 				return 1;
 			}
 		}
@@ -238,6 +254,14 @@ sub __TOKENIZER__on_char {
 			if ( $t->{line} =~ m/$CURLY_SYMBOL/gc ) {
 				# control-character symbol (e.g. %{^_Foo})
 				$t->{class} = $t->{token}->set_class( 'Magic' );
+				return 1;
+			}
+		}
+
+		if ( $char =~ /\s/ ) {
+			my $rest = substr( $t->{line}, $t->{line_cursor} );
+			if ( $rest =~ /^\s+[\w:]/ and _cast_or_op( $t ) eq 'Cast' ) {
+				$t->{class} = $t->{token}->set_class( 'Symbol' );
 				return 1;
 			}
 		}

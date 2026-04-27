@@ -57,8 +57,6 @@ CONSTRUCT_OWN_TOKEN: {
 
 
 SIGIL_WHITESPACE: {
-	local $TODO = "whitespace not yet supported between sigil and identifier (GH #158)";
-
 	my @tests = (
 		[ '$ foo',      { content => '$ foo',   canonical => '$foo',  raw_type => '$', symbol_type => '$', symbol => '$foo'  } ],
 		[ '@ foo',      { content => '@ foo',   canonical => '@foo',  raw_type => '@', symbol_type => '@', symbol => '@foo'  } ],

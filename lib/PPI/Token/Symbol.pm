@@ -160,6 +160,16 @@ sub symbol_type {
 sub __TOKENIZER__on_char {
 	my $t = $_[1];
 
+	# Consume whitespace between sigil and identifier only if no identifier
+	# chars have been consumed yet (content is bare sigil + optional space)
+	if ( $t->{token}->{content} =~ /^[\$\@\%\&\*]\s*$/ ) {
+		pos $t->{line} = $t->{line_cursor};
+		if ( $t->{line} =~ m/\G(\s+)/gc ) {
+			$t->{token}->{content} .= $1;
+			$t->{line_cursor}      += length $1;
+		}
+	}
+
 	# Suck in till the end of the symbol
 	pos $t->{line} = $t->{line_cursor};
 	if ( $t->{line} =~ m/\G([\w:\']+)/gc ) {
@@ -168,14 +178,15 @@ sub __TOKENIZER__on_char {
 	}
 
 	# Handle magic things
-	my $content = $t->{token}->{content};	
-	if ( $content eq '@_' or $content eq '$_' ) {
+	my $content = $t->{token}->{content};
+	(my $stripped = $content) =~ s/\s+//g;
+	if ( $stripped eq '@_' or $stripped eq '$_' ) {
 		$t->{class} = $t->{token}->set_class( 'Magic' );
 		return $t->_finalize_token->__TOKENIZER__on_char( $t );
 	}
 
 	# Shortcut for most of the X:: symbols
-	if ( $content eq '$::' ) {
+	if ( $stripped eq '$::' ) {
 		# May well be an alternate form of a Magic
 		my $nextchar = substr( $t->{line}, $t->{line_cursor}, 1 );
 		if ( $nextchar eq '|' ) {
@@ -185,13 +196,15 @@ sub __TOKENIZER__on_char {
 		}
 		return $t->_finalize_token->__TOKENIZER__on_char( $t );
 	}
-	if ( $content =~ /^[\$%*@&]::(?:[^\w]|$)/ ) {
-		my $current = substr( $content, 0, 3, '' );
+	if ( $stripped =~ /^[\$%*@&]::(?:[^\w]|$)/ ) {
+		my $sigil_len = length($content) - length($stripped) + 3;
+		my $current = substr( $content, 0, $sigil_len );
+		my $leftover = substr( $content, $sigil_len );
 		$t->{token}->{content} = $current;
-		$t->{line_cursor} -= length( $content );
+		$t->{line_cursor} -= length( $leftover );
 		return $t->_finalize_token->__TOKENIZER__on_char( $t );
 	}
-	if ( $content =~ /^(?:\$|\@)\d+/ ) {
+	if ( $stripped =~ /^(?:\$|\@)\d+/ ) {
 		$t->{class} = $t->{token}->set_class( 'Magic' );
 		return $t->_finalize_token->__TOKENIZER__on_char( $t );
 	}
@@ -201,6 +214,7 @@ sub __TOKENIZER__on_char {
 	my $pattern = qr/
 	^(
 		[\$@%&*]
+		\s*
 		(?:
 				: (?! : )			# allow single-colon non-magic variables
 			|
