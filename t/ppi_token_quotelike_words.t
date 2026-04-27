@@ -4,7 +4,7 @@
 
 use lib 't/lib';
 use PPI::Test::pragmas;
-use Test::More tests => 2425 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+use Test::More tests => 2445 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use PPI ();
 use Helper 'safe_new';
@@ -137,4 +137,24 @@ sub permute_test {
 	assemble_and_run "\f", $words_in, $left_delim, "\f", "\f", $right_delim, $expected;
 
 	return;
+}
+
+COMMENT_BEFORE_DELIMITER: {
+	my @cases = (
+		[ "qw # comment\n( a )",         ['a'],      "comment then parens" ],
+		[ "qw # comment\n/ a /",         ['a'],      "comment then slashes" ],
+		[ "qw  # comment\n[ a ]",        ['a'],      "extra space before comment" ],
+		[ "qw # c1\n# c2\n( a )",        ['a'],      "multiple comment lines" ],
+		[ "qw # comment\n{ a b }",       ['a', 'b'], "comment then braces" ],
+	);
+	for my $case ( @cases ) {
+		my ( $code, $expected, $label ) = @$case;
+		my $d = safe_new \$code;
+		my $qw = $d->find_first( 'PPI::Token::QuoteLike::Words' );
+		TODO: {
+			local $TODO = 'GH #126: qw with comment before delimiter';
+			ok( $qw, "$label - found qw token" );
+			is_deeply( $qw ? [ $qw->literal ] : [], $expected, "$label - literal" );
+		}
+	}
 }
