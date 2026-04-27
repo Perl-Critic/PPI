@@ -28,8 +28,9 @@ pointing at, rather than what it might appear to be pointing at.
 =cut
  
 use strict;
-use Params::Util qw{_INSTANCE};
-use PPI::Token   ();
+use Params::Util   qw{_INSTANCE};
+use PPI::Token     ();
+use PPI::Singletons qw{ %MAGIC };
 
 our $VERSION = '1.292';
 
@@ -167,24 +168,12 @@ sub __TOKENIZER__on_char {
 		$t->{line_cursor}      += length $1;
 	}
 
-	# Handle magic things
-	my $content = $t->{token}->{content};	
-	if ( $content eq '@_' or $content eq '$_' ) {
+	my $content = $t->{token}->{content};
+	if ( $MAGIC{$content} ) {
 		$t->{class} = $t->{token}->set_class( 'Magic' );
 		return $t->_finalize_token->__TOKENIZER__on_char( $t );
 	}
 
-	# Shortcut for most of the X:: symbols
-	if ( $content eq '$::' ) {
-		# May well be an alternate form of a Magic
-		my $nextchar = substr( $t->{line}, $t->{line_cursor}, 1 );
-		if ( $nextchar eq '|' ) {
-			$t->{token}->{content} .= $nextchar;
-			$t->{line_cursor}++;
-			$t->{class} = $t->{token}->set_class( 'Magic' );
-		}
-		return $t->_finalize_token->__TOKENIZER__on_char( $t );
-	}
 	if ( $content =~ /^[\$%*@&]::(?:[^\w]|$)/ ) {
 		my $current = substr( $content, 0, 3, '' );
 		$t->{token}->{content} = $current;

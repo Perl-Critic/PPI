@@ -72,8 +72,16 @@ sub __TOKENIZER__on_char {
 				return $t->_finalize_token->__TOKENIZER__on_char( $t );
 			}
 
+			if ( $c eq '$::' ) {
+				my $after = substr( $t->{line}, $t->{line_cursor} + 1, 1 );
+				if ( $MAGIC{ $c . $after } ) {
+					$t->{token}->{content} = $c . $after;
+					$t->{line_cursor} += 2;
+					return $t->_finalize_token->__TOKENIZER__on_char( $t );
+				}
+			}
+
 			# A symbol in the style $_foo or $::foo or $'foo.
-			# Overwrite the current token
 			$t->{class} = $t->{token}->set_class('Symbol');
 			return PPI::Token::Symbol->__TOKENIZER__on_char( $t );
 		}
@@ -128,15 +136,6 @@ sub __TOKENIZER__on_char {
 			}
 		}
 
-		if ( $c =~ /^\$\#\{/ ) {
-			# The $# is actually a cast, and { is its block
-			# Add the current token as the cast...
-			$t->{token} = PPI::Token::Cast->new( '$#' );
-			$t->_finalize_token;
-
-			# ... and create a new token for the block
-			return $t->_new_token( 'Structure', '{' );
-		}
 	} elsif ($c =~ /^%\^/) {
 		return 1 if $c eq '%^';
 		# It's an escaped char magic... maybe ( like %^H )
