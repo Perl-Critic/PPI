@@ -4,7 +4,7 @@
 
 use lib 't/lib';
 use PPI::Test::pragmas;
-use Test::More tests => 68 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+use Test::More tests => 125 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use PPI ();
 use Helper 'safe_new';
@@ -213,4 +213,178 @@ END_PERL
 		$tab_width + 2,
 		'Got correct visual column number.',
 	);
+}
+
+
+INSERT_AFTER_RETURN_VALUES: {
+	my $doc = safe_new \"my \$x = 1;";
+	my $st = $doc->find_first('Statement');
+	isa_ok( $st, 'PPI::Statement' );
+
+	is( $st->insert_after(undef), undef,
+		'insert_after returns undef for undef arg' );
+	is( $st->insert_after('string'), undef,
+		'insert_after returns undef for non-Element arg' );
+	is( $st->insert_after(42), undef,
+		'insert_after returns undef for numeric arg' );
+
+	my $ws = PPI::Token::Whitespace->new(' ');
+	is( $st->insert_after($ws), 1,
+		'insert_after returns 1 on success' );
+}
+
+
+INSERT_BEFORE_RETURN_VALUES: {
+	my $doc = safe_new \"my \$x = 1;";
+	my $st = $doc->find_first('Statement');
+	isa_ok( $st, 'PPI::Statement' );
+
+	is( $st->insert_before(undef), undef,
+		'insert_before returns undef for undef arg' );
+	is( $st->insert_before('string'), undef,
+		'insert_before returns undef for non-Element arg' );
+	is( $st->insert_before(42), undef,
+		'insert_before returns undef for numeric arg' );
+
+	my $ws = PPI::Token::Whitespace->new(' ');
+	is( $st->insert_before($ws), 1,
+		'insert_before returns 1 on success' );
+}
+
+
+STATEMENT_INSERT_AFTER: {
+	my $doc = safe_new \"my \$x = 1;";
+	my $st = $doc->find_first('Statement');
+	isa_ok( $st, 'PPI::Statement' );
+
+	my $new_st = PPI::Statement->new;
+	$new_st->add_element( PPI::Token::Word->new('foo') );
+	is( $st->insert_after($new_st), 1,
+		'Statement insert_after accepts another Statement' );
+
+	my $ws = PPI::Token::Whitespace->new("\n");
+	is( $st->insert_after($ws), 1,
+		'Statement insert_after accepts non-significant Token' );
+
+	my $word = PPI::Token::Word->new('bar');
+	is( $st->insert_after($word), '',
+		'Statement insert_after rejects significant Token' );
+
+	my $struct = PPI::Structure->new( PPI::Token::Structure->new('{') );
+	is( $st->insert_after($struct), '',
+		'Statement insert_after rejects Structure' );
+}
+
+
+STATEMENT_INSERT_BEFORE: {
+	my $doc = safe_new \"my \$x = 1;";
+	my $st = $doc->find_first('Statement');
+	isa_ok( $st, 'PPI::Statement' );
+
+	my $new_st = PPI::Statement->new;
+	$new_st->add_element( PPI::Token::Word->new('foo') );
+	is( $st->insert_before($new_st), 1,
+		'Statement insert_before accepts another Statement' );
+
+	my $ws = PPI::Token::Whitespace->new("\n");
+	is( $st->insert_before($ws), 1,
+		'Statement insert_before accepts non-significant Token' );
+
+	my $word = PPI::Token::Word->new('bar');
+	is( $st->insert_before($word), '',
+		'Statement insert_before rejects significant Token' );
+
+	my $struct = PPI::Structure->new( PPI::Token::Structure->new('{') );
+	is( $st->insert_before($struct), '',
+		'Statement insert_before rejects Structure' );
+}
+
+
+STRUCTURE_INSERT_AFTER: {
+	my $doc = safe_new \"print( 'Hello' );";
+	my $struct = $doc->find_first('Structure');
+	isa_ok( $struct, 'PPI::Structure' );
+
+	my $word = PPI::Token::Word->new('foo');
+	is( $struct->insert_after($word), 1,
+		'Structure insert_after accepts any Token (significant)' );
+
+	my $ws = PPI::Token::Whitespace->new(' ');
+	is( $struct->insert_after($ws), 1,
+		'Structure insert_after accepts non-significant Token' );
+
+	my $struct2 = PPI::Structure->new( PPI::Token::Structure->new('(') );
+	is( $struct->insert_after($struct2), 1,
+		'Structure insert_after accepts another Structure' );
+
+	my $new_st = PPI::Statement->new;
+	$new_st->add_element( PPI::Token::Word->new('bar') );
+	is( $struct->insert_after($new_st), '',
+		'Structure insert_after rejects Statement' );
+}
+
+
+STRUCTURE_INSERT_BEFORE: {
+	my $doc = safe_new \"print( 'Hello' );";
+	my $struct = $doc->find_first('Structure');
+	isa_ok( $struct, 'PPI::Structure' );
+
+	my $word = PPI::Token::Word->new('foo');
+	is( $struct->insert_before($word), 1,
+		'Structure insert_before accepts any Token (significant)' );
+
+	my $ws = PPI::Token::Whitespace->new(' ');
+	is( $struct->insert_before($ws), 1,
+		'Structure insert_before accepts non-significant Token' );
+
+	my $struct2 = PPI::Structure->new( PPI::Token::Structure->new('(') );
+	is( $struct->insert_before($struct2), 1,
+		'Structure insert_before accepts another Structure' );
+
+	my $new_st = PPI::Statement->new;
+	$new_st->add_element( PPI::Token::Word->new('bar') );
+	is( $struct->insert_before($new_st), '',
+		'Structure insert_before rejects Statement' );
+}
+
+
+DOCUMENT_INSERT: {
+	my $doc = safe_new \"my \$x = 1;";
+	isa_ok( $doc, 'PPI::Document' );
+
+	my $ws = PPI::Token::Whitespace->new(' ');
+	is( $doc->insert_before($ws), undef,
+		'Document insert_before always returns undef' );
+	is( $doc->insert_after($ws), undef,
+		'Document insert_after always returns undef' );
+}
+
+
+INSERT_AFTER_ACCEPTS_SINGLE_ELEMENT: {
+	my $doc = safe_new \"my \$x = 1;";
+	my $st = $doc->find_first('Statement');
+	isa_ok( $st, 'PPI::Statement' );
+
+	my $ws1 = PPI::Token::Whitespace->new(' ');
+	my $ws2 = PPI::Token::Whitespace->new("\n");
+	is( $st->insert_after($ws1, $ws2), 1,
+		'insert_after with multiple args only inserts the first' );
+
+	my $serialized = $doc->serialize;
+	ok( $serialized =~ / $/, 'only first element was inserted' );
+}
+
+
+INSERT_BEFORE_ACCEPTS_SINGLE_ELEMENT: {
+	my $doc = safe_new \"my \$x = 1;";
+	my $st = $doc->find_first('Statement');
+	isa_ok( $st, 'PPI::Statement' );
+
+	my $ws1 = PPI::Token::Whitespace->new(' ');
+	my $ws2 = PPI::Token::Whitespace->new("\n");
+	is( $st->insert_before($ws1, $ws2), 1,
+		'insert_before with multiple args only inserts the first' );
+
+	my $serialized = $doc->serialize;
+	ok( $serialized =~ /^ /, 'only first element was inserted' );
 }
