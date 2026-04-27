@@ -49,6 +49,19 @@ our @ISA = qw{
 
 =pod
 
+=head2 string
+
+The C<string> method returns the value of the string as PPI has
+parsed it, without the surrounding operator, delimiters, and modifiers.
+
+=cut
+
+sub string {
+	return $_[0]->_section_content( 0 );
+}
+
+=pod
+
 =head2 get_match_string
 
 The C<get_match_string> method returns the portion of the string that

@@ -29,10 +29,6 @@ line from a file, or all the lines from a file, as follows.
 
 =head1 METHODS
 
-There are no methods available for C<PPI::Token::QuoteLike::Readline>
-beyond those provided by the parent L<PPI::Token::QuoteLike>, L<PPI::Token>
-and L<PPI::Element> classes.
-
 =cut
 
 use strict;
@@ -45,6 +41,19 @@ our @ISA = qw{
 	PPI::Token::_QuoteEngine::Full
 	PPI::Token::QuoteLike
 };
+
+=pod
+
+=head2 string
+
+The C<string> method returns the value of the string as PPI has
+parsed it, without the surrounding angle bracket delimiters.
+
+=cut
+
+sub string {
+	return $_[0]->_section_content( 0 );
+}
 
 1;
 
