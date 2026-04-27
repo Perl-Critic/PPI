@@ -5,7 +5,7 @@
 
 use lib 't/lib';
 use PPI::Test::pragmas;
-use Test::More tests => 11 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+use Test::More tests => 12 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use PPI ();
 use Helper 'safe_new';
@@ -28,24 +28,18 @@ END_PERL
 my $doc = safe_new \$code;
 
 {
-	local $TODO = "GH #16: Pod below __END__ not parsed when __DATA__ present";
-
 	my $pods = $doc->find('PPI::Token::Pod');
 	ok( $pods, 'found Pod tokens' );
 	is( scalar @{ $pods || [] }, 1, 'found exactly one Pod section' );
-	if ( $pods and @$pods ) {
-		like( $pods->[0]->content, qr/After END pod/, 'Pod content from after __END__ is present' );
-	}
+	like( $pods->[0]->content, qr/After END pod/, 'Pod content from after __END__ is present' );
 
 	my $seps = $doc->find('PPI::Token::Separator');
 	is( scalar @{ $seps || [] }, 2, 'found two Separator tokens (__DATA__ and __END__)' );
 
 	my $data_tokens = $doc->find('PPI::Token::Data');
 	ok( $data_tokens, 'found Data tokens' );
-	if ( $data_tokens and @$data_tokens ) {
-		unlike( $data_tokens->[0]->content, qr/__END__/,
-			'Data token does not contain __END__' );
-	}
+	unlike( $data_tokens->[0]->content, qr/__END__/,
+		'Data token does not contain __END__' );
 }
 
 is( $doc->serialize, $code, 'round-trip preserves original source' );
@@ -65,7 +59,6 @@ END_PERL
 
 my $doc2 = safe_new \$code2;
 {
-	local $TODO = "GH #16: Pod below __END__ not parsed when __DATA__ present";
 	my $pods2 = $doc2->find('PPI::Token::Pod');
 	ok( $pods2, 'found Pod when __END__ immediately follows __DATA__' );
 }
