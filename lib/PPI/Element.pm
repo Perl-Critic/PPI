@@ -245,6 +245,53 @@ sub document {
 
 =pod
 
+=head2 namespace
+
+For any C<PPI::Element>, the C<namespace> method returns the effective
+package namespace at that point in the document.
+
+The effective namespace is determined by walking up the PDOM tree and
+scanning previous siblings for C<PPI::Statement::Package> declarations.
+Block-form package declarations (C<package Foo { ... }>) only affect
+elements within their block, while semicolon-form declarations
+(C<package Foo;>) affect all subsequent siblings within the same scope.
+
+If no package declaration is found, returns C<'main'>.
+
+Note: For L<PPI::Statement::Package> objects themselves, the inherited
+L<PPI::Statement::Package/namespace> method returns the declared package
+name rather than the effective namespace at that point.
+
+=cut
+
+sub namespace {
+	my $cursor = shift;
+
+	while ( 1 ) {
+		my $sib = $cursor;
+		while ( $sib = $sib->sprevious_sibling ) {
+			next unless _INSTANCE($sib, 'PPI::Statement::Package');
+			next if $sib->block;
+			my $ns = $sib->namespace;
+			return $ns if length $ns;
+		}
+
+		my $parent = $_PARENT{refaddr $cursor} or return 'main';
+
+		if ( _INSTANCE($parent, 'PPI::Structure::Block') ) {
+			my $grandparent = $_PARENT{refaddr $parent};
+			if ( $grandparent and _INSTANCE($grandparent, 'PPI::Statement::Package') ) {
+				my $ns = $grandparent->namespace;
+				return $ns if length $ns;
+			}
+		}
+
+		$cursor = $parent;
+	}
+}
+
+=pod
+
 =head2 next_sibling
 
 All L<PPI::Node> objects (specifically, our parent Node) contain a number of
