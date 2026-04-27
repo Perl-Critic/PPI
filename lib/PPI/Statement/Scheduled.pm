@@ -54,6 +54,7 @@ may have 'sub' in front of them.
 =cut
 
 use strict;
+use warnings;
 use PPI::Statement::Sub ();
 
 our $VERSION = '1.292';

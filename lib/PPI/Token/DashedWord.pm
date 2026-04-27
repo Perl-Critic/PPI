@@ -27,6 +27,7 @@ keywords.  As such, this class may be removed from PPI in the future.
 =cut
 
 use strict;
+use warnings;
 use PPI::Token ();
 
 our $VERSION = '1.292';

@@ -28,6 +28,7 @@ object as a bug.
 =cut
 
 use strict;
+use warnings;
 use PPI::Token     ();
 use PPI::Exception ();
 use PPI::Singletons qw' %MAGIC $CURLY_SYMBOL ';

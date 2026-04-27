@@ -25,6 +25,7 @@ L<PPI::Token> and L<PPI::Element> parent classes.
 =cut
 
 use strict;
+use warnings;
 use Params::Util qw{_INSTANCE};
 use PPI::Token   ();
 

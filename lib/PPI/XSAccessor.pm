@@ -5,6 +5,7 @@ package PPI::XSAccessor;
 
 use 5.006;
 use strict;
+use warnings;
 use PPI ();
 
 our $VERSION = '1.292';

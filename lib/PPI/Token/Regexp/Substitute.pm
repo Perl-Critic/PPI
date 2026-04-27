@@ -31,6 +31,7 @@ and L<PPI::Element> classes.
 =cut
 
 use strict;
+use warnings;
 use PPI::Token::Regexp             ();
 use PPI::Token::_QuoteEngine::Full ();
 

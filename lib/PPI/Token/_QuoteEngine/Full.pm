@@ -3,6 +3,7 @@ package PPI::Token::_QuoteEngine::Full;
 # Full quote engine
 
 use strict;
+use warnings;
 use Clone                    ();
 use Carp                     ();
 use PPI::Token::_QuoteEngine ();

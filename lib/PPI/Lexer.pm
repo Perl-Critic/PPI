@@ -54,6 +54,7 @@ For more unusual tasks, by all means forge onwards.
 =cut
 
 use strict;
+use warnings;
 use Scalar::Util    ();
 use Params::Util    qw{_STRING _INSTANCE};
 use PPI             ();

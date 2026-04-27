@@ -45,6 +45,7 @@ L<PPI::Statement>, L<PPI::Node> and L<PPI::Element> methods.
 =cut
 
 use strict;
+use warnings;
 
 use version 0.77 ();
 use Safe::Isa '$_call_if_object';

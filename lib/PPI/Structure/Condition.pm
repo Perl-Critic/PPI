@@ -36,6 +36,7 @@ the standard L<PPI::Structure>, L<PPI::Node> and L<PPI::Element> methods.
 =cut
 
 use strict;
+use warnings;
 use PPI::Structure ();
 
 our $VERSION = '1.292';

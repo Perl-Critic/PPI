@@ -31,6 +31,7 @@ If -E<gt>fill returns true, finalise the token.
 =cut
 
 use strict;
+use warnings;
 use Carp ();
 
 our $VERSION = '1.292';

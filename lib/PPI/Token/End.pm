@@ -41,6 +41,7 @@ L<PPI::Element> parent classes.
 =cut
 
 use strict;
+use warnings;
 use PPI::Token ();
 
 our $VERSION = '1.292';

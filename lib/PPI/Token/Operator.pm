@@ -40,6 +40,7 @@ L<PPI::Token> and L<PPI::Element> classes.
 =cut
 
 use strict;
+use warnings;
 use PPI::Token ();
 use PPI::Singletons '%OPERATOR';
 

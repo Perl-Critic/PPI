@@ -47,6 +47,7 @@ honor of its own token class (L<PPI::Token::HereDoc>).
 =cut
 
 use strict;
+use warnings;
 use PPI::Token ();
 
 our $VERSION = '1.292';

@@ -89,6 +89,7 @@ of the methods that are subclass-specific.
 =cut
 
 use strict;
+use warnings;
 use Scalar::Util   ();
 use Params::Util   qw{_INSTANCE};
 use PPI::Node      ();

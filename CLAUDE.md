@@ -112,7 +112,7 @@ Configured with `--state=hot,slow,save -j 9 --recurse -l t` — runs slow tests 
 ## Conventions
 
 - Perl 5.8 compatibility
-- Library modules do NOT enable `warnings` — warnings coverage comes from the test pragma
+- All library modules enable `use warnings`
 - Version set globally by `Git::VersionManager` during release (`our $VERSION = '...'`)
 - Extend PPI via `PPIx::` namespace; general Perl tools use `Perl::` namespace
 - PPI::XS is optional/experimental — always disabled in tests

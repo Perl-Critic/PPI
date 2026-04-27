@@ -36,6 +36,7 @@ provided by L<PPI::Statement>, L<PPI::Node> and L<PPI::Element>.
 =cut
 
 use strict;
+use warnings;
 use PPI::Statement ();
 
 our $VERSION = '1.292';

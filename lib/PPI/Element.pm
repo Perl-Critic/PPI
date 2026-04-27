@@ -22,6 +22,7 @@ implementations.
 =cut
 
 use strict;
+use warnings;
 use Clone 0.30      ();
 use Scalar::Util    qw{refaddr};
 use Params::Util    qw{_INSTANCE _ARRAY};
