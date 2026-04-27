@@ -49,7 +49,7 @@ PPI::Document
     PPI::Token::Whitespace  	' '
     PPI::Token::Symbol  	'@v'
     PPI::Token::Operator  	'='
-    PPI::Token::QuoteLike::Readline  	'<$up../*.v>'
+    PPI::Token::QuoteLike::Glob  	'<$up../*.v>'
     PPI::Token::Structure  	';'
   PPI::Token::Whitespace  	'\n'
   PPI::Statement
