@@ -4,7 +4,7 @@
 
 use lib 't/lib';
 use PPI::Test::pragmas;
-use Test::More tests => 1297 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+use Test::More tests => 1297 + 12 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use PPI ();
 use PPI::Singletons qw( %KEYWORDS );
@@ -208,6 +208,129 @@ sub test_sub_as {
 	}
 
 	return;
+}
+
+ANONYMOUS_SUB_STATEMENT_LEVEL: {
+	for my $test (
+		{ code => 'sub {}',     proto => undef },
+		{ code => 'sub () {}',  proto => '' },
+		{ code => 'sub ($) {}', proto => '$' },
+	) {
+		my $code = $test->{code};
+
+		subtest "'$code' anonymous sub at statement level" => sub {
+
+			my $Document = PPI::Document->new( \$code );
+			ok( $Document, "parsed" ) or return;
+
+			my $subs = $Document->find('PPI::Statement::Sub') || [];
+			is( scalar @$subs, 1, "find returns one Sub statement" ) or return;
+
+			my $sub_statement = $subs->[0];
+			is( $sub_statement->name, '', "name is empty string" );
+			is( $sub_statement->prototype, $test->{proto}, "prototype correct" );
+			isa_ok( $sub_statement->block, 'PPI::Structure::Block', "has a block" );
+			ok( !$sub_statement->forward, "not a forward declaration" );
+			ok( !$sub_statement->reserved, "not reserved" );
+			is( $Document->serialize, $code, "round-trip safe" );
+		};
+	}
+}
+
+ANONYMOUS_SUB_MID_EXPRESSION: {
+	for my $test (
+		{ code => 'my $x = sub {};',       parent => 'PPI::Statement::Variable' },
+		{ code => '$x = sub {};',           parent => 'PPI::Statement' },
+		{ code => '$x = sub ($) {};',       parent => 'PPI::Statement' },
+		{ code => 'my $x = sub ($) {};',    parent => 'PPI::Statement::Variable' },
+	) {
+		my $code = $test->{code};
+
+		subtest "'$code' anonymous sub mid-expression" => sub {
+
+			my $Document = PPI::Document->new( \$code );
+			ok( $Document, "parsed" ) or return;
+
+			my $subs = $Document->find('PPI::Statement::Sub') || [];
+			is( scalar @$subs, 1, "find returns one Sub statement" ) or return;
+
+			my $sub_statement = $subs->[0];
+			is( $sub_statement->name, '', "name is empty string" );
+			isa_ok( $sub_statement->block, 'PPI::Structure::Block', "has a block" );
+
+			my $parent = $sub_statement->parent;
+			isa_ok( $parent, $test->{parent}, "parent statement type" );
+			is( $Document->serialize, $code, "round-trip safe" );
+		};
+	}
+}
+
+ANONYMOUS_SUB_IN_STRUCTURE: {
+	for my $test (
+		{ code => 'foo(sub {})',       proto => undef },
+		{ code => 'foo(sub ($) {})',   proto => '$' },
+	) {
+		my $code = $test->{code};
+
+		subtest "'$code' anonymous sub in structure" => sub {
+
+			my $Document = PPI::Document->new( \$code );
+			ok( $Document, "parsed" ) or return;
+
+			my $subs = $Document->find('PPI::Statement::Sub') || [];
+			is( scalar @$subs, 1, "find returns one Sub statement" ) or return;
+
+			my $sub_statement = $subs->[0];
+			is( $sub_statement->name, '', "name is empty string" );
+			is( $sub_statement->prototype, $test->{proto}, "prototype correct" );
+			isa_ok( $sub_statement->block, 'PPI::Structure::Block', "has a block" );
+			is( $Document->serialize, $code, "round-trip safe" );
+		};
+	}
+}
+
+ANONYMOUS_SUB_MULTIPLE: {
+	subtest "multiple anonymous subs found via find()" => sub {
+
+		my $code = 'my $a = sub {}; my $b = sub {};';
+		my $Document = PPI::Document->new( \$code );
+		ok( $Document, "parsed" ) or return;
+
+		my $subs = $Document->find('PPI::Statement::Sub') || [];
+		is( scalar @$subs, 2, "find returns two Sub statements" );
+		is( $Document->serialize, $code, "round-trip safe" );
+	};
+}
+
+ANONYMOUS_SUB_MIXED: {
+	subtest "named and anonymous subs found together" => sub {
+
+		my $code = 'sub foo {} my $x = sub {};';
+		my $Document = PPI::Document->new( \$code );
+		ok( $Document, "parsed" ) or return;
+
+		my $subs = $Document->find('PPI::Statement::Sub') || [];
+		is( scalar @$subs, 2, "find returns named + anonymous sub" );
+		is( eval { $subs->[0]->name }, 'foo', "first sub is named" );
+		is( eval { $subs->[1]->name }, '', "second sub is anonymous" );
+		is( $Document->serialize, $code, "round-trip safe" );
+	};
+}
+
+ANONYMOUS_SUB_LEXICAL: {
+	subtest "lexical anonymous sub (my sub {})" => sub {
+
+		my $code = 'my sub {}';
+		my $Document = PPI::Document->new( \$code );
+		ok( $Document, "parsed" ) or return;
+
+		my $subs = $Document->find('PPI::Statement::Sub') || [];
+		is( scalar @$subs, 1, "find returns one Sub statement" ) or return;
+
+		my $sub_statement = $subs->[0];
+		is( $sub_statement->name, '', "name is empty string" );
+		is( $sub_statement->type, 'my', "type is my" );
+	};
 }
 
 KEYWORDS_AS_SUB_NAMES: {

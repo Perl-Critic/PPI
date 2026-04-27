@@ -88,14 +88,19 @@ Test::Object->register(
 sub nested_statements {
 	my $doc = shift;
 
+	# Anonymous subs (PPI::Statement::Sub) may nest inside parent
+	# statements (e.g. my $x = sub {}), so exclude those from the check.
 	ok(
 		! $doc->find_any( sub {
 			_INSTANCE($_[1], 'PPI::Statement')
 			and
-			any { _INSTANCE($_, 'PPI::Statement') } $_[1]->children
+			any {
+				_INSTANCE($_, 'PPI::Statement')
+				and !_INSTANCE($_, 'PPI::Statement::Sub')
+			} $_[1]->children
 		} ),
-		'Document contains no nested statements',
-	);	
+		'Document contains no invalid nested statements',
+	);
 }
 
 Test::Object->register(
