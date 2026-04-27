@@ -48,7 +48,6 @@ END_PERL
 }
 
 TRIPLE_DOLLAR: {
-	local $TODO = '$$$a parsed as $$ magic plus $a (GH #60)';
 	my $document = safe_new \"my \$x = \$\$\$a;";
 	my $casts = $document->find( 'PPI::Token::Cast' ) || [];
 	is( scalar(@$casts), 2, '$$$a produces two Cast tokens' );

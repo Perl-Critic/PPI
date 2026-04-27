@@ -8,3 +8,4 @@ PPI::Document
     PPI::Token::Whitespace  	' '
     PPI::Token::Number  	'3'
     PPI::Token::Structure  	';'
+  PPI::Token::Whitespace  	'\n'
