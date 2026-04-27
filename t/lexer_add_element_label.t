@@ -44,19 +44,15 @@ ADD_ELEMENT_RECLASSIFICATION: {
 
 	# When a PPI::Statement has a Label as schild(0) and a keyword as
 	# schild(1), _add_element should re-classify to the appropriate class.
-	TODO: {
-		local $TODO = '_add_element label detection has inverted condition (GH #51)';
+	my $parent = PPI::Statement->new;
+	$parent->__add_element(PPI::Token::Label->new('LABEL:'));
+	$parent->__add_element(PPI::Token::Whitespace->new(' '));
+	$parent->__add_element(PPI::Token::Word->new('for'));
 
-		my $parent = PPI::Statement->new;
-		$parent->__add_element(PPI::Token::Label->new('LABEL:'));
-		$parent->__add_element(PPI::Token::Whitespace->new(' '));
-		$parent->__add_element(PPI::Token::Word->new('for'));
+	$lexer->_add_element($parent, PPI::Token::Whitespace->new(' '));
 
-		$lexer->_add_element($parent, PPI::Token::Whitespace->new(' '));
-
-		is ref $parent, 'PPI::Statement::Compound',
-		   '_add_element re-classifies labeled "for" statement to Compound';
-	}
+	is ref $parent, 'PPI::Statement::Compound',
+	   '_add_element re-classifies labeled "for" statement to Compound';
 
 	# Unknown keywords should not cause re-classification
 	my $parent2 = PPI::Statement->new;
@@ -70,17 +66,13 @@ ADD_ELEMENT_RECLASSIFICATION: {
 	   '_add_element does not re-classify for unknown keywords';
 
 	# When label is the only significant child, should not crash
-	TODO: {
-		local $TODO = '_add_element crashes on undef when condition is inverted (GH #51)';
+	my $parent3 = PPI::Statement->new;
+	$parent3->__add_element(PPI::Token::Label->new('BAR:'));
 
-		my $parent3 = PPI::Statement->new;
-		$parent3->__add_element(PPI::Token::Label->new('BAR:'));
+	my $lived = eval {
+		$lexer->_add_element($parent3, PPI::Token::Whitespace->new(' '));
+		1;
+	};
 
-		my $lived = eval {
-			$lexer->_add_element($parent3, PPI::Token::Whitespace->new(' '));
-			1;
-		};
-
-		ok $lived, '_add_element does not crash when label is only child';
-	}
+	ok $lived, '_add_element does not crash when label is only child';
 }
