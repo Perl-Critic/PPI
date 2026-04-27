@@ -71,10 +71,7 @@ THROW_INSTANCE: {
 	ok _INSTANCE($caught, 'PPI::Exception'), 'instance throw dies with PPI::Exception';
 	is $caught->message, 'instance throw', 'instance throw preserves message';
 	my @callers = $caught->callers;
-	TODO: {
-		local $TODO = 'instance throw does not record caller info (bug)';
-		ok scalar @callers >= 1, 'instance throw records caller info';
-	}
+	ok scalar @callers >= 1, 'instance throw records caller info';
 }
 
 
