@@ -4,7 +4,7 @@
 
 use lib 't/lib';
 use PPI::Test::pragmas;
-use Test::More tests => 683 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+use Test::More tests => 695 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use PPI ();
 use Helper 'safe_new';
@@ -383,3 +383,61 @@ foreach my $i ( 0 .. $#test_locations ) {
 
 ok( $Document->flush_locations, '->flush_locations returns true' );
 is( scalar(grep { defined $_->{_location} } $Document->tokens), 0, 'All _location attributes removed' );
+
+
+#####################################################################
+# Character offset tests
+
+TODO: {
+	local $TODO = "character_offset not yet implemented";
+
+	# Simple source: verify location returns 6 elements and offsets are correct
+	my $simple_src = 'my $x = 1;';
+	my $sdoc = PPI::Document->new( \$simple_src );
+	$sdoc->index_locations;
+	my @st = $sdoc->tokens;
+
+	is( scalar( @{ $st[0]->location } ), 6,
+		"location returns a 6-element array" );
+
+	# character_offset accessor
+	is( eval { $st[0]->character_offset }, 1,  'my at offset 1' );
+	is( eval { $st[1]->character_offset }, 3,  'space at offset 3' );
+	is( eval { $st[2]->character_offset }, 4,  '$x at offset 4' );
+	is( eval { $st[3]->character_offset }, 6,  'space at offset 6' );
+	is( eval { $st[4]->character_offset }, 7,  '= at offset 7' );
+	is( eval { $st[5]->character_offset }, 8,  'space at offset 8' );
+	is( eval { $st[6]->character_offset }, 9,  '1 at offset 9' );
+	is( eval { $st[7]->character_offset }, 10, '; at offset 10' );
+
+	# Heredoc: offsets account for heredoc body content
+	my $hd_src = "my \$x = <<'END';\nhello\nEND\n\$y;\n";
+	my $hdoc = PPI::Document->new( \$hd_src );
+	$hdoc->index_locations;
+	my @ht = $hdoc->tokens;
+	# $y should be after: "my $x = <<'END';\n" (17) + "hello\n" (6) + "END\n" (4) = offset 28
+	is( eval { $ht[-3]->character_offset }, 28,
+		'$y at offset 28 (after heredoc body)' );
+
+	# All offsets match positions in the serialized document
+	my $tdoc = PPI::Document->new( \$test_source );
+	$tdoc->index_locations;
+	my $serialized = $tdoc->serialize;
+	my @tt = $tdoc->tokens;
+	my $all_have_offsets = 1;
+	my $all_match = 1;
+	for my $i ( 0 .. $#tt ) {
+		my $loc = $tt[$i]->location;
+		unless ( $loc && @$loc >= 6 ) {
+			$all_have_offsets = 0;
+			$all_match = 0;
+			next;
+		}
+		my $offset  = $loc->[5];
+		my $content = $tt[$i]->content;
+		my $at_pos  = substr( $serialized, $offset - 1, length($content) );
+		$all_match = 0 unless $at_pos eq $content;
+	}
+	ok( $all_have_offsets, "all tokens in test_source have a 6th location element" );
+	ok( $all_match, "all offsets match positions in the serialized document" );
+}
