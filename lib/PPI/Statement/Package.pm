@@ -21,15 +21,12 @@ starting with 'package', it converts it to a C<PPI::Statement::Package>
 object.
 
 When working with package statements, please remember that packages only
-exist within their scope, and proper support for scoping has yet to be
-completed in PPI.
+exist within their scope.
 
-However, if the immediate parent of the package statement is the
-top level L<PPI::Document> object, then it can be considered to define
-everything found until the next top-level "file scoped" package statement.
-
-A file may, however, contain nested temporary package, in which case you
-are mostly on your own :)
+To determine the effective namespace at any point in the document, use
+the L<PPI::Element/namespace> method on any element. It handles both
+semicolon-form (C<package Foo;>) and block-form (C<package Foo { ... }>)
+declarations, including scoped packages in nested blocks.
 
 =head1 METHODS
 
@@ -92,6 +89,26 @@ sub version {
 	$version->isa('PPI::Token::Structure')
 		? ''
 		: $version->content;
+}
+
+=pod
+
+=head2 block
+
+With its name and implementation shared with L<PPI::Statement::Sub>,
+the C<block> method finds and returns the actual Structure object of the
+code block for this package, if it uses the Perl 5.14+ block form
+(e.g. C<package Foo { ... }>).
+
+Returns false if this is a semicolon-form package declaration
+(e.g. C<package Foo;>).
+
+=cut
+
+sub block {
+	my $self = shift;
+	my $lastchild = $self->schild(-1) or return '';
+	$lastchild->isa('PPI::Structure::Block') and $lastchild;
 }
 
 =pod
