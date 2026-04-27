@@ -182,7 +182,7 @@ sub _scan_quote_like_operator_gap {
 		pos $t->{line} = $t->{line_cursor};
 
 		# Since this regex can match zero characters, it should always match
-		$t->{line} =~ /\G(\s*(?:\#.*)?)/gc or return undef;
+		$t->{line} =~ /\G(\s*(?:\#[^\n]*\n?)?)/gc or return undef;
 
 		# Add the chars found to the string
 		$string .= $1;

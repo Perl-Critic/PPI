@@ -151,10 +151,7 @@ COMMENT_BEFORE_DELIMITER: {
 		my ( $code, $expected, $label ) = @$case;
 		my $d = safe_new \$code;
 		my $qw = $d->find_first( 'PPI::Token::QuoteLike::Words' );
-		TODO: {
-			local $TODO = 'GH #126: qw with comment before delimiter';
-			ok( $qw, "$label - found qw token" );
-			is_deeply( $qw ? [ $qw->literal ] : [], $expected, "$label - literal" );
-		}
+		ok( $qw, "$label - found qw token" );
+		is_deeply( $qw ? [ $qw->literal ] : [], $expected, "$label - literal" );
 	}
 }
