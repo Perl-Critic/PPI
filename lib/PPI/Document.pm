@@ -270,10 +270,170 @@ sub load {
 	Carp::croak("API CHANGE: File names should now be passed to PPI::Document->new to load a file");
 }
 
+=pod
+
+=head2 new_from_string $source
+
+  my $Document = PPI::Document->new_from_string( $perl_code );
+
+The C<new_from_string> constructor takes a plain string of Perl source
+code that is presumed to already contain decoded characters (not bytes),
+and creates a new L<PPI::Document> for it.
+
+This is the recommended way to parse Perl source that you have in memory
+as a character string.
+
+Returns a new L<PPI::Document> object, or C<undef> on error.
+
+=cut
+
+sub new_from_string {
+	my $class = ref $_[0] ? ref shift : shift;
+	my $source = shift;
+	return $class->_error(
+		"Did not pass a defined string to PPI::Document::new_from_string"
+	) unless defined $source;
+
+	my %attr = @_;
+	my $document = PPI::Lexer->lex_source( $source, %attr );
+	return $document if $document;
+
+	my $errstr;
+	if ( PPI::Lexer->errstr ) {
+		$errstr = PPI::Lexer->errstr;
+	} elsif ( _INSTANCE($@, 'PPI::Exception') ) {
+		$errstr = $@->message;
+	} elsif ( $@ ) {
+		$errstr = $@;
+		$errstr =~ s/\sat line\s.+$//;
+	} else {
+		$errstr = "Unknown error parsing Perl document";
+	}
+	PPI::Lexer->_clear;
+	$class->_error( $errstr );
+}
+
+=pod
+
+=head2 new_from_file $filename, %options
+
+  my $Document = PPI::Document->new_from_file( 'Module.pm' );
+  my $Document = PPI::Document->new_from_file(
+      'Module.pm', encoding => 'UTF-8',
+  );
+
+The C<new_from_file> constructor takes a filename and an optional
+C<encoding> parameter. It reads the file, decoding from the specified
+encoding if provided, and creates a new L<PPI::Document> for it.
+
+When C<encoding> is specified, the file contents are decoded from that
+encoding into Perl's internal character representation, and the document
+records the encoding for later use by L</save>.
+
+Returns a new L<PPI::Document> object, or C<undef> on error.
+
+=cut
+
+sub new_from_file {
+	my $class = ref $_[0] ? ref shift : shift;
+	my $filename = shift;
+	return $class->_error(
+		"Did not pass a file name to PPI::Document::new_from_file"
+	) unless defined $filename;
+
+	my %attr = @_;
+	my $encoding = delete $attr{encoding};
+	$attr{filename} ||= $filename;
+
+	my $file_contents = PPI::Util::_slurp( $filename );
+	return $class->_error($file_contents) unless ref $file_contents;
+
+	if ( $encoding ) {
+		require Encode;
+		$$file_contents = Encode::decode( $encoding, $$file_contents );
+		$attr{encoding} = $encoding;
+	}
+
+	if ( $CACHE ) {
+		my $document = $CACHE->get_document($file_contents);
+		return $class->_setattr( $document, %attr ) if $document;
+
+		my $document2 = PPI::Lexer->lex_source( $$file_contents, %attr );
+		if ( $document2 ) {
+			$CACHE->store_document( $document2 );
+			return $document2;
+		}
+	} else {
+		my $document = PPI::Lexer->lex_source( $$file_contents, %attr );
+		return $document if $document;
+	}
+
+	my $errstr;
+	if ( PPI::Lexer->errstr ) {
+		$errstr = PPI::Lexer->errstr;
+	} elsif ( _INSTANCE($@, 'PPI::Exception') ) {
+		$errstr = $@->message;
+	} elsif ( $@ ) {
+		$errstr = $@;
+		$errstr =~ s/\sat line\s.+$//;
+	} else {
+		$errstr = "Unknown error parsing Perl document";
+	}
+	PPI::Lexer->_clear;
+	$class->_error( $errstr );
+}
+
+=pod
+
+=head2 new_from_handle $handle
+
+  open my $fh, '<:encoding(UTF-8)', $filename or die $!;
+  my $Document = PPI::Document->new_from_handle( $fh );
+
+The C<new_from_handle> constructor takes an open filehandle and creates
+a new L<PPI::Document> from its contents. The caller is responsible for
+applying the appropriate encoding layers to the handle before passing it.
+
+Returns a new L<PPI::Document> object, or C<undef> on error.
+
+=cut
+
+sub new_from_handle {
+	my $class = ref $_[0] ? ref shift : shift;
+	my $handle = shift;
+	return $class->_error(
+		"Did not pass a filehandle to PPI::Document::new_from_handle"
+	) unless defined $handle;
+
+	my %attr = @_;
+
+	local $/;
+	my $source = eval { scalar <$handle> };
+	return $class->_error("Failed to read from handle: $@") if $@;
+
+	my $document = PPI::Lexer->lex_source( $source, %attr );
+	return $document if $document;
+
+	my $errstr;
+	if ( PPI::Lexer->errstr ) {
+		$errstr = PPI::Lexer->errstr;
+	} elsif ( _INSTANCE($@, 'PPI::Exception') ) {
+		$errstr = $@->message;
+	} elsif ( $@ ) {
+		$errstr = $@;
+		$errstr =~ s/\sat line\s.+$//;
+	} else {
+		$errstr = "Unknown error parsing Perl document";
+	}
+	PPI::Lexer->_clear;
+	$class->_error( $errstr );
+}
+
 sub _setattr {
 	my ( $class, $document, %attr ) = @_;
 	$document->{readonly}                  = !!$attr{readonly};
 	$document->{filename}                  = $attr{filename};
+	$document->{encoding}                  = $attr{encoding};
 	$document->{feature_mods}              = $attr{feature_mods};
 	$document->{custom_feature_includes}   = $attr{custom_feature_includes};
 	$document->{custom_feature_include_cb} = $attr{custom_feature_include_cb};
@@ -364,6 +524,22 @@ sub filename {
 
 =pod
 
+=head2 encoding
+
+The C<encoding> accessor returns the encoding of the document, if one was
+specified when the document was created via L</new_from_file> with an
+C<encoding> parameter.
+
+Returns the encoding name as a string, or C<undef> if no encoding was set.
+
+=cut
+
+sub encoding {
+	$_[0]->{encoding};
+}
+
+=pod
+
 =head2 readonly
 
 The C<readonly> attribute indicates if the document is intended to be
@@ -436,19 +612,29 @@ sub custom_feature_include_cb {
 =head2 save
 
   $document->save( $file )
- 
+
 The C<save> method serializes the C<PPI::Document> object and saves the
-resulting Perl document to a file. Returns C<undef> on failure to open
-or write to the file.
+resulting Perl document to a file.
+
+If the document has an L</encoding> set (from L</new_from_file>), the
+output will be encoded to that encoding. Otherwise the content is written
+in binary mode as raw bytes.
+
+Returns C<undef> on failure to open or write to the file.
 
 =cut
 
 sub save {
 	my $self = shift;
+	my $content = $self->serialize;
+	if ( my $encoding = $self->{encoding} ) {
+		require Encode;
+		$content = Encode::encode( $encoding, $content );
+	}
 	local *FILE;
 	open( FILE, '>', $_[0] )    or return undef;
 	binmode FILE;
-	print FILE $self->serialize or return undef;
+	print FILE $content         or return undef;
 	close FILE                  or return undef;
 	return 1;
 }
