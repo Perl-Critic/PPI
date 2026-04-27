@@ -1,0 +1,3 @@
+$foo = $condition ? undef : 1;
+$foo = $condition ? Class->method : 1;
+$foo = $condition ? $obj->method : 1;
