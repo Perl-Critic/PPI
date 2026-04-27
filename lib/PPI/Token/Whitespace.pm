@@ -342,6 +342,31 @@ sub __TOKENIZER__on_char {
 		# After another number
 		return 'Operator' if $prev->isa('PPI::Token::Number');
 
+		# After a closing brace, check if map/grep/etc opened it
+		if ( $prec eq '}' and $prev->isa('PPI::Token::Structure') ) {
+			my $tokens = $t->{tokens};
+			my $depth  = 1;
+			my $i      = $#$tokens;
+			# Find the position of $prev (the closing brace)
+			$i-- while $i >= 0 and $tokens->[$i] != $prev;
+			# Walk backwards from before it to find the matching {
+			while ( --$i >= 0 ) {
+				my $c = $tokens->[$i]->{content};
+				$depth++ if $c eq '}';
+				$depth-- if $c eq '{';
+				last if $depth == 0;
+			}
+			if ( $depth == 0 ) {
+				while ( --$i >= 0 ) {
+					next if not $tokens->[$i]->significant;
+					return 'Regexp::Match'
+						if $tokens->[$i]->isa('PPI::Token::Word')
+						and $MATCHWORD{ $tokens->[$i]->{content} };
+					last;
+				}
+			}
+		}
+
 		# After going into scope/brackets
 		if (
 			$prev->isa('PPI::Token::Structure')

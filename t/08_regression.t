@@ -7,7 +7,7 @@
 use if !(-e 'META.yml'), "Test::InDistDir";
 use lib 't/lib';
 use PPI::Test::pragmas;
-use Test::More tests => 1131 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+use Test::More tests => 1149 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use PPI ();
 use PPI::Test qw( pause );
@@ -375,7 +375,6 @@ END_PERL
 # RT #75921: match on implicit $_ after map/grep not recognized
 
 SCOPE: {
-	local $TODO = 'RT #75921: regex after map/grep block parsed as operator';
 	my $doc = safe_new \"map { 0 } /z/";
 	my $match = $doc->find('PPI::Token::Regexp::Match');
 	ok( $match, 'map block followed by /regex/ has regexp match tokens' );
@@ -384,7 +383,6 @@ SCOPE: {
 }
 
 SCOPE: {
-	local $TODO = 'RT #75921: regex after map/grep block parsed as operator';
 	my $doc = safe_new \"grep { 1 } /z/";
 	my $match = $doc->find('PPI::Token::Regexp::Match');
 	ok( $match, 'grep block followed by /regex/ has regexp match tokens' );

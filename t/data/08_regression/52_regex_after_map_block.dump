@@ -1,0 +1,25 @@
+PPI::Document
+  PPI::Statement
+    PPI::Token::Word  	'map'
+    PPI::Token::Whitespace  	' '
+    PPI::Structure::Block  	{ ... }
+      PPI::Token::Whitespace  	' '
+      PPI::Statement
+        PPI::Token::Number  	'0'
+      PPI::Token::Whitespace  	' '
+    PPI::Token::Whitespace  	' '
+    PPI::Token::Regexp::Match  	'/z/'
+    PPI::Token::Structure  	';'
+  PPI::Token::Whitespace  	'\n'
+  PPI::Statement
+    PPI::Token::Word  	'grep'
+    PPI::Token::Whitespace  	' '
+    PPI::Structure::Block  	{ ... }
+      PPI::Token::Whitespace  	' '
+      PPI::Statement
+        PPI::Token::Number  	'0'
+      PPI::Token::Whitespace  	' '
+    PPI::Token::Whitespace  	' '
+    PPI::Token::Regexp::Match  	'/z/'
+    PPI::Token::Structure  	';'
+  PPI::Token::Whitespace  	'\n'
