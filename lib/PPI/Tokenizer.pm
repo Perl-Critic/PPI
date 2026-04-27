@@ -537,7 +537,7 @@ sub _process_next_line {
 	}
 
 	# If we can't deal with the entire line, process char by char
-	while ( $rv = $self->_process_next_char ) {}
+	$rv = $self->_process_next_char;
 	unless ( defined $rv ) {
 		PPI::Exception->throw("Error at line $self->{line_count}, character $self->{line_cursor}");
 	}
@@ -560,10 +560,10 @@ sub _process_next_line {
 #####################################################################
 # Per-character processing methods
 
-# Process on a per-character basis.
-# Note that due the high number of times this gets
-# called, it has been fairly heavily in-lined, so the code
-# might look a bit ugly and duplicated.
+# Process all remaining characters in the current line.
+# The loop is internal to avoid per-character method call overhead
+# (rt.cpan.org #16952). The line_end check is also inlined.
+# Returns 0 on successful completion, undef on error.
 sub _process_next_char {
 	my $self = shift;
 
@@ -574,50 +574,46 @@ sub _process_next_char {
 		return undef;
 	}
 
-    $self->{line_cursor}++;
-    return 0 if $self->_at_line_end;
+	while ( ++$self->{line_cursor} < $self->{line_length} ) {
 
-	# Pass control to the token class
-	my $result;
-	unless ( $result = $self->{class}->__TOKENIZER__on_char( $self ) ) {
-		# undef is error. 0 is "Did stuff ourself, you don't have to do anything"
-		return defined $result ? 1 : undef;
-	}
-
-	# We will need the value of the current character
-	my $char = substr( $self->{line}, $self->{line_cursor}, 1 );
-	if ( $result eq '1' ) {
-		# If __TOKENIZER__on_char returns 1, it is signaling that it thinks that
-		# the character is part of it.
-
-		# Add the character
-		if ( defined $self->{token} ) {
-			$self->{token}->{content} .= $char;
-		} else {
-			defined($self->{token} = $self->{class}->new($char)) or return undef;
+		# Pass control to the token class
+		my $result = $self->{class}->__TOKENIZER__on_char( $self );
+		unless ( $result ) {
+			# undef is error. 0 is "Did stuff ourself, you don't have to do anything"
+			return undef unless defined $result;
+			next;
 		}
 
-		return 1;
+		# We will need the value of the current character
+		my $char = substr( $self->{line}, $self->{line_cursor}, 1 );
+		if ( $result eq '1' ) {
+			# If __TOKENIZER__on_char returns 1, it is signaling that it thinks that
+			# the character is part of it.
+
+			# Add the character
+			if ( defined $self->{token} ) {
+				$self->{token}->{content} .= $char;
+			} else {
+				defined($self->{token} = $self->{class}->new($char)) or return undef;
+			}
+
+			next;
+		}
+
+		# We have been provided with the name of a class
+		if ( $self->{class} ne "PPI::Token::$result" ) {
+			# New class
+			$self->_new_token( $result, $char );
+		} elsif ( defined $self->{token} ) {
+			# Same class as current
+			$self->{token}->{content} .= $char;
+		} else {
+			# Same class, but no current
+			defined($self->{token} = $self->{class}->new($char)) or return undef;
+		}
 	}
 
-	# We have been provided with the name of a class
-	if ( $self->{class} ne "PPI::Token::$result" ) {
-		# New class
-		$self->_new_token( $result, $char );
-	} elsif ( defined $self->{token} ) {
-		# Same class as current
-		$self->{token}->{content} .= $char;
-	} else {
-		# Same class, but no current
-		defined($self->{token} = $self->{class}->new($char)) or return undef;
-	}
-
-	1;
-}
-
-sub _at_line_end {
-    my ($self) = @_;
-    return $self->{line_cursor} >= $self->{line_length};
+	0;
 }
 
 

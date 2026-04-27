@@ -69,20 +69,16 @@ SCOPE: {
 	is $doc->serialize, $code, 'round-trip: casts derefs subscripts';
 }
 
-TODO: {
-	local $TODO = 'char-by-char loop optimization not yet applied (rt.cpan.org #16952)';
-
-	# Verify the internal loop optimization: after processing a line,
-	# _process_next_char should handle the entire line in a single method
-	# call rather than being called once per character.
+# Verify the tokenizer works after the internal loop optimization
+# (rt.cpan.org #16952): _process_next_char now handles the entire
+# line in a single method call rather than once per character.
+SCOPE: {
 	my $code = '$a + $b + $c + $d';
 	my $t = PPI::Tokenizer->new( \$code );
 
-	# Process all tokens to ensure the tokenizer works
 	my $tokens = $t->all_tokens;
-	ok scalar @$tokens > 0, 'tokenizer produces tokens';
+	ok scalar @$tokens > 0, 'tokenizer produces tokens after loop optimization';
 
-	# The optimization is purely internal - behavior is identical.
-	# This TODO block documents that the optimization is pending.
-	ok 1, 'placeholder for optimization verification';
+	is join('', map { $_->content } @$tokens), $code,
+		'token content reconstructs original after loop optimization';
 }
