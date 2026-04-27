@@ -4,7 +4,7 @@
 
 use lib 't/lib';
 use PPI::Test::pragmas;
-use Test::More tests => 3073 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+use Test::More tests => 3081 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use PPI ();
 use PPI::Singletons qw( %KEYWORDS %OPERATOR );
@@ -726,5 +726,26 @@ OPERATORS_PLUS_MINUS: {
         my $ops = $doc->find('Token::Operator');
         local $TODO = "(1)-2 not parsed correctly";
         is( ref $ops, 'ARRAY', "found operator $op" );
+    }
+
+    {
+        my ( $a, $b ) = ( '$x[0]', '2' );
+        my $op = '+';
+        my $code = "${a}${op}${b}";
+        my $doc  = safe_new \$code;
+        my $ops = $doc->find('Token::Operator');
+        is( ref $ops, 'ARRAY', "found operator $op in ${code}" );
+        is( @$ops, 1, "operator $op found exactly once in ${code}" );
+        is( $ops->[0]->content(), $op, "operator $op text matches in ${code}" );
+    }
+
+    TODO: {
+        my ( $a, $b ) = ( '$x[0]', '2' );
+        my $op = '-';
+        my $code = "${a}${op}${b}";
+        my $doc  = safe_new \$code;
+        my $ops = $doc->find('Token::Operator');
+        local $TODO = '$x[0]-2 not parsed correctly';
+        is( ref $ops, 'ARRAY', "found operator $op in ${code}" );
     }
 }
