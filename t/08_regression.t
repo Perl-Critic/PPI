@@ -7,7 +7,7 @@
 use if !(-e 'META.yml'), "Test::InDistDir";
 use lib 't/lib';
 use PPI::Test::pragmas;
-use Test::More tests => 1121 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+use Test::More tests => 1149 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use PPI ();
 use PPI::Test qw( pause );
@@ -367,4 +367,25 @@ print "Hello" if /regex/;
 END_PERL
 	my $match = $doc->find('PPI::Token::Regexp::Match');
 	is( scalar(@$match), 3, 'Found expected number of matches' );
+}
+
+
+
+######################################################################
+# RT #75921: match on implicit $_ after map/grep not recognized
+
+SCOPE: {
+	my $doc = safe_new \"map { 0 } /z/";
+	my $match = $doc->find('PPI::Token::Regexp::Match');
+	ok( $match, 'map block followed by /regex/ has regexp match tokens' );
+	is( ref $match, 'ARRAY', 'find returned an array' );
+	is( scalar( @{ $match || [] } ), 1, 'map { 0 } /z/ - found 1 regex match' );
+}
+
+SCOPE: {
+	my $doc = safe_new \"grep { 1 } /z/";
+	my $match = $doc->find('PPI::Token::Regexp::Match');
+	ok( $match, 'grep block followed by /regex/ has regexp match tokens' );
+	is( ref $match, 'ARRAY', 'find returned an array' );
+	is( scalar( @{ $match || [] } ), 1, 'grep { 1 } /z/ - found 1 regex match' );
 }
