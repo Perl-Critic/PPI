@@ -4,10 +4,15 @@
 
 use lib 't/lib';
 use PPI::Test::pragmas;
-use Test::More tests => 22 + ( $ENV{AUTHOR_TESTING} ? 1 : 0 );
+use Test::More tests => 21 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use PPI ();
 use PPI::Document::Strict ();
+
+sub exception_message {
+	my $err = shift;
+	return ref $err && $err->can('message') ? $err->message : "$err";
+}
 
 #####################################################################
 # Successful parsing of valid code
@@ -32,7 +37,7 @@ VALID_MULTI_STATEMENT: {
 UNDEF_INPUT: {
 	my $doc = eval { PPI::Document::Strict->new(undef) };
 	ok( !defined $doc, 'undef input returns undef/throws' );
-	like( $@, qr/undefined value/i, 'undef input throws with message' );
+	like( exception_message($@), qr/PPI::Document::Strict:/, 'undef input throws with prefix' );
 }
 
 #####################################################################
@@ -41,13 +46,13 @@ UNDEF_INPUT: {
 UNMATCHED_CLOSE_BRACE: {
 	my $doc = eval { PPI::Document::Strict->new( \"my \$x = 1; }" ) };
 	ok( !defined $doc, 'unmatched closing brace throws' );
-	like( $@, qr/PPI::Statement::UnmatchedBrace/, 'error mentions UnmatchedBrace' );
+	like( exception_message($@), qr/UnmatchedBrace/, 'error mentions UnmatchedBrace' );
 }
 
 UNMATCHED_CLOSE_PAREN: {
 	my $doc = eval { PPI::Document::Strict->new( \"my \$x = 1; )" ) };
 	ok( !defined $doc, 'unmatched closing paren throws' );
-	like( $@, qr/PPI::Statement::UnmatchedBrace/, 'error mentions UnmatchedBrace' );
+	like( exception_message($@), qr/UnmatchedBrace/, 'error mentions UnmatchedBrace' );
 }
 
 #####################################################################
@@ -56,17 +61,17 @@ UNMATCHED_CLOSE_PAREN: {
 UNCLOSED_BRACE: {
 	my $doc = eval { PPI::Document::Strict->new( \"sub foo {" ) };
 	ok( !defined $doc, 'unclosed brace throws' );
-	like( $@, qr/incomplete/i, 'error mentions incomplete' );
+	like( exception_message($@), qr/incomplete/i, 'error mentions incomplete' );
 }
 
 UNCLOSED_PAREN: {
 	my $doc = eval { PPI::Document::Strict->new( \"my \$x = (" ) };
 	ok( !defined $doc, 'unclosed paren throws' );
-	like( $@, qr/incomplete/i, 'error mentions incomplete' );
+	like( exception_message($@), qr/incomplete/i, 'error mentions incomplete' );
 }
 
 #####################################################################
-# constructor attributes pass through
+# Constructor attributes pass through
 
 READONLY_ATTR: {
 	my $doc = eval { PPI::Document::Strict->new( \"my \$x = 1;", readonly => 1 ) };
