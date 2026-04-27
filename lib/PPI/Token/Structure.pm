@@ -166,17 +166,11 @@ sub previous_token {
 	if ( $CLOSES{ ord $self->{content} } ) {
 		my $child = $structure->child(-1);
 		if ( $child ) {
-			# Decend deeper, or return if it is a token
 			return $child->isa('PPI::Token') ? $child : $child->last_token;
-		} elsif ( $structure->start ) {
-			# Empty structure, so next is closing brace
-			return $structure->start;
 		}
 
-		# Anything that slips through to here is a structure
-		# with a closing brace, but no opening brace, so we
-		# just have to go with it, and continue as we would
-		# if we started with an opening brace.
+		# Empty structure: previous token is the opening brace
+		return $structure->start;
 	}
 
 	# We can use the default implement, if we call it from the

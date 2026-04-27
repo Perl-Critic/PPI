@@ -154,11 +154,8 @@ braces (at least for method purposes).
 The C<start> method returns the start brace for the structure (i.e. the
 opening brace).
 
-Returns the brace as a L<PPI::Token::Structure> or C<undef> if the
-structure does not have a starting brace.
-
-Under normal parsing circumstances this should never occur, but may happen
-due to manipulation of the PDOM tree.
+Returns the brace as a L<PPI::Token::Structure>. This is always defined,
+since the constructor requires a start brace token.
 
 =cut
 
@@ -185,20 +182,18 @@ sub finish { $_[0]->{finish} }
 =head2 braces
 
 The C<braces> method is a utility method which returns the brace type,
-regardless of whether both or just one of the braces is defined.
+regardless of whether the finish brace is defined.
 
-Returns one of the three strings C<'[]'>, C<'{}'>, or C<'()'>, or C<undef>
-on error (primarily not having a start brace, as mentioned above).
+Returns one of the three strings C<'[]'>, C<'{}'>, or C<'()'>.
 
 =cut
 
 sub braces {
-	my $self = $_[0]->{start} ? shift : return undef;
 	return {
 		'[' => '[]',
 		'(' => '()',
 		'{' => '{}',
-	}->{ $self->{start}->{content} };
+	}->{ $_[0]->{start}->{content} };
 }
 
 =pod
@@ -216,7 +211,7 @@ for the braces, and does not recurse downwards.
 =cut
 
 sub complete {
-	!! ($_[0]->{start} and $_[0]->{finish});
+	!! $_[0]->{finish};
 }
 
 
@@ -232,27 +227,21 @@ sub elements {
 
 	if ( wantarray ) {
 		# Return a list in array context
-		return ( $self->{start} || (), @{$self->{children}}, $self->{finish} || () );
+		return ( $self->{start}, @{$self->{children}}, $self->{finish} || () );
 	} else {
 		# Return the number of elements in scalar context.
 		# This is memory-cheaper than creating another big array
 		return scalar(@{$self->{children}})
-			+ ($self->{start}  ? 1 : 0)
+			+ 1
 			+ ($self->{finish} ? 1 : 0);
 	}
 }
 
-# For us, the first element is probably the opening brace
 sub first_element {
-	# Technically, if we have no children and no opening brace,
-	# then the first element is the closing brace.
-	$_[0]->{start} or $_[0]->{children}->[0] or $_[0]->{finish};
+	$_[0]->{start};
 }
 
-# For us, the last element is probably the closing brace
 sub last_element {
-	# Technically, if we have no children and no closing brace,
-	# then the last element is the opening brace
 	$_[0]->{finish} or $_[0]->{children}->[-1] or $_[0]->{start};
 }
 
@@ -274,7 +263,7 @@ sub location {
 sub tokens {
 	my $self = shift;
 	my @tokens = (
-		$self->{start}  || (),
+		$self->{start},
 		$self->SUPER::tokens(@_),
 		$self->{finish} || (),
 		);
@@ -286,7 +275,7 @@ sub tokens {
 ### Reimplement this using List::Utils stuff
 sub content {
 	my $self = shift;
-	my $content = $self->{start} ? $self->{start}->content : '';
+	my $content = $self->{start}->content;
 	foreach my $child ( @{$self->{children}} ) {
 		$content .= $child->content;
 	}
