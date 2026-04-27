@@ -90,6 +90,8 @@ use PPI::Document ();
 
 our $VERSION = '1.292';
 
+our $errstr = "";
+
 # The x operator cannot follow most Perl operators, implying that
 # anything beginning with x following an operator is a word.
 # These are the exceptions.
@@ -533,7 +535,7 @@ sub _process_next_line {
 
 		# Defined but false means next line
 		return 1 if defined $rv;
-		PPI::Exception->throw("Error at line $self->{line_count}");
+		return $self->_error($errstr || "Error at line $self->{line_count}");
 	}
 
 	# If we can't deal with the entire line, process char by char
@@ -859,6 +861,25 @@ sub _features {
 }
 
 sub _current_token_has_signatures_active { shift->{feature_set}{signatures} }
+
+
+
+#####################################################################
+# Error Handling
+
+sub _error {
+	$errstr = $_[1];
+	undef;
+}
+
+sub _clear {
+	$errstr = '';
+	$_[0];
+}
+
+sub errstr {
+	$errstr;
+}
 
 1;
 

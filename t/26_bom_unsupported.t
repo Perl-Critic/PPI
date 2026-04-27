@@ -6,12 +6,7 @@ use Test::More tests => 9 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use PPI::Document ();
 
-our $TODO;
-my $todo_msg = "_error method missing from PPI::Tokenizer";
-
 {
-	local $TODO = $todo_msg;
-
 	my $utf16_be = "\xfe\xff" . "p r i n t   1 ;";
 	my $doc = PPI::Document->new(\$utf16_be);
 	my $err = PPI::Document->errstr;
@@ -22,8 +17,6 @@ my $todo_msg = "_error method missing from PPI::Tokenizer";
 }
 
 {
-	local $TODO = $todo_msg;
-
 	my $utf16_le = "\xff\xfe" . "p\x00r\x00i\x00n\x00t\x00";
 	my $doc = PPI::Document->new(\$utf16_le);
 	my $err = PPI::Document->errstr;
@@ -34,8 +27,6 @@ my $todo_msg = "_error method missing from PPI::Tokenizer";
 }
 
 {
-	local $TODO = $todo_msg;
-
 	my $utf32_be = "\x00\x00\xfe\xff" . "\x00\x00\x00p";
 	my $doc = PPI::Document->new(\$utf32_be);
 	my $err = PPI::Document->errstr;
