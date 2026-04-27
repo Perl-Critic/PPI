@@ -7,7 +7,7 @@
 use if !(-e 'META.yml'), "Test::InDistDir";
 use lib 't/lib';
 use PPI::Test::pragmas;
-use Test::More tests => 1121 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+use Test::More tests => 1145 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use PPI ();
 use PPI::Test qw( pause );
@@ -367,4 +367,24 @@ print "Hello" if /regex/;
 END_PERL
 	my $match = $doc->find('PPI::Token::Regexp::Match');
 	is( scalar(@$match), 3, 'Found expected number of matches' );
+}
+
+
+
+#####################################################################
+# Regression Test for rt.cpan.org #57163
+# Whitespace-only line should not concatenate with next line's leading whitespace
+
+SCOPE: {
+	my $code = "my \$x;\n    \n    my \$y;\n";
+	my $Document = safe_new \$code;
+	my @ws = grep { $_->isa('PPI::Token::Whitespace') && $_->content =~ /\n./ } $Document->tokens;
+	is( scalar @ws, 0, 'Whitespace-only line is separate token from next line indentation' );
+}
+
+SCOPE: {
+	my $code = "my \$x;\n\n    my \$y;\n";
+	my $Document = safe_new \$code;
+	my @ws = grep { $_->isa('PPI::Token::Whitespace') && $_->content =~ /\n./ } $Document->tokens;
+	is( scalar @ws, 0, 'Empty line is separate token from next line indentation' );
 }
