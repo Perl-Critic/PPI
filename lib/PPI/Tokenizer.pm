@@ -755,6 +755,8 @@ my %OBVIOUS_CONTENT = (
 	'{' => 'operand',
 	'[' => 'operand',
 	';' => 'operand',
+	')' => 'operator',
+	']' => 'operator',
 	'}' => 'operator',
 );
 
