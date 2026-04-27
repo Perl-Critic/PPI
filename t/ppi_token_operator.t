@@ -4,7 +4,7 @@
 
 use lib 't/lib';
 use PPI::Test::pragmas;
-use Test::More tests => 3081 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+use Test::More tests => 3087 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use PPI ();
 use PPI::Singletons qw( %KEYWORDS %OPERATOR );
@@ -691,9 +691,11 @@ OPERATOR_FAT_COMMA: {
 
 OPERATORS_PLUS_MINUS: {
     my @operands = (
-         '1',   '2',
-         '1',  '(2)',
-        '(1)', '(2)'
+           '1',    '2',
+           '1',   '(2)',
+          '(1)',  '(2)',
+          '(1)',   '2',
+        '$x[0]',   '2',
     );
 
     for my $op (qw/- +/) {
@@ -702,50 +704,9 @@ OPERATORS_PLUS_MINUS: {
             my $code = "${a}${op}${b}";
             my $doc  = safe_new \$code;
             my $ops = $doc->find('Token::Operator');
-            is( ref $ops, 'ARRAY', "found operator $op" );
-            is( @$ops, 1, "operator $op found exactly once" );
-            is( $ops->[0]->content(), $op, "operator $op text matches" );
+            is( ref $ops, 'ARRAY', "found operator $op in ${code}" );
+            is( @$ops, 1, "operator $op found exactly once in ${code}" );
+            is( $ops->[0]->content(), $op, "operator $op text matches in ${code}" );
         }
-    }
-
-    # Add "'(1)', '2'" into operands once TODO is resolved.
-    {
-        my ( $a, $b ) = ( '(1)', '2' );
-        my $op = '+';
-        my $code = "${a}${op}${b}";
-        my $doc  = safe_new \$code;
-        my $ops = $doc->find('Token::Operator');
-        is( ref $ops, 'ARRAY', "found operator $op" );
-    }
-
-    TODO: {
-        my ( $a, $b ) = ( '(1)', '2' );
-        my $op = '-';
-        my $code = "${a}${op}${b}";
-        my $doc  = safe_new \$code;
-        my $ops = $doc->find('Token::Operator');
-        local $TODO = "(1)-2 not parsed correctly";
-        is( ref $ops, 'ARRAY', "found operator $op" );
-    }
-
-    {
-        my ( $a, $b ) = ( '$x[0]', '2' );
-        my $op = '+';
-        my $code = "${a}${op}${b}";
-        my $doc  = safe_new \$code;
-        my $ops = $doc->find('Token::Operator');
-        is( ref $ops, 'ARRAY', "found operator $op in ${code}" );
-        is( @$ops, 1, "operator $op found exactly once in ${code}" );
-        is( $ops->[0]->content(), $op, "operator $op text matches in ${code}" );
-    }
-
-    TODO: {
-        my ( $a, $b ) = ( '$x[0]', '2' );
-        my $op = '-';
-        my $code = "${a}${op}${b}";
-        my $doc  = safe_new \$code;
-        my $ops = $doc->find('Token::Operator');
-        local $TODO = '$x[0]-2 not parsed correctly';
-        is( ref $ops, 'ARRAY', "found operator $op in ${code}" );
     }
 }
