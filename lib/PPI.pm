@@ -445,6 +445,7 @@ based on inheritance.
          PPI::Token::Separator
          PPI::Token::Data
          PPI::Token::End
+         PPI::Token::Preamble
          PPI::Token::Prototype
          PPI::Token::Attribute
          PPI::Token::Unknown

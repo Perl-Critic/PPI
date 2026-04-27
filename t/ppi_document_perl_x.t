@@ -10,8 +10,6 @@ use PPI ();
 use PPI::Token::Preamble ();
 use Helper 'safe_new';
 
-our $TODO_MSG = "perl_x option not yet implemented";
-
 #####################################################################
 # Basic perl_x parsing — preamble before shebang
 
@@ -26,21 +24,16 @@ END_SOURCE
 	my $doc = PPI::Document->new(\$source, perl_x => 1);
 	ok( $doc, 'document created with perl_x' );
 
-	TODO: {
-		local $TODO = $TODO_MSG;
+	my $preamble = $doc->find_first('Token::Preamble');
+	ok( $preamble, 'found a Preamble token' );
+	is( $preamble->content,
+		"This is some random text\nthat appears before the perl script.\n",
+		'preamble content is correct' );
+	ok( !$preamble->significant, 'preamble is not significant' );
 
-		my $preamble = $doc->find_first('Token::Preamble');
-		ok( $preamble, 'found a Preamble token' );
-		is( ($preamble ? $preamble->content : undef),
-			"This is some random text\nthat appears before the perl script.\n",
-			'preamble content is correct' );
-		ok( ($preamble ? !$preamble->significant : undef),
-			'preamble is not significant' );
-
-		my $code = $doc->find_first('Token::Word');
-		is( ($code ? $code->content : undef), 'print',
-			'first word after preamble is code, not preamble text' );
-	}
+	my $code = $doc->find_first('Token::Word');
+	is( $code->content, 'print',
+		'first word after preamble is code, not preamble text' );
 }
 
 
@@ -62,12 +55,8 @@ END_SOURCE
 	is( $doc->serialize, $source,
 		'round-trip is safe with perl_x' );
 
-	TODO: {
-		local $TODO = $TODO_MSG;
-
-		my $preamble = $doc->find_first('Token::Preamble');
-		ok( $preamble, 'preamble found in batch wrapper' );
-	}
+	my $preamble = $doc->find_first('Token::Preamble');
+	ok( $preamble, 'preamble found in batch wrapper' );
 }
 
 
@@ -123,15 +112,11 @@ END_SOURCE
 	my $doc = PPI::Document->new(\$source, perl_x => 1);
 	ok( $doc, 'document created with non-perl shebang before perl one' );
 
-	TODO: {
-		local $TODO = $TODO_MSG;
-
-		my $preamble = $doc->find_first('Token::Preamble');
-		ok( $preamble, 'preamble found — skipped non-perl shebang' );
-		is( ($preamble ? $preamble->content : undef),
-			"some text\n#!/bin/bash\necho \"not perl\"\n",
-			'preamble includes everything up to #!...perl line' );
-	}
+	my $preamble = $doc->find_first('Token::Preamble');
+	ok( $preamble, 'preamble found — skipped non-perl shebang' );
+	is( $preamble->content,
+		"some text\n#!/bin/bash\necho \"not perl\"\n",
+		'preamble includes everything up to #!...perl line' );
 }
 
 
@@ -164,14 +149,10 @@ PERL_X_FROM_FILE: {
 
 	my $doc = PPI::Document->new("$tmp", perl_x => 1);
 	ok( $doc, 'document loaded from file with perl_x' );
-	isa_ok( ($doc || 'PPI::Document'), 'PPI::Document' );
+	isa_ok( $doc, 'PPI::Document' );
 
-	TODO: {
-		local $TODO = $TODO_MSG;
-
-		my $preamble = $doc->find_first('Token::Preamble');
-		ok( $preamble, 'preamble found when loading from file' );
-	}
+	my $preamble = $doc->find_first('Token::Preamble');
+	ok( $preamble, 'preamble found when loading from file' );
 }
 
 
@@ -184,14 +165,10 @@ SINGLE_LINE_PREAMBLE: {
 	my $doc = PPI::Document->new(\$source, perl_x => 1);
 	ok( $doc, 'document created for single-line preamble' );
 
-	TODO: {
-		local $TODO = $TODO_MSG;
-
-		my $preamble = $doc->find_first('Token::Preamble');
-		ok( $preamble, 'single-line preamble found' );
-		is( ($preamble ? $preamble->content : undef), "wrapper\n",
-			'single-line preamble content is correct' );
-	}
+	my $preamble = $doc->find_first('Token::Preamble');
+	ok( $preamble, 'single-line preamble found' );
+	is( $preamble->content, "wrapper\n",
+		'single-line preamble content is correct' );
 }
 
 
@@ -204,12 +181,8 @@ EMPTY_LINE_PREAMBLE: {
 	my $doc = PPI::Document->new(\$source, perl_x => 1);
 	ok( $doc, 'document created for empty-line preamble' );
 
-	TODO: {
-		local $TODO = $TODO_MSG;
-
-		my $preamble = $doc->find_first('Token::Preamble');
-		ok( $preamble, 'preamble with empty lines found' );
-		is( ($preamble ? $preamble->content : undef), "\n\nsome text\n\n",
-			'preamble preserves empty lines' );
-	}
+	my $preamble = $doc->find_first('Token::Preamble');
+	ok( $preamble, 'preamble with empty lines found' );
+	is( $preamble->content, "\n\nsome text\n\n",
+		'preamble preserves empty lines' );
 }

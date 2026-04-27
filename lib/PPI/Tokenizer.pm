@@ -137,7 +137,7 @@ my %X_CAN_FOLLOW_WORD = map { $_ => 1 } qw(
 
 =pod
 
-=head2 new $file | \@lines | \$source
+=head2 new $file | \@lines | \$source [, %options ]
 
 The main C<new> constructor creates a new Tokenizer object. These
 objects have no configuration parameters, and can only be used once,
@@ -147,6 +147,11 @@ It takes as argument either a normal scalar containing source code,
 a reference to a scalar containing source code, or a reference to an
 ARRAY containing newline-terminated lines of source code.
 
+An optional hash of options may follow the source argument. Currently
+the only recognized option is C<perl_x>, which when true emulates
+C<perl -x> by treating text before the first C<#!...perl> line as a
+non-significant L<PPI::Token::Preamble>.
+
 Returns a new C<PPI::Tokenizer> object on success, or throws a
 L<PPI::Exception> exception on error.
 
@@ -154,6 +159,7 @@ L<PPI::Exception> exception on error.
 
 sub new {
 	my $class = ref($_[0]) || $_[0];
+	my %args = @_ > 2 ? @_[2..$#_] : ();
 
 	# Create the empty tokenizer struct
 	my $self = bless {
@@ -210,6 +216,22 @@ sub new {
 
 	} else {
 		$self->{source} = [ ];
+	}
+
+	# perl -x emulation: strip preamble before the first #!...perl line
+	if ( $args{perl_x} and @{$self->{source}} ) {
+		my $shebang_idx;
+		for my $i ( 0 .. $#{$self->{source}} ) {
+			if ( $self->{source}[$i] =~ /^#!.*perl/ ) {
+				$shebang_idx = $i;
+				last;
+			}
+		}
+		if ( defined $shebang_idx and $shebang_idx > 0 ) {
+			my @preamble = splice @{$self->{source}}, 0, $shebang_idx;
+			push @{$self->{tokens}},
+				PPI::Token::Preamble->new( join '', @preamble );
+		}
 	}
 
 	### EVIL

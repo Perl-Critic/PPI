@@ -162,8 +162,12 @@ sub _lex_input {
 	my ( $self, $input, %args ) = @_;
 	$self = ref $self ? $self : $self->new;
 
+	# Extract tokenizer-specific options before passing the rest to the document
+	my %tokenizer_args;
+	$tokenizer_args{perl_x} = delete $args{perl_x} if exists $args{perl_x};
+
 	# Create the Tokenizer
-	my $Tokenizer = eval { X_TOKENIZER->new($input) };
+	my $Tokenizer = eval { X_TOKENIZER->new($input, %tokenizer_args) };
 	return    #
 	  $@
 	  ? $self->_error( _INSTANCE( $@, 'PPI::Exception' ) ? $@->message : $@ )
