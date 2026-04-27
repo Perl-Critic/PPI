@@ -16,7 +16,6 @@ SCOPE: {
 	my $doc = safe_new \"f(\$x, \$z, \$x);";
 	my $stmt = $doc->find_first('PPI::Statement');
 	my $clone = $stmt->clone;
-	local $TODO = "location data should survive clone";
 	is $clone->line_number, 1, 'cloned statement has line_number';
 }
 
@@ -28,7 +27,6 @@ SCOPE: {
 	is scalar @stmts, 2, 'found two statements';
 
 	my $clone2 = $stmts[1]->clone;
-	local $TODO = "location data should survive clone";
 	is $clone2->line_number, 2, 'cloned second statement preserves line 2';
 }
 
@@ -37,7 +35,6 @@ SCOPE: {
 	my $doc = safe_new \"my \$x = 1;";
 	my $sym = $doc->find_first('PPI::Token::Symbol');
 	my $clone = $sym->clone;
-	local $TODO = "location data should survive clone";
 	is $clone->line_number,   1, 'cloned token has line_number';
 	is $clone->column_number, 4, 'cloned token has column_number';
 }

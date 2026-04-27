@@ -106,10 +106,10 @@ use Test::Script 1.27 qw(
 EOSTM
 	chomp $text;
 	my $replacement = parse_statement($text);
-	is $replacement->first_token->{_location}, undef,
-	  'replacement has no location data';
-	is $replacement->location, undef,
-	  'and it cant generate a default location when asked';
+	ok defined $replacement->first_token->{_location},
+	  'clone preserves location data from source document';
+	ok defined $replacement->location,
+	  'and it can report a location';
 
 	$include2->replace($replacement);
 
@@ -117,10 +117,11 @@ EOSTM
 	is_deeply $nextsib->location, [ 4, 91, 91, 4, $file ],
 	  'next token location is stale';
 
-	# now the $Document has a node without location, and all
+	# now the $Document has a node with stale location, and all
 	# subsequent elements have a stale cached location.
 
-	# a partial reindex should fix all location caches:
+	# flush + reindex should fix all location caches:
+	$replacement->_flush_locations;
 	my $res = eval {
 		use warnings 'FATAL';
 		$Document->index_locations;

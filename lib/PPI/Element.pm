@@ -500,7 +500,11 @@ Nodes, there is more work involved to keep the parent-child links intact.
 =cut
 
 sub clone {
-	Clone::clone(shift);
+	my $self = shift;
+	# Index locations before deep copy so they survive cloning
+	my $doc = $self->document;
+	$doc->index_locations if $doc;
+	Clone::clone($self);
 }
 
 =pod
