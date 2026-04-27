@@ -130,6 +130,22 @@ sub module_version {
 
 =pod
 
+=head2 module_first_arg
+
+The C<module_first_arg> method returns the first argument to the module,
+after the module name and optional module version.  Returns C<undef> if
+there are no arguments.
+
+=cut
+
+sub module_first_arg {
+	my $self = shift;
+	my @args = $self->arguments or return undef;
+	return $args[0];
+}
+
+=pod
+
 =head2 pragma
 
 The C<pragma> method checks for an include statement's use as a
