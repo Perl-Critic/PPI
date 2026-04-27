@@ -166,28 +166,38 @@ sub content {
 	$_[0]->{content};
 }
 
-# You can insert either a statement, or a non-significant token.
 sub insert_before {
-	my $self    = shift;
-	my $Element = _INSTANCE(shift, 'PPI::Element')  or return undef;
-	if ( $Element->isa('PPI::Structure') ) {
-		return $self->__insert_before($Element);
-	} elsif ( $Element->isa('PPI::Token') ) {
-		return $self->__insert_before($Element);
+	my $self = shift;
+	my @insertions = PPI::Element::_prepare_insertions(@_) or return undef;
+	@insertions = _flatten_for_token(@insertions);
+	for my $Element ( @insertions ) {
+		return '' unless $Element->isa('PPI::Structure') or $Element->isa('PPI::Token');
 	}
-	'';
+	$self->__insert_before(@insertions);
 }
 
-# As above, you can insert a statement, or a non-significant token
 sub insert_after {
-	my $self    = shift;
-	my $Element = _INSTANCE(shift, 'PPI::Element') or return undef;
-	if ( $Element->isa('PPI::Structure') ) {
-		return $self->__insert_after($Element);
-	} elsif ( $Element->isa('PPI::Token') ) {
-		return $self->__insert_after($Element);
+	my $self = shift;
+	my @insertions = PPI::Element::_prepare_insertions(@_) or return undef;
+	@insertions = _flatten_for_token(@insertions);
+	for my $Element ( @insertions ) {
+		return '' unless $Element->isa('PPI::Structure') or $Element->isa('PPI::Token');
 	}
-	'';
+	$self->__insert_after(@insertions);
+}
+
+sub _flatten_for_token {
+	my @out;
+	for my $elem ( @_ ) {
+		if ( $elem->isa('PPI::Statement') ) {
+			my @children = $elem->children;
+			$_->remove for @children;
+			push @out, @children;
+		} else {
+			push @out, $elem;
+		}
+	}
+	return @out;
 }
 
 

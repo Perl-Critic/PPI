@@ -4,7 +4,7 @@
 
 use lib 't/lib';
 use PPI::Test::pragmas;
-use Test::More tests => 68 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+use Test::More tests => 118 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use PPI ();
 use Helper 'safe_new';
@@ -213,4 +213,136 @@ END_PERL
 		$tab_width + 2,
 		'Got correct visual column number.',
 	);
+}
+
+
+INSERT_BEFORE_MULTIPLE_TOKENS: {
+	my $Document = safe_new \"print 'Hello World';";
+	my $string = $Document->find_first('Token::Quote');
+	my $foo = PPI::Token::Word->new('foo');
+	my $bar = PPI::Token::Word->new('bar');
+	my $result = $string->insert_before( $foo, $bar );
+	ok( $result, 'insert_before accepts multiple tokens' );
+	is( $Document->serialize, "print foobar'Hello World';",
+		'insert_before inserts multiple tokens in order' );
+}
+
+
+INSERT_AFTER_MULTIPLE_TOKENS: {
+	my $Document = safe_new \"print 'Hello World';";
+	my $string = $Document->find_first('Token::Quote');
+	my $foo = PPI::Token::Word->new('foo');
+	my $bar = PPI::Token::Word->new('bar');
+	my $result = $string->insert_after( $foo, $bar );
+	ok( $result, 'insert_after accepts multiple tokens' );
+	is( $Document->serialize, "print 'Hello World'foobar;",
+		'insert_after inserts multiple tokens in order' );
+}
+
+
+INSERT_BEFORE_MULTIPLE_STATEMENTS: {
+	my $Document = safe_new \"my \$x = 1; my \$y = 2;";
+	my @stmts = $Document->schildren;
+	is( scalar @stmts, 2, 'Found two statements' );
+	my $new1 = PPI::Document->new(\"my \$a = 0;")->schild(0)->remove;
+	my $ws   = PPI::Token::Whitespace->new(' ');
+	my $result = $stmts[1]->insert_before( $new1, $ws );
+	ok( $result, 'insert_before accepts multiple elements before a statement' );
+	is( $Document->serialize, "my \$x = 1; my \$a = 0; my \$y = 2;",
+		'insert_before inserts statement + whitespace in order' );
+}
+
+
+INSERT_AFTER_MULTIPLE_STATEMENTS: {
+	my $Document = safe_new \"my \$x = 1; my \$y = 2;";
+	my @stmts = $Document->schildren;
+	is( scalar @stmts, 2, 'Found two statements' );
+	my $ws   = PPI::Token::Whitespace->new(' ');
+	my $new1 = PPI::Document->new(\"my \$a = 0;")->schild(0)->remove;
+	my $result = $stmts[0]->insert_after( $ws, $new1 );
+	ok( $result, 'insert_after accepts multiple elements after a statement' );
+	is( $Document->serialize, "my \$x = 1; my \$a = 0; my \$y = 2;",
+		'insert_after inserts whitespace + statement in order' );
+}
+
+
+INSERT_BEFORE_STRING: {
+	my $Document = safe_new \"my \$x = 1;";
+	my $stmt = $Document->schild(0);
+	my $result = $stmt->insert_before("my \$y = 2; ");
+	ok( $result, 'insert_before accepts a code string' );
+	is( $Document->serialize, "my \$y = 2; my \$x = 1;",
+		'insert_before parses and inserts code string' );
+}
+
+
+INSERT_AFTER_STRING: {
+	my $Document = safe_new \"my \$x = 1;";
+	my $stmt = $Document->schild(0);
+	my $result = $stmt->insert_after(" my \$y = 2;");
+	ok( $result, 'insert_after accepts a code string' );
+	is( $Document->serialize, "my \$x = 1; my \$y = 2;",
+		'insert_after parses and inserts code string' );
+}
+
+
+INSERT_BEFORE_STRING_TOKEN: {
+	my $Document = safe_new \"print 'Hello';";
+	my $string = $Document->find_first('Token::Quote');
+	my $result = $string->insert_before("foo ");
+	ok( $result, 'insert_before accepts a code string on a token' );
+	is( $Document->serialize, "print foo 'Hello';",
+		'insert_before parses and inserts string before token' );
+}
+
+
+INSERT_AFTER_STRING_TOKEN: {
+	my $Document = safe_new \"print 'Hello';";
+	my $string = $Document->find_first('Token::Quote');
+	my $result = $string->insert_after(" . 'World'");
+	ok( $result, 'insert_after accepts a code string on a token' );
+	is( $Document->serialize, "print 'Hello' . 'World';",
+		'insert_after parses and inserts string after token' );
+}
+
+
+INSERT_BEFORE_FRAGMENT: {
+	my $Document = safe_new \"my \$x = 1;";
+	my $stmt = $Document->schild(0);
+	my $source = PPI::Document->new(\"my \$y = 2; ");
+	my $frag = bless $source, 'PPI::Document::Fragment';
+	isa_ok( $frag, 'PPI::Document::Fragment' );
+	my $result = $stmt->insert_before($frag);
+	ok( $result, 'insert_before accepts a Document::Fragment' );
+	is( $Document->serialize, "my \$y = 2; my \$x = 1;",
+		'insert_before inserts fragment children' );
+}
+
+
+INSERT_AFTER_FRAGMENT: {
+	my $Document = safe_new \"my \$x = 1;";
+	my $stmt = $Document->schild(0);
+	my $source = PPI::Document->new(\" my \$y = 2;");
+	my $frag = bless $source, 'PPI::Document::Fragment';
+	isa_ok( $frag, 'PPI::Document::Fragment' );
+	my $result = $stmt->insert_after($frag);
+	ok( $result, 'insert_after accepts a Document::Fragment' );
+	is( $Document->serialize, "my \$x = 1; my \$y = 2;",
+		'insert_after inserts fragment children' );
+}
+
+
+INSERT_BEFORE_UNDEF_ON_INVALID: {
+	my $Document = safe_new \"print 'Hello';";
+	my $string = $Document->find_first('Token::Quote');
+	my $result = $string->insert_before();
+	is( $result, undef, 'insert_before with no args returns undef' );
+}
+
+
+INSERT_AFTER_UNDEF_ON_INVALID: {
+	my $Document = safe_new \"print 'Hello';";
+	my $string = $Document->find_first('Token::Quote');
+	my $result = $string->insert_after();
+	is( $result, undef, 'insert_after with no args returns undef' );
 }
