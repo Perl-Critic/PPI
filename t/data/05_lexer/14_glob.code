@@ -1,0 +1,6 @@
+my @f = <*>;
+my @f = <*.c>;
+my @f = <$path/*.v>;
+my @f = grep { /foo/ } <$path/*.v>;
+while (<STDIN>) {}
+my $line = <$fh>;
