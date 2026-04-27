@@ -4,7 +4,7 @@
 
 use lib 't/lib';
 use PPI::Test::pragmas;
-use Test::More tests => 216 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+use Test::More tests => 258 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use PPI ();
 use Helper 'safe_new';
@@ -49,11 +49,41 @@ TOKEN_FROM_PARSE: {
 
 
 CONSTRUCT_OWN_TOKEN: {
-	# Test behavior that parsing does not support as of PPI 1.220.
 	test_symbol( PPI::Token::Symbol->new('$ foo'),             { content => '$ foo',             canonical => '$foo',                 raw_type => '$', symbol_type => '$', symbol => '$foo' }, '$ foo' );
 	test_symbol( PPI::Token::Symbol->new('$ foo\'bar'),        { content => '$ foo\'bar',        canonical => '$foo::bar',            raw_type => '$', symbol_type => '$', symbol => '$foo::bar' }, '$ foo\'bar' );
 	# example from PPI::Token::Symbol->canonical documentation
 	test_symbol( PPI::Token::Symbol->new('$ ::foo\'bar::baz'), { content => '$ ::foo\'bar::baz', canonical => '$main::foo::bar::baz', raw_type => '$', symbol_type => '$', symbol => '$main::foo::bar::baz' }, '$ ::foo\'bar::baz' );
+}
+
+
+SIGIL_WHITESPACE: {
+	local $TODO = "whitespace not yet supported between sigil and identifier (GH #158)";
+
+	my @tests = (
+		[ '$ foo',      { content => '$ foo',   canonical => '$foo',  raw_type => '$', symbol_type => '$', symbol => '$foo'  } ],
+		[ '@ foo',      { content => '@ foo',   canonical => '@foo',  raw_type => '@', symbol_type => '@', symbol => '@foo'  } ],
+		[ '% foo',      { content => '% foo',   canonical => '%foo',  raw_type => '%', symbol_type => '%', symbol => '%foo'  } ],
+		[ '$  foo',     { content => '$  foo',  canonical => '$foo',  raw_type => '$', symbol_type => '$', symbol => '$foo'  } ],
+		[ '$ foo[0]',   { content => '$ foo',   canonical => '$foo',  raw_type => '$', symbol_type => '@', symbol => '@foo'  } ],
+		[ '@ foo{0}',   { content => '@ foo',   canonical => '@foo',  raw_type => '@', symbol_type => '%', symbol => '%foo'  } ],
+		[ '% foo[0,1]', { content => '% foo',   canonical => '%foo',  raw_type => '%', symbol_type => '@', symbol => '@foo'  } ],
+	);
+
+	for my $case (@tests) {
+		my ($code, $expected) = @$case;
+		my $d = PPI::Document->new(\$code);
+		my $symbols = $d ? ($d->find('PPI::Token::Symbol') || []) : [];
+		is( scalar @$symbols, 1, "$code: got exactly one symbol" ) or do {
+			fail("$code: $_") for qw(content canonical raw_type symbol_type symbol);
+			next;
+		};
+		my $s = $symbols->[0];
+		is( $s->content,     $expected->{content},     "$code: content" );
+		is( $s->canonical,   $expected->{canonical},   "$code: canonical" );
+		is( $s->raw_type,    $expected->{raw_type},    "$code: raw_type" );
+		is( $s->symbol_type, $expected->{symbol_type}, "$code: symbol_type" );
+		is( $s->symbol,      $expected->{symbol},      "$code: symbol" );
+	}
 }
 
 
