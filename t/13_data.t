@@ -4,7 +4,7 @@
 
 use lib 't/lib';
 use PPI::Test::pragmas;
-use Test::More tests => 9 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+use Test::More tests => 8 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use File::Spec::Functions qw( catfile );
 use PPI ();
@@ -23,11 +23,6 @@ isa_ok( $Token, 'PPI::Token::Data' );
 # Get the handle
 my $handle = $Token->handle;
 isa_ok( $handle, 'GLOB' );
-
-TODO: {
-	local $TODO = 'Remove IO::String compat after bumping minimum perl to 5.008001';
-	ok( !defined &PPI::Token::Data::USE_IO_STRING, 'USE_IO_STRING constant removed' );
-}
 
 # Try to read a line off the handle
 my $line = <$handle>;

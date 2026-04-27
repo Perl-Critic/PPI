@@ -2,7 +2,7 @@ package PPI;
 
 # See POD at end for documentation
 
-use 5.006;
+use 5.008001;
 use strict;
 
 # Set the version for CPAN

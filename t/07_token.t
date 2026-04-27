@@ -2,13 +2,12 @@
 
 # Formal unit tests for specific PPI::Token classes
 
-sub warns_on_misplaced_underscore { $] >= 5.006 and $] < 5.008 }
 sub dies_on_incomplete_bx { $] >= 5.031002 }
 
 use if !(-e 'META.yml'), "Test::InDistDir";
 use lib 't/lib';
 use PPI::Test::pragmas;
-use Test::More tests => 594 + (warns_on_misplaced_underscore() ? 2 : 0 ) + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+use Test::More tests => 594 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use File::Spec::Functions qw( catdir );
 use PPI ();
@@ -78,12 +77,6 @@ SCOPE: {
 	while ( @examples ) {
 		my $code  = shift @examples;
 		my $base  = shift @examples;
-		if ( warns_on_misplaced_underscore() and ($code eq '1_0e1_0' or $code eq '1_0' or $code eq '1_0.') ) {
-			SKIP: {
-				skip( 'Ignoring known-bad cases on Perl 5.6.2', 5 );
-			}
-			next;
-		}
 		my $is_exp   = $base =~ s/e//;
 		my $is_float = $is_exp || $base =~ s/f//;
 		my $T     = PPI::Tokenizer->new( \$code );
@@ -98,17 +91,10 @@ SCOPE: {
 		next if $base == 256;
 
 		$^W = 0;
-		my $underscore_incompatible = warns_on_misplaced_underscore() && $code =~ /^1_0[.]?$/;
 		my $incomplete_incompatible = dies_on_incomplete_bx() && $code =~ /^0[bx]$/;
 		my $literal = eval $code;
 		my $err = $@;
-		$literal = undef if $underscore_incompatible || $incomplete_incompatible;
-		warning_is { $literal = eval $code } "Misplaced _ in number",
-			"$] warns about misplaced underscore"
-			if $underscore_incompatible;
-		like($err, qr/No digits found for (binary|hexadecimal) literal/,
-			 "$] dies on incomplete binary/hexadecimal literals")
-			if $underscore_incompatible;
+		$literal = undef if $incomplete_incompatible;
 		no warnings qw{ uninitialized };
 		cmp_ok($token->literal, '==', $err ? undef : $literal,
 			   "literal('$code'), eval error: " . ($err || "none"));
