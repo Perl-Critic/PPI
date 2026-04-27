@@ -43,6 +43,21 @@ separately, even though they do the same thing. This is intentional,
 as the inherit from and are processed by two different parts of the
 PPI's quote engine.
 
+=head1 METHODS
+
+=head2 string
+
+The C<string> method is provided by all five ::QuoteLike subclasses.
+It returns the content of the quote-like operator stripped of its
+delimiters (and operator keyword, if any).
+
+  # The following all return foo from the ->string method
+  `foo`
+  qx{foo}
+  qr{foo}
+  qw{foo}
+  <foo>
+
 =cut
 
 use strict;

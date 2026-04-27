@@ -16,11 +16,8 @@ BACKTICK: {
 	is( ref $found, 'ARRAY', 'Backtick: found token' );
 	is( scalar @$found, 1, 'Backtick: found 1 token' );
 	my $token = $found->[0];
-	TODO: {
-		local $TODO = 'string method not yet implemented on QuoteLike classes';
-		can_ok( $token, 'string' );
-		is( eval { $token->string }, 'foo', 'Backtick: ->string returns content without delimiters' );
-	}
+	can_ok( $token, 'string' );
+	is( $token->string, 'foo', 'Backtick: ->string returns content without delimiters' );
 }
 
 COMMAND: {
@@ -29,11 +26,8 @@ COMMAND: {
 	is( ref $found, 'ARRAY', 'Command: found token' );
 	is( scalar @$found, 1, 'Command: found 1 token' );
 	my $token = $found->[0];
-	TODO: {
-		local $TODO = 'string method not yet implemented on QuoteLike classes';
-		can_ok( $token, 'string' );
-		is( eval { $token->string }, 'foo', 'Command: ->string returns content without delimiters' );
-	}
+	can_ok( $token, 'string' );
+	is( $token->string, 'foo', 'Command: ->string returns content without delimiters' );
 }
 
 COMMAND_SLASH: {
@@ -42,10 +36,7 @@ COMMAND_SLASH: {
 	is( ref $found, 'ARRAY', 'Command slash: found token' );
 	is( scalar @$found, 1, 'Command slash: found 1 token' );
 	my $token = $found->[0];
-	TODO: {
-		local $TODO = 'string method not yet implemented on QuoteLike classes';
-		is( eval { $token->string }, 'bar', 'Command slash: ->string returns content without delimiters' );
-	}
+	is( $token->string, 'bar', 'Command slash: ->string returns content without delimiters' );
 }
 
 REGEXP: {
@@ -54,11 +45,8 @@ REGEXP: {
 	is( ref $found, 'ARRAY', 'Regexp: found token' );
 	is( scalar @$found, 1, 'Regexp: found 1 token' );
 	my $token = $found->[0];
-	TODO: {
-		local $TODO = 'string method not yet implemented on QuoteLike classes';
-		can_ok( $token, 'string' );
-		is( eval { $token->string }, 'foo', 'Regexp: ->string returns content without delimiters' );
-	}
+	can_ok( $token, 'string' );
+	is( $token->string, 'foo', 'Regexp: ->string returns content without delimiters' );
 }
 
 REGEXP_SLASH: {
@@ -67,10 +55,7 @@ REGEXP_SLASH: {
 	is( ref $found, 'ARRAY', 'Regexp slash: found token' );
 	is( scalar @$found, 1, 'Regexp slash: found 1 token' );
 	my $token = $found->[0];
-	TODO: {
-		local $TODO = 'string method not yet implemented on QuoteLike classes';
-		is( eval { $token->string }, 'baz', 'Regexp slash: ->string returns content without delimiters' );
-	}
+	is( $token->string, 'baz', 'Regexp slash: ->string returns content without delimiters' );
 }
 
 WORDS: {
@@ -79,11 +64,8 @@ WORDS: {
 	is( ref $found, 'ARRAY', 'Words: found token' );
 	is( scalar @$found, 1, 'Words: found 1 token' );
 	my $token = $found->[0];
-	TODO: {
-		local $TODO = 'string method not yet implemented on QuoteLike classes';
-		can_ok( $token, 'string' );
-		is( eval { $token->string }, 'foo bar baz', 'Words: ->string returns content without delimiters' );
-	}
+	can_ok( $token, 'string' );
+	is( $token->string, 'foo bar baz', 'Words: ->string returns content without delimiters' );
 }
 
 WORDS_SLASH: {
@@ -92,10 +74,7 @@ WORDS_SLASH: {
 	is( ref $found, 'ARRAY', 'Words slash: found token' );
 	is( scalar @$found, 1, 'Words slash: found 1 token' );
 	my $token = $found->[0];
-	TODO: {
-		local $TODO = 'string method not yet implemented on QuoteLike classes';
-		is( eval { $token->string }, 'a b c', 'Words slash: ->string returns content without delimiters' );
-	}
+	is( $token->string, 'a b c', 'Words slash: ->string returns content without delimiters' );
 }
 
 READLINE: {
@@ -104,9 +83,6 @@ READLINE: {
 	is( ref $found, 'ARRAY', 'Readline: found token' );
 	is( scalar @$found, 1, 'Readline: found 1 token' );
 	my $token = $found->[0];
-	TODO: {
-		local $TODO = 'string method not yet implemented on QuoteLike classes';
-		can_ok( $token, 'string' );
-		is( eval { $token->string }, 'STDIN', 'Readline: ->string returns content without delimiters' );
-	}
+	can_ok( $token, 'string' );
+	is( $token->string, 'STDIN', 'Readline: ->string returns content without delimiters' );
 }

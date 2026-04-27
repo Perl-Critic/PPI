@@ -38,6 +38,19 @@ our @ISA = qw{
 
 =pod
 
+=head2 string
+
+The C<string> method returns the value of the string as PPI has
+parsed it, without the surrounding operator and delimiters.
+
+=cut
+
+sub string {
+	return $_[0]->_section_content( 0 );
+}
+
+=pod
+
 =head2 literal
 
 Returns the words contained as a list.  Note that this method does not check the

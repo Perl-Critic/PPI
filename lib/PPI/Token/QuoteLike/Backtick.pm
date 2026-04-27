@@ -20,10 +20,6 @@ capturing quote.
 
 =head1 METHODS
 
-There are no methods available for C<PPI::Token::QuoteLike::Backtick>
-beyond those provided by the parent L<PPI::Token::QuoteLike>, L<PPI::Token>
-and L<PPI::Element> classes.
-
 =cut
 
 use strict;
@@ -36,6 +32,20 @@ our @ISA = qw{
 	PPI::Token::_QuoteEngine::Simple
 	PPI::Token::QuoteLike
 };
+
+=pod
+
+=head2 string
+
+The C<string> method returns the value of the string as PPI has
+parsed it, without the surrounding delimiters.
+
+=cut
+
+sub string {
+	my $str = $_[0]->{content};
+	substr( $str, 1, length($str) - 2 );
+}
 
 1;
 
