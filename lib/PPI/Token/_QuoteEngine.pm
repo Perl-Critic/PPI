@@ -74,11 +74,14 @@ sub __TOKENIZER__on_char {
 sub _scan_for_unescaped_character {
 	my $class = shift;
 	my $t     = shift;
-	my $char  = (length $_[0] == 1) ? quotemeta shift : return undef;
+	return undef unless length $_[0] == 1;
+	my $is_backslash = $_[0] eq '\\';
+	my $char = quotemeta shift;
 
-	# Create the search regex.
-	# Same as above but with a negative look-behind assertion.
-	my $search = qr/(.*?(?<!\\)(?:\\\\)*$char)/;
+	# When the delimiter is a backslash, escaping is not possible (perlop).
+	my $search = $is_backslash
+		? qr/(.*?$char)/
+		: qr/(.*?(?<!\\)(?:\\\\)*$char)/;
 
 	my $string = '';
 	while ( exists $t->{line} ) {
