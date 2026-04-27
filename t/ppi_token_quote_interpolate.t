@@ -24,7 +24,6 @@ STRING: {
 
 
 INTERPOLATIONS: {
-	local $TODO = 'interpolations not yet implemented on Interpolate';
 	my $Document = safe_new \<<'END_PERL';
 qq{no interpolations}
 qq{no \@interpolations}
@@ -35,17 +34,16 @@ qq{}
 END_PERL
 	my $strings = $Document->find('Token::Quote::Interpolate');
 	is( scalar @{$strings}, 6, 'Found the 6 test strings' );
-	is( eval { $strings->[0]->interpolations }, '', 'String 1: No interpolations'  );
-	is( eval { $strings->[1]->interpolations }, '', 'String 2: No interpolations'  );
-	is( eval { $strings->[2]->interpolations }, 1,  'String 3: Has interpolations' );
-	is( eval { $strings->[3]->interpolations }, 1,  'String 4: Has interpolations' );
-	is( eval { $strings->[4]->interpolations }, 1,  'String 5: Has interpolations' );
-	is( eval { $strings->[5]->interpolations }, '', 'String 6: No interpolations'  );
+	is( $strings->[0]->interpolations, '', 'String 1: No interpolations'  );
+	is( $strings->[1]->interpolations, '', 'String 2: No interpolations'  );
+	is( $strings->[2]->interpolations, 1,  'String 3: Has interpolations' );
+	is( $strings->[3]->interpolations, 1,  'String 4: Has interpolations' );
+	is( $strings->[4]->interpolations, 1,  'String 5: Has interpolations' );
+	is( $strings->[5]->interpolations, '', 'String 6: No interpolations'  );
 }
 
 
 SIMPLIFY: {
-	local $TODO = 'simplify not yet implemented on Interpolate';
 	my $Document = safe_new \<<'END_PERL';
 qq{no special characters}
 qq{has $interpolation}
@@ -57,26 +55,26 @@ END_PERL
 	my $strings = $Document->find('Token::Quote::Interpolate');
 	is( scalar @{$strings}, 6, 'Found the 6 test strings' );
 
-	my $result = eval { $strings->[0]->simplify };
+	my $result = $strings->[0]->simplify;
 	isa_ok( $result, 'PPI::Token::Quote::Literal' );
-	is( eval { $result->content }, 'q{no special characters}', 'Simplified qq{} to q{}' );
-	is( eval { $result->string }, 'no special characters', '->string works after simplify' );
+	is( $result->content, 'q{no special characters}', 'Simplified qq{} to q{}' );
+	is( $result->string, 'no special characters', '->string works after simplify' );
 
-	$result = eval { $strings->[1]->simplify };
+	$result = $strings->[1]->simplify;
 	isa_ok( $result, 'PPI::Token::Quote::Interpolate' );
 
-	$result = eval { $strings->[2]->simplify };
+	$result = $strings->[2]->simplify;
 	isa_ok( $result, 'PPI::Token::Quote::Interpolate' );
 
-	$result = eval { $strings->[3]->simplify };
+	$result = $strings->[3]->simplify;
 	isa_ok( $result, 'PPI::Token::Quote::Interpolate' );
 
-	$result = eval { $strings->[4]->simplify };
+	$result = $strings->[4]->simplify;
 	isa_ok( $result, 'PPI::Token::Quote::Literal' );
-	is( eval { $result->content }, 'q{}', 'Empty string simplified' );
+	is( $result->content, 'q{}', 'Empty string simplified' );
 
-	$result = eval { $strings->[5]->simplify };
+	$result = $strings->[5]->simplify;
 	isa_ok( $result, 'PPI::Token::Quote::Literal' );
-	is( eval { $result->content }, 'q!simple with bangs!', 'Simplified qq!! to q!!' );
-	is( eval { $result->string }, 'simple with bangs', '->string works after simplify with !' );
+	is( $result->content, 'q!simple with bangs!', 'Simplified qq!! to q!!' );
+	is( $result->string, 'simple with bangs', '->string works after simplify with !' );
 }

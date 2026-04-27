@@ -215,6 +215,7 @@ string=method
 [PPI::Token::Quote::Single]
 PPI::Token=isa
 PPI::Token::Quote=isa
+interpolations=method
 literal=method
 
 [PPI::Token::Quote::Double]
@@ -225,10 +226,13 @@ simplify=method
 
 [PPI::Token::Quote::Literal]
 PPI::Token=isa
+interpolations=method
 literal=method
 
 [PPI::Token::Quote::Interpolate]
 PPI::Token=isa
+interpolations=method
+simplify=method
 
 [PPI::Token::QuoteLike]
 PPI::Token=isa

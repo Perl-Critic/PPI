@@ -26,8 +26,8 @@ literal.
 
 =head1 METHODS
 
-There are no methods available for C<PPI::Token::Quote::Single> beyond
-those provided by the parent L<PPI::Token::Quote>, L<PPI::Token> and
+There are several methods available for C<PPI::Token::Quote::Single>,
+beyond those provided by the parent L<PPI::Token::Quote>, L<PPI::Token> and
 L<PPI::Element> classes.
 
 =cut
@@ -45,6 +45,23 @@ our @ISA = qw{
 
 
 
+
+
+#####################################################################
+# PPI::Token::Quote::Single Methods
+
+=pod
+
+=head2 interpolations
+
+The C<interpolations> method always returns false for single-quoted
+strings, since they do not support interpolation.
+
+=cut
+
+sub interpolations {
+	'';
+}
 
 
 #####################################################################

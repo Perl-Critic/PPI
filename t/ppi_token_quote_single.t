@@ -19,10 +19,9 @@ STRING: {
 
 
 INTERPOLATIONS: {
-	local $TODO = 'interpolations not yet implemented on Single';
 	my $Document = safe_new \"print 'foo';";
 	my $Single = $Document->find_first('Token::Quote::Single');
-	is( eval { $Single->interpolations }, '', 'Single quotes have no interpolations' );
+	is( $Single->interpolations, '', 'Single quotes have no interpolations' );
 }
 
 

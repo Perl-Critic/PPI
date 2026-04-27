@@ -25,10 +25,9 @@ STRING: {
 }
 
 INTERPOLATIONS: {
-	local $TODO = 'interpolations not yet implemented on Literal';
 	my $Document = safe_new \"print q{foo};";
 	my $Literal = $Document->find_first('Token::Quote::Literal');
-	is( eval { $Literal->interpolations }, '', 'Literal quotes have no interpolations' );
+	is( $Literal->interpolations, '', 'Literal quotes have no interpolations' );
 }
 
 
