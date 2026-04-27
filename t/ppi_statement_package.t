@@ -4,7 +4,7 @@
 
 use lib 't/lib';
 use PPI::Test::pragmas;
-use Test::More tests => 2508 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+use Test::More tests => 2524 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use PPI ();
 use PPI::Singletons qw( %KEYWORDS );
@@ -62,6 +62,47 @@ END_PERL
 	is( $packages->[2]->version, 'v1.23', 'Package 3 returns correct version' );
 	is( $packages->[3]->version, '0.09', 'Package 4 returns correct version' );
 }
+
+BLOCK_METHOD: {
+	my $doc1 = safe_new \"package Foo;";
+	my $pkg1 = $doc1->find_first('Statement::Package');
+	{
+		local $TODO = 'block() not yet implemented';
+		ok( $pkg1->can('block'), 'Package can block()' );
+		is( eval { $pkg1->block }, '', 'block() returns empty for semicolon form' );
+	}
+
+	my $doc2 = safe_new \"package Foo { 1 }";
+	my $pkg2 = $doc2->find_first('Statement::Package');
+	{
+		local $TODO = 'block() not yet implemented';
+		ok( ref( eval { $pkg2->block } ) && eval { $pkg2->block }->isa('PPI::Structure::Block'),
+			'block() returns Block for block form' );
+	}
+
+	my $doc3 = safe_new \"package Foo v1.2.3 { 1 }";
+	my $pkg3 = $doc3->find_first('Statement::Package');
+	{
+		local $TODO = 'block() not yet implemented';
+		ok( ref( eval { $pkg3->block } ) && eval { $pkg3->block }->isa('PPI::Structure::Block'),
+			'block() returns Block for versioned block form' );
+	}
+}
+
+
+COMPLETE_WITH_BLOCK: {
+	my $doc1 = safe_new \"package Foo;";
+	my $pkg1 = $doc1->find_first('Statement::Package');
+	ok( $pkg1->_complete, '_complete returns true for semicolon form' );
+
+	my $doc2 = safe_new \"package Foo { 1 }";
+	my $pkg2 = $doc2->find_first('Statement::Package');
+	{
+		local $TODO = '_complete not yet fixed for block form';
+		ok( $pkg2->_complete, '_complete returns true for block form' );
+	}
+}
+
 
 PERL_5_12_SYNTAX: {
 	my @names = (

@@ -4,7 +4,7 @@
 
 use lib 't/lib';
 use PPI::Test::pragmas;
-use Test::More tests => 68 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+use Test::More tests => 98 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use PPI ();
 use Helper 'safe_new';
@@ -213,4 +213,84 @@ END_PERL
 		$tab_width + 2,
 		'Got correct visual column number.',
 	);
+}
+
+
+NAMESPACE: {
+	# Default namespace is main
+	my $doc1 = safe_new \"my \$x = 1;";
+	my $sym1 = $doc1->find_first('Token::Symbol');
+	{
+		local $TODO = 'namespace() not yet implemented on Element';
+		is( eval { $sym1->namespace }, 'main', 'default namespace is main' );
+	}
+
+	# Flat package
+	my $doc2 = safe_new \"package Foo; my \$x = 1;";
+	my $sym2 = $doc2->find_first('Token::Symbol');
+	{
+		local $TODO = 'namespace() not yet implemented on Element';
+		is( eval { $sym2->namespace }, 'Foo', 'flat package namespace' );
+	}
+
+	# Multiple flat packages
+	my $doc3 = safe_new \"package Foo; package Bar; my \$x = 1;";
+	my $sym3 = $doc3->find_first('Token::Symbol');
+	{
+		local $TODO = 'namespace() not yet implemented on Element';
+		is( eval { $sym3->namespace }, 'Bar', 'later flat package overrides' );
+	}
+
+	# Block form package
+	my $doc4 = safe_new \"package Foo { my \$x = 1; }";
+	my $sym4 = $doc4->find_first('Token::Symbol');
+	{
+		local $TODO = 'namespace() not yet implemented on Element';
+		is( eval { $sym4->namespace }, 'Foo', 'block package namespace' );
+	}
+
+	# Block form package does not affect siblings after
+	my $doc5 = safe_new \"package Foo { 1; } my \$x = 1;";
+	my $sym5 = $doc5->find_first('Token::Symbol');
+	{
+		local $TODO = 'namespace() not yet implemented on Element';
+		is( eval { $sym5->namespace }, 'main', 'after block package reverts to main' );
+	}
+
+	# Flat package persists past block package
+	my $doc6 = safe_new \"package Foo; package Bar { 1; } my \$x = 1;";
+	my $sym6 = $doc6->find_first('Token::Symbol');
+	{
+		local $TODO = 'namespace() not yet implemented on Element';
+		is( eval { $sym6->namespace }, 'Foo', 'flat package persists past block package' );
+	}
+
+	# Nested block packages
+	my $doc7 = safe_new \"package Foo { package Bar { my \$x = 1; } }";
+	my $sym7 = $doc7->find_first('Token::Symbol');
+	{
+		local $TODO = 'namespace() not yet implemented on Element';
+		is( eval { $sym7->namespace }, 'Bar', 'nested block packages' );
+	}
+
+	# Flat inside block
+	my $doc8 = safe_new \"package Foo { package Bar; my \$x = 1; }";
+	my $sym8 = $doc8->find_first('Token::Symbol');
+	{
+		local $TODO = 'namespace() not yet implemented on Element';
+		is( eval { $sym8->namespace }, 'Bar', 'flat package inside block package' );
+	}
+
+	# Block with version
+	my $doc9 = safe_new \"package Foo v1.2.3 { my \$x = 1; }";
+	my $sym9 = $doc9->find_first('Token::Symbol');
+	{
+		local $TODO = 'namespace() not yet implemented on Element';
+		is( eval { $sym9->namespace }, 'Foo', 'block package with version' );
+	}
+
+	# Package statement itself reports its declared namespace (existing behavior)
+	my $doc10 = safe_new \"package Foo;";
+	my $pkg10 = $doc10->find_first('Statement::Package');
+	is( $pkg10->namespace, 'Foo', 'Package->namespace still returns declared name' );
 }
