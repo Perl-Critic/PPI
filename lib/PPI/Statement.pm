@@ -235,6 +235,89 @@ sub label {
 
 =pod
 
+=head2 modifier_type
+
+The C<modifier_type> method identifies statements that use a postfix
+conditional modifier, as described in L<perlsyn>.
+
+  # Statements with postfix modifiers
+  print "hello" if $condition;       # modifier_type returns 'if'
+  die "error" unless $ok;            # modifier_type returns 'unless'
+  sleep 1 until $ready;              # modifier_type returns 'until'
+  $count++ for @items;               # modifier_type returns 'for'
+
+  # Block-form compound statements are NOT postfix modifiers
+  if ($condition) { ... }            # modifier_type returns ''
+
+Returns a string (C<'if'>, C<'unless'>, C<'while'>, C<'until'>, C<'for'>,
+C<'foreach'>, or C<'when'>) if the statement has a postfix modifier.
+
+Returns C<''> (false) if the statement has no postfix modifier, including
+all L<PPI::Statement::Compound>, L<PPI::Statement::Given>, and
+L<PPI::Statement::When> statements which use block-form syntax.
+
+=cut
+
+my %_MODIFIER_KEYWORD = map { $_ => 1 }
+	qw{ if unless while until for foreach when };
+
+sub modifier_type {
+	my $self = shift;
+	my $mod = $self->modifier or return '';
+	$mod->content;
+}
+
+=pod
+
+=head2 modifier
+
+The C<modifier> method returns the L<PPI::Token::Word> element that
+represents the postfix conditional modifier keyword, if one exists.
+
+  my $doc  = PPI::Document->new(\"print 'hello' if \$condition;");
+  my $stmt = $doc->find_first('Statement');
+  my $mod  = $stmt->modifier;   # PPI::Token::Word 'if'
+
+This can be used as an anchor point to navigate the elements before the
+modifier (the statement body) and after it (the condition expression).
+
+Returns a L<PPI::Token::Word> object if the statement has a postfix
+modifier, or C<''> (false) if it does not.
+
+=cut
+
+sub modifier {
+	my $self = shift;
+
+	return '' if $self->isa('PPI::Statement::Compound');
+	return '' if $self->isa('PPI::Statement::Scheduled');
+	return '' if $self->isa('PPI::Statement::Sub');
+	return '' if $self->isa('PPI::Statement::Given');
+	return '' if $self->isa('PPI::Statement::When');
+	return '' if $self->isa('PPI::Statement::Null');
+	return '' if $self->isa('PPI::Statement::End');
+	return '' if $self->isa('PPI::Statement::Data');
+
+	my @children = $self->schildren;
+	return '' if @children < 2;
+
+	for my $i ( 1 .. $#children ) {
+		my $child = $children[$i];
+		next unless $child->isa('PPI::Token::Word');
+		next unless $_MODIFIER_KEYWORD{ $child->content };
+
+		my $next = $child->snext_sibling or next;
+		next if $next->isa('PPI::Token::Operator')
+			and $next->content eq '=>';
+
+		return $child;
+	}
+
+	return '';
+}
+
+=pod
+
 =head2 specialized
 
 Answer whether this is a plain statement or one that has more

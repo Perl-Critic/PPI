@@ -16,18 +16,11 @@ POSTFIX_IF: {
 	is( scalar @{$stmts}, 1, 'postfix if: found 1 statement' );
 	my $stmt = $stmts->[0];
 
-	TODO: {
-		local $TODO = 'modifier_type not yet implemented';
-		my $type = eval { $stmt->modifier_type };
-		is( $type, 'if', 'postfix if: modifier_type returns if' );
-	}
+	is( $stmt->modifier_type, 'if', 'postfix if: modifier_type returns if' );
 
-	TODO: {
-		local $TODO = 'modifier not yet implemented';
-		my $mod = eval { $stmt->modifier };
-		isa_ok( $mod, 'PPI::Token::Word', 'postfix if: modifier returns a Word token' );
-		is( eval { $mod && $mod->content }, 'if', 'postfix if: modifier content is if' );
-	}
+	my $mod = $stmt->modifier;
+	isa_ok( $mod, 'PPI::Token::Word', 'postfix if: modifier returns a Word token' );
+	is( $mod->content, 'if', 'postfix if: modifier content is if' );
 }
 
 
@@ -36,11 +29,7 @@ POSTFIX_UNLESS: {
 	my $stmts = $doc->find('Statement');
 	my $stmt = $stmts->[0];
 
-	TODO: {
-		local $TODO = 'modifier_type not yet implemented';
-		my $type = eval { $stmt->modifier_type };
-		is( $type, 'unless', 'postfix unless: modifier_type returns unless' );
-	}
+	is( $stmt->modifier_type, 'unless', 'postfix unless: modifier_type returns unless' );
 }
 
 
@@ -49,11 +38,7 @@ POSTFIX_WHILE: {
 	my $stmts = $doc->find('Statement');
 	my $stmt = $stmts->[0];
 
-	TODO: {
-		local $TODO = 'modifier_type not yet implemented';
-		my $type = eval { $stmt->modifier_type };
-		is( $type, 'while', 'postfix while: modifier_type returns while' );
-	}
+	is( $stmt->modifier_type, 'while', 'postfix while: modifier_type returns while' );
 }
 
 
@@ -62,11 +47,7 @@ POSTFIX_UNTIL: {
 	my $stmts = $doc->find('Statement');
 	my $stmt = $stmts->[0];
 
-	TODO: {
-		local $TODO = 'modifier_type not yet implemented';
-		my $type = eval { $stmt->modifier_type };
-		is( $type, 'until', 'postfix until: modifier_type returns until' );
-	}
+	is( $stmt->modifier_type, 'until', 'postfix until: modifier_type returns until' );
 }
 
 
@@ -75,11 +56,7 @@ POSTFIX_FOR: {
 	my $stmts = $doc->find('Statement');
 	my $stmt = $stmts->[0];
 
-	TODO: {
-		local $TODO = 'modifier_type not yet implemented';
-		my $type = eval { $stmt->modifier_type };
-		is( $type, 'for', 'postfix for: modifier_type returns for' );
-	}
+	is( $stmt->modifier_type, 'for', 'postfix for: modifier_type returns for' );
 }
 
 
@@ -88,11 +65,7 @@ POSTFIX_FOREACH: {
 	my $stmts = $doc->find('Statement');
 	my $stmt = $stmts->[0];
 
-	TODO: {
-		local $TODO = 'modifier_type not yet implemented';
-		my $type = eval { $stmt->modifier_type };
-		is( $type, 'foreach', 'postfix foreach: modifier_type returns foreach' );
-	}
+	is( $stmt->modifier_type, 'foreach', 'postfix foreach: modifier_type returns foreach' );
 }
 
 
@@ -102,17 +75,10 @@ BREAK_WITH_MODIFIER: {
 	is( scalar @{$stmts}, 1, 'break with modifier: found 1 Break statement' );
 	my $stmt = $stmts->[0];
 
-	TODO: {
-		local $TODO = 'modifier_type not yet implemented';
-		my $type = eval { $stmt->modifier_type };
-		is( $type, 'if', 'break with modifier: modifier_type returns if' );
-	}
+	is( $stmt->modifier_type, 'if', 'break with modifier: modifier_type returns if' );
 
-	TODO: {
-		local $TODO = 'modifier not yet implemented';
-		my $mod = eval { $stmt->modifier };
-		isa_ok( $mod, 'PPI::Token::Word', 'break with modifier: modifier is a Word' );
-	}
+	my $mod = $stmt->modifier;
+	isa_ok( $mod, 'PPI::Token::Word', 'break with modifier: modifier is a Word' );
 }
 
 
@@ -121,11 +87,7 @@ BREAK_UNLESS: {
 	my $stmts = $doc->find('Statement::Break');
 	my $stmt = $stmts->[0];
 
-	TODO: {
-		local $TODO = 'modifier_type not yet implemented';
-		my $type = eval { $stmt->modifier_type };
-		is( $type, 'unless', 'next unless: modifier_type returns unless' );
-	}
+	is( $stmt->modifier_type, 'unless', 'next unless: modifier_type returns unless' );
 }
 
 
@@ -135,11 +97,7 @@ VARIABLE_WITH_MODIFIER: {
 	is( scalar @{$stmts}, 1, 'variable with modifier: found 1 Variable statement' );
 	my $stmt = $stmts->[0];
 
-	TODO: {
-		local $TODO = 'modifier_type not yet implemented';
-		my $type = eval { $stmt->modifier_type };
-		is( $type, 'if', 'variable with modifier: modifier_type returns if' );
-	}
+	is( $stmt->modifier_type, 'if', 'variable with modifier: modifier_type returns if' );
 }
 
 
@@ -148,17 +106,8 @@ NO_MODIFIER_SIMPLE: {
 	my $stmts = $doc->find('Statement::Variable');
 	my $stmt = $stmts->[0];
 
-	TODO: {
-		local $TODO = 'modifier_type not yet implemented';
-		my $type = eval { $stmt->modifier_type };
-		is( $type, '', 'no modifier: variable assignment returns empty' );
-	}
-
-	TODO: {
-		local $TODO = 'modifier not yet implemented';
-		my $mod = eval { $stmt->modifier };
-		is( $mod, '', 'no modifier: modifier returns empty' );
-	}
+	is( $stmt->modifier_type, '', 'no modifier: variable assignment returns empty' );
+	is( $stmt->modifier, '', 'no modifier: modifier returns empty' );
 }
 
 
@@ -167,11 +116,7 @@ NO_MODIFIER_PLAIN: {
 	my $stmts = $doc->find('Statement');
 	my $stmt = $stmts->[0];
 
-	TODO: {
-		local $TODO = 'modifier_type not yet implemented';
-		my $type = eval { $stmt->modifier_type };
-		is( $type, '', 'plain statement: no modifier' );
-	}
+	is( $stmt->modifier_type, '', 'plain statement: no modifier' );
 }
 
 
@@ -181,17 +126,8 @@ COMPOUND_NOT_MODIFIER: {
 	is( scalar @{$stmts}, 1, 'compound: found 1 Compound statement' );
 	my $stmt = $stmts->[0];
 
-	TODO: {
-		local $TODO = 'modifier_type not yet implemented';
-		my $type = eval { $stmt->modifier_type };
-		is( $type, '', 'compound if: modifier_type returns empty' );
-	}
-
-	TODO: {
-		local $TODO = 'modifier not yet implemented';
-		my $mod = eval { $stmt->modifier };
-		is( $mod, '', 'compound if: modifier returns empty' );
-	}
+	is( $stmt->modifier_type, '', 'compound if: modifier_type returns empty' );
+	is( $stmt->modifier, '', 'compound if: modifier returns empty' );
 }
 
 
@@ -200,11 +136,7 @@ COMPOUND_WHILE_NOT_MODIFIER: {
 	my $stmts = $doc->find('Statement::Compound');
 	my $stmt = $stmts->[0];
 
-	TODO: {
-		local $TODO = 'modifier_type not yet implemented';
-		my $type = eval { $stmt->modifier_type };
-		is( $type, '', 'compound while: modifier_type returns empty' );
-	}
+	is( $stmt->modifier_type, '', 'compound while: modifier_type returns empty' );
 }
 
 
@@ -213,11 +145,7 @@ COMPOUND_FOR_NOT_MODIFIER: {
 	my $stmts = $doc->find('Statement::Compound');
 	my $stmt = $stmts->[0];
 
-	TODO: {
-		local $TODO = 'modifier_type not yet implemented';
-		my $type = eval { $stmt->modifier_type };
-		is( $type, '', 'compound for: modifier_type returns empty' );
-	}
+	is( $stmt->modifier_type, '', 'compound for: modifier_type returns empty' );
 }
 
 
@@ -226,17 +154,8 @@ FAT_COMMA_NOT_MODIFIER: {
 	my $stmts = $doc->find('Statement');
 	my $stmt = $stmts->[0];
 
-	TODO: {
-		local $TODO = 'modifier_type not yet implemented';
-		my $type = eval { $stmt->modifier_type };
-		is( $type, '', 'fat comma if: not a modifier' );
-	}
-
-	TODO: {
-		local $TODO = 'modifier not yet implemented';
-		my $mod = eval { $stmt->modifier };
-		is( $mod, '', 'fat comma if: modifier returns empty' );
-	}
+	is( $stmt->modifier_type, '', 'fat comma if: not a modifier' );
+	is( $stmt->modifier, '', 'fat comma if: modifier returns empty' );
 }
 
 
@@ -245,11 +164,7 @@ HASH_KEY_NOT_MODIFIER: {
 	my $stmts = $doc->find('Statement');
 	my $stmt = $stmts->[0];
 
-	TODO: {
-		local $TODO = 'modifier_type not yet implemented';
-		my $type = eval { $stmt->modifier_type };
-		is( $type, '', 'hash key for: not a modifier' );
-	}
+	is( $stmt->modifier_type, '', 'hash key for: not a modifier' );
 }
 
 
@@ -259,11 +174,7 @@ DO_WHILE: {
 	is( scalar @{$stmts}, 2, 'do-while: found 2 statements (outer + inner)' );
 	my $stmt = $stmts->[0];
 
-	TODO: {
-		local $TODO = 'modifier_type not yet implemented';
-		my $type = eval { $stmt->modifier_type };
-		is( $type, 'while', 'do-while: modifier_type returns while' );
-	}
+	is( $stmt->modifier_type, 'while', 'do-while: modifier_type returns while' );
 }
 
 
@@ -272,18 +183,11 @@ COMPLEX_CONDITION: {
 	my $stmts = $doc->find('Statement');
 	my $stmt = $stmts->[0];
 
-	TODO: {
-		local $TODO = 'modifier_type not yet implemented';
-		my $type = eval { $stmt->modifier_type };
-		is( $type, 'if', 'complex condition: modifier_type returns if' );
-	}
+	is( $stmt->modifier_type, 'if', 'complex condition: modifier_type returns if' );
 
-	TODO: {
-		local $TODO = 'modifier not yet implemented';
-		my $mod = eval { $stmt->modifier };
-		isa_ok( $mod, 'PPI::Token::Word', 'complex condition: modifier is a Word' );
-		is( eval { $mod && $mod->content }, 'if', 'complex condition: modifier content is if' );
-	}
+	my $mod = $stmt->modifier;
+	isa_ok( $mod, 'PPI::Token::Word', 'complex condition: modifier is a Word' );
+	is( $mod->content, 'if', 'complex condition: modifier content is if' );
 }
 
 
@@ -292,11 +196,7 @@ INCLUDE_NOT_MODIFIER: {
 	my $stmts = $doc->find('Statement::Include');
 	my $stmt = $stmts->[0];
 
-	TODO: {
-		local $TODO = 'modifier_type not yet implemented';
-		my $type = eval { $stmt->modifier_type };
-		is( $type, '', 'include: no modifier' );
-	}
+	is( $stmt->modifier_type, '', 'include: no modifier' );
 }
 
 
@@ -305,11 +205,7 @@ SCHEDULED_NOT_MODIFIER: {
 	my $stmts = $doc->find('Statement::Scheduled');
 	my $stmt = $stmts->[0];
 
-	TODO: {
-		local $TODO = 'modifier_type not yet implemented';
-		my $type = eval { $stmt->modifier_type };
-		is( $type, '', 'scheduled: no modifier' );
-	}
+	is( $stmt->modifier_type, '', 'scheduled: no modifier' );
 }
 
 
@@ -318,11 +214,7 @@ SUB_NOT_MODIFIER: {
 	my $stmts = $doc->find('Statement::Sub');
 	my $stmt = $stmts->[0];
 
-	TODO: {
-		local $TODO = 'modifier_type not yet implemented';
-		my $type = eval { $stmt->modifier_type };
-		is( $type, '', 'sub: no modifier' );
-	}
+	is( $stmt->modifier_type, '', 'sub: no modifier' );
 }
 
 
@@ -331,11 +223,7 @@ NULL_NOT_MODIFIER: {
 	my $stmts = $doc->find('Statement::Null');
 	my $stmt = $stmts->[0];
 
-	TODO: {
-		local $TODO = 'modifier_type not yet implemented';
-		my $type = eval { $stmt->modifier_type };
-		is( $type, '', 'null statement: no modifier' );
-	}
+	is( $stmt->modifier_type, '', 'null statement: no modifier' );
 }
 
 
@@ -344,16 +232,9 @@ RETURN_EXPR_UNLESS: {
 	my $stmts = $doc->find('Statement::Break');
 	my $stmt = $stmts->[0];
 
-	TODO: {
-		local $TODO = 'modifier_type not yet implemented';
-		my $type = eval { $stmt->modifier_type };
-		is( $type, 'unless', 'return expr unless: modifier_type returns unless' );
-	}
+	is( $stmt->modifier_type, 'unless', 'return expr unless: modifier_type returns unless' );
 
-	TODO: {
-		local $TODO = 'modifier not yet implemented';
-		my $mod = eval { $stmt->modifier };
-		isa_ok( $mod, 'PPI::Token::Word', 'return expr unless: modifier is a Word' );
-		is( eval { $mod && $mod->content }, 'unless', 'return expr unless: modifier content is unless' );
-	}
+	my $mod = $stmt->modifier;
+	isa_ok( $mod, 'PPI::Token::Word', 'return expr unless: modifier is a Word' );
+	is( $mod->content, 'unless', 'return expr unless: modifier content is unless' );
 }
