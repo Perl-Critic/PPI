@@ -3,6 +3,7 @@ package PPI::Singletons;
 # exports some singleton variables to avoid aliasing magic
 
 use strict;
+use warnings;
 use Exporter     ();
 
 our $VERSION = '1.292';

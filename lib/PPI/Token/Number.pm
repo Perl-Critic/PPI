@@ -30,6 +30,7 @@ in the various types that Perl supports.
 =cut
 
 use strict;
+use warnings;
 use PPI::Token ();
 
 our $VERSION = '1.292';

@@ -17,6 +17,7 @@ B<Move along, nothing to see here>.
 =cut
 
 use strict;
+use warnings;
 
 our $VERSION = '1.292';
 

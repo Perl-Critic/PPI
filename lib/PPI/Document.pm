@@ -64,6 +64,7 @@ Document-specific.
 =cut
 
 use strict;
+use warnings;
 use Carp                          ();
 use List::Util 1.33               ();
 use Params::Util 1.00             qw{_SCALAR0 _ARRAY0 _INSTANCE};

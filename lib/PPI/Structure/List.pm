@@ -34,6 +34,7 @@ standard L<PPI::Structure>, L<PPI::Node> and L<PPI::Element> methods.
 =cut
 
 use strict;
+use warnings;
 use Carp           ();
 use PPI::Structure ();
 

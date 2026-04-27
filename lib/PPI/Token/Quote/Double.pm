@@ -30,6 +30,7 @@ L<PPI::Element> classes.
 =cut
 
 use strict;
+use warnings;
 use Params::Util                     qw{_INSTANCE};
 use PPI::Token::Quote                ();
 use PPI::Token::_QuoteEngine::Simple ();

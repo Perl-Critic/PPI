@@ -28,6 +28,7 @@ pointing at, rather than what it might appear to be pointing at.
 =cut
  
 use strict;
+use warnings;
 use Params::Util qw{_INSTANCE};
 use PPI::Token   ();
 

@@ -31,6 +31,7 @@ at all by Perl, but they look like numbers to a parser.
 =cut
 
 use strict;
+use warnings;
 use PPI::Token::Number ();
 
 our $VERSION = '1.292';

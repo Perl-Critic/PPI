@@ -30,6 +30,7 @@ L<PPI::Token> and L<PPI::Element> classes.
 =cut
 
 use strict;
+use warnings;
 use PPI::Token ();
 
 our $VERSION = '1.292';

@@ -19,6 +19,7 @@ within it, and it does not represent a scope.
 =cut
 
 use strict;
+use warnings;
 use PPI::Document ();
 
 our $VERSION = '1.292';

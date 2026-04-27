@@ -27,6 +27,7 @@ represent base-16 numbers.
 =cut
 
 use strict;
+use warnings;
 use PPI::Token::Number ();
 
 our $VERSION = '1.292';

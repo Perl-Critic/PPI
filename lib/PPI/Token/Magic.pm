@@ -42,6 +42,7 @@ L<PPI::Token::Symbol>, L<PPI::Token> and L<PPI::Element>.
 =cut
 
 use strict;
+use warnings;
 use PPI::Token::Symbol ();
 use PPI::Token::Unknown ();
 use PPI::Singletons qw' %MAGIC $CURLY_SYMBOL ';

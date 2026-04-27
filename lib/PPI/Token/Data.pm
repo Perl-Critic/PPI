@@ -28,6 +28,7 @@ our parent L<PPI::Token> and L<PPI::Element> classes.
 =cut
 
 use strict;
+use warnings;
 use PPI::Token ();
 
 # IO::String emulates file handles using in memory strings. Perl can do this

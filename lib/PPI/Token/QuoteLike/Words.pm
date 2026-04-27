@@ -26,6 +26,7 @@ that acts as a constructor for a list of words.
 =cut
 
 use strict;
+use warnings;
 use PPI::Token::QuoteLike          ();
 use PPI::Token::_QuoteEngine::Full ();
 

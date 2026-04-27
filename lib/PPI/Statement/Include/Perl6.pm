@@ -39,6 +39,7 @@ string and will not be parsed by PPI.
 =cut
 
 use strict;
+use warnings;
 use PPI::Statement::Include ();
 
 our $VERSION = '1.292';

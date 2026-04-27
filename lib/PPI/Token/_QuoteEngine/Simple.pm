@@ -3,6 +3,7 @@ package PPI::Token::_QuoteEngine::Simple;
 # Simple quote engine
 
 use strict;
+use warnings;
 use PPI::Token::_QuoteEngine ();
 
 our $VERSION = '1.292';

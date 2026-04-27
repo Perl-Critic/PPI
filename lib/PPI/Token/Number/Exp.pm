@@ -29,6 +29,7 @@ represent floating point numbers with exponential notation.
 =cut
 
 use strict;
+use warnings;
 use PPI::Token::Number::Float ();
 
 our $VERSION = '1.292';

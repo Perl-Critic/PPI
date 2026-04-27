@@ -38,6 +38,7 @@ to, or the structure to break out of.
 =cut
 
 use strict;
+use warnings;
 use PPI::Statement ();
 
 our $VERSION = '1.292';

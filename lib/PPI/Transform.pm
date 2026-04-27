@@ -16,6 +16,7 @@ that modify or transform PPI documents.
 =cut
 
 use strict;
+use warnings;
 use Carp          ();
 use List::Util    ();
 use PPI::Document ();

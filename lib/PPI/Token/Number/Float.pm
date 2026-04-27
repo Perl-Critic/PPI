@@ -29,6 +29,7 @@ PPI::Token::Number::Exp class.
 =cut
 
 use strict;
+use warnings;
 use PPI::Token::Number ();
 
 our $VERSION = '1.292';

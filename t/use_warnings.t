@@ -19,8 +19,5 @@ for my $file (@files) {
 	my $content = do { local $/; <$fh> };
 	close $fh;
 
-	TODO: {
-		local $TODO = 'use warnings not yet added to all modules';
-		like( $content, qr/^use warnings;$/m, "$file has 'use warnings'" );
-	}
+	like( $content, qr/^use warnings;$/m, "$file has 'use warnings'" );
 }

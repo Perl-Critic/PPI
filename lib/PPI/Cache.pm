@@ -46,6 +46,7 @@ also be provided to C<use>.
 =cut
 
 use strict;
+use warnings;
 use Carp             ();
 use File::Spec       ();
 use File::Path       ();

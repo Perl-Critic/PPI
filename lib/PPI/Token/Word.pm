@@ -36,6 +36,7 @@ now, look at L<Perl::Critic::Utils>.
 =cut
 
 use strict;
+use warnings;
 use PPI::Token ();
 use PPI::Singletons qw' %OPERATOR %QUOTELIKE %KEYWORDS ';
 

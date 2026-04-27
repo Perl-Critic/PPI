@@ -18,6 +18,7 @@ a Perl document stored in a specific named file.
 =cut
 
 use strict;
+use warnings;
 use Carp          ();
 use Params::Util  qw{_STRING _INSTANCE};
 use PPI::Document ();

@@ -43,6 +43,7 @@ The following methods are inherited by this class' offspring:
 =cut
 
 use strict;
+use warnings;
 use PPI::Token ();
 
 our $VERSION = '1.292';

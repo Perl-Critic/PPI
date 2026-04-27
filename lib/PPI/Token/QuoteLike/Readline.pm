@@ -36,6 +36,7 @@ and L<PPI::Element> classes.
 =cut
 
 use strict;
+use warnings;
 use PPI::Token::QuoteLike          ();
 use PPI::Token::_QuoteEngine::Full ();
 

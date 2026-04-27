@@ -28,6 +28,7 @@ if it does not already do so.
 =cut
 
 use strict;
+use warnings;
 use Params::Util   qw{_STRING};
 use PPI::Transform ();
 

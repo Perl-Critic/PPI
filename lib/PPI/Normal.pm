@@ -35,6 +35,7 @@ process to be.
 =cut
 
 use strict;
+use warnings;
 use Carp                      ();
 use List::Util 1.33           ();
 use PPI::Util                 '_Document';

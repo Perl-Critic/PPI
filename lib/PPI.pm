@@ -4,6 +4,7 @@ package PPI;
 
 use 5.006;
 use strict;
+use warnings;
 
 # Set the version for CPAN
 our $VERSION = '1.292';

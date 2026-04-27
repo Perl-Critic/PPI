@@ -85,6 +85,7 @@ have a relatively large number of unique methods all of their own.
 =cut
 
 use strict;
+use warnings;
 
 our $VERSION = '1.292';
 

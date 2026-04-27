@@ -33,6 +33,7 @@ parent classes.
 =cut
 
 use strict;
+use warnings;
 use PPI::Token::Word ();
 
 our $VERSION = '1.292';
