@@ -219,7 +219,6 @@ ANONYMOUS_SUB_STATEMENT_LEVEL: {
 		my $code = $test->{code};
 
 		subtest "'$code' anonymous sub at statement level" => sub {
-			local $TODO = 'anonymous subs should be parsed as PPI::Statement::Sub';
 
 			my $Document = PPI::Document->new( \$code );
 			ok( $Document, "parsed" ) or return;
@@ -248,7 +247,6 @@ ANONYMOUS_SUB_MID_EXPRESSION: {
 		my $code = $test->{code};
 
 		subtest "'$code' anonymous sub mid-expression" => sub {
-			local $TODO = 'anonymous subs should be parsed as PPI::Statement::Sub';
 
 			my $Document = PPI::Document->new( \$code );
 			ok( $Document, "parsed" ) or return;
@@ -275,7 +273,6 @@ ANONYMOUS_SUB_IN_STRUCTURE: {
 		my $code = $test->{code};
 
 		subtest "'$code' anonymous sub in structure" => sub {
-			local $TODO = 'anonymous subs should be parsed as PPI::Statement::Sub';
 
 			my $Document = PPI::Document->new( \$code );
 			ok( $Document, "parsed" ) or return;
@@ -294,7 +291,6 @@ ANONYMOUS_SUB_IN_STRUCTURE: {
 
 ANONYMOUS_SUB_MULTIPLE: {
 	subtest "multiple anonymous subs found via find()" => sub {
-		local $TODO = 'anonymous subs should be parsed as PPI::Statement::Sub';
 
 		my $code = 'my $a = sub {}; my $b = sub {};';
 		my $Document = PPI::Document->new( \$code );
@@ -308,7 +304,6 @@ ANONYMOUS_SUB_MULTIPLE: {
 
 ANONYMOUS_SUB_MIXED: {
 	subtest "named and anonymous subs found together" => sub {
-		local $TODO = 'anonymous subs should be parsed as PPI::Statement::Sub';
 
 		my $code = 'sub foo {} my $x = sub {};';
 		my $Document = PPI::Document->new( \$code );
@@ -324,7 +319,6 @@ ANONYMOUS_SUB_MIXED: {
 
 ANONYMOUS_SUB_LEXICAL: {
 	subtest "lexical anonymous sub (my sub {})" => sub {
-		local $TODO = 'anonymous subs should be parsed as PPI::Statement::Sub';
 
 		my $code = 'my sub {}';
 		my $Document = PPI::Document->new( \$code );

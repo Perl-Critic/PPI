@@ -533,16 +533,14 @@ sub _statement {
 				return 'PPI::Statement::Sub';
 			}
 
-			### Comment out these two, as they would return PPI::Statement anyway
-			# if ( $content eq '{' ) {
-			#	Anonymous sub at start of statement
-			#	return 'PPI::Statement';
-			# }
-			#
-			# if ( $Next->isa('PPI::Token::Prototype') ) {
-			#	Anonymous sub at start of statement
-			#	return 'PPI::Statement';
-			# }
+			if (
+				$Next->isa('PPI::Token::Prototype')
+				or ( $Next->isa('PPI::Token::Structure') and $Next->content eq '{' )
+			) {
+				# Anonymous sub at start of statement
+				$self->_rollback( $Next );
+				return 'PPI::Statement::Sub';
+			}
 
 			# PPI::Statement is the safest fall-through
 			$self->_rollback( $Next );
@@ -670,6 +668,49 @@ sub _lex_statement {
 				# Rollback and finish the statement
 				$self->_update_features( $Statement );
 				return $self->_rollback( $Token );
+			}
+		}
+
+		# Detect anonymous sub mid-expression and wrap it in
+		# a nested PPI::Statement::Sub so find() can locate it.
+		# Skip when the parent statement uses "sub" as a name rather
+		# than the keyword: Sub ("sub sub {}"), Scheduled, Package
+		# ("package sub {}").
+		if (
+			$Token->isa('PPI::Token::Word')
+			and $Token->content eq 'sub'
+			and $Statement->schildren
+			and !$Statement->isa('PPI::Statement::Sub')
+			and !$Statement->isa('PPI::Statement::Scheduled')
+			and !$Statement->isa('PPI::Statement::Package')
+		) {
+			$self->_add_delayed( $Statement );
+
+			my $Next;
+			while ( $Next = $self->_get_token ) {
+				unless ( $Next->significant ) {
+					push @{$self->{delayed}}, $Next;
+					next;
+				}
+				last;
+			}
+
+			if ( $Next and (
+				$Next->isa('PPI::Token::Prototype')
+				or ( $Next->isa('PPI::Token::Structure')
+					and $Next->content eq '{' )
+			) ) {
+				$self->_rollback( $Next );
+				my $AnonSub = PPI::Statement::Sub->new( $Token );
+				$self->_add_element( $Statement, $AnonSub );
+				$self->_lex_statement( $AnonSub );
+				next;
+			}
+
+			if ( defined $Next ) {
+				$self->_rollback( $Next );
+			} elsif ( @{$self->{delayed}} ) {
+				$self->_rollback;
 			}
 		}
 

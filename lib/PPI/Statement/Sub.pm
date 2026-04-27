@@ -19,9 +19,12 @@ Except for the special BEGIN, CHECK, UNITCHECK, INIT, and END subroutines
 (which are part of L<PPI::Statement::Scheduled>) all subroutine declarations
 are lexed as a PPI::Statement::Sub object.
 
-Primarily, this means all of the various C<sub foo {}> statements, but also
-forward declarations such as C<sub foo;> or C<sub foo($);>. It B<does not>
-include anonymous subroutines, as these are merely part of a normal statement.
+This includes named subroutines such as C<sub foo {}>, forward declarations
+such as C<sub foo;> or C<sub foo($);>, and anonymous subroutines such as
+C<sub {}> or C<sub ($) {}>. Anonymous subroutines appearing mid-expression
+(e.g. C<my $x = sub {};>) are parsed as a nested C<PPI::Statement::Sub>
+within the enclosing statement. Use C<< $sub->name >> to distinguish
+anonymous subs (returns C<''>) from named subs.
 
 =head1 METHODS
 
@@ -66,8 +69,8 @@ sub _complete {
 
 The C<name> method returns the name of the subroutine being declared.
 
-In some rare cases such as a naked C<sub> at the end of the file, this may return
-false.
+For anonymous subroutines, this returns C<''>. In some rare cases such as a
+naked C<sub> at the end of the file, this may also return false.
 
 =cut
 
@@ -84,7 +87,9 @@ sub name {
 	# or DESTROY), the name will be the first token.
 	$token = $self->schild(0);
 	return $token->content
-	  if defined $token and $token->isa('PPI::Token::Word');
+	  if defined $token
+	  and $token->isa('PPI::Token::Word')
+	  and $token->content !~ /^(?:sub|my|our|state)$/;
 	return '';
 }
 

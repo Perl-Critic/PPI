@@ -6,9 +6,10 @@ PPI::Document
     PPI::Token::Whitespace  	' '
     PPI::Token::Operator  	'='
     PPI::Token::Whitespace  	' '
-    PPI::Token::Word  	'sub'
-    PPI::Token::Whitespace  	' '
-    PPI::Structure::Block  	{ ... }
+    PPI::Statement::Sub
+      PPI::Token::Word  	'sub'
+      PPI::Token::Whitespace  	' '
+      PPI::Structure::Block  	{ ... }
     PPI::Token::Structure  	';'
   PPI::Token::Whitespace  	'\n'
   PPI::Statement
@@ -16,9 +17,10 @@ PPI::Document
     PPI::Token::Whitespace  	' '
     PPI::Token::Operator  	'='
     PPI::Token::Whitespace  	' '
-    PPI::Token::Word  	'sub'
-    PPI::Token::Prototype  	'($)'
-    PPI::Structure::Block  	{ ... }
+    PPI::Statement::Sub
+      PPI::Token::Word  	'sub'
+      PPI::Token::Prototype  	'($)'
+      PPI::Structure::Block  	{ ... }
     PPI::Token::Structure  	';'
   PPI::Token::Whitespace  	'\n'
   PPI::Statement
@@ -26,10 +28,11 @@ PPI::Document
     PPI::Token::Whitespace  	' '
     PPI::Token::Operator  	'='
     PPI::Token::Whitespace  	' '
-    PPI::Token::Word  	'sub'
-    PPI::Token::Whitespace  	' '
-    PPI::Token::Prototype  	'(&$@)'
-    PPI::Token::Whitespace  	' '
-    PPI::Structure::Block  	{ ... }
+    PPI::Statement::Sub
+      PPI::Token::Word  	'sub'
+      PPI::Token::Whitespace  	' '
+      PPI::Token::Prototype  	'(&$@)'
+      PPI::Token::Whitespace  	' '
+      PPI::Structure::Block  	{ ... }
     PPI::Token::Structure  	';'
   PPI::Token::Whitespace  	'\n'
