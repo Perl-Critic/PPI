@@ -44,9 +44,14 @@ sub _Document {
 # Provide a simple _slurp implementation
 sub _slurp {
 	my $file = shift or return "_slurp() failed: no filename provided";
+	my %opts = @_;
 	local $/ = undef;
 	local *FILE;
 	open( FILE, '<', $file ) or return "open($file) failed: $!";
+	if ( my $encoding = $opts{encoding} ) {
+		binmode( FILE, ":encoding($encoding)" )
+			or return "binmode($file, :encoding($encoding)) failed: $!";
+	}
 	my $source = <FILE>;
 	close( FILE ) or return "close($file) failed: $!";
 	return \$source;

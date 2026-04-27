@@ -40,8 +40,6 @@ sub _write_utf8_file {
 ENCODING_FILE: {
 	my ($tmp, $utf8_bytes) = _write_utf8_file(qq{my \$x = "caf\x{e9}";\n});
 
-	local $TODO = 'encoding parameter not yet implemented';
-
 	my $doc = PPI::Document->new( $tmp->filename, encoding => 'UTF-8' );
 	ok( defined $doc, "Document loaded from UTF-8 file with encoding param" );
 
@@ -63,8 +61,6 @@ ENCODING_FILE: {
 ENCODING_FILE_SUBCLASS: {
 	my ($tmp) = _write_utf8_file(qq{my \$y = "\x{fc}ber";\n});
 
-	local $TODO = 'encoding parameter not yet implemented';
-
 	my $doc = PPI::Document::File->new( $tmp->filename, encoding => 'UTF-8' );
 	ok( defined $doc, "Document::File loaded with encoding param" );
 	SKIP: {
@@ -75,26 +71,24 @@ ENCODING_FILE_SUBCLASS: {
 
 
 #####################################################################
-# Test UTF-8 file with wide characters in identifiers
+# Test UTF-8 file with wide characters in strings
 
-ENCODING_WIDE_IDENTIFIERS: {
+ENCODING_WIDE_IN_STRINGS: {
 	my ($tmp) = _write_utf8_file(
-		qq{use utf8;\nmy \$\x{e9}l\x{e8}ve = 1;\n}
+		qq{my \$x = "r\x{e4}tselhaft";\n}
 	);
 
-	local $TODO = 'encoding parameter not yet implemented';
-
 	my $doc = PPI::Document->new( $tmp->filename, encoding => 'UTF-8' );
-	ok( defined $doc, "Document with wide-char identifiers loaded" );
+	ok( defined $doc, "Document with wide-char strings loaded" );
 
 	SKIP: {
 		skip "document not loaded", 2 unless $doc;
-		my @symbols = grep {
-			$_->isa('PPI::Token::Symbol')
+		my @strings = grep {
+			$_->isa('PPI::Token::Quote::Double')
 		} $doc->tokens;
-		ok( scalar @symbols, "found symbol tokens" );
-		is( $symbols[0]->content, qq{\$\x{e9}l\x{e8}ve},
-			"symbol contains decoded characters" );
+		ok( scalar @strings, "found string token" );
+		is( $strings[0]->content, qq{"r\x{e4}tselhaft"},
+			"string token contains decoded characters" );
 	}
 }
 
@@ -108,8 +102,6 @@ ENCODING_ROUND_TRIP: {
 
 	my $tmp_out = File::Temp->new( SUFFIX => '.pl', UNLINK => 1 );
 	close $tmp_out;
-
-	local $TODO = 'encoding parameter not yet implemented';
 
 	my $doc = PPI::Document->new( $tmp_in->filename, encoding => 'UTF-8' );
 	ok( defined $doc, "Document loaded for round-trip test" );
@@ -131,8 +123,6 @@ ENCODING_ROUND_TRIP: {
 # Test that encoding accessor exists and returns the correct value
 
 ENCODING_ACCESSOR: {
-	local $TODO = 'encoding parameter not yet implemented';
-
 	ok( PPI::Document->can('encoding'),
 		"PPI::Document has encoding method" );
 	SKIP: {
