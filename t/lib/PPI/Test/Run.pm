@@ -6,7 +6,6 @@ use PPI::Document;
 use PPI::Dumper;
 use Test::More;
 use Test::Object;
-use lib 't/lib';
 use PPI::Test::Object;
 use Helper 'safe_new';
 
