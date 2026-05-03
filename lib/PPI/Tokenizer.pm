@@ -102,33 +102,10 @@ my %X_CAN_FOLLOW_STRUCTURE = map { $_ => 1 } qw( } ] \) );
 
 # Something that looks like the x operator but follows a word
 # is usually that word's argument.
-# These are the exceptions.
+# The exceptions are FUN0 keywords (zero-argument builtins like
+# time, fork) — now centralized in %KEYWORDS_FUN0 from Singletons.
 # chop, chomp, dump are ambiguous because they can have either parms
 # or no parms.
-my %X_CAN_FOLLOW_WORD = map { $_ => 1 } qw(
-		endgrent
-		endhostent
-		endnetent
-		endprotoent
-		endpwent
-		endservent
-		fork
-		getgrent
-		gethostent
-		getlogin
-		getnetent
-		getppid
-		getprotoent
-		getpwent
-		getservent
-		setgrent
-		setpwent
-		time
-		times
-		wait
-		wantarray
-		__SUB__
-);
 
 
 

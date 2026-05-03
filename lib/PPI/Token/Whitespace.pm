@@ -44,6 +44,7 @@ provided by the parent L<PPI::Token> and L<PPI::Element> classes.
 use strict;
 use Clone      ();
 use PPI::Token ();
+use PPI::Singletons qw' %KEYWORDS %KEYWORDS_FUN0 ';
 
 our $VERSION = '1.292';
 
@@ -307,8 +308,17 @@ sub __TOKENIZER__on_char {
 			}
 		}
 
-		# Otherwise, we guess operator, which has been the default up
-		# until this more comprehensive section was created.
+		# Known Perl keywords that are not FUN0 can take arguments,
+		# so < after them is readline: print <STDIN>;
+		# FUN0 keywords take no arguments, so < is comparison: time < 1;
+		if ( $prev->isa('PPI::Token::Word')
+			and $KEYWORDS{$prec}
+			and !$KEYWORDS_FUN0{$prec} ) {
+			return 'QuoteLike::Readline';
+		}
+
+		# For non-keyword words (user-defined subs), default to operator
+		# since most real code uses prototyped functions.
 		return 'Operator';
 
 	} elsif ( $char == 47 ) { #  $char eq '/'

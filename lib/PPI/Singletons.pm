@@ -8,7 +8,7 @@ use Exporter     ();
 our $VERSION = '1.292';
 
 our @ISA       = 'Exporter';
-our @EXPORT_OK = qw{ %_PARENT %_POSITION_CACHE %OPERATOR %MAGIC %LAYER $CURLY_SYMBOL %QUOTELIKE %KEYWORDS };
+our @EXPORT_OK = qw{ %_PARENT %_POSITION_CACHE %OPERATOR %MAGIC %LAYER $CURLY_SYMBOL %QUOTELIKE %KEYWORDS %KEYWORDS_FUN0 };
 
 our %_PARENT; # Master Child -> Parent index
 our %_POSITION_CACHE; # cache for position in parent
@@ -61,6 +61,16 @@ our %QUOTELIKE = (
 	'tr' => 'Regexp::Transliterate',
 	'y'  => 'Regexp::Transliterate',
 );
+
+# Perl built-in functions with an empty prototype () — "FUN0" in toke.c.
+# These take no arguments, so a following < is a comparison operator,
+# and a following x is the repetition operator.
+our %KEYWORDS_FUN0 = map { $_ => 1 } qw{
+	endgrent endhostent endnetent endprotoent endpwent endservent
+	fork getgrent gethostent getlogin getnetent getppid getprotoent
+	getpwent getservent setgrent setpwent time times wait wantarray
+	__SUB__
+};
 
 # List of keywords is from regen/keywords.pl in the perl source.
 our %KEYWORDS = map { $_ => 1 } qw{
