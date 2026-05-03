@@ -112,6 +112,25 @@ sub prototype {
 
 =pod
 
+=head2 signature
+
+If the subroutine has a signature, the C<signature> method returns the
+L<PPI::Structure::Signature> object for it.
+
+Returns the L<PPI::Structure::Signature> object, or C<undef> if the
+subroutine does not have a signature.
+
+=cut
+
+sub signature {
+	my $self = shift;
+	List::Util::first {
+		_INSTANCE($_, 'PPI::Structure::Signature')
+	} $self->children;
+}
+
+=pod
+
 =head2 block
 
 With its name and implementation shared with L<PPI::Statement::Scheduled>,
