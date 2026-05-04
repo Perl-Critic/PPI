@@ -8,6 +8,7 @@ use B 'perlstring';
 
 use PPI ();
 use PPI::Dumper;
+use Helper 'test_document';
 
 #use DB::Skip subs => [
 #	qw( PPI::Document::new  PPI::Lexer::lex_source  PPI::Lexer::new
@@ -15,8 +16,6 @@ use PPI::Dumper;
 #	  PPI::Tokenizer::new  PPI::Lexer::lex_tokenizer  PPI::Node::new  ),
 #	qr/^PPI::Tokenizer::__ANON__.*237.*$/
 #];
-
-sub test_document;
 
 FEATURE_TRACKING: {
 	test_document
@@ -435,42 +434,3 @@ SIMPLE_LIST: {
 
 ok( PPI::Tokenizer->new( \"d()" )->all_tokens, "bare tokenizer auto-vivifies document object" );
 
-### TODO from ppi_token_unknown.t , deduplicate
-
-sub one_line_explain {
-	my ($data) = @_;
-	my @explain = explain $data;
-	s/\n//g for @explain;
-	return join "", @explain;
-}
-
-sub main_level_line {
-	return "" if not $TODO;
-	my @outer_final;
-	my $level = 0;
-	while ( my @outer = caller( $level++ ) ) {
-		@outer_final = @outer;
-	}
-	return "l $outer_final[2] - ";
-}
-
-sub test_document {
-	local $Test::Builder::Level = $Test::Builder::Level + 1;
-	my $args = ref $_[0] eq "ARRAY" ? shift : [];
-	my ( $code, $expected, $msg ) = @_;
-	$msg = perlstring $code if !defined $msg;
-
-	my $d      = PPI::Document->new( \$code, @{$args} ) or die explain $@;
-	my $tokens = $d->find( sub { $_[1]->significant } );
-	$tokens = [ map { ref($_), $_->content } @$tokens ];
-
-	my $ok = is_deeply( $tokens, $expected, main_level_line . $msg );
-	if ( !$ok ) {
-		diag ">>> $code -- $msg\n";
-		diag( PPI::Dumper->new($d)->string );
-		diag one_line_explain $tokens;
-		diag one_line_explain $expected;
-	}
-
-	return;
-}
