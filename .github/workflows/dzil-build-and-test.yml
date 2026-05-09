@@ -11,6 +11,22 @@ on:
   workflow_dispatch:
 
 jobs:
+  perl-versions:
+    runs-on: ubuntu-latest
+    name: List Perl versions
+    outputs:
+      versions-perl:    ${{ steps.action.outputs.versions-target-perl }}
+      versions-macos:   ${{ steps.action.outputs.versions-target-macos }}
+      versions-windows: ${{ steps.action.outputs.versions-target-windows-strawberry }}
+    steps:
+      - id: action
+        uses: perl-actions/multi-target-perl-versions@v2
+        with:
+          since-perl:                     5.8
+          with-target-perl:               true
+          with-target-macos:              true
+          with-target-windows-strawberry: true
+
   build-job:
     name: Build distribution
     runs-on: ubuntu-latest
@@ -49,28 +65,14 @@ jobs:
         env:
           CODECOV_TOKEN: ${{secrets.CODECOV_TOKEN}}
   ubuntu-test-job:
-    needs: build-job
+    needs:
+      - build-job
+      - perl-versions
     runs-on: "ubuntu-latest"
     strategy:
       fail-fast: true
       matrix:
-        perl-version:
-          - "5.8"
-          - "5.10"
-          - "5.12"
-          - "5.14"
-          - "5.16"
-          - "5.18"
-          - "5.20"
-          - "5.22"
-          - "5.24"
-          - "5.26"
-          - "5.28"
-          - "5.30"
-          - "5.32"
-          - "5.34"
-          - "5.36"
-          - "5.38"
+        perl-version: ${{ fromJson (needs.perl-versions.outputs.versions-perl) }}
     name: Perl ${{ matrix.perl-version }} on ubuntu-latest
     steps:
       - name: set up perl
@@ -91,28 +93,14 @@ jobs:
           AUTHOR_TESTING: 0
           RELEASE_TESTING: 0
   macos-test-job:
-    needs: ubuntu-test-job
+    needs:
+      - ubuntu-test-job
+      - perl-versions
     runs-on: "macos-latest"
     strategy:
       fail-fast: false
       matrix:
-        perl-version:
-          - "5.8"
-          - "5.10"
-          - "5.12"
-          - "5.14"
-          - "5.16"
-          - "5.18"
-          - "5.20"
-          - "5.22"
-          - "5.24"
-          - "5.26"
-          - "5.28"
-          - "5.30"
-          - "5.32"
-          - "5.34"
-          - "5.36"
-          - "5.38"
+        perl-version: ${{ fromJson (needs.perl-versions.outputs.versions-macos) }}
     name: perl ${{ matrix.perl-version }} on macos-latest
     steps:
       - name: set up perl
@@ -132,22 +120,14 @@ jobs:
           AUTHOR_TESTING: 0
           RELEASE_TESTING: 0
   windows-test-job:
-    needs: ubuntu-test-job
+    needs:
+      - ubuntu-test-job
+      - perl-versions
     runs-on: "windows-latest"
     strategy:
       fail-fast: true
       matrix:
-        perl-version:
-          - "5.14"
-          - "5.16"
-          - "5.18"
-          - "5.20"
-          - "5.22"
-          - "5.24"
-          - "5.26"
-          - "5.28"
-          - "5.30"
-          - "5.32"
+        perl-version: ${{ fromJson (needs.perl-versions.outputs.versions-windows) }}
     name: perl ${{ matrix.perl-version }} on windows-latest
     steps:
       - name: set up perl
