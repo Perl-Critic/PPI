@@ -15,6 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     name: List Perl versions
     outputs:
+      build-on:         ${{ steps.action.outputs.build-on }}
       versions-perl:    ${{ steps.action.outputs.versions-target-perl }}
       versions-macos:   ${{ steps.action.outputs.versions-target-macos }}
       versions-windows: ${{ steps.action.outputs.versions-target-windows-strawberry }}
@@ -23,15 +24,18 @@ jobs:
         uses: perl-actions/multi-target-perl-versions@v2
         with:
           since-perl:                     5.8
+          with-build-on:                  true
           with-target-perl:               true
           with-target-macos:              true
           with-target-windows-strawberry: true
 
   build-job:
+    needs:
+      - perl-versions
     name: Build distribution
     runs-on: ubuntu-latest
     container:
-      image: perldocker/perl-tester:5.38
+      image: perldocker/perl-tester:${{ needs.perl-versions.outputs.build-on }}
     steps:
       - uses: actions/checkout@v6
       - name: Run Tests
@@ -46,10 +50,12 @@ jobs:
           name: build_dir
           path: build_dir
   coverage-job:
-    needs: build-job
+    needs:
+      - build-job
+      - perl-versions
     runs-on: ubuntu-latest
     container:
-      image: perldocker/perl-tester:5.38
+      image: perldocker/perl-tester:${{ needs.perl-versions.outputs.build-on }}
     steps:
       - uses: actions/checkout@v6 # codecov wants to be inside a Git repository
       - uses: actions/download-artifact@v8
