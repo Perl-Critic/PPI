@@ -106,8 +106,8 @@ like $@, qr/PPI::Transform does not implement the required ->document method/,
 # Test Transform class
 package MyCleaner;
 
-use Params::Util qw( _INSTANCE );
-use PPI::Transform ();
+use Params::SomeUtil qw( _INSTANCE );
+use PPI::Transform   ();
 
 our @ISA;
 BEGIN {

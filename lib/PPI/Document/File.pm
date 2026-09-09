@@ -18,9 +18,9 @@ a Perl document stored in a specific named file.
 =cut
 
 use strict;
-use Carp          ();
-use Params::Util  qw{_STRING _INSTANCE};
-use PPI::Document ();
+use Carp              ();
+use Params::SomeUtil  qw{_STRING _INSTANCE};
+use PPI::Document     ();
 
 our $VERSION = '1.292';
 

@@ -49,11 +49,11 @@ L<PPI::Element> objects also apply to C<PPI::Node> objects.
 =cut
 
 use strict;
-use Carp            ();
-use Scalar::Util    qw{refaddr};
-use Params::Util    qw{_INSTANCE _CLASS _CODELIKE _NUMBER};
-use PPI::Element    ();
-use PPI::Singletons '%_PARENT', '%_POSITION_CACHE';
+use Carp             ();
+use Scalar::Util     qw{refaddr};
+use Params::SomeUtil qw{_INSTANCE _CLASS _CODELIKE _NUMBER};
+use PPI::Element     ();
+use PPI::Singletons  '%_PARENT', '%_POSITION_CACHE';
 
 our $VERSION = '1.292';
 

@@ -1,7 +1,7 @@
 package PPI::Test::Run;
 
 use File::Spec::Functions ':ALL';
-use Params::Util qw{_INSTANCE};
+use Params::SomeUtil qw{_INSTANCE};
 use PPI::Document;
 use PPI::Dumper;
 use Test::More;

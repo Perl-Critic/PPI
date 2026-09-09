@@ -22,12 +22,12 @@ implementations.
 =cut
 
 use strict;
-use Clone 0.30      ();
-use Scalar::Util    qw{refaddr};
-use Params::Util    qw{_INSTANCE _ARRAY};
-use PPI::Util       ();
-use PPI::Node       ();
-use PPI::Singletons '%_PARENT', '%_POSITION_CACHE';
+use Clone 0.30       ();
+use Scalar::Util     qw{refaddr};
+use Params::SomeUtil qw{_INSTANCE _ARRAY};
+use PPI::Util        ();
+use PPI::Node        ();
+use PPI::Singletons  '%_PARENT', '%_POSITION_CACHE';
 
 our $VERSION = '1.292';
 

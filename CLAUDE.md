@@ -122,6 +122,6 @@ Configured with `--state=hot,slow,save -j 9 --recurse -l t` — runs slow tests 
 
 ## Dependencies
 
-Runtime: `Clone`, `Params::Util`, `List::Util` ≥ 1.33, `Scalar::Util`, `Storable` ≥ 2.17, `Digest::MD5`, `Task::Weaken`, `Safe::Isa`
+Runtime: `Clone`, `Params::SomeUtil`, `List::Util` ≥ 1.33, `Scalar::Util`, `Storable` ≥ 2.17, `Digest::MD5`, `Task::Weaken`, `Safe::Isa`
 
 Test: `Test::More` ≥ 0.96, `Test::Warnings` (author testing only)

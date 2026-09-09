@@ -12,7 +12,7 @@ BEGIN {
 }
 
 use utf8;  # perl version check above says this is okay
-use Params::Util qw( _INSTANCE );
+use Params::SomeUtil qw( _INSTANCE );
 use PPI ();
 use Helper 'safe_new';
 
