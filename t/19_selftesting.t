@@ -10,7 +10,7 @@ use PPI::Test::pragmas;
 
 use Class::Inspector 1.22 ();
 use File::Spec::Functions qw( catdir );
-use Params::Util qw( _CLASS _ARRAY _INSTANCE _IDENTIFIER );
+use Params::SomeUtil qw( _CLASS _ARRAY _INSTANCE _IDENTIFIER );
 use PPI ();
 use PPI::Test qw( find_files );
 use PPI::Test::Object (); ## no perlimports

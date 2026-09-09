@@ -54,11 +54,11 @@ For more unusual tasks, by all means forge onwards.
 =cut
 
 use strict;
-use Scalar::Util    ();
-use Params::Util    qw{_STRING _INSTANCE};
-use PPI             ();
-use PPI::Exception  ();
-use PPI::Singletons '%_PARENT';
+use Scalar::Util     ();
+use Params::SomeUtil qw{_STRING _INSTANCE};
+use PPI              ();
+use PPI::Exception   ();
+use PPI::Singletons  '%_PARENT';
 
 our $VERSION = '1.292';
 

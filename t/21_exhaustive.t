@@ -6,7 +6,7 @@ use lib 't/lib';
 use PPI::Test::pragmas;
 use Test::More; # Plan comes later
 
-use Params::Util qw( _INSTANCE );
+use Params::SomeUtil qw( _INSTANCE );
 use PPI ();
 use PPI::Test qw( quotable );
 use Helper 'safe_new';
