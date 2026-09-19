@@ -4,7 +4,7 @@ use warnings;
 use strict;
 
 use List::Util 1.33 'any';
-use Params::Util qw{_INSTANCE};
+use Params::SomeUtil qw{_INSTANCE};
 use PPI::Dumper;
 use Test::More;
 use Test::Object 0.07;

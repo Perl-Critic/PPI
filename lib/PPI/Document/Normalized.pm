@@ -42,7 +42,7 @@ a code security process, and false positives could be highly dangerous.
 # the methods we will need from Scalar::Util.
 use strict;
 use Scalar::Util qw{refaddr reftype blessed};
-use Params::Util qw{_INSTANCE _ARRAY};
+use Params::SomeUtil qw{_INSTANCE _ARRAY};
 use PPI::Util    ();
 
 our $VERSION = '1.292';

@@ -148,7 +148,7 @@ of the methods that are subclass-specific.
 
 use strict;
 use Scalar::Util   ();
-use Params::Util   qw{_INSTANCE};
+use Params::SomeUtil qw{_INSTANCE};
 use PPI::Node      ();
 use PPI::Exception ();
 use PPI::Singletons '%_PARENT';

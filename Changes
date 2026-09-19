@@ -1,6 +1,9 @@
 Revision history for Perl extension PPI
 
 {{$NEXT}}
+	- switch from Params::Util to Params::SomeUtil, fixing a bug where
+	  blessed arrayrefs were misparsed as source code instead of being
+	  rejected (RT#75561)
 
 1.291   2026-04-25 21:05:04Z
 	- fail parse on double-referenced input
