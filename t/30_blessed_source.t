@@ -14,8 +14,6 @@ use PPI::Document ();
 use PPI::Tokenizer ();
 use PPI::Util qw{ _Document };
 
-my $BUG = 'Params::Util XS _ARRAY0 does not reject blessed references (RT#75561)';
-
 # A blessed arrayref is not a filename, a SCALAR ref, or a plain ARRAY
 # ref, so none of these should treat it as a source of Perl code.
 my $bogus = bless [ 'print 1;', 'print 2;' ], 'Test::BlessedArray::NotASource';
@@ -23,51 +21,33 @@ my $bogus = bless [ 'print 1;', 'print 2;' ], 'Test::BlessedArray::NotASource';
 SCOPE: {
 	my $doc = PPI::Document->new($bogus);
 
-	TODO: {
-		local $TODO = $BUG;
-		ok( !defined($doc), 'PPI::Document->new rejects a blessed arrayref' );
-	}
+	ok( !defined($doc), 'PPI::Document->new rejects a blessed arrayref' );
 }
 
 SCOPE: {
 	PPI::Document->_clear;
 	PPI::Document->new($bogus);
 
-	TODO: {
-		local $TODO = $BUG;
-		ok( PPI::Document->errstr, 'PPI::Document->new records an error for a blessed arrayref' );
-	}
+	ok( PPI::Document->errstr, 'PPI::Document->new records an error for a blessed arrayref' );
 }
 
 SCOPE: {
 	my $tokenizer = eval { PPI::Tokenizer->new($bogus) };
 	my $exception = $@;
 
-	TODO: {
-		local $TODO = $BUG;
-		ok( !defined($tokenizer), 'PPI::Tokenizer->new rejects a blessed arrayref' );
-	}
+	ok( !defined($tokenizer), 'PPI::Tokenizer->new rejects a blessed arrayref' );
 
-	TODO: {
-		local $TODO = $BUG;
-		isa_ok( $exception, 'PPI::Exception' );
-	}
+	isa_ok( $exception, 'PPI::Exception' );
 
-	TODO: {
-		local $TODO = $BUG;
-		like(
-			( ref($exception) && $exception->isa('PPI::Exception') ) ? $exception->message : '',
-			qr/not supported as a source provider/,
-			'PPI::Tokenizer->new explains why a blessed arrayref was rejected',
-		);
-	}
+	like(
+		( ref($exception) && $exception->isa('PPI::Exception') ) ? $exception->message : '',
+		qr/not supported as a source provider/,
+		'PPI::Tokenizer->new explains why a blessed arrayref was rejected',
+	);
 }
 
 SCOPE: {
 	my $doc = _Document($bogus);
 
-	TODO: {
-		local $TODO = $BUG;
-		ok( !defined($doc), 'PPI::Util::_Document rejects a blessed arrayref' );
-	}
+	ok( !defined($doc), 'PPI::Util::_Document rejects a blessed arrayref' );
 }
