@@ -28,7 +28,7 @@ if it does not already do so.
 =cut
 
 use strict;
-use Params::Util   qw{_STRING};
+use Params::SomeUtil qw{_STRING};
 use PPI::Transform ();
 
 our $VERSION = '1.292';

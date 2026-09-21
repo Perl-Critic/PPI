@@ -19,7 +19,7 @@ use strict;
 use Carp          ();
 use List::Util    ();
 use PPI::Document ();
-use Params::Util  qw{_INSTANCE _CLASS _CODE _SCALAR0};
+use Params::SomeUtil qw{_INSTANCE _CLASS _CODE _SCALAR0};
 
 our $VERSION = '1.292';
 

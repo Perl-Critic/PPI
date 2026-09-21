@@ -21,7 +21,7 @@ a L<PPI::Element> that directly represents bytes of source code.
 =cut
 
 use strict;
-use Params::Util   qw{_INSTANCE};
+use Params::SomeUtil qw{_INSTANCE};
 use PPI::Element   ();
 use PPI::Exception ();
 

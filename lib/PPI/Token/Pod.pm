@@ -25,7 +25,7 @@ L<PPI::Token> and L<PPI::Element> parent classes.
 =cut
 
 use strict;
-use Params::Util qw{_INSTANCE};
+use Params::SomeUtil qw{_INSTANCE};
 use PPI::Token   ();
 
 our $VERSION = '1.292';

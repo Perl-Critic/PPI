@@ -32,7 +32,7 @@ L<PPI::Statement>, L<PPI::Node> and L<PPI::Element> methods.
 
 use strict;
 use List::Util     ();
-use Params::Util   qw{_INSTANCE};
+use Params::SomeUtil qw{_INSTANCE};
 use PPI::Statement ();
 
 our $VERSION = '1.292';

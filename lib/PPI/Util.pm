@@ -5,7 +5,7 @@ package PPI::Util;
 use strict;
 use Exporter     ();
 use Digest::MD5  ();
-use Params::Util qw{_INSTANCE _SCALAR0 _ARRAY0};
+use Params::SomeUtil 1.08 qw{_INSTANCE _SCALAR0 _ARRAY0};
 
 our $VERSION = '1.292';
 
