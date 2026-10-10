@@ -20,8 +20,10 @@ PPI::Token::Operator - Token class for operators
   <<   >>   lt   gt   le   ge   cmp  ~~
   ==   !=   <=>  .    ..   ...  ,
   &    |    ^    &&   ||   //
+  &.   |.   ^.   ~.
   ?    :    **=  +=   -=   .=   *=   /=
   %=   x=   &=   |=   ^=   <<=  >>=  &&=
+  &.=  |.=  ^.=  ~.=
   ||=  //=  <    >    <=   >=   <>   =>   ->
   and  or   xor  not  eq   ne   <<>>
 
