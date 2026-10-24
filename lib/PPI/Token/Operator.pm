@@ -78,7 +78,9 @@ sub __TOKENIZER__on_char {
 
 	# Handle the special case of a .1234 decimal number
 	if ( $content eq '.' ) {
-		if ( $char =~ /^[0-9]$/ ) {
+		# .5 is a number only in TERM position; after a term ($x.2) it is
+		# the concatenation operator
+		if ( $char =~ /^[0-9]$/ and $t->_opcontext ne 'operator' ) {
 			# This is a decimal number
 			$t->{class} = $t->{token}->set_class('Number::Float');
 			return $t->{class}->__TOKENIZER__on_char( $t );

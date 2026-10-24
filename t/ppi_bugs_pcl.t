@@ -832,16 +832,14 @@ TODO: {
 # `$_ . 2` (perl -MO=Deparse says so).  PPI leaves NO operator in the stream at
 # all, so a consumer sees two juxtaposed terms.  A space or a non-digit on the
 # right fixes it — the bug needs the digit adjacent.
-TODO: {
-    local $TODO = 'PCL §28: $x.2 — a . followed by a digit after a term is lexed as a Number::Float, so the concatenation OPERATOR disappears';
+{
     my $doc = PPI::Document->new(\'my $x = $_.2;');
     ok( !(grep { $_->isa('PPI::Token::Number') && $_->content eq '.2' } $doc->tokens),
         '`$_.2` should lex as Operator(.) + Number(2), not one Number::Float' )
         or diag "got: " . join(' ', map { short_class(ref $_) . "[" . $_->content . "]" }
                                     grep { $_->significant } $doc->tokens);
 }
-TODO: {
-    local $TODO = 'PCL §28: $x.2 — a . followed by a digit after a term is lexed as a Number::Float, so the concatenation OPERATOR disappears';
+{
     my $doc = PPI::Document->new(\'my $z = $y[1].3;');
     ok( (grep { $_->isa('PPI::Token::Operator') && $_->content eq '.' } $doc->tokens),
         '`].3` should carry a concatenation operator' )

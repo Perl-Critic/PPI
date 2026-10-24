@@ -755,20 +755,17 @@ DOT_DIGIT_AFTER_A_TERM: {
     # After a term, .2 is the concatenation operator and the number 2:
     # perl -e '$_ = 1; print $_.2' prints 12.  Where a term is expected
     # .5 is the number 0.5.
-    TODO: {
-        local $TODO = '.digit after a term is lexed as a Number::Float';
-        my @concat = (
-            'my $x = $_.2;'      => 'Operator=.,Number=2',
-            'my $z = $y[$i].3;'  => 'Operator=.,Number=3',
-            'my $s = "a".5;'     => 'Operator=.,Number=5',
-        );
-        for ( my $i = 0; $i < @concat; $i += 2 ) {
-            my $doc = safe_new \$concat[$i];
-            my @t = grep { $_->isa('PPI::Token::Operator') && $_->content eq '.' or $_->isa('PPI::Token::Number') }
-                $doc->tokens;
-            my $got = join ',', map { my $c = ref $_; $c =~ s/^PPI::Token:://; "$c=" . $_->content } @t;
-            is( $got, $concat[$i + 1], "tokens of $concat[$i]" );
-        }
+    my @concat = (
+        'my $x = $_.2;'      => 'Operator=.,Number=2',
+        'my $z = $y[$i].3;'  => 'Operator=.,Number=3',
+        'my $s = "a".5;'     => 'Operator=.,Number=5',
+    );
+    for ( my $i = 0; $i < @concat; $i += 2 ) {
+        my $doc = safe_new \$concat[$i];
+        my @t = grep { $_->isa('PPI::Token::Operator') && $_->content eq '.' or $_->isa('PPI::Token::Number') }
+            $doc->tokens;
+        my $got = join ',', map { my $c = ref $_; $c =~ s/^PPI::Token:://; "$c=" . $_->content } @t;
+        is( $got, $concat[$i + 1], "tokens of $concat[$i]" );
     }
     my $doc = safe_new \'my $x = .5;';
     my ($num) = grep { $_->isa('PPI::Token::Number') } $doc->tokens;
