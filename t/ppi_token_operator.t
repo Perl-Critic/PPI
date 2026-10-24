@@ -4,7 +4,7 @@
 
 use lib 't/lib';
 use PPI::Test::pragmas;
-use Test::More tests => 3197 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+use Test::More tests => 3200 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use PPI ();
 use PPI::Singletons qw( %KEYWORDS %OPERATOR );
@@ -792,4 +792,13 @@ DOT_DIGIT_AFTER_A_TERM: {
     my $doc = safe_new \'my $x = .5;';
     my ($num) = grep { $_->isa('PPI::Token::Number') } $doc->tokens;
     is( ( $num ? ref($num) . '=' . $num->content : '' ), 'PPI::Token::Number::Float=.5', '= .5 is the number 0.5' );
+
+    # A scalar filehandle is not a term: perl -e 'print $fh .5' writes 0.5
+    # to $fh (space before the ., none after it), as print $fh %h does.
+    TODO: {
+        local $TODO = '.digit after a print filehandle is lexed as concatenation';
+        my $doc = safe_new \'print $fh .5;';
+        my ($num) = grep { $_->isa('PPI::Token::Number') } $doc->tokens;
+        is( ( $num ? ref($num) . '=' . $num->content : '' ), 'PPI::Token::Number::Float=.5', 'print $fh .5 prints the number 0.5' );
+    }
 }
