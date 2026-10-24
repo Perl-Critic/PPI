@@ -4,7 +4,7 @@
 
 use lib 't/lib';
 use PPI::Test::pragmas;
-use Test::More tests => 3185 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+use Test::More tests => 3197 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use PPI ();
 use PPI::Singletons qw( %KEYWORDS %OPERATOR );
@@ -748,6 +748,31 @@ TERM_INITIAL_COMPLEMENTS: {
         my $doc = safe_new \$operators[$i];
         my $ops = $doc->find('Token::Operator') || [];
         is( join( ',', map { $_->content } @$ops ), $operators[$i + 1], "operators of $operators[$i]" );
+    }
+
+    # After a builtin that takes an operand, a term is expected too
+    # (print ~~$y numifies $y); after one that takes none (time,
+    # wantarray) the ~~ is the smart match.
+    TODO: {
+        local $TODO = '~~ after a builtin list operator is lexed as a smart match';
+        my @after_listop = (
+            'print ~~$y;'            => '~,~',
+            'return ~~@a;'           => '~,~',
+        );
+        for ( my $i = 0; $i < @after_listop; $i += 2 ) {
+            my $doc = safe_new \$after_listop[$i];
+            my $ops = $doc->find('Token::Operator') || [];
+            is( join( ',', map { $_->content } @$ops ), $after_listop[$i + 1], "operators of $after_listop[$i]" );
+        }
+    }
+    my @no_operand = (
+        'my $r = time ~~ @a;'        => '=,~~',
+        'my $r = wantarray ~~ @a;'   => '=,~~',
+    );
+    for ( my $i = 0; $i < @no_operand; $i += 2 ) {
+        my $doc = safe_new \$no_operand[$i];
+        my $ops = $doc->find('Token::Operator') || [];
+        is( join( ',', map { $_->content } @$ops ), $no_operand[$i + 1], "operators of $no_operand[$i]" );
     }
 }
 
