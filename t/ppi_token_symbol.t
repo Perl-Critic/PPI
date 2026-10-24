@@ -4,7 +4,7 @@
 
 use lib 't/lib';
 use PPI::Test::pragmas;
-use Test::More tests => 216 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+use Test::More tests => 228 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use PPI ();
 use Helper 'safe_new';
@@ -56,6 +56,24 @@ CONSTRUCT_OWN_TOKEN: {
 	test_symbol( PPI::Token::Symbol->new('$ ::foo\'bar::baz'), { content => '$ ::foo\'bar::baz', canonical => '$main::foo::bar::baz', raw_type => '$', symbol_type => '$', symbol => '$main::foo::bar::baz' }, '$ ::foo\'bar::baz' );
 }
 
+
+NON_ASCII_NAMES: {
+	# Under `use utf8` a variable name may be any word characters, and the
+	# @ % * & sigils already take them.  The $ sigil must too: with
+	# use utf8, perl -e '$X = 1; print $X' (a fullwidth X) prints 1.
+	my $x = "\x{ff38}";
+	TODO: {
+		local $TODO = 'a $ scalar with a non-ASCII name is lexed as a Cast and a Word';
+		for my $code ( "\$$x = 1;", "\$$x\{a} = 1;", "\$$x\[0] = 1;" ) {
+			my $doc = safe_new \$code;
+			my ($tok) = grep { $_->significant } $doc->tokens;
+			ok( $tok && ref($tok) eq 'PPI::Token::Symbol' && $tok->content eq "\$$x", 'the scalar is one Symbol' );
+		}
+	}
+	my $doc = safe_new \"\%$x = ();";
+	my ($tok) = grep { $_->significant } $doc->tokens;
+	ok( $tok && ref($tok) eq 'PPI::Token::Symbol' && $tok->content eq "\%$x", 'the hash is one Symbol (control)' );
+}
 
 sub parse_and_test {
 	local $Test::Builder::Level = $Test::Builder::Level+1;
