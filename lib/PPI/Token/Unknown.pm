@@ -109,8 +109,8 @@ sub __TOKENIZER__on_char {
 			}
 		}
 
-		if ( $char =~ /[a-z_]/i ) {
-			# Symbol
+		if ( $char =~ /[^\W\d]/ ) {
+			# Symbol -- any letter or _, not only ASCII, as the @ % * & arms allow
 			$t->{class} = $t->{token}->set_class( 'Symbol' );
 			return 1;
 		}

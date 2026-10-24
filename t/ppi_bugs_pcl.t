@@ -610,8 +610,7 @@ TODO: {
 # `*`, `%`, `&` and `@` siblings test /[\w:]/.  The name itself is fine — once
 # the token is classed Symbol, PPI::Token::Symbol consumes it with
 # m/\G([\w:\']+)/gc.
-TODO: {
-    local $TODO = 'PCL §23: A $ scalar with a NON-ASCII name is split into Cast + Word';
+{
     my $doc = PPI::Document->new(\"use utf8;\n\$\x{ff38} = 1;\n");
     my @sym = grep { $_->isa('PPI::Token::Symbol') } $doc->tokens;
     ok( (grep { $_->content eq "\$\x{ff38}" } @sym),
@@ -632,8 +631,7 @@ TODO: {
 # Second-order: because the lexer sees a bareword, the subscript that follows
 # is built as a BLOCK (and `[…]` as an anonymous-array constructor), so the
 # statement is not a subscripted variable at all.
-TODO: {
-    local $TODO = 'PCL §23: A $ scalar with a NON-ASCII name is split into Cast + Word';
+{
     my $doc = PPI::Document->new(\"use utf8;\n\$\x{ff38}{a} = 1;\n");
     ok( scalar @{ $doc->find('PPI::Structure::Subscript') || [] },
         'the `{…}` after a non-ASCII scalar should be a Subscript' )
@@ -644,8 +642,7 @@ TODO: {
 # because the foreach-slot state machine sees the Cast the `$` split produced
 # where it expects a Symbol.  `for (my $X=0;...)` and `while (my $X = ...)`
 # lex fine.  PPI::Document->new returns undef, so no repair is possible.
-TODO: {
-    local $TODO = 'PCL §23: A $ scalar with a NON-ASCII name is split into Cast + Word';
+{
     my $doc = PPI::Document->new(\"use utf8;\nfor my \$\x{ff29} (1,2) { 1 }\n");
     ok( defined $doc,
         'a foreach with a non-ASCII loop variable should lex at all' )
