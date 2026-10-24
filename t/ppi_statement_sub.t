@@ -289,14 +289,11 @@ sub test_subs {
 SUB_NAMED_UNDERSCORE: {
 	# `_` after `sub` is the sub's name: perl -e 'sub _ { "x" } print _()'
 	# prints x.  Anywhere else a lone `_` is the stat filehandle.
-	TODO: {
-		local $TODO = 'the _ naming a sub is lexed as the magic filehandle';
-		for my $code ( 'sub _ { "x" } print 1;', 'sub _; print 1;', 'sub _ { "x" }' ) {
-			my $doc = safe_new \$code;
-			my ($sub) = $doc->schildren;
-			ok( $sub && $sub->isa('PPI::Statement::Sub'), "$code: a Statement::Sub" );
-			is( ( $sub && $sub->isa('PPI::Statement::Sub') ? $sub->name : '' ), '_', "$code: named _" );
-		}
+	for my $code ( 'sub _ { "x" } print 1;', 'sub _; print 1;', 'sub _ { "x" }' ) {
+		my $doc = safe_new \$code;
+		my ($sub) = $doc->schildren;
+		ok( $sub && $sub->isa('PPI::Statement::Sub'), "$code: a Statement::Sub" );
+		is( ( $sub && $sub->isa('PPI::Statement::Sub') ? $sub->name : '' ), '_', "$code: named _" );
 	}
 	my $doc = safe_new \'print -f _;';
 	my ($u) = grep { $_->content eq '_' } $doc->tokens;

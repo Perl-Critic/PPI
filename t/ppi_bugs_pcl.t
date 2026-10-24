@@ -981,8 +981,7 @@ TODO: {
 # Token::Magic everywhere, and PPI::Lexer's Statement::Sub rule needs a
 # Token::Word there, so `sub _ { "x" } print 1;` becomes ONE plain
 # PPI::Statement spanning both halves.
-TODO: {
-    local $TODO = 'PCL §31: sub _ { … } — the NAME _ after sub is lexed as Token::Magic, so no Statement::Sub is built and the FOLLOWING statement is swallowed';
+{
     my $doc = PPI::Document->new(\q{sub _ { "x" } print 1;});
     my @st  = $doc->schildren;
     is( scalar @st, 2,
@@ -994,8 +993,7 @@ TODO: {
         'the `_` naming the sub is a Token::Word, not Token::Magic' );
 }
 # The forward declaration is the same shape.
-TODO: {
-    local $TODO = 'PCL §31: sub _ { … } — the NAME _ after sub is lexed as Token::Magic, so no Statement::Sub is built and the FOLLOWING statement is swallowed';
+{
     my $doc = PPI::Document->new(\q{sub _; print 1;});
     my @st  = $doc->schildren;
     is( ref($st[0]), 'PPI::Statement::Sub',

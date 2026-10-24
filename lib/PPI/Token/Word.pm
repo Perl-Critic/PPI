@@ -177,9 +177,10 @@ sub __TOKENIZER__on_char {
 		$t->{line_cursor}++;
 		$t->{class} = $t->{token}->set_class( 'Label' );
 
-	# If not a label, '_' on its own is the magic filehandle
+	# If not a label, '_' on its own is the magic filehandle, unless it
+	# names a sub
 	} elsif ( $word eq '_' ) {
-		$t->{class} = $t->{token}->set_class( 'Magic' );
+		$t->{class} = $t->{token}->set_class( __underscore_class($t) );
 
 	}
 
@@ -313,7 +314,7 @@ sub __TOKENIZER__commit {
 				$token_class = 'Word';
 			}
 		} elsif ( $word eq '_' ) {
-			$token_class = 'Magic';
+			$token_class = __underscore_class($t);
 		} else {
 			$token_class = 'Word';
 		}
@@ -344,6 +345,15 @@ sub __current_token_is_attribute {
 			or $tokens[0]->isa('PPI::Token::Attribute')
 		)
 	);
+}
+
+# The class of a lone `_`: right after `sub` it names the sub
+# (sub _ { ... }); anywhere else it is the stat filehandle.
+sub __underscore_class {
+	my ( $t ) = @_;
+	my ( $prev ) = $t->_previous_significant_tokens(1);
+	return 'Word' if $prev and $prev->isa('PPI::Token::Word') and $prev->content eq 'sub';
+	return 'Magic';
 }
 
 1;
