@@ -4,7 +4,7 @@
 
 use lib 't/lib';
 use PPI::Test::pragmas;
-use Test::More tests => 3158 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+use Test::More tests => 3173 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use PPI ();
 use PPI::Singletons qw( %KEYWORDS %OPERATOR );
@@ -724,4 +724,32 @@ LOGICAL_XOR: {
     my $doc = safe_new \'my $r = $a ^^ $b;';
     my $ops = $doc->find('Token::Operator') || [];
     is( join( ',', map { $_->content } @$ops ), '=,^^', '^^ is one operator' );
+}
+
+TERM_INITIAL_COMPLEMENTS: {
+    # Where a term is expected, ~~ is two bitwise complements -- the
+    # "numify" idiom: perl -e '$y = "3"; print ~~$y' prints 3.  Where an
+    # operator is expected it is the smart match.
+    my @operators = (
+        'my $r = $x ~~ @a;'          => '=,~~',
+        'my $r = (/X/ ~~ @a);'       => '=,~~',
+        'my $r = $o->name ~~ @a;'    => '=,->,~~',
+    );
+    TODO: {
+        local $TODO = '~~ where a term is expected is lexed as a smart match';
+        my @complements = (
+            'is(~~$y, 3);'           => '~,~,,',
+            'my $v = $a[~~2];'       => '=,~,~',
+        );
+        for ( my $i = 0; $i < @complements; $i += 2 ) {
+            my $doc = safe_new \$complements[$i];
+            my $ops = $doc->find('Token::Operator') || [];
+            is( join( ',', map { $_->content } @$ops ), $complements[$i + 1], "operators of $complements[$i]" );
+        }
+    }
+    for ( my $i = 0; $i < @operators; $i += 2 ) {
+        my $doc = safe_new \$operators[$i];
+        my $ops = $doc->find('Token::Operator') || [];
+        is( join( ',', map { $_->content } @$ops ), $operators[$i + 1], "operators of $operators[$i]" );
+    }
 }
