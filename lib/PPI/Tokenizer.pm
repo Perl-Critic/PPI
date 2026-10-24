@@ -787,6 +787,24 @@ sub _opcontext {
 	return ''
 }
 
+# In `print $fh %h` (or *STDOUT, or .5) the $fh is a filehandle, not a
+# term, and what follows starts the list.  perl tells the two apart by the
+# whitespace: there is some before the next character and none after it
+# (`print $fh % 2` and `print $fh%2` are a modulo).  True when the tokenizer
+# stands in that slot: the previous significant token is a $scalar right
+# after print, printf, say, exec or system, and whitespace separates it from
+# the current token.
+my %FILEHANDLE_LISTOP = map { $_ => 1 } qw( print printf say exec system );
+
+sub _after_scalar_filehandle {
+	my $self = shift;
+	my ( $prev, $op ) = $self->_previous_significant_tokens(2);
+	return '' if !$prev or !$prev->isa('PPI::Token::Symbol') or $prev->content !~ /^\$/;
+	my $last = $self->_last_token;
+	return '' if !$last or !$last->isa('PPI::Token::Whitespace');
+	return $op && $op->isa('PPI::Token::Word') && $FILEHANDLE_LISTOP{ $op->content };
+}
+
 # Assuming we are currently parsing the word 'x', return true
 # if previous tokens imply the x is an operator, false otherwise.
 sub _current_x_is_operator {

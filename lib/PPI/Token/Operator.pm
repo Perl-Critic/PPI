@@ -76,7 +76,9 @@ sub __TOKENIZER__on_char {
 	if ( $content eq '.' ) {
 		# .5 is a number only in TERM position; after a term ($x.2) it is
 		# the concatenation operator
-		if ( $char =~ /^[0-9]$/ and $t->_opcontext ne 'operator' ) {
+		if ( $char =~ /^[0-9]$/
+			and ( $t->_opcontext ne 'operator' or $t->_after_scalar_filehandle )
+		) {
 			# This is a decimal number
 			$t->{class} = $t->{token}->set_class('Number::Float');
 			return $t->{class}->__TOKENIZER__on_char( $t );
