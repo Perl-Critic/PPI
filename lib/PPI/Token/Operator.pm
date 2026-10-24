@@ -65,6 +65,15 @@ sub __TOKENIZER__on_char {
 		$content . substr( $t->{line}, $t->{line_cursor}, 4 - length($content) ) eq '<<>>') {
 		return 1;
 	}
+	# Where a term is expected, ~~ is two bitwise complements (~~$y), not
+	# the smart match.  Only a known operand position counts (or the start
+	# of the document): after a match or a method name _opcontext cannot
+	# say, and those take ~~.
+	if ( $content eq '~' and $char eq '~'
+		and ( $t->_opcontext eq 'operand' or !$t->_last_significant_token )
+	) {
+		return $t->_finalize_token->__TOKENIZER__on_char( $t );
+	}
 	return 1 if $OPERATOR{ $content . $char };
 
 	# Handle the special case of a .1234 decimal number

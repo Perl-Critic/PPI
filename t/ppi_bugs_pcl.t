@@ -557,8 +557,7 @@ TODO: {
 # position, so a statement that starts an argument with it has a binary
 # operator with no left operand.  (PPI already makes exactly this
 # term-or-not decision correctly for `x` and for `/PATTERN/`.)
-TODO: {
-    local $TODO = 'PCL §21: A term-initial ~~ is lexed as the smart-match operator';
+{
     my $doc = PPI::Document->new(\'is(~~$y, 3);');
     my @ops = grep { $_->isa('PPI::Token::Operator') } $doc->tokens;
     ok( !(grep { $_->content eq '~~' } @ops),

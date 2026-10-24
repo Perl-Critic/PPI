@@ -735,17 +735,14 @@ TERM_INITIAL_COMPLEMENTS: {
         'my $r = (/X/ ~~ @a);'       => '=,~~',
         'my $r = $o->name ~~ @a;'    => '=,->,~~',
     );
-    TODO: {
-        local $TODO = '~~ where a term is expected is lexed as a smart match';
-        my @complements = (
-            'is(~~$y, 3);'           => '~,~,,',
-            'my $v = $a[~~2];'       => '=,~,~',
-        );
-        for ( my $i = 0; $i < @complements; $i += 2 ) {
-            my $doc = safe_new \$complements[$i];
-            my $ops = $doc->find('Token::Operator') || [];
-            is( join( ',', map { $_->content } @$ops ), $complements[$i + 1], "operators of $complements[$i]" );
-        }
+    my @complements = (
+        'is(~~$y, 3);'           => '~,~,,',
+        'my $v = $a[~~2];'       => '=,~,~',
+    );
+    for ( my $i = 0; $i < @complements; $i += 2 ) {
+        my $doc = safe_new \$complements[$i];
+        my $ops = $doc->find('Token::Operator') || [];
+        is( join( ',', map { $_->content } @$ops ), $complements[$i + 1], "operators of $complements[$i]" );
     }
     for ( my $i = 0; $i < @operators; $i += 2 ) {
         my $doc = safe_new \$operators[$i];
