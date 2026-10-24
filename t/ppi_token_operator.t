@@ -4,7 +4,7 @@
 
 use lib 't/lib';
 use PPI::Test::pragmas;
-use Test::More tests => 3073 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+use Test::More tests => 3094 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use PPI ();
 use PPI::Singletons qw( %KEYWORDS %OPERATOR );
@@ -726,5 +726,26 @@ OPERATORS_PLUS_MINUS: {
         my $ops = $doc->find('Token::Operator');
         local $TODO = "(1)-2 not parsed correctly";
         is( ref $ops, 'ARRAY', "found operator $op" );
+    }
+
+    # A closing ] ends a term as a closing ) does, and so does a number of
+    # any kind, so the - after it is the subtraction operator.
+    TODO: {
+        local $TODO = "a - after ], a float or a non-decimal number is lexed as a negative number";
+        my @more = (
+            '$x[1]', '2',
+            '1.5',   '2',
+            '1e3',   '2',
+            '0x10',  '2',
+            '010',   '2',
+            '0b1',   '2',
+            '(1)',   'length',
+        );
+        for ( my $i = 0; $i < @more; $i += 2 ) {
+            my $code = "$more[$i]-$more[$i + 1]";
+            my $doc  = safe_new \$code;
+            my $ops  = $doc->find('Token::Operator') || [];
+            is( join( ',', map { $_->content } @$ops ), '-', "$code has one - operator" );
+        }
     }
 }
