@@ -4,7 +4,7 @@
 
 use lib 't/lib';
 use PPI::Test::pragmas;
-use Test::More tests => 3094 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+use Test::More tests => 3147 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use PPI ();
 use PPI::Singletons qw( %KEYWORDS %OPERATOR );
@@ -690,10 +690,20 @@ OPERATOR_FAT_COMMA: {
 }
 
 OPERATORS_PLUS_MINUS: {
+    # A closing ) or ] ends a term, and so does a number of any kind, so
+    # the - after it is the subtraction operator, not part of a number.
     my @operands = (
-         '1',   '2',
-         '1',  '(2)',
-        '(1)', '(2)'
+         '1',     '2',
+         '1',    '(2)',
+        '(1)',   '(2)',
+        '(1)',    '2',
+        '(1)',   'length',
+        '$x[1]', '2',
+        '1.5',   '2',
+        '1e3',   '2',
+        '0x10',  '2',
+        '010',   '2',
+        '0b1',   '2',
     );
 
     for my $op (qw/- +/) {
@@ -705,47 +715,6 @@ OPERATORS_PLUS_MINUS: {
             is( ref $ops, 'ARRAY', "found operator $op" );
             is( @$ops, 1, "operator $op found exactly once" );
             is( $ops->[0]->content(), $op, "operator $op text matches" );
-        }
-    }
-
-    # Add "'(1)', '2'" into operands once TODO is resolved.
-    {
-        my ( $a, $b ) = ( '(1)', '2' );
-        my $op = '+';
-        my $code = "${a}${op}${b}";
-        my $doc  = safe_new \$code;
-        my $ops = $doc->find('Token::Operator');
-        is( ref $ops, 'ARRAY', "found operator $op" );
-    }
-
-    TODO: {
-        my ( $a, $b ) = ( '(1)', '2' );
-        my $op = '-';
-        my $code = "${a}${op}${b}";
-        my $doc  = safe_new \$code;
-        my $ops = $doc->find('Token::Operator');
-        local $TODO = "(1)-2 not parsed correctly";
-        is( ref $ops, 'ARRAY', "found operator $op" );
-    }
-
-    # A closing ] ends a term as a closing ) does, and so does a number of
-    # any kind, so the - after it is the subtraction operator.
-    TODO: {
-        local $TODO = "a - after ], a float or a non-decimal number is lexed as a negative number";
-        my @more = (
-            '$x[1]', '2',
-            '1.5',   '2',
-            '1e3',   '2',
-            '0x10',  '2',
-            '010',   '2',
-            '0b1',   '2',
-            '(1)',   'length',
-        );
-        for ( my $i = 0; $i < @more; $i += 2 ) {
-            my $code = "$more[$i]-$more[$i + 1]";
-            my $doc  = safe_new \$code;
-            my $ops  = $doc->find('Token::Operator') || [];
-            is( join( ',', map { $_->content } @$ops ), '-', "$code has one - operator" );
         }
     }
 }

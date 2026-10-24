@@ -410,8 +410,7 @@ TODO: {
 # After `)` a term has ENDED, so `-` is an operator.  PPI emits Number('-1'),
 # and the subtraction is gone: the consumer sees two adjacent terms.  With a
 # space (`(1+2) - 1`) it is correct, which is what makes it easy to miss.
-TODO: {
-    local $TODO = 'PCL §15: ) followed by -1 — the operator is swallowed into a negative NUMBER';
+{
     my @t = toks('my $x = (1+2)-1;');
     ok( !grep(/^PPI::Token::Number=-1$/, @t),
         ')-1 should be Operator(-) + Number(1), not a negative literal' )
@@ -714,8 +713,7 @@ TODO: {
 # start where a TERM can.  perl -MO=Deparse gives `length('abc') - length('a')`.
 # A space fixes the lexing, and PPI already makes exactly this operator-vs-term
 # decision correctly for `x` and for `/PATTERN/`.
-TODO: {
-    local $TODO = 'PCL §25: -name after a token that ENDS A TERM is lexed as one negative-bareword Word';
+{
     my $doc = PPI::Document->new(\'my $z = length("abc")-length("a");');
     ok( !(grep { $_->isa('PPI::Token::Word') && $_->content eq '-length' } $doc->tokens),
         '`)-length` should lex as Operator(-) + Word(length), not one Word' )
@@ -1076,14 +1074,11 @@ TODO: {
 # §34 -- after a Float / Exp / Hex number, `-N` is taken as a negative NUMBER
 # although the previous token ends a term (the integer tokenizer gets it right:
 # `2-0.5` has its Operator).  perl: `1.5-0.5` is 1, `1e3-1` is 999.
-TODO: {
-    local $TODO = 'PCL §34: After a FLOAT / EXP / HEX / OCTAL / BINARY number, -N is lexed as a NEGATIVE NUMBER';
-    for my $src ('1.5-0.5;', '1e3-1;') {
-        my $doc = PPI::Document->new(\$src);
-        my @ops = grep { $_->isa('PPI::Token::Operator') && $_->content eq '-' }
-                  $doc->tokens;
-        is( scalar @ops, 1, "`$src` has a subtraction Operator token" );
-    }
+for my $src ('1.5-0.5;', '1e3-1;') {
+    my $doc = PPI::Document->new(\$src);
+    my @ops = grep { $_->isa('PPI::Token::Operator') && $_->content eq '-' }
+              $doc->tokens;
+    is( scalar @ops, 1, "`$src` has a subtraction Operator token" );
 }
 
 # §35 -- a filetest right after a `BEGIN { … }` block is split into Operator(-)

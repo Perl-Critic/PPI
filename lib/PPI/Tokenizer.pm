@@ -756,6 +756,8 @@ my %OBVIOUS_CONTENT = (
 	'[' => 'operand',
 	';' => 'operand',
 	'}' => 'operator',
+	')' => 'operator',
+	']' => 'operator',
 );
 
 
@@ -772,6 +774,7 @@ sub _opcontext {
 
 	# Map the obvious cases
 	return $OBVIOUS_CLASS{$c0}   if defined $OBVIOUS_CLASS{$c0};
+	return 'operator' if $p0->isa('PPI::Token::Number');   # Float, Exp, Hex, Octal, Binary too
 	return $OBVIOUS_CONTENT{$p0} if defined $OBVIOUS_CONTENT{$p0};
 
 	# Most of the time after an operator, we are an operand
