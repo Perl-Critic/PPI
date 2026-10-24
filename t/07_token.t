@@ -217,23 +217,20 @@ HEX_FLOAT: {
 	# perl 5.22+ hexadecimal floating point: perl -e 'print 0x1.8p+1'
 	# prints 3.  The binary exponent (p) is required; without it, 0x1.8
 	# is 0x1 concatenated with 8.
-	TODO: {
-		local $TODO = 'a hexadecimal float is split into several tokens';
-		my @tests = (
-			{ code => '0x1.8p+1',  value => 3 },
-			{ code => '0x.8p1',    value => 1 },
-			{ code => '0x1p-3',    value => 0.125 },
-			{ code => '0x1_0.8p0', value => 16.5 },
-			{ code => '0X1P2',     value => 4 },
-		);
-		foreach my $test ( @tests ) {
-			my $code = $test->{code};
-			my $T = PPI::Tokenizer->new( \$code );
-			my $token = $T->get_token;
-			isa_ok($token, 'PPI::Token::Number::Float');
-			is($token->content, $code, "'$code' is one token");
-			is($token->literal, $test->{value}, "literal('$code') is $test->{value}");
-		}
+	my @tests = (
+		{ code => '0x1.8p+1',  value => 3 },
+		{ code => '0x.8p1',    value => 1 },
+		{ code => '0x1p-3',    value => 0.125 },
+		{ code => '0x1_0.8p0', value => 16.5 },
+		{ code => '0X1P2',     value => 4 },
+	);
+	foreach my $test ( @tests ) {
+		my $code = $test->{code};
+		my $T = PPI::Tokenizer->new( \$code );
+		my $token = $T->get_token;
+		isa_ok($token, 'PPI::Token::Number::Float');
+		is($token->content, $code, "'$code' is one token");
+		is($token->literal, $test->{value}, "literal('$code') is $test->{value}");
 	}
 	my $code = '0x1.8';
 	my $T = PPI::Tokenizer->new( \$code );

@@ -81,8 +81,7 @@ TODO: {
 # Perl 5.22+ accepts hex floating-point literals; 0x1.8p+1 == 3.0 is ONE number.
 # PPI splits it into  Number::Hex '0x1' + Number::Float '.8' + Word 'p' +
 # Operator '+' + Number '1'.
-TODO: {
-    local $TODO = 'PCL §2: C99 hex-float literal 0x1.8p+1 split into 5 tokens';
+{
     my @t = toks('my $n = 0x1.8p+1;');
     my @nums = grep { /^PPI::Token::Number/ } @t;
     is( scalar(@nums), 1,
