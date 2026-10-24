@@ -419,8 +419,7 @@ TODO: {
 #
 # 5.40 added `^^`.  PPI emits Operator('^') twice, which is a different
 # expression (bitwise XOR applied twice) and cannot be told apart from one.
-TODO: {
-    local $TODO = 'PCL §16: perl 5.40\'s ^^ (logical XOR) is tokenized as two ^ operators';
+{
     my @t = toks('my $r = $a ^^ $b;');
     ok( grep(/^PPI::Token::Operator=\^\^$/, @t),
         '^^ should be one logical-XOR operator token' )
