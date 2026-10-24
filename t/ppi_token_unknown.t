@@ -4,7 +4,7 @@
 
 use lib 't/lib';
 use PPI::Test::pragmas;
-use Test::More tests => 2328 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+use Test::More tests => 2346 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use PPI ();
 use B qw( perlstring );
@@ -638,6 +638,79 @@ OPERATOR_CAST: {
 		]
 	)
 }
+}
+
+AFTER_A_TERM: {
+	# After a term, % is the modulo operator and * the multiplication
+	# operator, whatever character follows them.
+	TODO: {
+		local $TODO = '% or * right after a term, before a - or a word, is read as a variable';
+		test_statement(
+			'7%-3',
+			[
+				'PPI::Token::Number' => '7',
+				'PPI::Token::Operator' => '%',
+				'PPI::Token::Number' => '-3',
+			]
+		);
+		test_statement(
+			'$x[0]%-1',
+			[
+				'PPI::Token::Symbol' => '$x',
+				'PPI::Structure::Subscript' => '[0]',
+				'PPI::Token::Structure' => '[',
+				'PPI::Statement::Expression' => '0',
+				'PPI::Token::Number' => '0',
+				'PPI::Token::Structure' => ']',
+				'PPI::Token::Operator' => '%',
+				'PPI::Token::Number' => '-1',
+			]
+		);
+		test_statement(
+			'length($k)*length($k)',
+			[
+				'PPI::Token::Word' => 'length',
+				'PPI::Structure::List' => '($k)',
+				'PPI::Token::Structure' => '(',
+				'PPI::Statement::Expression' => '$k',
+				'PPI::Token::Symbol' => '$k',
+				'PPI::Token::Structure' => ')',
+				'PPI::Token::Operator' => '*',
+				'PPI::Token::Word' => 'length',
+				'PPI::Structure::List' => '($k)',
+				'PPI::Token::Structure' => '(',
+				'PPI::Statement::Expression' => '$k',
+				'PPI::Token::Symbol' => '$k',
+				'PPI::Token::Structure' => ')',
+			]
+		);
+	}
+
+	# A scalar filehandle is not a term: what follows it is the first
+	# element of the list (perl -e 'print $fh %h' prints the hash).
+	test_statement(
+		'print $fh %h',
+		[
+			'PPI::Token::Word' => 'print',
+			'PPI::Token::Symbol' => '$fh',
+			'PPI::Token::Symbol' => '%h',
+		]
+	);
+	test_statement(
+		'print $fh *STDOUT',
+		[
+			'PPI::Token::Word' => 'print',
+			'PPI::Token::Symbol' => '$fh',
+			'PPI::Token::Symbol' => '*STDOUT',
+		]
+	);
+	test_statement(
+		'keys %-',
+		[
+			'PPI::Token::Word' => 'keys',
+			'PPI::Token::Magic' => '%-',
+		]
+	);
 }
 
 sub one_line_explain {
