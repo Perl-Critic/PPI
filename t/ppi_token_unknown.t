@@ -643,48 +643,45 @@ OPERATOR_CAST: {
 AFTER_A_TERM: {
 	# After a term, % is the modulo operator and * the multiplication
 	# operator, whatever character follows them.
-	TODO: {
-		local $TODO = '% or * right after a term, before a - or a word, is read as a variable';
-		test_statement(
-			'7%-3',
-			[
-				'PPI::Token::Number' => '7',
-				'PPI::Token::Operator' => '%',
-				'PPI::Token::Number' => '-3',
-			]
-		);
-		test_statement(
-			'$x[0]%-1',
-			[
-				'PPI::Token::Symbol' => '$x',
-				'PPI::Structure::Subscript' => '[0]',
-				'PPI::Token::Structure' => '[',
-				'PPI::Statement::Expression' => '0',
-				'PPI::Token::Number' => '0',
-				'PPI::Token::Structure' => ']',
-				'PPI::Token::Operator' => '%',
-				'PPI::Token::Number' => '-1',
-			]
-		);
-		test_statement(
-			'length($k)*length($k)',
-			[
-				'PPI::Token::Word' => 'length',
-				'PPI::Structure::List' => '($k)',
-				'PPI::Token::Structure' => '(',
-				'PPI::Statement::Expression' => '$k',
-				'PPI::Token::Symbol' => '$k',
-				'PPI::Token::Structure' => ')',
-				'PPI::Token::Operator' => '*',
-				'PPI::Token::Word' => 'length',
-				'PPI::Structure::List' => '($k)',
-				'PPI::Token::Structure' => '(',
-				'PPI::Statement::Expression' => '$k',
-				'PPI::Token::Symbol' => '$k',
-				'PPI::Token::Structure' => ')',
-			]
-		);
-	}
+	test_statement(
+		'7%-3',
+		[
+			'PPI::Token::Number' => '7',
+			'PPI::Token::Operator' => '%',
+			'PPI::Token::Number' => '-3',
+		]
+	);
+	test_statement(
+		'$x[0]%-1',
+		[
+			'PPI::Token::Symbol' => '$x',
+			'PPI::Structure::Subscript' => '[0]',
+			'PPI::Token::Structure' => '[',
+			'PPI::Statement::Expression' => '0',
+			'PPI::Token::Number' => '0',
+			'PPI::Token::Structure' => ']',
+			'PPI::Token::Operator' => '%',
+			'PPI::Token::Number' => '-1',
+		]
+	);
+	test_statement(
+		'length($k)*length($k)',
+		[
+			'PPI::Token::Word' => 'length',
+			'PPI::Structure::List' => '($k)',
+			'PPI::Token::Structure' => '(',
+			'PPI::Statement::Expression' => '$k',
+			'PPI::Token::Symbol' => '$k',
+			'PPI::Token::Structure' => ')',
+			'PPI::Token::Operator' => '*',
+			'PPI::Token::Word' => 'length',
+			'PPI::Structure::List' => '($k)',
+			'PPI::Token::Structure' => '(',
+			'PPI::Statement::Expression' => '$k',
+			'PPI::Token::Symbol' => '$k',
+			'PPI::Token::Structure' => ')',
+		]
+	);
 
 	# A scalar filehandle is not a term: what follows it is the first
 	# element of the list (perl -e 'print $fh %h' prints the hash).

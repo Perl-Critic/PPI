@@ -96,8 +96,7 @@ TODO: {
 # position.  In `7%-3` the `%` follows a term (7) so it is the modulo operator
 # and `-3` is its operand — exactly what PPI gives for the spaced form `7 % -3`.
 # PPI instead emits Magic `%-`, losing the `%` operator.
-TODO: {
-    local $TODO = 'PCL §4: 7%-3 tokenized as the magic hash %- (modulo lost)';
+{
     my @t = toks('7%-3');
     ok( !grep(/^PPI::Token::Magic=\%-$/, @t),
         '7%-3 should tokenize as 7 % -3, not as the magic hash %-' )
@@ -312,8 +311,7 @@ TODO: {
 # left (`2*length($k)`) or a single space (`) * length`) it is correct, which is
 # what makes this easy to miss.  A consumer sees `Word List Symbol List` and has
 # no way back: the multiplication is gone.
-TODO: {
-    local $TODO = 'PCL §12: )*name — a * after a term is lexed as a GLOB, not multiplication';
+{
     my @t = toks('$s += length($k)*length($k);');
     ok( !grep(/^PPI::Token::Symbol=\*/, @t),
         ')*name after a term should be Operator(*) + Word, not a glob Symbol' )

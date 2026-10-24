@@ -59,9 +59,9 @@ sub __TOKENIZER__on_char {
 		}
 
 		if ( $char =~ /[\w:]/ ) {
-			# Symbol (unless the thing before it is a number
+			# Symbol, unless the thing before it ends a term: length($k)*length($k)
 			my ( $prev ) = $t->_previous_significant_tokens(1);
-			if ( not $prev or not $prev->isa('PPI::Token::Number') ) {
+			if ( not _after_term( $t, $prev ) ) {
 				$t->{class} = $t->{token}->set_class( 'Symbol' );
 				return 1;
 			}
@@ -217,6 +217,12 @@ sub __TOKENIZER__on_char {
 			return $t->_finalize_token->__TOKENIZER__on_char($t);
 		}
 
+		# After a term, % is the modulo operator whatever follows it (7%-3)
+		if ( _after_term( $t, ($t->_previous_significant_tokens(1))[0] ) ) {
+			$t->{class} = $t->{token}->set_class( 'Operator' );
+			return $t->{class}->__TOKENIZER__on_char( $t );
+		}
+
 		# Is it a magic variable?
 		if ( $char eq '^' || $MAGIC{ $c . $char } ) {
 			$t->{class} = $t->{token}->set_class( 'Magic' );
@@ -332,6 +338,33 @@ sub __TOKENIZER__on_char {
 
 	# erm...
 	PPI::Exception->throw('Unknown value in PPI::Token::Unknown token');
+}
+
+# True when the previous significant token ENDS A TERM, so the % or * now
+# being classified is an operator (7%-3, length($k)*length($k)).  A } is
+# excluded: here the tokenizer cannot tell a block's end from a subscript's
+# (_cast_or_op scans back for that).  So is a scalar filehandle.
+sub _after_term {
+	my ( $t, $prev ) = @_;
+	return '' if !$prev;
+	return '' if $prev->isa('PPI::Token::Structure') and $prev->content eq '}';
+	return '' if _is_scalar_filehandle( $t, $prev );
+	return $t->_opcontext eq 'operator';
+}
+
+# In `print $fh %h` the $fh is a filehandle, not a term, and %h is the
+# first element of the list.  perl tells the two apart by the whitespace:
+# there is some before the % or * and none after it (`print $fh % 2` is
+# a modulo, and so is `print $fh%2`).
+my %FILEHANDLE_LISTOP = map { $_ => 1 } qw( print printf say exec system );
+
+sub _is_scalar_filehandle {
+	my ( $t, $prev ) = @_;
+	return '' if !$prev->isa('PPI::Token::Symbol') or $prev->content !~ /^\$/;
+	my $last = $t->_last_token;
+	return '' if !$last or !$last->isa('PPI::Token::Whitespace');
+	my ( undef, $op ) = $t->_previous_significant_tokens(2);
+	return $op && $op->isa('PPI::Token::Word') && $FILEHANDLE_LISTOP{ $op->content };
 }
 
 sub _is_cast_or_op {
