@@ -4,7 +4,7 @@
 
 use lib 't/lib';
 use PPI::Test::pragmas;
-use Test::More tests => 39 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+use Test::More tests => 42 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use PPI ();
 use Helper 'safe_new';
@@ -44,5 +44,16 @@ END_PERL
 			split /\s+/, $comments->[$token->line_number - 1], 4;
 		isa_ok( $token, "PPI::Token::$class" );
 		is( $token->symbol, $name, $remk || "The symbol is $name" );
+	}
+}
+
+PUNCTUATION_ARRAY: {
+	# Every punctuation variable name is an array name too: perl -e
+	# '@? = (1,2); print scalar(@?)' prints 2.
+	TODO: {
+		local $TODO = '@? is lexed as a Cast and an Operator';
+		my $doc = safe_new \'@? = (1,2);';
+		my ($tok) = grep { $_->significant } $doc->tokens;
+		is( ($tok ? ref($tok) . '=' . $tok->content : ''), 'PPI::Token::Magic=@?', '@? is one Magic token' );
 	}
 }
