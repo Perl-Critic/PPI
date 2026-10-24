@@ -664,8 +664,7 @@ TODO: {
 # It is not a missing feature: in valid perl a `@` Cast is only ever followed by
 # `$`, `{` or an identifier, so `Cast + Operator` is a parse of no legal program
 # at all.  perl accepts @? @! @. @/ @~ @^ @& @% @= @< @> (probed, 5.40.3).
-TODO: {
-    local $TODO = 'PCL §24: A PUNCTUATION-named array @? is split into Cast + Operator';
+{
     my $doc = PPI::Document->new(\'@? = (1,2);');
     my @sym = grep { $_->isa('PPI::Token::Symbol') } $doc->tokens;
     ok( (grep { $_->content eq '@?' } @sym),

@@ -50,10 +50,7 @@ END_PERL
 PUNCTUATION_ARRAY: {
 	# Every punctuation variable name is an array name too: perl -e
 	# '@? = (1,2); print scalar(@?)' prints 2.
-	TODO: {
-		local $TODO = '@? is lexed as a Cast and an Operator';
-		my $doc = safe_new \'@? = (1,2);';
-		my ($tok) = grep { $_->significant } $doc->tokens;
-		is( ($tok ? ref($tok) . '=' . $tok->content : ''), 'PPI::Token::Magic=@?', '@? is one Magic token' );
-	}
+	my $doc = safe_new \'@? = (1,2);';
+	my ($tok) = grep { $_->significant } $doc->tokens;
+	is( ($tok ? ref($tok) . '=' . $tok->content : ''), 'PPI::Token::Magic=@?', '@? is one Magic token' );
 }
