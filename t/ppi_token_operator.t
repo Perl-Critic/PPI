@@ -4,7 +4,7 @@
 
 use lib 't/lib';
 use PPI::Test::pragmas;
-use Test::More tests => 3147 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+use Test::More tests => 3150 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use PPI ();
 use PPI::Singletons qw( %KEYWORDS %OPERATOR );
@@ -716,5 +716,15 @@ OPERATORS_PLUS_MINUS: {
             is( @$ops, 1, "operator $op found exactly once" );
             is( $ops->[0]->content(), $op, "operator $op text matches" );
         }
+    }
+}
+
+LOGICAL_XOR: {
+    # perl 5.40: $a ^^ $b is the logical exclusive or (there is no ^^=)
+    TODO: {
+        local $TODO = "^^ is lexed as two ^ operators";
+        my $doc = safe_new \'my $r = $a ^^ $b;';
+        my $ops = $doc->find('Token::Operator') || [];
+        is( join( ',', map { $_->content } @$ops ), '=,^^', '^^ is one operator' );
     }
 }
