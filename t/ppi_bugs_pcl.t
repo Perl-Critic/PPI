@@ -13,7 +13,7 @@
 use lib 't/lib';
 use PPI::Test::pragmas;
 use utf8;
-use Test::More tests => 149 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+use Test::More tests => 155 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use PPI ();
 
@@ -1236,4 +1236,28 @@ TODO: {
         my @t = map { short_class($_) } toks($code);
         ok( grep( $_ eq $want, @t ), "$code: $desc" ) or diag "got: @t";
     }
+}
+
+# §55, a builtin that takes no operand is a whole TERM: time, wait,
+# wantarray, fork, getppid, ... (perl -e 'print time.2' prints the time
+# with a 2 appended; `time %.5e1` is a modulo).  After one of them the
+# tokenizer is in operator position.
+{
+    my @rows = (
+        [ '$t = time %.5e1;', 'Operator=%', 'after time % is modulo' ],
+        [ '$t = time.2;',     'Operator=.', 'after time . concatenates' ],
+        [ '$t = wait-1;',     'Operator=-', 'after wait - subtracts' ],
+        [ '$t = time %~$y;',  'Operator=%', 'after time %~ is modulo of a complement' ],
+        [ '$t = time*f();',   'Operator=*', 'after time * multiplies' ],
+    );
+    TODO: {
+        local $TODO = 'PCL §55: a builtin that takes no operand does not end a term';
+        for my $r (@rows) {
+            my ( $code, $want, $desc ) = @$r;
+            my @t = map { short_class($_) } toks($code);
+            ok( grep( $_ eq $want, @t ), "$code: $desc" ) or diag "got: @t";
+        }
+    }
+    my @t = map { short_class($_) } toks('my %h = (time => 1);');
+    ok( grep( $_ eq 'Word=time', @t ), 'time before => stays a word (control)' ) or diag "got: @t";
 }
