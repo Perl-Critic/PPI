@@ -1262,8 +1262,7 @@ TODO: {
 # §24, the caret: perl -e '@^ = (1,2); print scalar(@^)' prints 2.  The
 # hash spelling %^ stays two tokens here: a % before ^ starts the caret
 # names (%^H), and only %^H is one.
-TODO: {
-    local $TODO = 'PCL §24: A PUNCTUATION-named array @? is split into Cast + Operator';
+{
     my @t = map { short_class($_) } toks('my @k = (scalar(@^));');
     ok( grep( $_ eq 'Magic=@^', @t ), '`@^` in term position is one Magic token' )
         or diag "got: @t";
