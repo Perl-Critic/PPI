@@ -381,8 +381,7 @@ sub _cast_or_op {
 	if ( $token->isa( 'PPI::Token::Structure' ) and $token->content eq '}' ) {
 		# After a block's } a cast starts the next term; after the } of a
 		# subscript, of a dereference block or of do/eval's block it is an
-		# operator.  An unbalanced }, or a { that opens the document (which
-		# must be a hash constructor), counts as a term too.
+		# operator.  An unbalanced } counts as a term.
 		my $kind = $t->_curly_kind( $cursor + 1 );
 		return ( $kind and $kind eq 'block' ) ? 'Cast' : 'Operator';
 	}

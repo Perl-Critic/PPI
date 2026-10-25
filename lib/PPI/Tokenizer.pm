@@ -867,8 +867,8 @@ sub _significant_before {
 #   'subscript'  after a Symbol, a ->, or another subscript's } or ]  ($h{a}, $r->{a}{b})
 #   'deref'      after a Cast                                         (@{$r}, ${$x})
 #   'value'      after do or eval, whose block yields a value         (do { 1 })
-#   'block'      anything else
-#   'start'      the { opens the document
+#   'block'      anything else, and a { that opens the document (perl reads
+#                a { at the start of a statement as a block)
 #   undef        no matching { (an unbalanced })
 sub _curly_kind {
 	my ( $self, $cursor ) = @_;
@@ -883,7 +883,7 @@ sub _curly_kind {
 	}
 	return if $cursor < 0;
 	my ( $prev ) = $self->_significant_before($cursor);
-	return 'start' if !$prev;
+	return 'block' if !$prev;
 	return 'subscript' if $prev->isa('PPI::Token::Symbol');
 	my $content = $prev->content;
 	return 'subscript' if $content eq '->' or $content eq '}' or $content eq ']';

@@ -1111,16 +1111,14 @@ TODO: {
 # §38 -- a statement that begins with `*$name` after a bare block whose first
 # token is a scalar: the `*` is lexed as the multiplication Operator.
 # perl: `{ my $c = 1; $c++ } *$o->{A} = 7;` stores into the glob's hash.
-TODO: {
-    local $TODO = 'PCL §38: A statement that begins with *$name after a bare block is lexed with a multiplication OPERATOR';
+{
     my $doc = PPI::Document->new(\qq{{ \$c = \$b; }\n*\$o->{A} = 1;\n});
     my ($star) = grep { $_->content eq q{*} } $doc->tokens;
     is( ref($star), q{PPI::Token::Cast},
         q{the statement-initial `*` of `*$o->{A} = 1` after a block is a Cast} );
 }
 # §38, the code-sigil twin: `{ 1 while $x; } &$cb(7);` -- perl calls $cb.
-TODO: {
-    local $TODO = 'PCL §38: A statement that begins with *$name after a bare block is lexed with a multiplication OPERATOR';
+{
     my $doc = PPI::Document->new(\qq{{ 1 while \$x; }\n&\$cb(7);\n});
     my ($amp) = grep { $_->content eq q{&} } $doc->tokens;
     is( ref($amp), q{PPI::Token::Cast},
