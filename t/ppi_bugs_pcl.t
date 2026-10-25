@@ -13,7 +13,7 @@
 use lib 't/lib';
 use PPI::Test::pragmas;
 use utf8;
-use Test::More tests => 119 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+use Test::More tests => 149 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use PPI ();
 
@@ -1211,5 +1211,34 @@ TODO: {
         my @t = map { short_class($_) } toks($code);
         my $smart = grep( $_ eq 'Operator=~~', @t );
         ok( $split ? !$smart : $smart, "$code: $desc" ) or diag "got: @t";
+    }
+}
+
+# §24, every punctuation name: perl accepts @X and %X for each of these
+# characters in term position (probed 5.40.3, `scalar(@X)` / `scalar(%X)`),
+# as it accepts $X.  A @ cast is only ever followed by $, { or a name, so
+# there is no second reading; after a term a % is still the modulo operator.
+{
+    my @names = ( map( "\@$_", split //, q{!./~&%=<>,|@\\} ),
+                  map( "%$_",  split //, q{?./~&%=<>,|@\\} ) );
+    TODO: {
+        local $TODO = 'PCL §24: A PUNCTUATION-named array @? is split into Cast + Operator';
+        for my $name (@names) {
+            my $code = "my \@k = (scalar($name));";
+            my @t = map { short_class($_) } toks($code);
+            ok( grep( $_ eq "Magic=$name", @t ), "`$name` in term position is one Magic token" )
+                or diag "got: @t";
+        }
+    }
+    my @controls = (
+        [ '$x %= 3;',   'Operator=%=', 'after a term %= is the assignment operator (control)' ],
+        [ '$h{a}%.5;',  'Operator=%',  'after a subscript % is modulo, .5 a number (control)' ],
+        [ '$z = 7 %.5;', 'Operator=%',  'after a number % is modulo (control)' ],
+        [ 'my $n = @{$r};', 'Cast=@',  'a @ before { stays a cast (control)' ],
+    );
+    for my $r (@controls) {
+        my ( $code, $want, $desc ) = @$r;
+        my @t = map { short_class($_) } toks($code);
+        ok( grep( $_ eq $want, @t ), "$code: $desc" ) or diag "got: @t";
     }
 }
