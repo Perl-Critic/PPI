@@ -71,7 +71,6 @@ use Digest::MD5                   ();
 use PPI::Util                     ();
 use PPI                           ();
 use PPI::Node                     ();
-use YAML::PP                      ();
 
 use overload 'bool' => \&PPI::Util::TRUE;
 use overload '""'   => 'content';
@@ -278,7 +277,10 @@ sub _setattr {
 	$document->{custom_feature_includes}   = $attr{custom_feature_includes};
 	$document->{custom_feature_include_cb} = $attr{custom_feature_include_cb};
 	if ( $ENV{PPI_CUSTOM_FEATURE_INCLUDES} ) {
-		my $includes = YAML::PP::Load $ENV{PPI_CUSTOM_FEATURE_INCLUDES};
+		# YAML::PP is needed only here, so it is loaded only here: PPI itself
+		# runs without it (dist.ini lists it as a runtime recommendation).
+		require YAML::PP;
+		my $includes = YAML::PP::Load( $ENV{PPI_CUSTOM_FEATURE_INCLUDES} );
 		die "\$ENV{PPI_CUSTOM_FEATURE_INCLUDES} "
 		  . "does not contain valid perl:\n"
 		  . "val: '$ENV{PPI_CUSTOM_FEATURE_INCLUDES}'\nerr: $@"

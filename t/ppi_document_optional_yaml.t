@@ -20,8 +20,7 @@ our $TODO;
 
 delete $ENV{PPI_CUSTOM_FEATURE_INCLUDES};
 
-TODO: {
-	local $TODO = 'PPI::Document loads YAML::PP when it is compiled';
+{
 	ok( eval { require PPI; 1 }, 'PPI loads without YAML::PP' ) or diag $@;
 	my $doc = eval { PPI::Document->new( \'my $x = 1;' ) };
 	ok( $doc && $doc->serialize eq 'my $x = 1;', '... and parses a document' );
