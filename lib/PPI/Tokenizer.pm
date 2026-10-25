@@ -87,6 +87,7 @@ use PPI::Token      ();
 use PPI::Exception  ();
 use PPI::Exception::ParserRejection ();
 use PPI::Document ();
+use PPI::Singletons qw' %NO_OPERAND ';
 
 our $VERSION = '1.292';
 
@@ -823,6 +824,7 @@ sub _after_scalar_filehandle {
 # tables of _opcontext cannot see:
 #
 #   * a method name -- a Word right after -> ($o->w * 2, $o->name . 2);
+#   * a builtin that takes no operand (time . 2, wait - 1);
 #   * a postfix ++ or -- ($i++ * 2), which is the one that itself follows a
 #     term; the prefix spelling (++$i) opens a term instead;
 #   * the } of a subscript or of a dereference block ($h{a} * 2,
@@ -834,6 +836,7 @@ sub _ends_term_at {
 	return '' if $cursor < 0;
 	my $token = $tokens->[$cursor];
 	if ( $token->isa('PPI::Token::Word') ) {
+		return 1 if $NO_OPERAND{ $token->content };
 		my ( $prev ) = $self->_significant_before($cursor);
 		return $prev && $prev->isa('PPI::Token::Operator') && $prev->content eq '->';
 	}

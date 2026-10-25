@@ -41,7 +41,7 @@ L<PPI::Token> and L<PPI::Element> classes.
 
 use strict;
 use PPI::Token ();
-use PPI::Singletons qw' %OPERATOR %KEYWORDS ';
+use PPI::Singletons qw' %OPERATOR %KEYWORDS %NO_OPERAND ';
 
 our $VERSION = '1.292';
 
@@ -105,15 +105,6 @@ sub __TOKENIZER__on_char {
 	# Finalize normally
 	$t->_finalize_token->__TOKENIZER__on_char( $t );
 }
-
-# Builtins that take no operand: after one of them an operator follows
-# (time ~~ @a is a smart match).
-my %NO_OPERAND = map { $_ => 1 } qw(
-	time times wait wantarray fork getppid getlogin
-	getgrent gethostent getnetent getprotoent getpwent getservent
-	endgrent endhostent endnetent endprotoent endpwent endservent
-	setgrent setpwent
-);
 
 # Is a TERM expected where the tokenizer now stands?  Only what is known
 # counts: after an operator, an opening bracket or a ; (_opcontext), after a

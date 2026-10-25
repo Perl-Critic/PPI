@@ -8,7 +8,7 @@ use Exporter     ();
 our $VERSION = '1.292';
 
 our @ISA       = 'Exporter';
-our @EXPORT_OK = qw{ %_PARENT %_POSITION_CACHE %OPERATOR %MAGIC %LAYER $CURLY_SYMBOL %QUOTELIKE %KEYWORDS };
+our @EXPORT_OK = qw{ %_PARENT %_POSITION_CACHE %OPERATOR %MAGIC %LAYER $CURLY_SYMBOL %QUOTELIKE %KEYWORDS %NO_OPERAND };
 
 our %_PARENT; # Master Child -> Parent index
 our %_POSITION_CACHE; # cache for position in parent
@@ -48,6 +48,15 @@ our %MAGIC = map { $_ => 1 } qw{
 
 	$::|
 }, '$}', '$,', '$#', '$#+', '$#-', '@\\', '%\\', '@,', '%,';
+
+# Builtins that take no operand: each is a whole term, so after one of them
+# an operator follows (time ~~ @a is a smart match, time.2 a concatenation).
+our %NO_OPERAND = map { $_ => 1 } qw(
+	time times wait wantarray fork getppid getlogin
+	getgrent gethostent getnetent getprotoent getpwent getservent
+	endgrent endhostent endnetent endprotoent endpwent endservent
+	setgrent setpwent
+);
 
 our %LAYER = ( 1 => [], 2 => [] );    # Registered function store
 
