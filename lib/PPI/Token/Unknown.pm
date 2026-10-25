@@ -60,8 +60,7 @@ sub __TOKENIZER__on_char {
 
 		if ( $char =~ /[\w:]/ ) {
 			# Symbol, unless the thing before it ends a term: length($k)*length($k)
-			my ( $prev ) = $t->_previous_significant_tokens(1);
-			if ( not _after_term( $t, $prev ) ) {
+			if ( not $t->_after_term ) {
 				$t->{class} = $t->{token}->set_class( 'Symbol' );
 				return 1;
 			}
@@ -218,7 +217,7 @@ sub __TOKENIZER__on_char {
 		}
 
 		# After a term, % is the modulo operator whatever follows it (7%-3)
-		if ( _after_term( $t, ($t->_previous_significant_tokens(1))[0] ) ) {
+		if ( $t->_after_term ) {
 			$t->{class} = $t->{token}->set_class( 'Operator' );
 			return $t->{class}->__TOKENIZER__on_char( $t );
 		}
@@ -340,18 +339,6 @@ sub __TOKENIZER__on_char {
 	PPI::Exception->throw('Unknown value in PPI::Token::Unknown token');
 }
 
-# True when the previous significant token ENDS A TERM, so the % or * now
-# being classified is an operator (7%-3, length($k)*length($k)).  A } is
-# excluded: here the tokenizer cannot tell a block's end from a subscript's
-# (_cast_or_op scans back for that).  So is a scalar filehandle.
-sub _after_term {
-	my ( $t, $prev ) = @_;
-	return '' if !$prev;
-	return '' if $prev->isa('PPI::Token::Structure') and $prev->content eq '}';
-	return '' if $t->_after_scalar_filehandle;
-	return $t->_opcontext eq 'operator';
-}
-
 sub _is_cast_or_op {
 	my ( $self, $char ) = @_;
 	return 1 if $char eq '$';
@@ -392,40 +379,12 @@ sub _cast_or_op {
 	return 'Cast' if !$token;    # token was first in the document
 
 	if ( $token->isa( 'PPI::Token::Structure' ) and $token->content eq '}' ) {
-
-		# Scan the token stream backwards an arbitrarily long way,
-		# looking for the matching opening curly brace.
-		my $structure_depth = 1;
-		( $token, $cursor ) = _prev_significant_w_cursor(
-			$tokens, $cursor,
-			sub {
-				my ( $token ) = @_;
-				return if !$token->isa( 'PPI::Token::Structure' );
-				if ( $token eq '}' ) {
-					$structure_depth++;
-					return;
-				}
-				if ( $token eq '{' ) {
-					$structure_depth--;
-					return if $structure_depth;
-				}
-				return 1;
-			}
-		);
-		return 'Operator' if !$token;    # no matching '{', probably an unbalanced '}'
-
-		# Scan past any whitespace
-		( $token, $cursor ) = _prev_significant_w_cursor( $tokens, $cursor );
-		return 'Operator' if !$token;                             # Document began with what must be a hash constructor.
-		return 'Operator' if $token->isa( 'PPI::Token::Symbol' ); # subscript
-
-		my %meth_or_subscript_end = map { $_ => 1 } qw@ -> } ] @;
-		return 'Operator' if $meth_or_subscript_end{ $token->content };    # subscript
-
-		my $content = $token->content;
-		my $produces_or_wants_value =
-		  ( $token->isa( 'PPI::Token::Word' ) and ( $content eq 'do' or $content eq 'eval' ) );
-		return $produces_or_wants_value ? 'Operator' : 'Cast';
+		# After a block's } a cast starts the next term; after the } of a
+		# subscript, of a dereference block or of do/eval's block it is an
+		# operator.  An unbalanced }, or a { that opens the document (which
+		# must be a hash constructor), counts as a term too.
+		my $kind = $t->_curly_kind( $cursor + 1 );
+		return ( $kind and $kind eq 'block' ) ? 'Cast' : 'Operator';
 	}
 
 	my %list_start_or_term_end = map { $_ => 1 } qw@ ; ( { [ @;

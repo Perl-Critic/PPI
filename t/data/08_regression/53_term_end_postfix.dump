@@ -1,0 +1,39 @@
+PPI::Document
+  PPI::Statement
+    PPI::Token::Symbol  	'$i'
+    PPI::Token::Operator  	'++'
+    PPI::Token::Operator  	'*'
+    PPI::Token::Word  	'f'
+    PPI::Structure::List  	( ... )
+    PPI::Token::Structure  	';'
+  PPI::Token::Whitespace  	'\n'
+  PPI::Statement
+    PPI::Token::Symbol  	'$i'
+    PPI::Token::Operator  	'++'
+    PPI::Token::Whitespace  	' '
+    PPI::Token::Operator  	'/'
+    PPI::Token::Whitespace  	' '
+    PPI::Token::Number  	'2'
+    PPI::Token::Structure  	';'
+  PPI::Token::Whitespace  	'\n'
+  PPI::Statement
+    PPI::Token::Symbol  	'$i'
+    PPI::Token::Operator  	'--'
+    PPI::Token::Operator  	'%'
+    PPI::Token::Number  	'-1'
+    PPI::Token::Structure  	';'
+  PPI::Token::Whitespace  	'\n'
+  PPI::Statement
+    PPI::Token::Symbol  	'$i'
+    PPI::Token::Operator  	'++'
+    PPI::Token::Operator  	'.'
+    PPI::Token::Number  	'2'
+    PPI::Token::Structure  	';'
+  PPI::Token::Whitespace  	'\n'
+  PPI::Statement
+    PPI::Token::Operator  	'++'
+    PPI::Token::Symbol  	'$i'
+    PPI::Token::Operator  	'*'
+    PPI::Token::Symbol  	'$x'
+    PPI::Token::Structure  	';'
+  PPI::Token::Whitespace  	'\n'

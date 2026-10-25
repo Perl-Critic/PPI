@@ -748,6 +748,10 @@ my %OBVIOUS_CLASS = (
 	'PPI::Token::QuoteLike::Readline' => 'operator',
 	'PPI::Token::QuoteLike::Regexp'   => 'operator',
 	'PPI::Token::QuoteLike::Words'    => 'operator',
+	'PPI::Token::Regexp::Match'       => 'operator',
+	'PPI::Token::Regexp::Substitute'  => 'operator',
+	'PPI::Token::Regexp::Transliterate' => 'operator',
+	'PPI::Token::HereDoc'             => 'operator',
 );
 
 my %OBVIOUS_CONTENT = (
@@ -762,6 +766,7 @@ my %OBVIOUS_CONTENT = (
 
 
 my %USUALLY_FORCES = map { $_ => 1 } qw( sub package use no );
+my %POSTFIX = map { $_ => 1 } qw( ++ -- );
 
 # Try to determine operator/operand context, if possible.
 # Returns "operator", "operand", or "" if unknown.
@@ -776,6 +781,13 @@ sub _opcontext {
 	return $OBVIOUS_CLASS{$c0}   if defined $OBVIOUS_CLASS{$c0};
 	return 'operator' if $p0->isa('PPI::Token::Number');   # Float, Exp, Hex, Octal, Binary too
 	return $OBVIOUS_CONTENT{$p0} if defined $OBVIOUS_CONTENT{$p0};
+
+	# A method name and a postfix ++ or -- end a term too (_ends_term_at)
+	my $cursor = $#{ $self->{tokens} };
+	$cursor-- while $cursor >= 0 and !$self->{tokens}->[$cursor]->significant;
+	if ( $p0->isa('PPI::Token::Word') or $POSTFIX{ $p0->content } ) {
+		return 'operator' if $self->_ends_term_at($cursor);
+	}
 
 	# Most of the time after an operator, we are an operand
 	return 'operand' if $p0->isa('PPI::Token::Operator');
@@ -803,6 +815,92 @@ sub _after_scalar_filehandle {
 	my $last = $self->_last_token;
 	return '' if !$last or !$last->isa('PPI::Token::Whitespace');
 	return $op && $op->isa('PPI::Token::Word') && $FILEHANDLE_LISTOP{ $op->content };
+}
+
+# After a TERM perl expects an operator (toke.c: PL_expect == XOPERATOR).
+# _ends_term_at says whether the significant token at index $cursor of the
+# token list ends a term, including the three cases the class and content
+# tables of _opcontext cannot see:
+#
+#   * a method name -- a Word right after -> ($o->w * 2, $o->name . 2);
+#   * a postfix ++ or -- ($i++ * 2), which is the one that itself follows a
+#     term; the prefix spelling (++$i) opens a term instead;
+#   * the } of a subscript or of a dereference block ($h{a} * 2,
+#     @{$r} * 2), told from a block's } by what comes before its { (see
+#     _curly_kind).  The } of a block does not end a term.
+sub _ends_term_at {
+	my ( $self, $cursor ) = @_;
+	my $tokens = $self->{tokens};
+	return '' if $cursor < 0;
+	my $token = $tokens->[$cursor];
+	if ( $token->isa('PPI::Token::Word') ) {
+		my ( $prev ) = $self->_significant_before($cursor);
+		return $prev && $prev->isa('PPI::Token::Operator') && $prev->content eq '->';
+	}
+	if ( $token->isa('PPI::Token::Operator') ) {
+		return '' if !$POSTFIX{ $token->content };
+		my ( $prev, $at ) = $self->_significant_before($cursor);
+		return $prev && $self->_ends_term_at($at);
+	}
+	if ( $token->isa('PPI::Token::Structure') ) {
+		my $c = $token->content;
+		return 1 if $c eq ')' or $c eq ']';
+		return '' if $c ne '}';
+		my $kind = $self->_curly_kind($cursor);
+		return $kind && ( $kind eq 'subscript' or $kind eq 'deref' or $kind eq 'value' );
+	}
+	return 1 if $OBVIOUS_CLASS{ ref $token } or $token->isa('PPI::Token::Number');
+	return '';
+}
+
+# The significant token before index $cursor, and its index.
+sub _significant_before {
+	my ( $self, $cursor ) = @_;
+	my $tokens = $self->{tokens};
+	while ( --$cursor >= 0 ) {
+		return ( $tokens->[$cursor], $cursor ) if $tokens->[$cursor]->significant;
+	}
+	return ( undef, -1 );
+}
+
+# What the } at index $cursor closes, from the token before its matching {:
+#   'subscript'  after a Symbol, a ->, or another subscript's } or ]  ($h{a}, $r->{a}{b})
+#   'deref'      after a Cast                                         (@{$r}, ${$x})
+#   'value'      after do or eval, whose block yields a value         (do { 1 })
+#   'block'      anything else
+#   'start'      the { opens the document
+#   undef        no matching { (an unbalanced })
+sub _curly_kind {
+	my ( $self, $cursor ) = @_;
+	my $tokens = $self->{tokens};
+	my $depth  = 1;
+	while ( --$cursor >= 0 ) {
+		my $token = $tokens->[$cursor];
+		next if !$token->isa('PPI::Token::Structure');
+		$depth++ if $token->content eq '}';
+		$depth-- if $token->content eq '{';
+		last if !$depth;
+	}
+	return if $cursor < 0;
+	my ( $prev ) = $self->_significant_before($cursor);
+	return 'start' if !$prev;
+	return 'subscript' if $prev->isa('PPI::Token::Symbol');
+	my $content = $prev->content;
+	return 'subscript' if $content eq '->' or $content eq '}' or $content eq ']';
+	return 'deref' if $prev->isa('PPI::Token::Cast');
+	return 'value' if $prev->isa('PPI::Token::Word') and ( $content eq 'do' or $content eq 'eval' );
+	return 'block';
+}
+
+# True when the token before the current one ends a term (_ends_term_at),
+# except in the scalar-filehandle slot of print $fh LIST, where the next
+# token starts the list (_after_scalar_filehandle).
+sub _after_term {
+	my $self = shift;
+	return '' if $self->_after_scalar_filehandle;
+	my $cursor = $#{ $self->{tokens} };
+	$cursor-- while $cursor >= 0 and !$self->{tokens}->[$cursor]->significant;
+	return $self->_ends_term_at($cursor);
 }
 
 # Assuming we are currently parsing the word 'x', return true

@@ -331,6 +331,8 @@ sub __TOKENIZER__on_char {
 		# .. - The second condition in a flip flop
 		# =~ - A bound regex
 		# !~ - Ditto
+		# But after a postfix ++ or -- a term has ended: $i++ / 2 divides
+		return 'Operator' if $prev->isa('PPI::Token::Operator') and $t->_after_term;
 		return 'Regexp::Match' if $prev->isa('PPI::Token::Operator');
 
 		# After a symbol

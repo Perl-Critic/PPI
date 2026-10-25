@@ -250,8 +250,7 @@ TODO: {
 # `*` inside the SECOND pattern becomes a typeglob SYMBOL that appears nowhere
 # in the source.  A consumer that repairs `)*name` (bug 9) will faithfully
 # rewrite it, splicing a space into the middle of a regular expression.
-TODO: {
-    local $TODO = 'PCL §11: /PATTERN/ after a paren-less WORD is tokenized as division';
+{
     my $src = qq{sub ok { 1 }\n\$_ = 'aaabccc';\n ok /a+b?c+/, "one";\n}
             . qq{ ok /a*b?c*/, "two";\n};
     my $doc = PPI::Document->new(\$src);
@@ -1049,8 +1048,7 @@ TODO: {
 # §33 -- a `*` right after a compound statement's block is lexed as an
 # OPERATOR when the block's last statement ends in a hash subscript, although
 # the `}` ends the statement and the `*` starts a glob assignment.
-TODO: {
-    local $TODO = 'PCL §33: A * right after a BLOCK\'s } is lexed as MULTIPLICATION when the block\'s last statement ends in a hash subscript';
+{
     my $src = qq{for (1) { \$h{\$_}; }\n*{"main::x"} = sub { 7 };\n};
     my $doc = PPI::Document->new(\$src);
     my ($tok) = grep { $_->content eq '*' } $doc->tokens;
@@ -1169,13 +1167,10 @@ TODO: {
         [ 'print $fh %h',          'Symbol=%h',     'after a scalar filehandle a hash is the list (control)' ],
         [ 'foo *bar',              'Symbol=*bar',   'after a plain word a glob is its argument (control)' ],
     );
-    TODO: {
-        local $TODO = 'PCL §55: a method name, a postfix ++/-- and a subscript or dereference } do not end a term';
-        for my $r (@rows) {
-            my ( $code, $want, $desc ) = @$r;
-            my @t = map { short_class($_) } toks($code);
-            ok( grep( $_ eq $want, @t ), "$code: $desc" ) or diag "got: @t";
-        }
+    for my $r (@rows) {
+        my ( $code, $want, $desc ) = @$r;
+        my @t = map { short_class($_) } toks($code);
+        ok( grep( $_ eq $want, @t ), "$code: $desc" ) or diag "got: @t";
     }
     for my $r (@controls) {
         my ( $code, $want, $desc ) = @$r;
