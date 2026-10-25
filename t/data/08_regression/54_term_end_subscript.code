@@ -5,3 +5,5 @@ $x->{a}{b}*f();
 do { 1 }*f();
 sub f {} *bar = \&f;
 print {$fh} .5;
+${$r}{a}*f();
+{ my $y = 1; } { my %h; } *trit = *scile;

@@ -1180,8 +1180,7 @@ TODO: {
 # §55, the block-after-block case: a { right after a block's } opens the next
 # BLOCK, not a subscript, so a glob after the second block starts the next
 # statement (perl-tests/array.t: `{ ... }\n\n{ ... }\n\n*trit = *scile;`).
-TODO: {
-    local $TODO = 'PCL §55: a { after a block\'s } is taken for a chained subscript';
+{
     my @t = map { short_class($_) } toks('{ my $y = 1; } { my %h; } *trit = *scile;');
     ok( grep( $_ eq 'Symbol=*trit', @t ),
         'a glob after two consecutive blocks starts the next statement' )

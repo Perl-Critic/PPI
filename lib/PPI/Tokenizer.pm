@@ -882,11 +882,18 @@ sub _curly_kind {
 		last if !$depth;
 	}
 	return if $cursor < 0;
-	my ( $prev ) = $self->_significant_before($cursor);
+	my ( $prev, $at ) = $self->_significant_before($cursor);
 	return 'block' if !$prev;
 	return 'subscript' if $prev->isa('PPI::Token::Symbol');
 	my $content = $prev->content;
-	return 'subscript' if $content eq '->' or $content eq '}' or $content eq ']';
+	return 'subscript' if $content eq '->' or $content eq ']';
+	if ( $content eq '}' ) {
+		# A chained subscript ($h{a}{b}, @{$r}{qw(a b)}) follows the } of a
+		# subscript or a dereference; after a block's } a { opens the next
+		# block (a bare block after an if, sub or bare block).
+		my $before = $self->_curly_kind($at);
+		return ( $before and ( $before eq 'subscript' or $before eq 'deref' ) ) ? 'subscript' : 'block';
+	}
 	return 'deref' if $prev->isa('PPI::Token::Cast');
 	return 'value' if $prev->isa('PPI::Token::Word') and ( $content eq 'do' or $content eq 'eval' );
 	return 'block';
