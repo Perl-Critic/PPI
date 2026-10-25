@@ -668,8 +668,7 @@ TODO: {
 }
 # The documented siblings prove the intent — @- and @+ ARE single Magic tokens,
 # so the name rule is an enumeration where perl has a character class.
-TODO: {
-    local $TODO = 'PCL §24: A PUNCTUATION-named array @? is split into Cast + Operator';
+{
     my $doc = PPI::Document->new(\'my $n = scalar(@!);');
     my @sym = grep { $_->isa('PPI::Token::Symbol') || $_->isa('PPI::Token::Magic') }
                    $doc->tokens;
@@ -686,8 +685,7 @@ TODO: {
 #   7                        # `%3, "\n"` is the HASH %3, passed to f
 #   $ perl -e 'sub f { 7 } print f() % 3, "\n"'
 #   1                        # after `)` a term has ended: modulo
-TODO: {
-    local $TODO = 'PCL §24: A PUNCTUATION-named array @? is split into Cast + Operator';
+{
     my $doc = PPI::Document->new(\'my @k = keys %?;');
     my @sym = grep { $_->isa('PPI::Token::Symbol') } $doc->tokens;
     ok( (grep { $_->content eq '%?' } @sym),
@@ -1221,14 +1219,11 @@ TODO: {
 {
     my @names = ( map( "\@$_", split //, q{!./~&%=<>,|@\\} ),
                   map( "%$_",  split //, q{?./~&%=<>,|@\\} ) );
-    TODO: {
-        local $TODO = 'PCL §24: A PUNCTUATION-named array @? is split into Cast + Operator';
-        for my $name (@names) {
-            my $code = "my \@k = (scalar($name));";
-            my @t = map { short_class($_) } toks($code);
-            ok( grep( $_ eq "Magic=$name", @t ), "`$name` in term position is one Magic token" )
-                or diag "got: @t";
-        }
+    for my $name (@names) {
+        my $code = "my \@k = (scalar($name));";
+        my @t = map { short_class($_) } toks($code);
+        ok( grep( $_ eq "Magic=$name", @t ), "`$name` in term position is one Magic token" )
+            or diag "got: @t";
     }
     my @controls = (
         [ '$x %= 3;',   'Operator=%=', 'after a term %= is the assignment operator (control)' ],
