@@ -13,7 +13,7 @@
 use lib 't/lib';
 use PPI::Test::pragmas;
 use utf8;
-use Test::More tests => 155 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+use Test::More tests => 157 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use PPI ();
 
@@ -1257,4 +1257,19 @@ TODO: {
     }
     my @t = map { short_class($_) } toks('my %h = (time => 1);');
     ok( grep( $_ eq 'Word=time', @t ), 'time before => stays a word (control)' ) or diag "got: @t";
+}
+
+# §24, the caret: perl -e '@^ = (1,2); print scalar(@^)' prints 2.  The
+# hash spelling %^ stays two tokens here: a % before ^ starts the caret
+# names (%^H), and only %^H is one.
+TODO: {
+    local $TODO = 'PCL §24: A PUNCTUATION-named array @? is split into Cast + Operator';
+    my @t = map { short_class($_) } toks('my @k = (scalar(@^));');
+    ok( grep( $_ eq 'Magic=@^', @t ), '`@^` in term position is one Magic token' )
+        or diag "got: @t";
+}
+{
+    my @t = map { short_class($_) } toks('my $n = scalar(%^H);');
+    ok( grep( $_ eq 'Magic=%^H', @t ), '`%^H` stays one Magic token (control)' )
+        or diag "got: @t";
 }
