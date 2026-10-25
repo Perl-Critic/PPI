@@ -13,7 +13,7 @@
 use lib 't/lib';
 use PPI::Test::pragmas;
 use utf8;
-use Test::More tests => 112 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+use Test::More tests => 114 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use PPI ();
 
@@ -1175,4 +1175,21 @@ TODO: {
         my @t = map { short_class($_) } toks($code);
         ok( grep( $_ eq $want, @t ), "$code: $desc" ) or diag "got: @t";
     }
+}
+
+# §55, the block-after-block case: a { right after a block's } opens the next
+# BLOCK, not a subscript, so a glob after the second block starts the next
+# statement (perl-tests/array.t: `{ ... }\n\n{ ... }\n\n*trit = *scile;`).
+TODO: {
+    local $TODO = 'PCL §55: a { after a block\'s } is taken for a chained subscript';
+    my @t = map { short_class($_) } toks('{ my $y = 1; } { my %h; } *trit = *scile;');
+    ok( grep( $_ eq 'Symbol=*trit', @t ),
+        'a glob after two consecutive blocks starts the next statement' )
+        or diag "got: @t";
+}
+{
+    my @t = map { short_class($_) } toks('${$r}{a}*f()');
+    ok( grep( $_ eq 'Operator=*', @t ),
+        "a subscript after a dereference block ends a term: * multiplies (control)" )
+        or diag "got: @t";
 }
