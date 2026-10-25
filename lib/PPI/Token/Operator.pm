@@ -116,15 +116,17 @@ my %NO_OPERAND = map { $_ => 1 } qw(
 );
 
 # Is a TERM expected where the tokenizer now stands?  Only what is known
-# counts: after an operator, an opening bracket or a ; (_opcontext), at the
-# start of the document, and after a builtin that takes an operand (print,
-# return, ...).  After a match, a method name or a user's word it cannot
-# say, and the answer is no.
+# counts: after an operator, an opening bracket or a ; (_opcontext), after a
+# block's } (_after_term), at the start of the document, and after a builtin
+# that takes an operand (print, return, ...).  After a match, a method name or
+# a user's word it cannot say, and the answer is no.
 sub __term_expected {
 	my ( $t ) = @_;
 	my ( $prev, $prevprev ) = $t->_previous_significant_tokens(2);
 	return 1 if !$prev;
 	return 1 if $t->_opcontext eq 'operand';
+	# A block's } does not end a term (map { $_ } ~~$y); a subscript's does
+	return !$t->_after_term if $prev->isa('PPI::Token::Structure') and $prev->content eq '}';
 	return '' if !$prev->isa('PPI::Token::Word');
 	return '' if $prevprev and $prevprev->isa('PPI::Token::Operator') and $prevprev->content eq '->';
 	return $KEYWORDS{ $prev->content } && !$NO_OPERAND{ $prev->content };

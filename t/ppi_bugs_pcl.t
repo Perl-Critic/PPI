@@ -1210,7 +1210,6 @@ TODO: {
         my ( $code, $split, $desc ) = @$r;
         my @t = map { short_class($_) } toks($code);
         my $smart = grep( $_ eq 'Operator=~~', @t );
-        local $TODO = $split ? 'PCL §21: a term-initial ~~ is lexed as the smart-match operator' : undef;
         ok( $split ? !$smart : $smart, "$code: $desc" ) or diag "got: @t";
     }
 }
