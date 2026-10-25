@@ -80,7 +80,7 @@ Returns the symbol as a string.
 
 =cut
 
-my %cast_which_trumps_braces = map { $_ => 1 } qw{ $ @ % };
+my %cast_which_trumps_braces = map { $_ => 1 } qw{ $ @ % * };
 
 sub symbol {
 	my $self   = shift;

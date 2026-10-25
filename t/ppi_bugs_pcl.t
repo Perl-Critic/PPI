@@ -802,15 +802,13 @@ TODO: {
 # (`*$_{HASH}`, `${*$_{SCALAR}}`), plus t/op/filetest.t, t/op/stat.t,
 # t/op/gv.t and t/uni/parser.t.  One-token fix: add `*` to
 # %cast_which_trumps_braces in PPI/Token/Symbol.pm.
-TODO: {
-    local $TODO = 'PCL §27: ->symbol answers %x for the $x in *$x{SLOT}';
+{
     my $doc = PPI::Document->new(\'my $x = *$a{SCALAR};');
     my ($sym) = grep { $_->isa('PPI::Token::Symbol') && $_->content eq '$a' } $doc->tokens;
     is( ($sym ? $sym->symbol : '(no token)'), '$a',
         '`$a` under a `*` cast is the SCALAR $a — the glob-slot operand' );
 }
-TODO: {
-    local $TODO = 'PCL §27: ->symbol answers %x for the $x in *$x{SLOT}';
+{
     my $doc = PPI::Document->new(\'return *$_{HASH};');
     my ($sym) = grep { $_->isa('PPI::Token::Magic') && $_->content eq '$_' } $doc->tokens;
     is( ($sym ? $sym->symbol : '(no token)'), '$_',
