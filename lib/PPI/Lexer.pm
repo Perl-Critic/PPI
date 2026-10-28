@@ -1160,6 +1160,22 @@ sub _round {
 	'PPI::Structure::List'
 }
 
+# The first token after a { that a comma after it makes an anonymous
+# hash (toke.c's curly look-ahead): a quote, or a run of word characters
+# -- a number such as 1 or 0x1F, a word -- unless it starts with a
+# lower-case letter.  { 1.5, 2 } and { foo, 1 } stay blocks.
+sub _hash_comma_head {
+	my $Token = shift or return '';
+	return 1 if $Token->isa('PPI::Token::Quote');
+	return 1 if $Token->isa('PPI::Token::QuoteLike::Words');      # qw()
+	return 1 if $Token->isa('PPI::Token::QuoteLike::Backtick');   # ``
+	return 1 if $Token->isa('PPI::Token::QuoteLike::Command');    # qx()
+	my $content = $Token->content;
+	return '' if $content !~ /\A\w+\z/;
+	return 1 if $Token->isa('PPI::Token::Number');
+	return $Token->isa('PPI::Token::Word') && $content !~ /\A[a-z]/;
+}
+
 # Is the last child of the parent the block of a dereference -- a $, @ or
 # % cast before it, as in ${$ref}, @{$ref}, %{$ref} or ${name}?  A [ or {
 # right after it subscripts it, as after the symbol it stands for.
@@ -1354,10 +1370,24 @@ sub _curly {
 	my $Next;
 	my $position = 0;
 	my @delayed;
+	my $first;
 	while ( $Next = $self->_get_token ) {
 		unless ( $Next->significant ) {
 			push @delayed, $Next;
 			next;
+		}
+
+		# perl (toke.c): a string, a number or a word that does not
+		# start with a lower-case letter, followed by a comma, makes an
+		# anonymous hash: { 'a', 1 }, { 1, 2 }, { Foo, 1 }
+		$first = $Next if $position == 0;
+		if (
+			$position == 1
+			and $Next->content eq ','
+			and _hash_comma_head($first)
+		) {
+			$self->_buffer( splice(@delayed), $Next );
+			return 'PPI::Structure::Constructor';
 		}
 
 		# If we are off the end of the lookahead array,

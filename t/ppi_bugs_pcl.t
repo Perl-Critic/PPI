@@ -1601,15 +1601,12 @@ is_deeply( [ stmts("use feature 'try';\ntry { a() } catch (\$e) { b() }\nd();\n"
         [ q{{ 'a' => 1 };},    'PPI::Structure::Constructor', 0 ],
     );
     for my $r (@rows) {
-        my ( $code, $want, $todo ) = @$r;
+        my ( $code, $want, $row ) = @$r;
         my $doc = PPI::Document->new(\$code);
         my ($first) = $doc->schildren;
         my $br = $first && $first->schild(0);
-        local $TODO = $todo
-          ? 'PCL §5: { LITERAL , ... } (anon hash, comma-separated) misclassified as a Block'
-          : undef;
         is( ref($br), $want,
             "$code: the statement-initial { is a " . short_class($want)
-              . ( $todo ? '' : ' (control)' ) );
+              . ( $row ? " (PCL \x{a7}5)" : " (control)" ) );
     }
 }

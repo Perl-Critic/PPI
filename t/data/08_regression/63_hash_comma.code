@@ -1,0 +1,6 @@
+sub f { { 'a', 'foo' } }
+sub g { { 1, 2 } }
+sub h { { foo, 1 } }
+sub i { { $x, 1 } }
+{ Foo, 1 };
+{ 1.5, 2 };
