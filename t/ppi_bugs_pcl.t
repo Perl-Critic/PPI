@@ -13,7 +13,7 @@
 use lib 't/lib';
 use PPI::Test::pragmas;
 use utf8;
-use Test::More tests => 179 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+use Test::More tests => 184 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use PPI ();
 
@@ -1363,4 +1363,28 @@ TODO: {
 {
     my @t = map { short_class($_) } toks('*X = *::foo;');
     ok( grep( $_ eq 'Symbol=*::foo', @t ), '*::foo stays one glob (control)' ) or diag "got: @t";
+}
+
+# §32, the siblings: $, and $= take the same wrong branch as $) once the
+# signatures feature is on (perl: $, is the output field separator, $= the
+# page length).  A nameless parameter is a $ followed by ) , or = INSIDE a
+# signature, and only there.
+TODO: {
+    local $TODO = 'PCL §32: $) is tokenized as Symbol:$ + Structure:) ANYWHERE once the signatures feature is on';
+    for my $r ( [ "use v5.36;\nmy \$s = \$,;", 'Magic=$,' ],
+                [ "use v5.36;\nprint \$=;",     'Magic=$=' ] ) {
+        my ( $code, $want ) = @$r;
+        my @t = map { short_class($_) } toks($code);
+        ok( grep( $_ eq $want, @t ), "$want under the signatures feature is one Magic" )
+            or diag "got: @t";
+    }
+}
+# The controls: nameless parameters in a named sub's, an anonymous sub's and
+# an attributed sub's signature stay a $ Symbol.
+for my $code ( "use v5.36;\nsub f (\$, \$y) { 1 }",
+               "use v5.36;\nmy \$c = sub (\$) { 1 };",
+               "use v5.36;\nsub g :prototype(\$) (\$x, \$=) { 1 }" ) {
+    my @t = map { short_class($_) } toks($code);
+    ok( grep( $_ eq 'Symbol=$', @t ), "a nameless parameter stays a \$ Symbol (control)" )
+        or diag "got: @t";
 }
