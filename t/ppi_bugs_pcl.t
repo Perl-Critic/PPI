@@ -13,7 +13,7 @@
 use lib 't/lib';
 use PPI::Test::pragmas;
 use utf8;
-use Test::More tests => 251 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+use Test::More tests => 253 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use PPI ();
 
@@ -1608,5 +1608,25 @@ is_deeply( [ stmts("use feature 'try';\ntry { a() } catch (\$e) { b() }\nd();\n"
         is( ref($br), $want,
             "$code: the statement-initial { is a " . short_class($want)
               . ( $row ? " (PCL \x{a7}5)" : " (control)" ) );
+    }
+}
+
+# §13, the whole of it: the tokens of a document do not depend on the
+# caller's $/.  In slurp mode ($/ undefined, as code that has just read
+# the source is likely to be) a trailing comment absorbs its newline and
+# the newline after __DATA__ / __END__ becomes a Comment.
+{
+    my $src = "# c\nx; # d\n__DATA__\nfoo\n";
+    my $tokens = sub {
+        join '|', map { short_class(ref $_) . '=' . $_->content }
+                  PPI::Document->new(\$src)->tokens;
+    };
+    my $plain   = $tokens->();
+    my $slurped = do { local $/; $tokens->() };
+    my $crlf    = do { local $/ = "\r\n"; $tokens->() };
+    TODO: {
+        local $TODO = 'PCL §13: Tokenization of a trailing __END__/__DATA__ section depends on $/';
+        is( $slurped, $plain, 'the tokens are the same when $/ is undef' );
+        is( $crlf,    $plain, 'the tokens are the same when $/ is "\r\n"' );
     }
 }
