@@ -13,7 +13,7 @@
 use lib 't/lib';
 use PPI::Test::pragmas;
 use utf8;
-use Test::More tests => 177 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+use Test::More tests => 179 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use PPI ();
 
@@ -1352,4 +1352,16 @@ TODO: {
         my @t = map { short_class($_) } toks($code);
         ok( grep( $_ eq $want, @t ), "$code: $desc" ) or diag "got: @t";
     }
+}
+
+# §26, the colon: $: names a scalar, so *: is a glob, while *::foo stays the
+# glob main::foo.
+TODO: {
+    local $TODO = 'PCL §26: A glob whose NAME is punctuation or a digit run is split into two operators';
+    my @t = map { short_class($_) } toks('*X = *:;');
+    ok( grep( $_ eq 'Symbol=*:', @t ), '*: is one glob' ) or diag "got: @t";
+}
+{
+    my @t = map { short_class($_) } toks('*X = *::foo;');
+    ok( grep( $_ eq 'Symbol=*::foo', @t ), '*::foo stays one glob (control)' ) or diag "got: @t";
 }
