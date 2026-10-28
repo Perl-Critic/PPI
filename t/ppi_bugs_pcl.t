@@ -114,8 +114,7 @@ sub toks {
 #   Lexer failed: Illegal state in 'for' compound statement
 # Plain `for $x (…)` is fine; `foreach ${*$f} (…)` fails identically, as does
 # the construct buried anywhere in a larger document (the whole parse dies).
-TODO: {
-    local $TODO = 'PCL §6: for ${*$f} (LIST) { } — LEXER DIES: "Illegal state in \'for\' compound statement"';
+{
     my $src = 'no strict "refs"; my $f = "v"; for ${*$f} (5,11,33) { print }';
     my $doc = PPI::Document->new(\$src);
     ok( $doc,
@@ -168,8 +167,7 @@ TODO: {
 # a consumer sees a `for` with no list and no block, and loses unrelated code
 # with it.  (Compare `for my $q (@l) { A() } print "x";`, which parses into two
 # statements as expected.)
-TODO: {
-    local $TODO = 'PCL §10: for accepts only [my] $scalar as its loop variable';
+{
     my $src = 'for my ($q, $r) (@l) { A() } print "x";';
     my $doc = PPI::Document->new(\$src);
     my ($first) = $doc ? $doc->schildren : ();
@@ -851,8 +849,7 @@ TODO: {
 # ("Lexer failed: Illegal state in 'for' compound statement"), so the WHOLE
 # FILE is lost.  The same dereference outside a for head lexes fine, so the
 # fault is in the for-compound lexer's loop-variable slot.
-TODO: {
-    local $TODO = 'PCL §29: A DEREFERENCE as the foreach loop variable fails the LEXER: "Illegal state in \'for\' compound statement"';
+{
     for my $src ('for $$f (1,2) { }',
                  'for ${$f} (1,2) { }',
                  'for ${*$f} (5,11,33) { }') {
@@ -880,8 +877,7 @@ TODO: {
 # the list and the block in a SIBLING PPI::Statement, so the document exists
 # and is silently wrong-shaped.  perl runs the loop, aliasing $x to each
 # element's referent.
-TODO: {
-    local $TODO = 'PCL §29: A DEREFERENCE as the foreach loop variable fails the LEXER: "Illegal state in \'for\' compound statement"';
+{
     for my $src ('for my \$x (\$main::y) { 1 }',
                  'foreach my \@a (\@main::b) { 1 }') {
         my $doc = PPI::Document->new(\$src) or do {
@@ -1527,9 +1523,6 @@ is_deeply( [ stmts("use feature 'try';\ntry { a() } catch (\$e) { b() }\nd();\n"
     );
     my %why = (
         '§1'  => 'PCL §1: $$$ref (triple dereference) tokenized as $$ + $ref',
-        '§6'  => 'PCL §6: for ${*$f} (LIST) { } — LEXER DIES: "Illegal state in \'for\' compound statement"',
-        '§10' => 'PCL §10: for accepts only [my] $scalar as its loop variable',
-        '§29' => 'PCL §29: A DEREFERENCE as the foreach loop variable fails the LEXER: "Illegal state in \'for\' compound statement"',
     );
     for my $r (@shapes) {
         my ( $code, $sect ) = @$r;

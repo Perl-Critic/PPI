@@ -846,6 +846,12 @@ sub _continues {
 		return '';
 	}
 
+	# The loop variable of a foreach, up to its ( LIST )
+	if ( $type eq 'for' or $type eq 'foreach' ) {
+		my $head = $self->_foreach_head( \@part, $Token );
+		return $head if defined $head;
+	}
+
 	# Handle the common "after round braces" case
 	if ( $LastChild->isa('PPI::Structure') and $LastChild->braces eq '()' ) {
 		# LABEL while (EXPR) ...
@@ -1037,6 +1043,76 @@ sub _continues {
 
 	# Something we don't know about... what could it be
 	PPI::Exception->throw("Illegal state in '$type' compound statement");
+}
+
+
+
+
+
+# The loop variable of a foreach.  perly.y reads, between the for word and
+# the ( LIST ):
+#
+#   [my|our|state] $x            for my $x (LIST)
+#   a dereference                for $$f (LIST), for ${$r} (LIST)
+#   a refaliasing variable       for \my %h (LIST), for my \%h (LIST)
+#   my and a list of scalars     for my ($q, $r) (LIST)   (5.36)
+#
+# Given the significant children of the compound and the next token,
+# returns true to continue, '' to end, or undef once the variable (and
+# anything else this does not know) is past: the callers' rules decide.
+sub _foreach_head {
+	my ($self, $part, $Token) = @_;
+	my $i = $part->[0]->isa('PPI::Token::Label') ? 1 : 0;
+	return undef if $part->[$i]->content !~ /^for(?:each)?\z/;
+	my @head = @{$part}[ $i + 1 .. $#$part ];
+
+	# Classify the head so far; a part that cannot be in a loop variable
+	# (a C-style head, the LIST itself) hands back to the callers.
+	my $decl = sub {
+		my $e = shift;
+		$e and $e->isa('PPI::Token::Word') and $e->content =~ /^(?:my|our|state)\z/;
+	};
+	my $state = 'start';    # start | open | done
+	for my $j ( 0 .. $#head ) {
+		my $e    = $head[$j];
+		my $prev = $j ? $head[ $j - 1 ] : undef;
+		return undef if $state eq 'done';
+		if ( $decl->($e) or $e->isa('PPI::Token::Cast') ) {
+			$state = 'open';
+		} elsif ( $e->isa('PPI::Token::Symbol') or $e->isa('PPI::Token::Magic') ) {
+			$state = 'done';
+		} elsif ( $e->isa('PPI::Structure::Block') and _INSTANCE( $prev, 'PPI::Token::Cast' ) ) {
+			$state = 'done';
+		} elsif (
+			$e->isa('PPI::Structure') and $e->braces eq '()'
+			and _INSTANCE( $prev, 'PPI::Token::Word' ) and $prev->content eq 'my'
+		) {
+			$state = 'done';
+		} else {
+			return undef;
+		}
+	}
+	return undef if $state eq 'start' and not $Token->isa('PPI::Token::Cast');
+
+	my $open_round = $Token->isa('PPI::Token::Structure') && $Token->content eq '(';
+	my $qw         = $Token->isa('PPI::Token::QuoteLike::Words');
+	if ( $state eq 'done' ) {
+		# The variable is complete: the LIST comes next
+		return ( $open_round or $qw ) ? 1 : '';
+	}
+
+	# Inside the variable: a declarator, a cast, a symbol, a
+	# dereference block after a cast, or the scalar list after my/our
+	my $last = $head[-1];
+	return 1 if $decl->($Token) and not $decl->($last);
+	return 1 if $Token->isa('PPI::Token::Cast');
+	return 1 if $Token->isa('PPI::Token::Symbol') or $Token->isa('PPI::Token::Magic');
+	return 1 if $open_round and $last->isa('PPI::Token::Word') and $last->content eq 'my';
+	return 1
+	  if $Token->isa('PPI::Token::Structure')
+	  and $Token->content eq '{'
+	  and $last->isa('PPI::Token::Cast');
+	return '';
 }
 
 

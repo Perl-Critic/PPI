@@ -1,0 +1,132 @@
+PPI::Document
+  PPI::Statement::Compound
+    PPI::Token::Word  	'for'
+    PPI::Token::Whitespace  	' '
+    PPI::Token::Cast  	'$'
+    PPI::Token::Symbol  	'$f'
+    PPI::Token::Whitespace  	' '
+    PPI::Structure::List  	( ... )
+      PPI::Statement
+        PPI::Token::Number  	'5'
+        PPI::Token::Operator  	','
+        PPI::Token::Whitespace  	' '
+        PPI::Token::Number  	'11'
+    PPI::Token::Whitespace  	' '
+    PPI::Structure::Block  	{ ... }
+      PPI::Token::Whitespace  	' '
+      PPI::Statement
+        PPI::Token::Word  	'push'
+        PPI::Token::Whitespace  	' '
+        PPI::Token::Symbol  	'@seen'
+        PPI::Token::Operator  	','
+        PPI::Token::Whitespace  	' '
+        PPI::Token::Cast  	'$'
+        PPI::Token::Symbol  	'$f'
+      PPI::Token::Whitespace  	' '
+  PPI::Token::Whitespace  	'\n'
+  PPI::Statement::Compound
+    PPI::Token::Word  	'for'
+    PPI::Token::Whitespace  	' '
+    PPI::Token::Cast  	'$'
+    PPI::Structure::Block  	{ ... }
+      PPI::Statement
+        PPI::Token::Cast  	'*'
+        PPI::Token::Symbol  	'$f'
+    PPI::Token::Whitespace  	' '
+    PPI::Structure::List  	( ... )
+      PPI::Statement
+        PPI::Token::Number  	'5'
+        PPI::Token::Operator  	','
+        PPI::Token::Whitespace  	' '
+        PPI::Token::Number  	'11'
+    PPI::Token::Whitespace  	' '
+    PPI::Structure::Block  	{ ... }
+      PPI::Token::Whitespace  	' '
+      PPI::Statement
+        PPI::Token::Number  	'1'
+      PPI::Token::Whitespace  	' '
+  PPI::Token::Whitespace  	'\n'
+  PPI::Statement::Compound
+    PPI::Token::Word  	'foreach'
+    PPI::Token::Whitespace  	' '
+    PPI::Token::Word  	'my'
+    PPI::Token::Whitespace  	' '
+    PPI::Structure::List  	( ... )
+      PPI::Statement
+        PPI::Token::Symbol  	'$q'
+        PPI::Token::Operator  	','
+        PPI::Token::Whitespace  	' '
+        PPI::Token::Symbol  	'$r'
+    PPI::Token::Whitespace  	' '
+    PPI::Structure::List  	( ... )
+      PPI::Statement
+        PPI::Token::Symbol  	'@l'
+    PPI::Token::Whitespace  	' '
+    PPI::Structure::Block  	{ ... }
+      PPI::Token::Whitespace  	' '
+      PPI::Statement
+        PPI::Token::Word  	'print'
+        PPI::Token::Whitespace  	' '
+        PPI::Token::Quote::Double  	'"$q$r"'
+      PPI::Token::Whitespace  	' '
+  PPI::Token::Whitespace  	'\n'
+  PPI::Statement::Compound
+    PPI::Token::Word  	'for'
+    PPI::Token::Whitespace  	' '
+    PPI::Token::Cast  	'\'
+    PPI::Token::Word  	'my'
+    PPI::Token::Whitespace  	' '
+    PPI::Token::Symbol  	'%h'
+    PPI::Token::Whitespace  	' '
+    PPI::Structure::List  	( ... )
+      PPI::Statement
+        PPI::Token::Symbol  	'@l'
+    PPI::Token::Whitespace  	' '
+    PPI::Structure::Block  	{ ... }
+      PPI::Token::Whitespace  	' '
+      PPI::Statement
+        PPI::Token::Number  	'1'
+      PPI::Token::Whitespace  	' '
+  PPI::Token::Whitespace  	'\n'
+  PPI::Statement::Compound
+    PPI::Token::Word  	'for'
+    PPI::Token::Whitespace  	' '
+    PPI::Token::Word  	'my'
+    PPI::Token::Whitespace  	' '
+    PPI::Token::Cast  	'\'
+    PPI::Token::Symbol  	'@a'
+    PPI::Token::Whitespace  	' '
+    PPI::Structure::List  	( ... )
+      PPI::Statement
+        PPI::Token::Symbol  	'@l'
+    PPI::Token::Whitespace  	' '
+    PPI::Structure::Block  	{ ... }
+      PPI::Token::Whitespace  	' '
+      PPI::Statement
+        PPI::Token::Number  	'1'
+      PPI::Token::Whitespace  	' '
+  PPI::Token::Whitespace  	'\n'
+  PPI::Statement::Compound
+    PPI::Token::Label  	'L:'
+    PPI::Token::Whitespace  	' '
+    PPI::Token::Word  	'for'
+    PPI::Token::Whitespace  	' '
+    PPI::Token::Cast  	'\'
+    PPI::Token::Symbol  	'$x'
+    PPI::Token::Whitespace  	' '
+    PPI::Structure::List  	( ... )
+      PPI::Statement
+        PPI::Token::Symbol  	'@l'
+    PPI::Token::Whitespace  	' '
+    PPI::Structure::Block  	{ ... }
+      PPI::Token::Whitespace  	' '
+      PPI::Statement
+        PPI::Token::Number  	'1'
+      PPI::Token::Whitespace  	' '
+  PPI::Token::Whitespace  	'\n'
+  PPI::Statement
+    PPI::Token::Word  	'print'
+    PPI::Token::Whitespace  	' '
+    PPI::Token::Quote::Double  	'"x\n"'
+    PPI::Token::Structure  	';'
+  PPI::Token::Whitespace  	'\n'

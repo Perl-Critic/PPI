@@ -121,6 +121,8 @@ sub type {
 		if ( $Element->isa('PPI::Token') ) {
 			return 'foreach' if $Element->content =~ /^(?:my|our|state)\z/;
 			return 'foreach' if $Element->isa('PPI::Token::Symbol');
+			# a dereference or a refaliasing variable: for $$f, for \my %h
+			return 'foreach' if $Element->isa('PPI::Token::Cast');
 			return 'foreach' if $Element->isa('PPI::Token::QuoteLike::Words');
 		}
 		if ( $Element->isa('PPI::Structure::List') ) {
