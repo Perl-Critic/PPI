@@ -13,7 +13,7 @@
 use lib 't/lib';
 use PPI::Test::pragmas;
 use utf8;
-use Test::More tests => 184 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+use Test::More tests => 193 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use PPI ();
 
@@ -1384,4 +1384,38 @@ for my $code ( "use v5.36;\nsub f (\$, \$y) { 1 }",
     my @t = map { short_class($_) } toks($code);
     ok( grep( $_ eq 'Symbol=$', @t ), "a nameless parameter stays a \$ Symbol (control)" )
         or diag "got: @t";
+}
+
+# §7 and §8, more shapes.  perl reads a word before a colon as a LABEL only
+# where it expects a statement (toke.c's XSTATE), and the colon after a
+# declared variable or list introduces the declaration's attributes.
+TODO: {
+    local $TODO = 'PCL §7/§8: an attribute is lexed as a label or a word';
+    my @rows = (
+        [ 'my @a = (sub :lvalue { 1 });',  'Attribute=lvalue', 'an anonymous sub in a list takes an attribute, not a label' ],
+        [ 'my @s = (sub : lvalue { 1 });', 'Attribute=lvalue', 'an anonymous sub in a list takes a spaced attribute' ],
+        [ 'our ($p, $q) : unique;',       'Attribute=unique', 'a declared list takes an attribute' ],
+        [ 'state $n :shared = 0;',        'Attribute=shared', 'a state variable takes an attribute' ],
+    );
+    for my $r (@rows) {
+        my ( $code, $want, $desc ) = @$r;
+        my @t = map { short_class($_) } toks($code);
+        ok( grep( $_ eq $want, @t ), "$code: $desc" ) or diag "got: @t";
+    }
+}
+# The controls: labels at the start of a statement, after a block and after
+# another label, and the colon of a ternary.
+{
+    my @rows = (
+        [ 'LINE: for (1) { 1 }',       'Label=LINE:', 'a label at the start of the document (control)' ],
+        [ '{ 1 } NEXT: 1;',            'Label=NEXT:', 'a label after a block (control)' ],
+        [ 'A: B: 1;',                  'Label=B:',    'a label after a label (control)' ],
+        [ '$x = $c ? $a : $b;',        'Operator=:',  'the colon of a ternary (control)' ],
+        [ 'my $y = $c ? foo : bar;',   'Word=foo',    'a word in a ternary is no label (control)' ],
+    );
+    for my $r (@rows) {
+        my ( $code, $want, $desc ) = @$r;
+        my @t = map { short_class($_) } toks($code);
+        ok( grep( $_ eq $want, @t ), "$code: $desc" ) or diag "got: @t";
+    }
 }
