@@ -425,8 +425,7 @@ TODO: {
 # bracketed part SUBSCRIPTS what precedes it.  PPI builds Structure::Constructor
 # (an anonymous arrayref) and Structure::Block (a code block) instead — while
 # the sibling `@h{...}` correctly gets a Structure::Subscript.
-TODO: {
-    local $TODO = 'PCL §17: A SUBSCRIPT after a deref or a KV slice is structured as something else';
+{
     my $doc = PPI::Document->new(\'my $v = ${$r}[0];');
     my @s = map { ref } @{ $doc->find(sub { $_[1]->isa('PPI::Structure') }) || [] };
     ok( (grep { $_ eq 'PPI::Structure::Subscript' } @s),
@@ -1058,8 +1057,7 @@ for my $src ('1.5-0.5;', '1e3-1;') {
 # §36 -- the `[1]` of a braced element `${a}[1]` is lexed as an anonymous-array
 # Constructor, while `${h}{k}` gets a Subscript.  perl: `@a = (1, 2, 3);
 # print ${a}[1]` prints 2.
-TODO: {
-    local $TODO = 'PCL §36: The [i] of a braced element ${name}[i] is lexed as an anonymous-array CONSTRUCTOR';
+{
     my $doc = PPI::Document->new(\q{@a = (1, 2, 3); print ${a}[1];});
     my ($st) = grep { $_->start && $_->start->content eq q{[} }
                @{ $doc->find(q{PPI::Structure}) || [] };
@@ -1558,20 +1556,13 @@ is_deeply( [ stmts("use feature 'try';\ntry { a() } catch (\$e) { b() }\nd();\n"
         [ 'my %v = %h{"a", "b"};',     '{', '§17' ],
         [ 'my %v = %a[0, 1];',         '[', '§17' ],
     );
-    my %why = (
-        '§17' => 'PCL §17: A SUBSCRIPT after a deref or a KV slice is structured as something else',
-        '§36' => 'PCL §36: The [i] of a braced element ${name}[i] is lexed as an anonymous-array CONSTRUCTOR',
-    );
     for my $r (@rows) {
         my ( $code, $open, $sect ) = @$r;
         my $doc = PPI::Document->new(\$code);
         my @br  = grep { $_->start && $_->start->content eq $open }
                   @{ $doc->find('PPI::Structure') || [] };
-        TODO: {
-            local $TODO = $why{$sect};
-            is( ref( $br[-1] ), 'PPI::Structure::Subscript',
-                "$code: the last $open...  is a Structure::Subscript" );
-        }
+        is( ref( $br[-1] ), 'PPI::Structure::Subscript',
+            "$code: the last $open...  is a Structure::Subscript ($sect)" );
     }
     for my $r ( [ 'print {$fh} [1];', '[', 'PPI::Structure::Constructor',
                   'after a block filehandle a [ is an anonymous array (control)' ],

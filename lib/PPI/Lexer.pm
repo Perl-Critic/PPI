@@ -1160,6 +1160,15 @@ sub _round {
 	'PPI::Structure::List'
 }
 
+# Is the last child of the parent the block of a dereference -- a $, @ or
+# % cast before it, as in ${$ref}, @{$ref}, %{$ref} or ${name}?  A [ or {
+# right after it subscripts it, as after the symbol it stands for.
+sub _deref_block {
+	my $Parent = shift;
+	my $prior  = $Parent->schild(-2) or return '';
+	return $prior->isa('PPI::Token::Cast') && $prior->content =~ /^[\$\@\%]\z/;
+}
+
 # Given a parent element, and a [ token to open a structure, determine
 # the class that the structure should be.
 sub _square {
@@ -1182,8 +1191,8 @@ sub _square {
 			# $foo{}[]
 			return 'PPI::Structure::Subscript';
 		}
-		if ( $Element->isa('PPI::Token::Symbol') and $Element->content =~ /^(?:\$|\@)/ ) {
-			# $foo[], @foo[]
+		if ( $Element->isa('PPI::Token::Symbol') and $Element->content =~ /^[\$\@\%]/ ) {
+			# $foo[], @foo[], %foo[] (a key/value slice)
 			return 'PPI::Structure::Subscript';
 		}
 		if ( $Element->isa('PPI::Token::Cast') and $Element->content =~ /^(?:\@|\%)/ ) {
@@ -1192,6 +1201,10 @@ sub _square {
 				# Postfix dereference: ->@[...] ->%[...]
 				return 'PPI::Structure::Subscript';
 			}
+		}
+		if ( $Element->isa('PPI::Structure::Block') and _deref_block($Parent) ) {
+			# ${$aref}[0], ${name}[0], @{$aref}[0, 1], %{$aref}[0, 1]
+			return 'PPI::Structure::Subscript';
 		}
 		# FIXME - More cases to catch
 	}
@@ -1265,8 +1278,8 @@ sub _curly {
 			# $foo[]{}
 			return 'PPI::Structure::Subscript';
 		}
-		if ( $content =~ /^(?:\$|\@)/ and $Element->isa('PPI::Token::Symbol') ) {
-			# $foo{}, @foo{}
+		if ( $content =~ /^[\$\@\%]/ and $Element->isa('PPI::Token::Symbol') ) {
+			# $foo{}, @foo{}, %foo{} (a key/value slice)
 			return 'PPI::Structure::Subscript';
 		}
 		if ( $Element->isa('PPI::Token::Cast') and $Element->content =~ /^(?:\@|\%|\*)/ ) {
@@ -1276,17 +1289,12 @@ sub _curly {
 				return 'PPI::Structure::Subscript';
 			}
 		}
-		if ( $Element->isa('PPI::Structure::Block') ) {
+		if ( $Element->isa('PPI::Structure::Block') and _deref_block($Parent) ) {
 			# deference - ${$hash_ref}{foo}
 			#     or even ${burfle}{foo}
 			# hash slice - @{$hash_ref}{'foo', 'bar'}
-			if ( my $prior = $Parent->schild(-2) ) {
-				my $prior_content = $prior->content();
-				$prior->isa( 'PPI::Token::Cast' )
-					and ( $prior_content eq '@' ||
-						$prior_content eq '$' )
-					and return 'PPI::Structure::Subscript';
-			}
+			# key/value slice - %{$hash_ref}{'foo', 'bar'}
+			return 'PPI::Structure::Subscript';
 		}
 
 		# Are we the last argument of sub?
