@@ -318,8 +318,7 @@ TODO: {
 # has just read the source with `local $/` leaves behind), a document whose last
 # line is `__END__`/`__DATA__` comes back one byte longer: serialize is no
 # longer the identity, and the DATA section gains a line the file never had.
-TODO: {
-    local $TODO = 'PCL §13: Tokenization of a trailing __END__/__DATA__ section depends on $/';
+{
     my $src = "# c\n__END__\n";
     my $slurped = do { local $/; PPI::Document->new(\$src)->serialize };
     is( $slurped, $src,
@@ -1624,8 +1623,7 @@ is_deeply( [ stmts("use feature 'try';\ntry { a() } catch (\$e) { b() }\nd();\n"
     my $plain   = $tokens->();
     my $slurped = do { local $/; $tokens->() };
     my $crlf    = do { local $/ = "\r\n"; $tokens->() };
-    TODO: {
-        local $TODO = 'PCL §13: Tokenization of a trailing __END__/__DATA__ section depends on $/';
+    {
         is( $slurped, $plain, 'the tokens are the same when $/ is undef' );
         is( $crlf,    $plain, 'the tokens are the same when $/ is "\r\n"' );
     }

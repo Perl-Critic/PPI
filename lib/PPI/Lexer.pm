@@ -202,8 +202,11 @@ sub lex_tokenizer {
 		$Tokenizer->_features($feat);
 	}
 
-	# Lex the token stream into the document
+	# Lex the token stream into the document.  The tokenizer splits its
+	# source on "\n" and chomps pieces of it, so the caller's $/ (undef
+	# in slurp mode) must not reach it.
 	$self->{Tokenizer} = $Tokenizer;
+	local $/ = "\n";
 	if ( !eval { $self->_lex_document($Document); 1 } ) {
 		# If an error occurs DESTROY the partially built document.
 		$Tokenizer->_document(undef);
