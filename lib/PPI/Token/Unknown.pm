@@ -58,7 +58,7 @@ sub __TOKENIZER__on_char {
 		# symbolic glob, so $ and { never start such a name.
 		if ( $t->_glob_name_expected ) {
 			pos $t->{line} = $t->{line_cursor};
-			my ($name) = $t->{line} =~ m/\G(\d+|\^[A-Z\[\]^_?\\]|[^\w\s\$\{\}\*\#':])/gc;
+			my ($name) = $t->{line} =~ m/\G(\d+|\^[A-Z\[\]^_?\\]|:(?!:)|[^\w\s\$\{\}\*\#':])/gc;
 			if ( defined $name and ( $name =~ /^[\d^]/ or $MAGIC{ '$' . $name } ) ) {
 				$t->{token}->{content} .= $name;
 				$t->{line_cursor} += length $name;

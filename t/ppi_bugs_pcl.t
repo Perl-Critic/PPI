@@ -1356,8 +1356,7 @@ TODO: {
 
 # §26, the colon: $: names a scalar, so *: is a glob, while *::foo stays the
 # glob main::foo.
-TODO: {
-    local $TODO = 'PCL §26: A glob whose NAME is punctuation or a digit run is split into two operators';
+{
     my @t = map { short_class($_) } toks('*X = *:;');
     ok( grep( $_ eq 'Symbol=*:', @t ), '*: is one glob' ) or diag "got: @t";
 }
