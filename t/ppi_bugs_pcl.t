@@ -13,7 +13,7 @@
 use lib 't/lib';
 use PPI::Test::pragmas;
 use utf8;
-use Test::More tests => 164 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+use Test::More tests => 170 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use PPI ();
 
@@ -1292,6 +1292,38 @@ TODO: {
         [ 'print $fh - e $f;',       'Word=e',     'print $fh - e $f subtracts a call of e (control)' ],
         [ 'my $s = sub { 1 } - 1;',  'Operator=-', 'an anonymous sub minus 1 subtracts (control)' ],
         [ '$x = $h{a} -1;',          'Operator=-', 'a subscript minus 1 subtracts (control)' ],
+    );
+    for my $r (@rows) {
+        my ( $code, $want, $desc ) = @$r;
+        my @t = map { short_class($_) } toks($code);
+        ok( grep( $_ eq $want, @t ), "$code: $desc" ) or diag "got: @t";
+    }
+}
+
+# §56 -- the same rule for a /: after the } of a block that opens a
+# statement or follows a word, a / starts a match.  perl:
+# $_ = "x"; BEGIN { 1 } /x/ and print "m\n" prints m, and
+# grep { 1 } /(x)/ is the list of the match's groups.
+TODO: {
+    local $TODO = 'PCL §56: a / after a statement block is lexed as a division';
+    my @rows = (
+        [ 'BEGIN { 1 } /x/ and print;', 'Regexp::Match=/x/', 'a match after a BEGIN block' ],
+        [ '{ 1 } /x/ and print;',       'Regexp::Match=/x/', 'a match after a bare block' ],
+        [ '@a = grep { 1 } /(x)/;',     'Regexp::Match=/(x)/', 'a match after a grep block' ],
+    );
+    for my $r (@rows) {
+        my ( $code, $want, $desc ) = @$r;
+        my @t = map { short_class($_) } toks($code);
+        ok( grep( $_ eq $want, @t ), "$code: $desc" ) or diag "got: @t";
+    }
+}
+# The controls: after a subscript, a dereference block and an anonymous sub
+# a / divides.
+{
+    my @rows = (
+        [ '$x = $h{a} /2;',          'Operator=/', 'a subscript divided by 2 (control)' ],
+        [ '$x = @{$r} /2;',          'Operator=/', 'a dereference divided by 2 (control)' ],
+        [ 'my $s = sub { 1 } / 2;',  'Operator=/', 'an anonymous sub divided by 2 (control)' ],
     );
     for my $r (@rows) {
         my ( $code, $want, $desc ) = @$r;
