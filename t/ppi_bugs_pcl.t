@@ -13,7 +13,7 @@
 use lib 't/lib';
 use PPI::Test::pragmas;
 use utf8;
-use Test::More tests => 230 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+use Test::More tests => 241 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use PPI ();
 
@@ -1541,5 +1541,50 @@ is_deeply( [ stmts("use feature 'try';\ntry { a() } catch (\$e) { b() }\nd();\n"
         ( my $loop = $code ) =~ s/ f\(\);$//;
         is_deeply( [ stmts($code) ], [ "Statement::Compound: $loop", 'Statement: f();' ],
             "$code: one compound, then f(); (control)" );
+    }
+}
+
+# §17 §36, the rest of the family: a [ or { right after a term subscripts
+# it -- perl reads a dereference block (${$r}[0], ${a}[1], @{$r}[0, 1],
+# %{$r}{'a'}) and a key/value slice (%h{'a'}, %a[0, 1]) the way it reads
+# $a[1] and @h{'a'}.  The brackets are a Structure::Subscript.
+{
+    my @rows = (
+        [ 'my $v = ${a}[1];',          '[', '§36' ],
+        [ 'my $v = ${$r}[0];',         '[', '§17' ],
+        [ 'my @v = @{$r}[0, 1];',      '[', '§17' ],
+        [ 'my %v = %{$r}[0, 1];',      '[', '§17' ],
+        [ 'my %v = %{$r}{"a", "b"};',  '{', '§17' ],
+        [ 'my %v = %h{"a", "b"};',     '{', '§17' ],
+        [ 'my %v = %a[0, 1];',         '[', '§17' ],
+    );
+    my %why = (
+        '§17' => 'PCL §17: A SUBSCRIPT after a deref or a KV slice is structured as something else',
+        '§36' => 'PCL §36: The [i] of a braced element ${name}[i] is lexed as an anonymous-array CONSTRUCTOR',
+    );
+    for my $r (@rows) {
+        my ( $code, $open, $sect ) = @$r;
+        my $doc = PPI::Document->new(\$code);
+        my @br  = grep { $_->start && $_->start->content eq $open }
+                  @{ $doc->find('PPI::Structure') || [] };
+        TODO: {
+            local $TODO = $why{$sect};
+            is( ref( $br[-1] ), 'PPI::Structure::Subscript',
+                "$code: the last $open...  is a Structure::Subscript" );
+        }
+    }
+    for my $r ( [ 'print {$fh} [1];', '[', 'PPI::Structure::Constructor',
+                  'after a block filehandle a [ is an anonymous array (control)' ],
+                [ 'my $v = ${$r}{a};', '{', 'PPI::Structure::Subscript',
+                  '${$r}{a} is a Subscript (control)' ],
+                [ 'my @v = @h{"a", "b"};', '{', 'PPI::Structure::Subscript',
+                  '@h{...} is a Subscript (control)' ],
+                [ 'my %v = %$r{"a", "b"};', '{', 'PPI::Structure::Subscript',
+                  '%$r{...} is a Subscript (control)' ] ) {
+        my ( $code, $open, $want, $desc ) = @$r;
+        my $doc = PPI::Document->new(\$code);
+        my @br  = grep { $_->start && $_->start->content eq $open }
+                  @{ $doc->find('PPI::Structure') || [] };
+        is( ref( $br[-1] ), $want, "$code: $desc" );
     }
 }
