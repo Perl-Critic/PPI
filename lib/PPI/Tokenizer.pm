@@ -965,6 +965,47 @@ sub _glob_name_expected {
 	return $self->_opcontext eq 'operand';
 }
 
+# True when the signatures feature is on AND the tokenizer stands inside a
+# signature: the innermost open bracket before the current token is a ( that
+# follows sub (an anonymous sub) or sub NAME, with any attributes between.
+# Only there is a $, @ or % before ) , or = a nameless parameter; anywhere
+# else $) $, $= are the magic variables.  The scan is bounded: it stops at
+# the first unmatched opener, or at a ; outside brackets.
+sub _in_signature {
+	my $self = shift;
+	return '' if !$self->_current_token_has_signatures_active;
+	my $tokens = $self->{tokens};
+	my $depth  = 0;
+	my $cursor = $#$tokens;
+	for ( ; $cursor >= 0; $cursor-- ) {
+		my $token = $tokens->[$cursor];
+		next if !$token->isa('PPI::Token::Structure');
+		my $c = $token->content;
+		if ( $c eq ')' or $c eq ']' or $c eq '}' ) {
+			$depth++;
+			next;
+		}
+		return '' if $c eq ';' and !$depth;
+		next if $c eq ';';
+		if ( $depth ) {
+			$depth--;
+			next;
+		}
+		return '' if $c ne '(';
+		last;
+	}
+	return '' if $cursor < 0;
+	my ( $prev, $at ) = $self->_significant_before($cursor);
+	while ( $prev and ( $prev->isa('PPI::Token::Attribute')
+		or ( $prev->isa('PPI::Token::Operator') and $prev->content eq ':' ) ) ) {
+		( $prev, $at ) = $self->_significant_before($at);
+	}
+	return '' if !$prev or !$prev->isa('PPI::Token::Word');
+	return 1 if $prev->content eq 'sub';
+	( $prev ) = $self->_significant_before($at);
+	return $prev && $prev->isa('PPI::Token::Word') && $prev->content eq 'sub';
+}
+
 # True when the token before the current one ends a term (_ends_term_at),
 # except in the scalar-filehandle slot of print $fh LIST, where the next
 # token starts the list (_after_scalar_filehandle).

@@ -132,7 +132,7 @@ sub __TOKENIZER__on_char {
 
 		# Is it a nameless arg in a signature?
 		my %noname = ( ')' => 1, '=' => 1, ',' => 1 );
-		if ( $noname{$char} and $t->_current_token_has_signatures_active ) {
+		if ( $noname{$char} and $t->_in_signature ) {
 			$t->{class} = $t->{token}->set_class('Symbol');
 			return $t->_finalize_token->__TOKENIZER__on_char($t);
 		}
@@ -184,7 +184,7 @@ sub __TOKENIZER__on_char {
 		}
 
 		# Is it a nameless arg in a signature?
-		if ( $char eq ')' and $t->_current_token_has_signatures_active ) {
+		if ( $char eq ')' and $t->_in_signature ) {
 			$t->{class} = $t->{token}->set_class('Symbol');
 			return $t->_finalize_token->__TOKENIZER__on_char($t);
 		}
@@ -235,7 +235,7 @@ sub __TOKENIZER__on_char {
 		}
 
 		# Is it a nameless arg in a signature?
-		if ( $char eq ')' and $t->_current_token_has_signatures_active ) {
+		if ( $char eq ')' and $t->_in_signature ) {
 			$t->{class} = $t->{token}->set_class('Symbol');
 			return $t->_finalize_token->__TOKENIZER__on_char($t);
 		}

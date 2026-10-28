@@ -999,8 +999,7 @@ TODO: {
 # is split EVERYWHERE -- and the stray `)` reaches the lexer, which uses it to
 # close a structure.  `$(` is not affected, and without the pragma `$)` is a
 # single Magic token.
-TODO: {
-    local $TODO = 'PCL §32: $) is tokenized as Symbol:$ + Structure:) ANYWHERE once the signatures feature is on';
+{
     my $src = qq{use v5.36;\nmy \$e = \$);\n};
     my $doc = PPI::Document->new(\$src);
     my ($tok) = grep { $_->content eq '$)' } $doc->tokens;
@@ -1013,8 +1012,7 @@ TODO: {
     my $doc = PPI::Document->new(\$src);
     my @unmatched = grep { $_->isa('PPI::Statement::UnmatchedBrace') }
                     $doc->schildren;
-    TODO: {
-        local $TODO = 'PCL §32: $) is tokenized as Symbol:$ + Structure:) ANYWHERE once the signatures feature is on';
+    {
         is( scalar @unmatched, 0,
             '`$)` inside a nested block leaves no UnmatchedBrace statements' );
     }
@@ -1369,8 +1367,7 @@ TODO: {
 # signatures feature is on (perl: $, is the output field separator, $= the
 # page length).  A nameless parameter is a $ followed by ) , or = INSIDE a
 # signature, and only there.
-TODO: {
-    local $TODO = 'PCL §32: $) is tokenized as Symbol:$ + Structure:) ANYWHERE once the signatures feature is on';
+{
     for my $r ( [ "use v5.36;\nmy \$s = \$,;", 'Magic=$,' ],
                 [ "use v5.36;\nprint \$=;",     'Magic=$=' ] ) {
         my ( $code, $want ) = @$r;
