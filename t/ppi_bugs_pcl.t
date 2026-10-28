@@ -13,7 +13,7 @@
 use lib 't/lib';
 use PPI::Test::pragmas;
 use utf8;
-use Test::More tests => 200 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+use Test::More tests => 206 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use PPI ();
 
@@ -1468,3 +1468,40 @@ is_deeply( [ stmts("use feature 'try';\ntry { a() } catch (\$e) { b() }\nd();\n"
       'Statement::Compound: try { a() } catch ($e) { b() }',
       'Statement: d();' ],
     'try/catch without finally ends at its block (control)' );
+
+# §37, the rest of the family: every list operator that takes a block
+# filehandle or program (print, printf, say, exec, system; with or without
+# CORE::) reads a { right after its ( the way it reads it without the
+# parens -- perl -e 'use feature "say"; my $fh = \*STDOUT;
+# say({$fh} "a"); CORE::say({$fh} "b")' prints a and b.  The block is the
+# first element of ONE statement inside the list.
+{
+    my @rows = (
+        [ 'say({$fh} "a");',                'say' ],
+        [ 'CORE::say({$fh} "a");',          'CORE::say' ],
+        [ 'print( {$fh} map { $_ } @d );',  'print with map in the list' ],
+        [ 'system({$prog} "a", "b");',      'system' ],
+        [ 'exec({$prog} "a", "b");',        'exec' ],
+    );
+    for my $r (@rows) {
+        my ( $code, $what ) = @$r;
+        my $doc = PPI::Document->new(\$code);
+        my ($list) = @{ $doc->find('PPI::Structure::List') || [] };
+        my @st = $list ? $list->schildren : ();
+        my $first = @st ? $st[0]->schild(0) : undef;
+        TODO: {
+            local $TODO = 'PCL §37: print({$fh} LIST) -- the parenthesised block filehandle -- is split into two statements, or its block is a CONSTRUCTOR';
+            ok( @st == 1 && ref($st[0]) eq 'PPI::Statement'
+                  && $first && ref($first) eq 'PPI::Structure::Block',
+                "$what: {\$fh} is a Block opening the one plain statement in $code" )
+              or diag 'got: ' . join( ' | ', map { ref($_) . ': ' . squash($_->content) } @st );
+        }
+    }
+}
+{
+    my $doc = PPI::Document->new(\'print({a => 1});');
+    my ($br) = grep { $_->start && $_->start->content eq '{' }
+               @{ $doc->find('PPI::Structure') || [] };
+    is( ref($br), 'PPI::Structure::Constructor',
+        'print({a => 1}) stays an anonymous hash (control)' );
+}
