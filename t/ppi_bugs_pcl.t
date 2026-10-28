@@ -13,7 +13,7 @@
 use lib 't/lib';
 use PPI::Test::pragmas;
 use utf8;
-use Test::More tests => 197 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+use Test::More tests => 200 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use PPI ();
 
@@ -1440,3 +1440,33 @@ for my $code ( "use v5.36;\nsub f (\$, \$y) { 1 }",
     ok( grep( $_ eq 'Operator=:', @t ), 'a ternary after print $x keeps its colon (control)' )
         or diag "got: @t";
 }
+# Top-level statements of a snippet, as "Class: content" strings.
+sub stmts {
+    my $doc = PPI::Document->new(\$_[0]) or return ('NO DOCUMENT');
+    return map { short_class(ref $_) . ': ' . squash($_->content) }
+           grep { $_->isa('PPI::Statement') } $doc->schildren;
+}
+
+# §18, the rest of the shape: perl's try (5.34) takes catch, and from 5.36
+# finally, as ONE self-terminating statement -- `try BLOCK catch (VAR) BLOCK
+# finally BLOCK` -- and Syntax::Keyword::Try also allows `try BLOCK finally
+# BLOCK`.  The finally block belongs to the Statement::Compound, and the
+# statement after it is a statement of its own.
+TODO: {
+    local $TODO = 'PCL §18: finally { … } is not part of the try statement — and eats the next one';
+    is_deeply( [ stmts("use feature 'try';\ntry { a() } catch (\$e) { b() } finally { c() }\nd();\n") ],
+        [ "Statement::Include: use feature 'try';",
+          'Statement::Compound: try { a() } catch ($e) { b() } finally { c() }',
+          'Statement: d();' ],
+        'try/catch/finally is one Statement::Compound, the next statement its own' );
+    is_deeply( [ stmts("use Syntax::Keyword::Try;\ntry { a() } finally { c() }\nd();\n") ],
+        [ 'Statement::Include: use Syntax::Keyword::Try;',
+          'Statement::Compound: try { a() } finally { c() }',
+          'Statement: d();' ],
+        'try/finally (Syntax::Keyword::Try) is one Statement::Compound' );
+}
+is_deeply( [ stmts("use feature 'try';\ntry { a() } catch (\$e) { b() }\nd();\n") ],
+    [ "Statement::Include: use feature 'try';",
+      'Statement::Compound: try { a() } catch ($e) { b() }',
+      'Statement: d();' ],
+    'try/catch without finally ends at its block (control)' );
