@@ -4,7 +4,7 @@
 
 use lib 't/lib';
 use PPI::Test::pragmas;
-use Test::More tests => 30 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+use Test::More tests => 33 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use PPI ();
 use Helper 'safe_new';
@@ -396,6 +396,49 @@ h	{
 			_indentation     => "\t",
 		},
 	};
+
+	# The indentation is what stands BEFORE the terminator on its line, so a
+	# terminator that itself begins with whitespace, or is empty, does not
+	# count towards it (perl strips the same).
+TODO: {
+	local $TODO = 'the indentation is ^(\s*) of the whole terminator line';
+h	{
+		name     => 'Single-quoted terminator beginning with a space (indented).',
+		content  => "my \$heredoc = <<~' HERE';\n\t\tLine 1\n\t\tLine 2\n\t\t HERE\n",
+		expected => {
+			_terminator_line => " HERE\n",
+			_damaged         => undef,
+			_terminator      => ' HERE',
+			_mode            => 'literal',
+			_indented        => 1,
+			_indentation     => "\t\t",
+		},
+	};
+h	{
+		name     => 'Double-quoted terminator beginning with two spaces (indented).',
+		content  => "my \$heredoc = <<~\"  HERE\";\n\tLine 1\n\tLine 2\n\t  HERE\n",
+		expected => {
+			_terminator_line => "  HERE\n",
+			_damaged         => undef,
+			_terminator      => '  HERE',
+			_mode            => 'interpolate',
+			_indented        => 1,
+			_indentation     => "\t",
+		},
+	};
+h	{
+		name     => 'Empty terminator (indented).',
+		content  => "my \$heredoc = <<~'';\n  Line 1\n  Line 2\n  \n",
+		expected => {
+			_terminator_line => "\n",
+			_damaged         => undef,
+			_terminator      => '',
+			_mode            => 'literal',
+			_indented        => 1,
+			_indentation     => "  ",
+		},
+	};
+}
 
 
 sub h {
