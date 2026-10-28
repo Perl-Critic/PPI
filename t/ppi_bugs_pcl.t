@@ -442,8 +442,7 @@ TODO: {
 # ONE self-terminating statement.  PPI builds a Statement::Compound for the
 # try/catch part and stops; `finally {…}` starts an unterminated statement that
 # then swallows everything up to the next `;` — here, a whole assertion.
-TODO: {
-    local $TODO = 'PCL §18: finally { … } is not part of the try statement — and eats the next one';
+{
     my $doc = PPI::Document->new(\<<'PERL');
 use feature 'try';
 try { foo(); } catch ($e) { bar($e); } finally { baz(); }
@@ -1452,8 +1451,7 @@ sub stmts {
 # finally BLOCK` -- and Syntax::Keyword::Try also allows `try BLOCK finally
 # BLOCK`.  The finally block belongs to the Statement::Compound, and the
 # statement after it is a statement of its own.
-TODO: {
-    local $TODO = 'PCL §18: finally { … } is not part of the try statement — and eats the next one';
+{
     is_deeply( [ stmts("use feature 'try';\ntry { a() } catch (\$e) { b() } finally { c() }\nd();\n") ],
         [ "Statement::Include: use feature 'try';",
           'Statement::Compound: try { a() } catch ($e) { b() } finally { c() }',

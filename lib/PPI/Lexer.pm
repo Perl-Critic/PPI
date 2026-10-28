@@ -910,17 +910,23 @@ sub _continues {
 	}
 
 	if ( $type eq 'try' and $LastChild->presumed_features->{try} ) {
+		# try BLOCK catch (VAR) BLOCK
+		# try BLOCK catch (VAR) BLOCK finally BLOCK
+		# try BLOCK finally BLOCK                    (Syntax::Keyword::Try)
 		return 1 if not $LastChild->isa('PPI::Structure::Block');
 
+		# The block after a finally ends the statement
 		my $NextLast = $Statement->schild(-2);
-		return ''
-		  if $NextLast
-		  and $NextLast->isa('PPI::Token')
-		  and $NextLast->isa('PPI::Token::Word')
-		  and $NextLast->content eq 'catch';
+		my $after =
+		  ( $NextLast and $NextLast->isa('PPI::Token::Word') )
+		  ? $NextLast->content
+		  : '';
+		return '' if $after eq 'finally';
 
-		return 1    #
-		  if $Token->isa('PPI::Token::Word') and $Token->content eq 'catch';
+		# Only a catch (after the try block) or a finally will do
+		return '' if not $Token->isa('PPI::Token::Word');
+		return 1 if $Token->content eq 'finally';
+		return 1 if $Token->content eq 'catch' and $after ne 'catch';
 
 		return '';
 	}
