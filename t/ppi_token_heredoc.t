@@ -400,8 +400,7 @@ h	{
 	# The indentation is what stands BEFORE the terminator on its line, so a
 	# terminator that itself begins with whitespace, or is empty, does not
 	# count towards it (perl strips the same).
-TODO: {
-	local $TODO = 'the indentation is ^(\s*) of the whole terminator line';
+{
 h	{
 		name     => 'Single-quoted terminator beginning with a space (indented).',
 		content  => "my \$heredoc = <<~' HERE';\n\t\tLine 1\n\t\tLine 2\n\t\t HERE\n",

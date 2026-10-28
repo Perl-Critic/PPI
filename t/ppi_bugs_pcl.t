@@ -927,8 +927,7 @@ TODO: {
 # indentation (and `<<~''` counts the NEWLINE); _is_match_indent then fails and
 # the body is left unstripped — or, when the body is indented as far as the
 # over-count, it is stripped one character too many.
-TODO: {
-    local $TODO = 'PCL §30: An indented here-doc\'s INDENTATION is ^(\s*) of the whole terminator line, so a delimiter that begins with whitespace (or is empty) over-counts';
+{
     for my $c (
       # [ source, what heredoc() should give, label ]
       [ "print <<~' EOF'\n  some data\n   EOF\n", "some data\n",
@@ -959,8 +958,7 @@ TODO: {
 }
 # The second face of the same bug: serialize() rebuilds each body line as
 # `indentation . line`, so the over-count is ADDED and the document grows.
-TODO: {
-    local $TODO = 'PCL §30: An indented here-doc\'s INDENTATION is ^(\s*) of the whole terminator line, so a delimiter that begins with whitespace (or is empty) over-counts';
+{
     my $src = "print <<~' EOF'\n  some data\n   EOF\n";
     my $doc = PPI::Document->new(\$src);
     is( $doc->serialize, $src,

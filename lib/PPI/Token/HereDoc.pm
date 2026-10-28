@@ -152,13 +152,18 @@ sub _is_terminator {
 
 sub _indent {
 	my ( $self, $token ) = @_;
-	my ($indent) = $token->{_terminator_line} =~ /^(\s*)/;
-	return $indent;
+	# The indentation is what stands before the terminator on its line.  Not
+	# ^(\s*) of the line: that also counts a terminator which itself begins
+	# with whitespace (<<~' EOF'), and the newline of an empty one (<<~'').
+	# The line has no newline when it ends the document.
+	my $line = $token->{_terminator_line};
+	$line =~ s/\n\z//;
+	return substr( $line, 0, length($line) - length( $token->{_terminator} ) );
 }
 
 sub _is_match_indent {
 	my ( $self, $token, $indent ) = @_;
-	return (grep { /^$indent/ || $_ eq "\n" } @{$token->{_heredoc}}) == @{$token->{_heredoc}};
+	return (grep { /^\Q$indent\E/ || $_ eq "\n" } @{$token->{_heredoc}}) == @{$token->{_heredoc}};
 }
 
 
@@ -250,7 +255,7 @@ sub __TOKENIZER__on_char {
 					last;
 				}
 
-				s/^$indent// for @heredoc, $token->{_terminator_line};
+				s/^\Q$indent\E// for @heredoc, $token->{_terminator_line};
 			}
 
 			# The HereDoc is now fully parsed
@@ -289,10 +294,10 @@ sub __TOKENIZER__on_char {
 		$token->{_indentation} = $indent;
 		if ( $self->_is_match_indent( $token, $indent ) ) {
 			# Remove indent from here-doc as much as possible
-			s/^$indent// for @heredoc;
+			s/^\Q$indent\E// for @heredoc;
 		}
 
-		s/^$indent// for $token->{_terminator_line};
+		s/^\Q$indent\E// for $token->{_terminator_line};
 	}
 
 	# Set a hint for PPI::Document->serialize so it can
