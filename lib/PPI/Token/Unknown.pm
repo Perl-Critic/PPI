@@ -438,6 +438,9 @@ sub __TOKENIZER__is_an_attribute {
 	# If we just had a prototype, then we are an attribute
 	return 1 if $p0->isa('PPI::Token::Prototype');
 
+	# A declaration's attributes: my $x : shared, our ($p, $q) : unique
+	return 1 if $t->_after_declared_variables;
+
 	# Other than that, we would need to have had a bareword
 	return '' unless $p0->isa('PPI::Token::Word');
 

@@ -131,8 +131,7 @@ TODO: {
 # Operator ':' plus ordinary Words — indistinguishable from an unrelated
 # expression fragment, so a consumer that supports `my $x <trailing expr>`
 # silently takes ": shared = 1" as that expression.
-TODO: {
-    local $TODO = 'PCL §8: A variable declaration\'s ATTRIBUTE is not a Token::Attribute';
+{
     my @t = toks('my $x : shared = 1;');
     ok( grep(/^PPI::Token::Attribute=/, @t),
         'my $x : shared = 1 should yield a Token::Attribute, as sub attributes do' )
@@ -1389,8 +1388,7 @@ for my $code ( "use v5.36;\nsub f (\$, \$y) { 1 }",
 # §7 and §8, more shapes.  perl reads a word before a colon as a LABEL only
 # where it expects a statement (toke.c's XSTATE), and the colon after a
 # declared variable or list introduces the declaration's attributes.
-TODO: {
-    local $TODO = 'PCL §7/§8: an attribute is lexed as a label or a word';
+{
     my @rows = (
         [ 'my @a = (sub :lvalue { 1 });',  'Attribute=lvalue', 'an anonymous sub in a list takes an attribute, not a label' ],
         [ 'my @s = (sub : lvalue { 1 });', 'Attribute=lvalue', 'an anonymous sub in a list takes a spaced attribute' ],

@@ -306,7 +306,7 @@ sub __TOKENIZER__commit {
 				# attribute operator doesn't directly
 				# touch the object name already works.
 				$token_class = 'Word';
-			} elsif ( !($tokens[0] and $tokens[0]->isa('PPI::Token::Operator')) ) {
+			} elsif ( $t->_label_position($tokens[0]) ) {
 				$word .= $1;
 				$t->{line_cursor} += length($1);
 				$token_class = 'Label';
