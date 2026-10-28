@@ -52,8 +52,7 @@ sub toks {
 # correctly gives as Cast '$' + Symbol '$ref'.  For $$$ref PPI instead emits the
 # special process-ID variable $$ (PPI::Token::Magic) + Symbol '$ref', so the
 # extra dereference is lost and there is no PID variable in this code at all.
-TODO: {
-    local $TODO = 'PCL §1: $$$ref (triple dereference) tokenized as $$ + $ref';
+{
     my @t = toks('$$$ref');
     ok( !grep(/^PPI::Token::Magic=\$\$$/, @t),
         '$$$ref should NOT tokenize as the PID variable $$ (it is a triple deref)' )
@@ -67,8 +66,7 @@ TODO: {
 # PPI::Structure::Subscript, i.e. a hash key.  Compare ${$ref}, which PPI
 # correctly gives as Cast '$' + PPI::Structure::Block.  A consumer that repairs
 # only the Magic still has a subscript with no base in front of it.
-TODO: {
-    local $TODO = 'PCL §1: $$$ref (triple dereference) tokenized as $$ + $ref';
+{
     my $doc = PPI::Document->new(\'$${$ref}');
     my ($sub) = @{ $doc->find('PPI::Structure::Subscript') || [] };
     ok( !$sub,

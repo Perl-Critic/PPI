@@ -56,7 +56,6 @@ PUNCTUATION_ARRAY: {
 }
 
 TRIPLE_DOLLAR: {
-	local $TODO = '$$$a is lexed as the magic $$ and $a';
 	my $document = safe_new \"my \$x = \$\$\$a;";
 	my $casts = $document->find( 'PPI::Token::Cast' ) || [];
 	is( scalar(@$casts), 2, '$$$a produces two Cast tokens' );
