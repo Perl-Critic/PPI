@@ -952,6 +952,19 @@ sub _after_statement_block {
 	return $prev->isa('PPI::Token::Word') && $content ne 'sub' && $content ne 'return';
 }
 
+# True where a * can only open a glob name: at the start of the document,
+# where the operator context says an operand follows, or after local or
+# return, which take a term.
+my %GLOB_AFTER_WORD = map { $_ => 1 } qw( local return );
+
+sub _glob_name_expected {
+	my $self = shift;
+	my ( $prev ) = $self->_previous_significant_tokens(1);
+	return 1 if !$prev;
+	return 1 if $prev->isa('PPI::Token::Word') and $GLOB_AFTER_WORD{ $prev->content };
+	return $self->_opcontext eq 'operand';
+}
+
 # True when the token before the current one ends a term (_ends_term_at),
 # except in the scalar-filehandle slot of print $fh LIST, where the next
 # token starts the list (_after_scalar_filehandle).

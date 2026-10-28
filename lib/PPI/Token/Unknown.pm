@@ -51,6 +51,22 @@ sub __TOKENIZER__on_char {
 
 	# Now, we split on the different values of the current content
 	if ( $c eq '*' ) {
+		# A glob is named by whatever names a scalar, so a digit run, a caret
+		# letter and punctuation name globs too (*1, *^R, *-, *!, *@):
+		# perl -e '*X = *-' makes %X the named-capture hash.  Only where a
+		# term is certainly expected; *$x is a glob dereference and *{ a
+		# symbolic glob, so $ and { never start such a name.
+		if ( $t->_glob_name_expected ) {
+			pos $t->{line} = $t->{line_cursor};
+			my ($name) = $t->{line} =~ m/\G(\d+|\^[A-Z\[\]^_?\\]|[^\w\s\$\{\}\*\#':])/gc;
+			if ( defined $name and ( $name =~ /^[\d^]/ or $MAGIC{ '$' . $name } ) ) {
+				$t->{token}->{content} .= $name;
+				$t->{line_cursor} += length $name;
+				$t->{class} = $t->{token}->set_class( 'Symbol' );
+				return $t->_finalize_token->__TOKENIZER__on_char( $t );
+			}
+		}
+
 		# Is it a number?
 		if ( $char =~ /\d/ ) {
 			# bitwise operator

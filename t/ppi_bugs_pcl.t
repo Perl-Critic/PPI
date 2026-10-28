@@ -727,16 +727,14 @@ TODO: {
 # PPI::Token::Symbol's name is word-bounded, so only `*word` is a Symbol; the
 # rest arrive as Operator('*') + Operator/Number.  Same class as bug 24
 # (`@?` → Cast + Operator), one sigil over.
-TODO: {
-    local $TODO = 'PCL §26: A glob whose NAME is punctuation or a digit run is split into two operators';
+{
     my $doc = PPI::Document->new(\'our %X; *X = *-;');
     ok( (grep { $_->isa('PPI::Token::Symbol') && $_->content eq '*-' } $doc->tokens),
         '`*-` should lex as one Symbol, as `*foo` does' )
         or diag "got: " . join(' ', map { short_class(ref $_) . "[" . $_->content . "]" }
                                     grep { $_->significant } $doc->tokens);
 }
-TODO: {
-    local $TODO = 'PCL §26: A glob whose NAME is punctuation or a digit run is split into two operators';
+{
     my $doc = PPI::Document->new(\'local *a = *1;');
     ok( (grep { $_->isa('PPI::Token::Symbol') && $_->content eq '*1' } $doc->tokens),
         '`*1` should lex as one Symbol — a digit run names a glob too' )
@@ -752,16 +750,14 @@ TODO: {
 # and `*]` (t/op/tie_fetch_count.t:189) is the glob whose scalar slot is `$]`,
 # where PPI hands the bracket over as a Token::Structure parked in a
 # PPI::Statement::UnmatchedBrace.
-TODO: {
-    local $TODO = 'PCL §26: A glob whose NAME is punctuation or a digit run is split into two operators';
+{
     my $doc = PPI::Document->new(\'*^R = *g;');
     ok( (grep { $_->isa('PPI::Token::Symbol') && $_->content eq '*^R' } $doc->tokens),
         '`*^R` should lex as one Symbol — the caret convention names a glob too' )
         or diag "got: " . join(' ', map { short_class(ref $_) . "[" . $_->content . "]" }
                                     grep { $_->significant } $doc->tokens);
 }
-TODO: {
-    local $TODO = 'PCL §26: A glob whose NAME is punctuation or a digit run is split into two operators';
+{
     my $doc = PPI::Document->new(\'tie my $v => "main", *];');
     ok( (grep { $_->isa('PPI::Token::Symbol') && $_->content eq '*]' } $doc->tokens),
         '`*]` should lex as one Symbol — a closing bracket names the glob holding $]' )
@@ -775,8 +771,7 @@ TODO: {
 #   $ perl -e 'eval { die "b\n" }; { local *@; } print "kept=[$@]"'
 #   kept=[b
 #   ]
-TODO: {
-    local $TODO = 'PCL §26: A glob whose NAME is punctuation or a digit run is split into two operators';
+{
     my $doc = PPI::Document->new(\'local *@;');
     ok( (grep { $_->isa('PPI::Token::Symbol') && $_->content eq '*@' } $doc->tokens),
         '`*@` should lex as one Symbol — a sigil character names a glob too' )
@@ -1333,8 +1328,7 @@ TODO: {
 
 # §26, more positions of the same bug: after return and local, and in a
 # list (the five rows above are after = and at the start).
-TODO: {
-    local $TODO = 'PCL §26: A glob whose NAME is punctuation or a digit run is split into two operators';
+{
     my @rows = (
         [ 'return *!;',                'Symbol=*!',  '*! after return is one glob' ],
         [ 'local *12 = sub { 1 };',    'Symbol=*12', '*12 after local is one glob' ],
