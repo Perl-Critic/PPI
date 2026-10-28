@@ -1304,8 +1304,7 @@ TODO: {
 # statement or follows a word, a / starts a match.  perl:
 # $_ = "x"; BEGIN { 1 } /x/ and print "m\n" prints m, and
 # grep { 1 } /(x)/ is the list of the match's groups.
-TODO: {
-    local $TODO = 'PCL §56: a / after a statement block is lexed as a division';
+{
     my @rows = (
         [ 'BEGIN { 1 } /x/ and print;', 'Regexp::Match=/x/', 'a match after a BEGIN block' ],
         [ '{ 1 } /x/ and print;',       'Regexp::Match=/x/', 'a match after a bare block' ],

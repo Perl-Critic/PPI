@@ -358,6 +358,10 @@ sub __TOKENIZER__on_char {
 			return 'Regexp::Match';
 		}
 
+		# After the } of a block that opens a statement or follows a word
+		# (BEGIN { } /x/, grep { } /x/), a term starts
+		return 'Regexp::Match' if $t->_after_statement_block;
+
 		# Functions and keywords
 		if (
 			$MATCHWORD{$prec}
