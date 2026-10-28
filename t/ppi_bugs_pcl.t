@@ -13,7 +13,7 @@
 use lib 't/lib';
 use PPI::Test::pragmas;
 use utf8;
-use Test::More tests => 206 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+use Test::More tests => 230 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use PPI ();
 
@@ -1504,4 +1504,49 @@ is_deeply( [ stmts("use feature 'try';\ntry { a() } catch (\$e) { b() }\nd();\n"
                @{ $doc->find('PPI::Structure') || [] };
     is( ref($br), 'PPI::Structure::Constructor',
         'print({a => 1}) stays an anonymous hash (control)' );
+}
+
+# §6 §10 §29, the whole loop-variable slot of foreach (perly.y's FOR rules):
+# `for [my|our|state] $x`, a dereference (`for $$f`, `for ${$r}`,
+# `for ${*$f}`), a refaliasing variable (`for \my %h`, `for my \%h`,
+# `for \$x`) and the n-at-a-time list of 5.36 (`for my ($q, $r)`) all read
+# `( LIST ) BLOCK` next.  Each is ONE Statement::Compound of type foreach,
+# and the statement after it is its own.
+{
+    my @shapes = (
+        [ 'for $$f (5, 11) { 1 } f();',       '§29' ],
+        [ 'for ${$r} (5, 11) { 1 } f();',     '§29' ],
+        [ 'for ${*$f} (5, 11) { 1 } f();',    '§6' ],
+        [ 'for $$$r (5, 11) { 1 } f();',      '§1' ],
+        [ 'for my ($q, $r) (@l) { 1 } f();',  '§10' ],
+        [ 'for \my %h (@l) { 1 } f();',       '§10' ],
+        [ 'for my \%h (@l) { 1 } f();',       '§10' ],
+        [ 'for \my $x (@l) { 1 } f();',       '§10' ],
+        [ 'for \$x (@l) { 1 } f();',          '§10' ],
+        [ 'L: for \our @a (@l) { 1 } f();',   '§10' ],
+    );
+    my %why = (
+        '§1'  => 'PCL §1: $$$ref (triple dereference) tokenized as $$ + $ref',
+        '§6'  => 'PCL §6: for ${*$f} (LIST) { } — LEXER DIES: "Illegal state in \'for\' compound statement"',
+        '§10' => 'PCL §10: for accepts only [my] $scalar as its loop variable',
+        '§29' => 'PCL §29: A DEREFERENCE as the foreach loop variable fails the LEXER: "Illegal state in \'for\' compound statement"',
+    );
+    for my $r (@shapes) {
+        my ( $code, $sect ) = @$r;
+        ( my $loop = $code ) =~ s/ f\(\);$//;
+        my $doc = PPI::Document->new(\$code);
+        my ($cmp) = $doc ? grep { $_->isa('PPI::Statement::Compound') } $doc->schildren : ();
+        TODO: {
+            local $TODO = $why{$sect};
+            is_deeply( [ stmts($code) ], [ "Statement::Compound: $loop", 'Statement: f();' ],
+                "$code: the loop is one Statement::Compound, f(); its own statement" );
+            is( $cmp && $cmp->type, 'foreach', "$code: the compound is a foreach" );
+        }
+    }
+    for my $code ( 'for my $x (@l) { 1 } f();', 'for $x qw(a b) { 1 } f();',
+                   'for (my $i = 0; $i < 3; $i++) { 1 } f();', 'for (@l) { 1 } f();' ) {
+        ( my $loop = $code ) =~ s/ f\(\);$//;
+        is_deeply( [ stmts($code) ], [ "Statement::Compound: $loop", 'Statement: f();' ],
+            "$code: one compound, then f(); (control)" );
+    }
 }
