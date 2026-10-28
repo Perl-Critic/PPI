@@ -813,7 +813,10 @@ sub _after_scalar_filehandle {
 	my $self = shift;
 	my ( $prev, $op ) = $self->_previous_significant_tokens(2);
 	return '' if !$prev or !$prev->isa('PPI::Token::Symbol') or $prev->content !~ /^\$/;
-	my $last = $self->_last_token;
+	# The whitespace is the last token, or, when a Whitespace token is still
+	# being built (the tokenizer deciding what starts after it), that one.
+	my $last = ( $self->{token} and $self->{token}->isa('PPI::Token::Whitespace') )
+		? $self->{token} : $self->_last_token;
 	return '' if !$last or !$last->isa('PPI::Token::Whitespace');
 	return $op && $op->isa('PPI::Token::Word') && $FILEHANDLE_LISTOP{ $op->content };
 }
@@ -875,15 +878,7 @@ sub _significant_before {
 #   undef        no matching { (an unbalanced })
 sub _curly_kind {
 	my ( $self, $cursor ) = @_;
-	my $tokens = $self->{tokens};
-	my $depth  = 1;
-	while ( --$cursor >= 0 ) {
-		my $token = $tokens->[$cursor];
-		next if !$token->isa('PPI::Token::Structure');
-		$depth++ if $token->content eq '}';
-		$depth-- if $token->content eq '{';
-		last if !$depth;
-	}
+	$cursor = $self->_matching_curly($cursor);
 	return if $cursor < 0;
 	my ( $prev, $at ) = $self->_significant_before($cursor);
 	return 'block' if !$prev;
@@ -900,6 +895,61 @@ sub _curly_kind {
 	return 'deref' if $prev->isa('PPI::Token::Cast');
 	return 'value' if $prev->isa('PPI::Token::Word') and ( $content eq 'do' or $content eq 'eval' );
 	return 'block';
+}
+
+# The index of the { that the } at index $cursor closes, or -1.
+sub _matching_curly {
+	my ( $self, $cursor ) = @_;
+	my $tokens = $self->{tokens};
+	my $depth  = 1;
+	while ( --$cursor >= 0 ) {
+		my $token = $tokens->[$cursor];
+		next if !$token->isa('PPI::Token::Structure');
+		$depth++ if $token->content eq '}';
+		$depth-- if $token->content eq '{';
+		last if !$depth;
+	}
+	return $cursor;
+}
+
+# A - starts a term although the token before it would end one (perl reads
+# it in term position, toke.c's XTERM) in two places:
+#   * the filehandle slot of print $fh LIST (_after_scalar_filehandle), when
+#     neither whitespace nor = nor > follows the -: print $fh -1 and
+#     print $fh -e $f print to $fh; print $fh - 1 subtracts;
+#   * after the } of a block that ends a statement or takes a list
+#     (_after_statement_block): BEGIN { 1 } -e $f, sort { ... } -1, 2.
+sub _minus_starts_term {
+	my $self = shift;
+	if ( $self->_after_scalar_filehandle ) {
+		my $next = substr $self->{line}, $self->{line_cursor} + 1, 1;
+		return $next ne '' && $next !~ /[\s=>]/;
+	}
+	return $self->_after_statement_block;
+}
+
+# True when the previous significant token is the } of a block after which
+# perl expects a term: a block that opens a statement (its { follows
+# nothing, a ; or a }, or a label) or a block that follows a word, as after
+# BEGIN, END, sort, map, grep or print.  After sub the block is an
+# anonymous sub and after return an anonymous hash, both terms; a { after
+# an operator or a ( opens an anonymous hash too (_curly_kind says 'block'
+# for all of these, so they are told apart here).
+sub _after_statement_block {
+	my $self   = shift;
+	my $tokens = $self->{tokens};
+	my $cursor = $#$tokens;
+	$cursor-- while $cursor >= 0 and !$tokens->[$cursor]->significant;
+	return '' if $cursor < 0;
+	my $close = $tokens->[$cursor];
+	return '' if !$close->isa('PPI::Token::Structure') or $close->content ne '}';
+	my $kind = $self->_curly_kind($cursor);
+	return '' if !$kind or $kind ne 'block';
+	my ( $prev ) = $self->_significant_before( $self->_matching_curly($cursor) );
+	return 1 if !$prev or $prev->isa('PPI::Token::Label');
+	my $content = $prev->content;
+	return 1 if $prev->isa('PPI::Token::Structure') and ( $content eq ';' or $content eq '}' );
+	return $prev->isa('PPI::Token::Word') && $content ne 'sub' && $content ne 'return';
 }
 
 # True when the token before the current one ends a term (_ends_term_at),

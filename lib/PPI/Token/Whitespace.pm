@@ -410,7 +410,7 @@ sub __TOKENIZER__on_char {
 	} elsif ( $char == 45 ) { # $char eq '-'
 		# Look for an obvious operator operand context
 		my $context = $t->_opcontext;
-		if ( $context eq 'operator' ) {
+		if ( $context eq 'operator' and !$t->_minus_starts_term ) {
 			return 'Operator';
 		} else {
 			# More logic needed

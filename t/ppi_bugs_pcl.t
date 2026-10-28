@@ -572,8 +572,7 @@ TODO: {
 # is no competing reading to protect: `-e` cannot be a binary operator at all,
 # and `$n -e $b` is a perl syntax error.  Adjacency is the discriminator —
 # `print $fh - e $f` really IS `-(e($f))`, and perl honours the space.
-TODO: {
-    local $TODO = 'PCL §22: A filetest after a SCALAR filehandle is split into - + WORD';
+{
     my $doc = PPI::Document->new(\'print $fh -e $f;');
     my @ops = grep { $_->isa('PPI::Token::Operator') } $doc->tokens;
     ok( (grep { $_->content eq '-e' } @ops),
@@ -582,8 +581,7 @@ TODO: {
                                     grep { $_->significant } $doc->tokens);
 }
 # The block-handle form splits the same way…
-TODO: {
-    local $TODO = 'PCL §22: A filetest after a SCALAR filehandle is split into - + WORD';
+{
     my $doc = PPI::Document->new(\'print {$x} -e $f;');
     my @ops = grep { $_->isa('PPI::Token::Operator') } $doc->tokens;
     ok( (grep { $_->content eq '-e' } @ops),
@@ -1063,8 +1061,7 @@ for my $src ('1.5-0.5;', '1e3-1;') {
 # §35 -- a filetest right after a `BEGIN { … }` block is split into Operator(-)
 # + Word, although the block's `}` ends the statement and `-e` starts a new
 # one.  perl: `BEGIN { 1 } -e _; print "x\n"` prints x.
-TODO: {
-    local $TODO = 'PCL §35: A filetest right after a BEGIN { … } block on the same line is split into - + WORD';
+{
     my $doc = PPI::Document->new(\'BEGIN { 1 } -e _; print "x\n";');
     my @ops = grep { $_->isa('PPI::Token::Operator') } $doc->tokens;
     ok( (grep { $_->content eq '-e' } @ops),
@@ -1275,8 +1272,7 @@ TODO: {
 # stands before the - and none after it (perl -e 'print $fh -1' prints -1 to
 # $fh), and after the } of a block that ends a statement or takes a list
 # (BEGIN { 1 } -e $f, { 1 } -e $f, sort { $a <=> $b } -1, 2).
-TODO: {
-    local $TODO = 'PCL §22/§35: a - that starts a term is lexed as a subtraction';
+{
     my @rows = (
         [ 'print $fh -1;',                'Number=-1',   'print $fh -1 prints the number -1 to $fh' ],
         [ '{ 1 } -e $f;',                 'Operator=-e', 'a filetest after a bare block' ],
