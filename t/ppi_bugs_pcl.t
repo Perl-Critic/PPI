@@ -13,7 +13,7 @@
 use lib 't/lib';
 use PPI::Test::pragmas;
 use utf8;
-use Test::More tests => 170 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+use Test::More tests => 177 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use PPI ();
 
@@ -1323,6 +1323,37 @@ TODO: {
         [ '$x = $h{a} /2;',          'Operator=/', 'a subscript divided by 2 (control)' ],
         [ '$x = @{$r} /2;',          'Operator=/', 'a dereference divided by 2 (control)' ],
         [ 'my $s = sub { 1 } / 2;',  'Operator=/', 'an anonymous sub divided by 2 (control)' ],
+    );
+    for my $r (@rows) {
+        my ( $code, $want, $desc ) = @$r;
+        my @t = map { short_class($_) } toks($code);
+        ok( grep( $_ eq $want, @t ), "$code: $desc" ) or diag "got: @t";
+    }
+}
+
+# §26, more positions of the same bug: after return and local, and in a
+# list (the five rows above are after = and at the start).
+TODO: {
+    local $TODO = 'PCL §26: A glob whose NAME is punctuation or a digit run is split into two operators';
+    my @rows = (
+        [ 'return *!;',                'Symbol=*!',  '*! after return is one glob' ],
+        [ 'local *12 = sub { 1 };',    'Symbol=*12', '*12 after local is one glob' ],
+        [ '@a = (*-, *+);',           'Symbol=*+',  '*- and *+ in a list are globs' ],
+    );
+    for my $r (@rows) {
+        my ( $code, $want, $desc ) = @$r;
+        my @t = map { short_class($_) } toks($code);
+        ok( grep( $_ eq $want, @t ), "$code: $desc" ) or diag "got: @t";
+    }
+}
+# The controls: after a term a * multiplies, *$g is a glob dereference, and
+# after an unknown word the existing guess stays.
+{
+    my @rows = (
+        [ '$x = $y *-1;',  'Operator=*', 'a scalar times -1 multiplies (control)' ],
+        [ '$x = 2*3;',     'Operator=*', '2*3 multiplies (control)' ],
+        [ '$z = *$g;',     'Cast=*',     '*$g is a glob dereference (control)' ],
+        [ 'foo *-1;',      'Operator=*', 'after an unknown word * stays an operator (control)' ],
     );
     for my $r (@rows) {
         my ( $code, $want, $desc ) = @$r;
