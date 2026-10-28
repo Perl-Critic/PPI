@@ -13,7 +13,7 @@
 use lib 't/lib';
 use PPI::Test::pragmas;
 use utf8;
-use Test::More tests => 241 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+use Test::More tests => 251 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use PPI ();
 
@@ -1577,5 +1577,39 @@ is_deeply( [ stmts("use feature 'try';\ntry { a() } catch (\$e) { b() }\nd();\n"
         my @br  = grep { $_->start && $_->start->content eq $open }
                   @{ $doc->find('PPI::Structure') || [] };
         is( ref( $br[-1] ), $want, "$code: $desc" );
+    }
+}
+
+# §5 -- a { where a statement starts is a block unless what follows says
+# anonymous hash.  perl's rule (toke.c, the curly look-ahead): a } right
+# away, or a first term that is a string or a word followed by =>, or a
+# string, a number or a word not starting with a lower-case letter
+# followed by a comma -- perl -e 'sub f { { "a", "foo" } } print ref f()'
+# prints HASH, and so do { 1, 2 } and { Foo, 1 }; { foo, 1 }, { $x, 1 }
+# and { 1.5, 2 } are blocks.
+{
+    my @rows = (
+        [ q{{ 'a', 'foo' };},  'PPI::Structure::Constructor', 1 ],
+        [ q{{ "a", 1 };},      'PPI::Structure::Constructor', 1 ],
+        [ q{{ 1, 2 };},        'PPI::Structure::Constructor', 1 ],
+        [ q{{ Foo, 1 };},      'PPI::Structure::Constructor', 1 ],
+        [ q{{ q(a), 1 };},     'PPI::Structure::Constructor', 1 ],
+        [ q{{ foo, 1 };},      'PPI::Structure::Block', 0 ],
+        [ q{{ $x, 1 };},       'PPI::Structure::Block', 0 ],
+        [ q{{ 1.5, 2 };},      'PPI::Structure::Block', 0 ],
+        [ q{{ 'a' };},         'PPI::Structure::Block', 0 ],
+        [ q{{ 'a' => 1 };},    'PPI::Structure::Constructor', 0 ],
+    );
+    for my $r (@rows) {
+        my ( $code, $want, $todo ) = @$r;
+        my $doc = PPI::Document->new(\$code);
+        my ($first) = $doc->schildren;
+        my $br = $first && $first->schild(0);
+        local $TODO = $todo
+          ? 'PCL §5: { LITERAL , ... } (anon hash, comma-separated) misclassified as a Block'
+          : undef;
+        is( ref($br), $want,
+            "$code: the statement-initial { is a " . short_class($want)
+              . ( $todo ? '' : ' (control)' ) );
     }
 }
