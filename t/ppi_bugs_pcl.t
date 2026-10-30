@@ -1068,8 +1068,7 @@ for my $src ('1.5-0.5;', '1e3-1;') {
 # statement holding the block plus a second statement (print, say), or makes the
 # block an anonymous-hash Constructor followed directly by a term (printf).
 # perl: `my $fh = \*STDOUT; print({$fh} "a", "b")` prints ab.
-TODO: {
-    local $TODO = 'PCL §37: print({$fh} LIST) -- the parenthesised block filehandle -- is split into two statements, or its block is a CONSTRUCTOR';
+{
     my $doc = PPI::Document->new(\q{print({$fh} "a", "b");});
     my ($list) = @{ $doc->find(q{PPI::Structure::List}) || [] };
     my @st = $list->schildren;
@@ -1482,8 +1481,7 @@ is_deeply( [ stmts("use feature 'try';\ntry { a() } catch (\$e) { b() }\nd();\n"
         my ($list) = @{ $doc->find('PPI::Structure::List') || [] };
         my @st = $list ? $list->schildren : ();
         my $first = @st ? $st[0]->schild(0) : undef;
-        TODO: {
-            local $TODO = 'PCL §37: print({$fh} LIST) -- the parenthesised block filehandle -- is split into two statements, or its block is a CONSTRUCTOR';
+        {
             ok( @st == 1 && ref($st[0]) eq 'PPI::Statement'
                   && $first && ref($first) eq 'PPI::Structure::Block',
                 "$what: {\$fh} is a Block opening the one plain statement in $code" )

@@ -1365,11 +1365,33 @@ sub _curly {
 			if $function and $function->content =~ /^(?:map|grep|sort|eval|do)$/;
 
 		# If not part of a block print, list-embedded curlies are most likely constructors
-		return 'PPI::Structure::Constructor'
-			if not $function or $function->content !~ /^(?:print|say)$/;
+		my $block_fh = $function
+		  && $function->content =~ /^(?:CORE::)?(?:print|printf|say|exec|system)$/;
+		return 'PPI::Structure::Constructor' if not $block_fh;
+
+		# print({$fh} LIST): a filehandle (or program) block opens the one
+		# statement of the list; the look-ahead below tells it from
+		# print({a => 1}).  The statement stays plain, so the list
+		# continues after the block.
+		return $self->_curly_lookahead || 'PPI::Structure::Block';
 	}
 
 	# We need to scan ahead.
+	my $class = $self->_curly_lookahead;
+	return $class if $class;
+
+	# Hit the end of the document, or bailed out, go with block
+	if ( ref $Parent eq 'PPI::Statement' ) {
+		bless $Parent, 'PPI::Statement::Compound';
+	}
+	return 'PPI::Structure::Block';
+}
+
+# Look at the tokens after a { whose class its neighbours do not decide,
+# and return the class they decide, or '' (then it is a block).  The
+# tokens are put back.
+sub _curly_lookahead {
+	my $self = shift;
 	my $Next;
 	my $position = 0;
 	my @delayed;
@@ -1397,7 +1419,7 @@ sub _curly {
 		if ( ++$position >= @CURLY_LOOKAHEAD_CLASSES ) {
 			# default to block.
 			$self->_buffer( splice(@delayed), $Next );
-			last;
+			return '';
 		# If the content at this position is known
 		} elsif ( my $class = $CURLY_LOOKAHEAD_CLASSES[$position]
 			{$Next->content} ) {
@@ -1410,12 +1432,9 @@ sub _curly {
 		push @delayed, $Next;
 	}
 
-	# Hit the end of the document, or bailed out, go with block
+	# Hit the end of the document
 	$self->_buffer( splice(@delayed) );
-	if ( ref $Parent eq 'PPI::Statement' ) {
-		bless $Parent, 'PPI::Statement::Compound';
-	}
-	return 'PPI::Structure::Block';
+	return '';
 }
 
 
