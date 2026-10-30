@@ -1516,9 +1516,7 @@ is_deeply( [ stmts("use feature 'try';\ntry { a() } catch (\$e) { b() }\nd();\n"
         [ 'for \$x (@l) { 1 } f();',          '§10' ],
         [ 'L: for \our @a (@l) { 1 } f();',   '§10' ],
     );
-    my %why = (
-        '§1'  => 'PCL §1: $$$ref (triple dereference) tokenized as $$ + $ref',
-    );
+    my %why = ();   # every shape passes since §1 ($$$r) was fixed
     for my $r (@shapes) {
         my ( $code, $sect ) = @$r;
         ( my $loop = $code ) =~ s/ f\(\);$//;
