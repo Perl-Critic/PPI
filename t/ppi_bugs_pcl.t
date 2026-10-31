@@ -1717,8 +1717,7 @@ TODO: {
 # or a glob whatever it holds.  perl: my %h; my @l = map { $h{$_}++ } <DATA>
 # reads DATA.  After a subscript's } or a do block's } (the controls) the
 # < compares.
-TODO: {
-    local $TODO = 'PCL §14: <FH> / <glob> after a list operator or a block is lexed as < … >';
+{
     for my $r (
         [ 'my @l = map { $h{$_}++ } <op/*>;', 'QuoteLike::Readline=<op/*>',  'a glob after a map block' ],
         [ 'my @m = grep { 1 } <$fh>;',        'QuoteLike::Readline=<$fh>',   'a readline after a grep block' ],

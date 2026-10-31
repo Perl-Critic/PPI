@@ -324,6 +324,15 @@ sub __TOKENIZER__on_char {
 				# Almost definitely readline
 				return 'QuoteLike::Readline';
 			}
+
+			# After the } of a block that opens a statement or follows a
+			# word (map { ... } <op/*>, grep { ... } <$fh>) perl expects a
+			# term, so a closed <...> is a readline or a glob, whatever it
+			# holds.  After a subscript's } the < compares.
+			pos $t->{line} = $t->{line_cursor};
+			return 'QuoteLike::Readline'
+			  if $t->{line} =~ m/\G<(?:>|[^<>=\s][^<>]*>)/gc
+			  and $t->_after_statement_block;
 		}
 
 		# Otherwise, we guess operator, which has been the default up
