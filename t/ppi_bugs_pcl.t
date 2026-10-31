@@ -13,7 +13,7 @@
 use lib 't/lib';
 use PPI::Test::pragmas;
 use utf8;
-use Test::More tests => 266 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+use Test::More tests => 271 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use PPI ();
 
@@ -1710,4 +1710,32 @@ TODO: {
     my $plain   = $tokens->();
     my $slurped = do { local $/; $tokens->() };
     is( $slurped, $plain, 'a standalone tokenizer: the tokens are the same when $/ is undef' );
+}
+
+# §14, the after-a-block half: after the } of a block that opens a
+# statement or follows a word perl expects a term, so <...> is a readline
+# or a glob whatever it holds.  perl: my %h; my @l = map { $h{$_}++ } <DATA>
+# reads DATA.  After a subscript's } or a do block's } (the controls) the
+# < compares.
+TODO: {
+    local $TODO = 'PCL §14: <FH> / <glob> after a list operator or a block is lexed as < … >';
+    for my $r (
+        [ 'my @l = map { $h{$_}++ } <op/*>;', 'QuoteLike::Readline=<op/*>',  'a glob after a map block' ],
+        [ 'my @m = grep { 1 } <$fh>;',        'QuoteLike::Readline=<$fh>',   'a readline after a grep block' ],
+        [ 'if ($x) { } <STDIN>;',             'QuoteLike::Readline=<STDIN>', 'a readline after a statement block' ],
+    ) {
+        my ( $code, $want, $desc ) = @$r;
+        my @t = map { short_class($_) } toks($code);
+        ok( grep( $_ eq $want, @t ), "$code: $desc" ) or diag "got: @t";
+    }
+}
+{
+    for my $r (
+        [ '$x = $h{a} < $b;',   'less-than after a subscript (control)' ],
+        [ '$w = do { 1 } < 2;', 'less-than after a do block (control)' ],
+    ) {
+        my ( $code, $desc ) = @$r;
+        my @t = map { short_class($_) } toks($code);
+        ok( grep( $_ eq 'Operator=<', @t ), "$code: $desc" ) or diag "got: @t";
+    }
 }
