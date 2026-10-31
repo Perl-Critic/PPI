@@ -636,6 +636,7 @@ sub _finalize_token {
 
 	# Add the token to the token buffer
 	push @{ $self->{tokens} }, $self->{token};
+	$self->_lexical_sub_scope( $self->{token} ) if $self->{lexical_subs};
 	$self->{token} = undef;
 
 	# Return the parse class to that of the zone we are in
@@ -1101,7 +1102,7 @@ sub _current_x_is_operator {
 	my ($prev, $prevprev) = $self->_previous_significant_tokens(2);
 	return if !$prev;
 
-	return !$self->__current_token_is_forced_word if $prev->isa('PPI::Token::Word');
+	return !$self->__current_token_is_forced_word('x') if $prev->isa('PPI::Token::Word');
 
 	return (!$prev->isa('PPI::Token::Operator') || $X_CAN_FOLLOW_OPERATOR{$prev})
 		&& (!$prev->isa('PPI::Token::Structure') || $X_CAN_FOLLOW_STRUCTURE{$prev})
@@ -1116,6 +1117,12 @@ sub _current_x_is_operator {
 # during tokenization.
 sub __current_token_is_forced_word {
 	my ( $t, $word ) = @_;
+
+	# A lexical sub in scope is called by its bare name, also where the
+	# name is a keyword's (my sub s { ... } s(1)) -- but not after a term,
+	# where perl expects an operator ($n x 3 stays a repetition).
+	return 1 if $t->{lexical_subs} and defined $word
+		and $t->_lexical_sub_in_scope($word) and !$t->_after_term;
 
 	# Check if forced by preceding tokens.
 
@@ -1159,6 +1166,66 @@ sub __current_token_is_forced_word {
 
 	# Otherwise we probably aren't forced
 	return '';
+}
+
+# Lexical subs (perl 5.18): my sub NAME, state sub NAME and our sub NAME
+# declare NAME for the rest of the enclosing block, and there the bare NAME
+# is the sub, also where it is a keyword's name (toke.c yyl_keylookup looks
+# a word up in the pad before the keyword table): after my sub s { ... },
+# s(1) is a call and not a substitution.  The tokenizer keeps the declared
+# names with the brace depth of their block, a bounded set that the } which
+# closes that block empties again; it is only kept once a file declares one.
+my %LEXICAL_SUB_DECLARATOR = map { $_ => 1 } qw( my our state );
+
+# Called by PPI::Token::Word for the word sub, and for the word after it
+# while a declaration is pending (before the new token is created).
+sub _lexical_sub_word {
+	my ( $self, $word ) = @_;
+	if ( defined $self->{lexical_sub_pending} ) {
+		my $depth = delete $self->{lexical_sub_pending};
+		push @{ $self->{lexical_subs} ||= [] }, [ $word, $depth ];
+		$self->{lexical_sub_depth} = $depth if !defined $self->{lexical_sub_depth};
+		return;
+	}
+	my ( $prev ) = $self->_previous_significant_tokens(1);
+	return if !$prev or !$prev->isa('PPI::Token::Word') or !$LEXICAL_SUB_DECLARATOR{ $prev->content };
+	if ( defined $self->{lexical_sub_depth} ) {
+		$self->{lexical_sub_pending} = $self->{lexical_sub_depth};
+		return;
+	}
+	# The first declaration: count the braces still open before it.
+	my $depth = 0;
+	for my $token ( @{ $self->{tokens} } ) {
+		next if !$token->isa('PPI::Token::Structure');
+		$depth++ if $token->content eq '{';
+		$depth-- if $token->content eq '}' and $depth;
+	}
+	$self->{lexical_sub_pending} = $depth;
+}
+
+# Called by _finalize_token for every token while a lexical sub is in scope.
+sub _lexical_sub_scope {
+	my ( $self, $token ) = @_;
+	return if ref $token ne 'PPI::Token::Structure';
+	if ( $token->{content} eq '{' ) {
+		$self->{lexical_sub_depth}++;
+	}
+	elsif ( $token->{content} eq '}' ) {
+		my $depth = --$self->{lexical_sub_depth};
+		my @left = grep { $_->[1] <= $depth } @{ $self->{lexical_subs} };
+		if ( @left ) {
+			$self->{lexical_subs} = \@left;
+		}
+		else {
+			delete $self->{lexical_subs};
+			delete $self->{lexical_sub_depth};
+		}
+	}
+}
+
+sub _lexical_sub_in_scope {
+	my ( $self, $word ) = @_;
+	return scalar grep { $_->[0] eq $word } @{ $self->{lexical_subs} };
 }
 
 sub _features {

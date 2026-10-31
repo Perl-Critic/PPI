@@ -1655,8 +1655,7 @@ TODO: {
 
 # §43 -- a lexical sub may be named like a keyword, and its name is then
 # a sub call: `my sub s { "S@_" } print s(1)` prints S1.
-TODO: {
-    local $TODO = 'PCL §43: a lexical sub named like a keyword keeps the keyword lexing';
+{
     my @t = map { short_class($_) } toks('my sub s { "S@_" } print s(1), "\n";');
     ok( !grep( /^Regexp::Substitute=/, @t ), 'my sub s ... s(1): a call, not a substitution' ) or diag "got: @t";
 }
@@ -1874,14 +1873,12 @@ TODO: {
 # { "X@_" } print y(2), x(5)` prints Y2X5 -- while after a term x is still
 # the repetition operator and after the block's } the keyword is back:
 # `{ my sub s { 1 } } s/a/b/` substitutes.
-TODO: {
-    local $TODO = 'PCL §43: a lexical sub named like a keyword keeps the keyword lexing';
+{
     my @t = map { short_class($_) } toks('my sub y { 1 } my sub x { 2 } print y(2), x(5), 3 x 2;');
     my @ops = grep { /^(?:Regexp::Transliterate|Operator=x)/ } @t;
     is_deeply( \@ops, ['Operator=x'], 'my sub y / my sub x: y(2) and x(5) are calls, 3 x 2 repeats' ) or diag "got: @t";
 }
-TODO: {
-    local $TODO = 'PCL §43: a lexical sub named like a keyword keeps the keyword lexing';
+{
     my @t = map { short_class($_) } toks('{ my sub s { 1 } s(1); } s/a/b/;');
     is( $t[-2], 'Regexp::Substitute=s/a/b/', 'after the block of my sub s, s/a/b/ substitutes again' ) or diag "got: @t";
 }

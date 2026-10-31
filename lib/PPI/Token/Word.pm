@@ -145,7 +145,7 @@ sub __TOKENIZER__on_char {
 	my $word = $t->{token}->{content};
 	if ( $KEYWORDS{$word} ) {
 		# Check for a Perl keyword that is forced to be a normal word instead
-		if ( $t->__current_token_is_forced_word ) {
+		if ( $t->__current_token_is_forced_word($word) ) {
 			$t->{class} = $t->{token}->set_class( 'Word' );
 			return $t->{class}->__TOKENIZER__on_char( $t );
 		}
@@ -277,7 +277,7 @@ sub __TOKENIZER__commit {
 		# Since it's not a simple identifier...
 		$token_class = 'Word';
 
-	} elsif ( $KEYWORDS{$word} and $t->__current_token_is_forced_word ) {
+	} elsif ( $KEYWORDS{$word} and $t->__current_token_is_forced_word($word) ) {
 		$token_class = 'Word';
 
 	} elsif ( $QUOTELIKE{$word} ) {
@@ -321,6 +321,10 @@ sub __TOKENIZER__commit {
 			$token_class = 'Word';
 		}
 	}
+
+	# A lexical sub's declaration names it for the rest of its block
+	$t->_lexical_sub_word($word)
+		if $token_class eq 'Word' and ( $word eq 'sub' or defined $t->{lexical_sub_pending} );
 
 	# Create the new token and finalise
 	$t->_new_token( $token_class, $word );
