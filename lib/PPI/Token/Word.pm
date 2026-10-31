@@ -334,6 +334,23 @@ sub __TOKENIZER__commit {
 
 
 
+# A sub name that opens with the old package separator ' (sub 'Hello'_x):
+# the caller (PPI::Token::Whitespace) has checked that a name follows.
+sub __TOKENIZER__commit_quoted_name {
+	my ( $class, $t ) = @_;
+	pos $t->{line} = $t->{line_cursor};
+	$t->{line} =~ m/\G('(?!\d)\w+(?:(?:'(?!\d)|(?:::)+)\w+)*)/gc
+	  or die "Fatal error... quoted sub name expected";
+	my $word = $1;
+	$t->{line_cursor} += length $word;
+	$t->_new_token( 'Word', $word );
+	if ( $t->{line_cursor} >= $t->{line_length} ) {
+		$t->_finalize_token;
+		return 0;
+	}
+	$t->_finalize_token->__TOKENIZER__on_char($t);
+}
+
 # Is the current Word really a subroutine attribute?
 sub __current_token_is_attribute {
 	my ( $t ) = @_;

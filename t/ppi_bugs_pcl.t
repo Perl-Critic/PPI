@@ -1691,8 +1691,7 @@ TODO: {
 
 # §46 -- the old package separator ' may open a sub name:
 # `sub 'Hello'_he_said { "hi" } print Hello::_he_said()` prints hi.
-TODO: {
-    local $TODO = q{PCL §46: the ' package separator in a sub name lexes as a quote};
+{
     my @t = map { short_class($_) } toks(q{sub 'Hello'_he_said { "hi" }});
     ok( grep( $_ eq q{Word='Hello'_he_said}, @t ), q{sub 'Hello'_he_said: the name is one Word} ) or diag "got: @t";
 }

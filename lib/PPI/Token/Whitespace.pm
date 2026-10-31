@@ -191,6 +191,19 @@ sub __TOKENIZER__on_line_start {
 	1;
 }
 
+# Is the ' at the cursor the start of a sub's NAME (sub 'Hello'_he_said)?
+# Only right after the word sub (not a method named sub), and only when a
+# whole name follows: the separator, then a word, and more parts.
+sub __sub_name_expected {
+	my $t = shift;
+	pos $t->{line} = $t->{line_cursor};
+	return 0 if $t->{line} !~ m/\G'(?!\d)\w/gc;
+	my ( $prev, $before ) = $t->_previous_significant_tokens(2);
+	return 0 if !$prev or !$prev->isa('PPI::Token::Word') or $prev->content ne 'sub';
+	return 0 if $before and $before->isa('PPI::Token::Operator') and $before->content eq '->';
+	return 1;
+}
+
 sub __TOKENIZER__on_char {
 	my $t    = $_[1];
 	my $c = substr $t->{line}, $t->{line_cursor}, 1;
@@ -198,6 +211,12 @@ sub __TOKENIZER__on_char {
 
 	# Do we definitely know what something is?
 	return $COMMITMAP{$char}->__TOKENIZER__commit($t) if $COMMITMAP{$char};
+
+	# A sub's name may open with the old package separator ':
+	# sub 'Hello'_he_said is sub main'Hello'_he_said (perl reads a name
+	# after sub, toke.c yyl_sub, and ' separates its parts).
+	return 'PPI::Token::Word'->__TOKENIZER__commit_quoted_name($t)
+	  if $char == 39 and __sub_name_expected($t);
 
 	# Handle the simple option first
 	return $CLASSMAP{$char} if $CLASSMAP{$char};
