@@ -382,6 +382,14 @@ my %STATEMENT_CLASSES = (
 	'CORE::__END__'  => 'PPI::Statement::End',
 );
 
+# The statements of the class feature (perl 5.38; perly.y KW_CLASS,
+# KW_FIELD, PHASER), only under the feature
+my %CLASS_FEATURE_STATEMENTS = (
+	'class'  => 'PPI::Statement::Package',
+	'field'  => 'PPI::Statement::Variable',
+	'ADJUST' => 'PPI::Statement::Scheduled',
+);
+
 sub _statement {
 	my ($self, $Parent, $Token) = @_;
 	# my $self   = shift;
@@ -428,12 +436,18 @@ sub _statement {
 
 	# Is it a token in our known classes list
 	my $content = $Token->content;
-	# try and defer open a compound statement only under their feature
+	# try and defer open a compound statement only under their feature;
+	# under the class feature class declares a package, field a variable
+	# and ADJUST a phaser block (method is a sub, below) -- the shapes of
+	# upstream PR #346
+	my $features = $self->{features_stack}[-1] || {};
 	my $class =
-	  ( ( $content eq 'try' or $content eq 'defer' )
-		and ( $self->{features_stack}[-1] || {} )->{$content} )
+	  ( ( $content eq 'try' or $content eq 'defer' ) and $features->{$content} )
 	  ? 'PPI::Statement::Compound'
+	  : ( $features->{class} and $CLASS_FEATURE_STATEMENTS{$content} )
+	  ? $CLASS_FEATURE_STATEMENTS{$content}
 	  : $STATEMENT_CLASSES{$content};
+	my $is_method = $features->{class} && $content eq 'method';
 
 	if ( $class ) {
 		# Is the next significant token a =>
@@ -519,8 +533,8 @@ sub _statement {
 	# If it's a token in our list, use that class
 	return $class if $class;
 
-	# Handle the more in-depth sub detection
-	if ( $is_lexsub || $content eq 'sub' ) {
+	# Handle the more in-depth sub detection (a method NAME is a sub too)
+	if ( $is_lexsub || $content eq 'sub' || $is_method ) {
 		# Read ahead to the next significant token
 		my $Next;
 		while ( $Next = $self->_get_token ) {
@@ -532,7 +546,7 @@ sub _statement {
 
 			# Got the next significant token
 			my $sclass = $STATEMENT_CLASSES{$Next->content};
-			if ( $sclass and $sclass eq 'PPI::Statement::Scheduled' ) {
+			if ( !$is_method and $sclass and $sclass eq 'PPI::Statement::Scheduled' ) {
 				$self->_rollback( $Next );
 				return 'PPI::Statement::Scheduled';
 			}

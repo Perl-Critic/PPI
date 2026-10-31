@@ -1853,8 +1853,7 @@ for my $code ( 'my @t = map { $_ => 1 } @x;', 'my @u = map { lc($_) => 1 } @x;' 
 # §53 -- the class feature (perl 5.38): `class NAME BLOCK`, `field`,
 # `method NAME BLOCK` and `ADJUST BLOCK` are statements that end at their
 # block, and `class NAME :isa(PARENT)` takes an attribute, not a label.
-TODO: {
-    local $TODO = 'PCL §53: the class syntax builds no statements of its own';
+{
     my @s = stmts(q{use feature 'class'; class P { field $v = 1; method get { $v } } print P->new->get;});
     is( scalar(@s), 3, 'class NAME BLOCK ends at its block' ) or diag join "\n", @s;
     # the shapes of upstream PR #346: class a package, method a sub, field a
