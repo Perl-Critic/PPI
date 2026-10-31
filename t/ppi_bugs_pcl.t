@@ -13,7 +13,7 @@
 use lib 't/lib';
 use PPI::Test::pragmas;
 use utf8;
-use Test::More tests => 271 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+use Test::More tests => 275 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use PPI ();
 
@@ -1736,5 +1736,26 @@ TODO: {
         my ( $code, $desc ) = @$r;
         my @t = map { short_class($_) } toks($code);
         ok( grep( $_ eq 'Operator=<', @t ), "$code: $desc" ) or diag "got: @t";
+    }
+}
+
+# §20, the rest of the feature set: perl 5.36's `defer` and 5.38's
+# `class` are enabled the same two ways (use feature, use experimental),
+# and a lexer that changes how `defer {` and `class NAME` lex has to know
+# they are on.  perl: use feature 'defer'; defer { print "b\n" } print "a\n"
+# prints a then b.  Neither is in a version bundle.
+TODO: {
+    local $TODO = 'PCL §20: Two of perl\'s three ways to enable try are not recognised, so the construct mis-lexes';
+    for my $r (
+        [ q{use feature 'defer';},      'defer' ],
+        [ q{use experimental 'defer';}, 'defer' ],
+        [ q{use feature 'class';},      'class' ],
+        [ q{use experimental 'class';}, 'class' ],
+    ) {
+        my ( $code, $feature ) = @$r;
+        my $doc = PPI::Document->new( \$code );
+        my ($inc) = @{ $doc->find('PPI::Statement::Include') || [] };
+        my $mods = $inc ? $inc->feature_mods || {} : {};
+        is( $mods->{$feature}, 'perl', "$code enables $feature" );
     }
 }
