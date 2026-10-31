@@ -13,7 +13,7 @@
 use lib 't/lib';
 use PPI::Test::pragmas;
 use utf8;
-use Test::More tests => 275 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+use Test::More tests => 295 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use PPI ();
 
@@ -1757,4 +1757,110 @@ TODO: {
         my $mods = $inc ? $inc->feature_mods || {} : {};
         is( $mods->{$feature}, 'perl', "$code enables $feature" );
     }
+}
+
+# §48-§54, §57 -- the Lexer's structure rows found by PCL's expect-state
+# checker.  A bracket's class is perl's lexer state at the bracket (toke.c
+# yylex): after a term (XOPERATOR) a [ or { subscripts it; where a term is
+# expected (XTERM) a { is an anonymous hash; a block that perl's grammar
+# continues (continue) or ends (defer, class) decides the next statement.
+sub bracket_classes {
+    my ( $code, $open ) = @_;
+    my $doc = PPI::Document->new(\$code) or return ('NO DOCUMENT');
+    return map { ref $_ }
+           grep { $_->start && $_->start->content eq $open }
+           @{ $doc->find('PPI::Structure') || [] };
+}
+
+# §48 -- a LIST SLICE: after the ) of a list or a qw() the lexer expects an
+# operator (toke.c yyl_rightparen TERM), so the [ subscripts the list:
+# `print +(10, 20)[1]` prints 20.
+TODO: {
+    local $TODO = 'PCL §48: the [ of a list slice is a Constructor';
+    for my $code ( 'my @x = (1, 2, 3)[1];', 'print qw(a b c)[1];',
+                   'my ($p) = (sort { $b <=> $a } @a)[0];' ) {
+        my @c = bracket_classes( $code, '[' );
+        is( $c[-1], 'PPI::Structure::Subscript', "$code: the [ of the list slice is a Subscript" );
+    }
+}
+for my $code ( 'my $r = [1];', 'foo([1, 2]);' ) {
+    my @c = bracket_classes( $code, '[' );
+    is( $c[-1], 'PPI::Structure::Constructor', "$code: an anonymous array (control)" );
+}
+
+# §49 §57 -- a GLOB SLOT: *NAME is a complete term, so the { after it
+# subscripts the glob (toke.c yyl_leftcurly under XOPERATOR):
+# `*STDOUT{IO}`, `*x{HASH}`, `*main::f{CODE}`.
+TODO: {
+    local $TODO = 'PCL §49: the {SLOT} of a glob is a Block';
+    for my $code ( 'print ref(*STDOUT{IO});', 'my $h = *x{HASH};',
+                   'my $c = *main::f{CODE};', 'my $v = *x{HASH}{a};' ) {
+        my @c = bracket_classes( $code, '{' );
+        is( join( ' ', @c ), join( ' ', ('PPI::Structure::Subscript') x @c ),
+            "$code: the braces after the glob are Subscripts" );
+    }
+}
+{
+    my @c = bracket_classes( 'my $s = *$g{SCALAR};', '{' );
+    is( $c[-1], 'PPI::Structure::Subscript', '*$g{SCALAR} is a Subscript (control)' );
+}
+
+# §50 -- where a term is expected a { is an anonymous hash: after die or
+# exists (toke.c XTERM), and after map / grep when the first thing inside
+# is a word or a string followed by a comma or => (the XREF look-ahead):
+# `map {a => $_}, 1, 2` returns two hashes.
+TODO: {
+    local $TODO = 'PCL §50: an anonymous hash after a list operator is a Block';
+    for my $code ( 'die { code => 42 };', 'print exists { k => undef }->{k};',
+                   'my @r = map {a => $_}, 1, 2;' ) {
+        my @c = bracket_classes( $code, '{' );
+        is( $c[0], 'PPI::Structure::Constructor', "$code: the first { is an anonymous hash" );
+    }
+}
+for my $code ( 'my @t = map { $_ => 1 } @x;', 'my @u = map { lc($_) => 1 } @x;' ) {
+    my @c = bracket_classes( $code, '{' );
+    is( $c[0], 'PPI::Structure::Block', "$code: a map block (control)" );
+}
+
+# §51 -- a bare block is a loop that runs once, so it takes a continue
+# block (perly.y: block cont): `{ $n++ } continue { $n += 10 }` is one
+# statement, and the statement after it is its own.
+TODO: {
+    local $TODO = 'PCL §51: the continue of a bare block starts a new statement';
+    is_deeply( [ stmts('{ $n++ } continue { $n += 10 } print "$n\n";') ],
+               [ 'Statement::Compound: { $n++ } continue { $n += 10 }',
+                 'Statement: print "$n\n";' ],
+               'a bare block with a continue block is one compound statement' );
+}
+
+# §52 -- under the defer feature (perl 5.36) `defer BLOCK` is a statement
+# that ends at its block: the print after it is the next statement.
+TODO: {
+    local $TODO = 'PCL §52: defer BLOCK swallows the next statement';
+    my $doc = PPI::Document->new(\q{use feature 'defer'; { defer { print "b\n" } print "a\n"; }});
+    my ($blk) = grep { $_->isa('PPI::Statement::Compound') } $doc->schildren;
+    my @in = $blk ? map { squash( $_->content ) } $blk->schild(0)->schildren : ();
+    is_deeply( \@in, [ 'defer { print "b\n" }', 'print "a\n";' ],
+               'defer BLOCK ends at its block' );
+}
+
+# §53 -- the class feature (perl 5.38): `class NAME BLOCK`, `field`,
+# `method NAME BLOCK` and `ADJUST BLOCK` are statements that end at their
+# block, and `class NAME :isa(PARENT)` takes an attribute, not a label.
+TODO: {
+    local $TODO = 'PCL §53: the class syntax builds no statements of its own';
+    my @s = stmts(q{use feature 'class'; class P { field $v = 1; method get { $v } } print P->new->get;});
+    is( scalar(@s), 3, 'class NAME BLOCK ends at its block' ) or diag join "\n", @s;
+}
+{
+    my @t = map { short_class($_) } toks(q{use feature 'class'; class Q :isa(P);});
+    ok( !grep( /^Label=/, @t ), 'class NAME :isa(P): no label' ) or diag "got: @t";
+}
+
+# §54 -- `*{EXPR}` names a glob through a dereference block (toke.c
+# yyl_star: the cast's block is a block), also as require's argument.
+TODO: {
+    local $TODO = 'PCL §54: the block of a glob cast after require is a Constructor';
+    my @c = bracket_classes( 'require *{"\0a"};', '{' );
+    is( $c[0], 'PPI::Structure::Block', 'require *{"..."}: the dereference block is a Block' );
 }
