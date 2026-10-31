@@ -1791,8 +1791,7 @@ for my $code ( 'my $r = [1];', 'foo([1, 2]);' ) {
 # §49 §57 -- a GLOB SLOT: *NAME is a complete term, so the { after it
 # subscripts the glob (toke.c yyl_leftcurly under XOPERATOR):
 # `*STDOUT{IO}`, `*x{HASH}`, `*main::f{CODE}`.
-TODO: {
-    local $TODO = 'PCL §49: the {SLOT} of a glob is a Block';
+{
     for my $code ( 'print ref(*STDOUT{IO});', 'my $h = *x{HASH};',
                    'my $c = *main::f{CODE};', 'my $v = *x{HASH}{a};' ) {
         my @c = bracket_classes( $code, '{' );
@@ -1859,8 +1858,7 @@ TODO: {
 
 # §54 -- `*{EXPR}` names a glob through a dereference block (toke.c
 # yyl_star: the cast's block is a block), also as require's argument.
-TODO: {
-    local $TODO = 'PCL §54: the block of a glob cast after require is a Constructor';
+{
     my @c = bracket_classes( 'require *{"\0a"};', '{' );
     is( $c[0], 'PPI::Structure::Block', 'require *{"..."}: the dereference block is a Block' );
 }

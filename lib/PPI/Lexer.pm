@@ -1179,13 +1179,14 @@ sub _hash_comma_head {
 	return $Token->isa('PPI::Token::Word') && $content !~ /\A[a-z]/;
 }
 
-# Is the last child of the parent the block of a dereference -- a $, @ or
-# % cast before it, as in ${$ref}, @{$ref}, %{$ref} or ${name}?  A [ or {
-# right after it subscripts it, as after the symbol it stands for.
+# Is the last child of the parent the block of a dereference -- a $, @, %
+# or * cast before it, as in ${$ref}, @{$ref}, %{$ref}, ${name} or
+# *{"name"}?  A [ or { right after it subscripts it, as after the symbol
+# it stands for.
 sub _deref_block {
 	my $Parent = shift;
 	my $prior  = $Parent->schild(-2) or return '';
-	return $prior->isa('PPI::Token::Cast') && $prior->content =~ /^[\$\@\%]\z/;
+	return $prior->isa('PPI::Token::Cast') && $prior->content =~ /^[\$\@\%\*]\z/;
 }
 
 # Given a parent element, and a [ token to open a structure, determine
@@ -1301,6 +1302,11 @@ sub _curly {
 			# $foo{}, @foo{}, %foo{} (a key/value slice)
 			return 'PPI::Structure::Subscript';
 		}
+		if ( $content =~ /^\*/ and $Element->isa('PPI::Token::Symbol') ) {
+			# *STDOUT{IO}, *x{HASH}: a glob is a complete term, and the
+			# { after a term subscripts it (toke.c: XOPERATOR)
+			return 'PPI::Structure::Subscript';
+		}
 		if ( $Element->isa('PPI::Token::Cast') and $Element->content =~ /^(?:\@|\%|\*)/ ) {
 			my $prior = $Parent->schild(-2);
 			if ( $prior and $prior->isa('PPI::Token::Operator') and $prior->content eq '->' ) {
@@ -1337,8 +1343,13 @@ sub _curly {
 		return 'PPI::Structure::Block';
 	}
 
-	# Are we the second or third argument of use
-	if ( $Parent->isa('PPI::Statement::Include') ) {
+	# Are we the second or third argument of use -- right after the
+	# module name or its version?  (After a cast, as in require *{"name"},
+	# the { opens the cast's dereference block, below.)
+	if ( $Parent->isa('PPI::Statement::Include')
+		and $Element
+		and !$Element->isa('PPI::Token::Cast') )
+	{
 		if ( $Parent->schildren == 2 ||
 		    $Parent->schildren == 3 &&
 			$Parent->schild(2)->isa('PPI::Token::Number')
