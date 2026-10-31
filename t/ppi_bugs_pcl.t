@@ -13,7 +13,7 @@
 use lib 't/lib';
 use PPI::Test::pragmas;
 use utf8;
-use Test::More tests => 264 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+use Test::More tests => 265 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use PPI ();
 
@@ -1699,3 +1699,10 @@ TODO: {
     ok( grep( $_ eq q{Word='Hello'_he_said}, @t ), q{sub 'Hello'_he_said: the name is one Word} ) or diag "got: @t";
 }
 
+# §47 -- `WORD :` inside a ternary's middle operand is a word and the
+# colon, never a label (a label only where a statement starts):
+# `my $c = 0 ? ref shift : shift` is the second shift.
+{
+    my @t = map { short_class($_) } toks('sub f { my $c = 0 ? ref shift : shift; $c }');
+    ok( !grep( /^Label=/, @t ), '0 ? ref shift : shift: no label in a ternary' ) or diag "got: @t";
+}
