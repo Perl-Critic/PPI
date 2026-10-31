@@ -1032,7 +1032,13 @@ sub _after_declared_variables {
 	elsif ( !$last->isa('PPI::Token::Symbol') ) {
 		return '';
 	}
-	my ( $prev ) = $self->_significant_before($cursor);
+	my ( $prev, $at ) = $self->_significant_before($cursor);
+	return '' if !$prev or !$prev->isa('PPI::Token::Word');
+	return 1 if $DECLARATOR{ $prev->content };
+
+	# A typed declaration -- my Dog $spot : shared -- has the class name
+	# between the declarator and the variable.
+	( $prev ) = $self->_significant_before($at);
 	return $prev && $prev->isa('PPI::Token::Word') && $DECLARATOR{ $prev->content };
 }
 

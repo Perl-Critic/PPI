@@ -1421,8 +1421,7 @@ for my $code ( "use v5.36;\nsub f (\$, \$y) { 1 }",
 # §8, a TYPED declaration.  perl's `my CLASS $var : attr` (and `my CLASS
 # ($a, $b) : attr`) has the class name between the declarator and the
 # variable; the colon still introduces the declaration's attributes.
-TODO: {
-    local $TODO = 'PCL §8: a typed declaration\'s attribute is lexed as a word';
+{
     my @rows = (
         [ 'my A $x : plugh;',                 'Attribute=plugh',  'a typed declaration takes an attribute' ],
         [ 'my Foo::Bar @s :shared = ();',     'Attribute=shared', 'a typed declaration with a qualified class takes an attribute' ],
