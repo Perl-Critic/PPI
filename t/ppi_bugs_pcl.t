@@ -1808,8 +1808,7 @@ for my $code ( 'my $r = [1];', 'foo([1, 2]);' ) {
 # exists (toke.c XTERM), and after map / grep when the first thing inside
 # is a word or a string followed by a comma or => (the XREF look-ahead):
 # `map {a => $_}, 1, 2` returns two hashes.
-TODO: {
-    local $TODO = 'PCL §50: an anonymous hash after a list operator is a Block';
+{
     for my $code ( 'die { code => 42 };', 'print exists { k => undef }->{k};',
                    'my @r = map {a => $_}, 1, 2;' ) {
         my @c = bracket_classes( $code, '{' );

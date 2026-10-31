@@ -1271,6 +1271,12 @@ my %CURLY_CLASSES = (
 	'bless'  => 'PPI::Structure::Constructor', # pragmatic --
 				# perlfunc says first arg is a reference, and
 			# bless {; ... } fails to compile.
+	# After these named operators perl expects a term (toke.c: XTERM),
+	# and a { there is always an anonymous hash: die { code => 42 }
+	'die'    => 'PPI::Structure::Constructor',
+	'warn'   => 'PPI::Structure::Constructor',
+	'exists' => 'PPI::Structure::Constructor',
+	'delete' => 'PPI::Structure::Constructor',
 );
 
 my @CURLY_LOOKAHEAD_CLASSES = (
@@ -1340,6 +1346,12 @@ sub _curly {
 		return 'PPI::Structure::Block'
 			if $Parent->isa('PPI::Statement::Package');
 
+		if ( $content =~ /\A(?:map|grep)\z/ and $Element->isa('PPI::Token::Word') ) {
+			# map {a => $_}, LIST builds hashes, map { $_ => 1 } LIST
+			# is a block: the look-ahead perl applies there decides
+			return $self->_curly_hash_lookahead || 'PPI::Structure::Block';
+		}
+
 		if ( $CURLY_CLASSES{$content} ) {
 			# Known type
 			return $CURLY_CLASSES{$content};
@@ -1380,9 +1392,12 @@ sub _curly {
 		my $function = $Parent->parent->parent->schild(-2);
 
 		# Special case: Are we the param of a core function
-		# i.e. map({ $_ => 1 } @foo)
+		# i.e. map({ $_ => 1 } @foo) -- but map({a => $_}, @foo) builds
+		# hashes, by the same look-ahead as without the parentheses
+		return $self->_curly_hash_lookahead || 'PPI::Structure::Block'
+			if $function and $function->content =~ /^(?:map|grep)$/;
 		return 'PPI::Structure::Block'
-			if $function and $function->content =~ /^(?:map|grep|sort|eval|do)$/;
+			if $function and $function->content =~ /^(?:sort|eval|do)$/;
 
 		# If not part of a block print, list-embedded curlies are most likely constructors
 		my $block_fh = $function
@@ -1457,6 +1472,42 @@ sub _curly_lookahead {
 	return '';
 }
 
+
+# The look-ahead perl (toke.c yyl_leftcurly) applies to the { of a map or
+# a grep: an immediate }, or a word, number or string followed by => --
+# or by a comma, unless it is a word that starts with a lower-case
+# letter -- opens an anonymous hash.  Returns the class or '' (then it is
+# a block).  The tokens are put back.
+sub _curly_hash_lookahead {
+	my $self = shift;
+	my ( @delayed, @sig );
+	while ( @sig < 2 ) {
+		my $Next = $self->_get_token or last;
+		push @delayed, $Next;
+		push @sig, $Next if $Next->significant;
+	}
+	$self->_buffer(@delayed);
+	return '' if not @sig;
+	return 'PPI::Structure::Constructor'
+		if $sig[0]->isa('PPI::Token::Structure') and $sig[0]->content eq '}';
+	return '' if @sig < 2;
+	my ( $head, $sep ) = @sig;
+	return 'PPI::Structure::Constructor'
+		if $sep->content eq '=>' and _hash_arrow_head($head);
+	return 'PPI::Structure::Constructor'
+		if $sep->content eq ',' and _hash_comma_head($head);
+	return '';
+}
+
+# A word, a number or a string: what perl's look-ahead takes as the key
+# before a =>
+sub _hash_arrow_head {
+	my $Token = shift;
+	return 1 if $Token->isa('PPI::Token::Quote');
+	return 1 if $Token->isa('PPI::Token::QuoteLike::Backtick');
+	return 1 if $Token->isa('PPI::Token::QuoteLike::Command');
+	return $Token->content =~ /\A\w+\z/ ? 1 : '';
+}
 
 sub _lex_structure {
 	my ($self, $Structure) = @_;
