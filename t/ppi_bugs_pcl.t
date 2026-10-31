@@ -1683,8 +1683,7 @@ TODO: {
 # §45 -- `&` where a term is expected is the code sigil even before a
 # space and a block (toke.c yyl_ampersand): `& {sub { print "ok\n" }};`
 # prints ok.
-TODO: {
-    local $TODO = 'PCL §45: & {BLOCK} with a space is a bitwise and';
+{
     my @t = map { short_class($_) } toks('& {sub { print "ok\n" }};');
     is( $t[0], 'Cast=&', '& {BLOCK} at a statement start: & is a Cast' ) or diag "got: @t";
 }

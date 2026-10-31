@@ -307,6 +307,17 @@ sub __TOKENIZER__on_char {
 
 		return $self->_as_cast_or_op($t) if $self->_is_cast_or_op($char);
 
+		# Where a term is expected & is the code sigil even before
+		# whitespace (toke.c yyl_ampersand: not XOPERATOR => scan_ident),
+		# so & {BLOCK} and & $code call code.
+		if ( $char =~ /\s/ ) {
+			pos $t->{line} = $t->{line_cursor};
+			if ( $t->{line} =~ m/\G\s+[{\$]/gc and _cast_or_op($t) eq 'Cast' ) {
+				$t->{class} = $t->{token}->set_class( 'Cast' );
+				return $t->_finalize_token->__TOKENIZER__on_char( $t );
+			}
+		}
+
 		# Probably the binary and operator
 		$t->{class} = $t->{token}->set_class( 'Operator' );
 		return $t->{class}->__TOKENIZER__on_char( $t );
