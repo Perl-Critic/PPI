@@ -13,7 +13,7 @@
 use lib 't/lib';
 use PPI::Test::pragmas;
 use utf8;
-use Test::More tests => 296 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+use Test::More tests => 298 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use PPI ();
 
@@ -1866,4 +1866,22 @@ TODO: {
     my @t = map { short_class($_) } toks('my @b = sort </tmp/x-1/y/*.pl>; print 1;');
     is( $t[4], 'QuoteLike::Readline=</tmp/x-1/y/*.pl>',
         'sort </tmp/x-1/y/*.pl>: the glob after sort is one readline' ) or diag "got: @t";
+}
+
+# §43, more spellings: a lexical sub named like a quote-like operator or
+# like the x operator is called by its bare name in its scope (toke.c
+# yyl_keylookup looks in the pad first) -- `my sub y { "Y@_" } my sub x
+# { "X@_" } print y(2), x(5)` prints Y2X5 -- while after a term x is still
+# the repetition operator and after the block's } the keyword is back:
+# `{ my sub s { 1 } } s/a/b/` substitutes.
+TODO: {
+    local $TODO = 'PCL §43: a lexical sub named like a keyword keeps the keyword lexing';
+    my @t = map { short_class($_) } toks('my sub y { 1 } my sub x { 2 } print y(2), x(5), 3 x 2;');
+    my @ops = grep { /^(?:Regexp::Transliterate|Operator=x)/ } @t;
+    is_deeply( \@ops, ['Operator=x'], 'my sub y / my sub x: y(2) and x(5) are calls, 3 x 2 repeats' ) or diag "got: @t";
+}
+TODO: {
+    local $TODO = 'PCL §43: a lexical sub named like a keyword keeps the keyword lexing';
+    my @t = map { short_class($_) } toks('{ my sub s { 1 } s(1); } s/a/b/;');
+    is( $t[-2], 'Regexp::Substitute=s/a/b/', 'after the block of my sub s, s/a/b/ substitutes again' ) or diag "got: @t";
 }
