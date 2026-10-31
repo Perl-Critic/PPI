@@ -1647,8 +1647,7 @@ TODO: {
 
 # §41 -- an empty package segment is part of the name (toke.c scan_word6):
 # `sub foo::::bar { 7 } print foo::::bar()` prints 7.
-TODO: {
-    local $TODO = 'PCL §41: a name with an empty package segment is split into two Words';
+{
     for my $code ( 'sub foo::::bar { 7 }', 'foo::::bar();' ) {
         my @t = map { short_class($_) } toks($code);
         ok( grep( $_ eq 'Word=foo::::bar', @t ), "$code: foo::::bar is one Word" ) or diag "got: @t";

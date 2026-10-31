@@ -197,7 +197,7 @@ sub __TOKENIZER__on_char {
 	}
 
 	# Verify and extract actual full symbol name from sigil to end
-	my $sep = qr/ (?: :: | '(?!\d) ) /x; # :: and ' are namespace separators
+	my $sep = qr/ (?: (?: :: )+ | '(?!\d) ) /x; # :: (a run of them: foo::::bar) and ' are namespace separators
 	my $pattern = qr/
 	^(
 		[\$@%&*]
