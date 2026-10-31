@@ -220,8 +220,10 @@ sub __TOKENIZER__commit {
 			: $t->{class}->__TOKENIZER__on_char($t);
 	}
 
-	# Check for the end of the file
-	if ( $word eq '__END__' ) {
+	# Check for the end of the file.  CORE::__END__ ends it too: perl
+	# reads either spelling as the end of the code (toke.c
+	# yyl_data_handle), so the rest of the file is never code.
+	if ( $word eq '__END__' or $word eq 'CORE::__END__' ) {
 		# Create the token for the __END__ itself
 		$t->_new_token( 'Separator', $1 );
 		$t->_finalize_token;
@@ -246,8 +248,8 @@ sub __TOKENIZER__commit {
 		return 0;
 	}
 
-	# Check for the data section
-	if ( $word eq '__DATA__' ) {
+	# Check for the data section (CORE::__DATA__ is the same)
+	if ( $word eq '__DATA__' or $word eq 'CORE::__DATA__' ) {
 		# Create the token for the __DATA__ itself
 		$t->_new_token( 'Separator', "$1" );
 		$t->_finalize_token;

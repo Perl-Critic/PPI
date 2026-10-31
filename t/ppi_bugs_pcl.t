@@ -1674,8 +1674,7 @@ TODO: {
 
 # §44 -- CORE::__END__ and CORE::__DATA__ end the code like __END__ and
 # __DATA__: `print "x\n";\nCORE::__END__\nnot code` prints x.
-TODO: {
-    local $TODO = 'PCL §44: CORE::__END__ / CORE::__DATA__ is a Word';
+{
     for my $m (qw(__END__ __DATA__)) {
         my @t = map { short_class($_) } toks("print 1;\nCORE::$m\nnot code\n");
         ok( grep( $_ eq "Separator=CORE::$m", @t ), "CORE::$m is a Separator" ) or diag "got: @t";
