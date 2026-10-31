@@ -13,7 +13,7 @@
 use lib 't/lib';
 use PPI::Test::pragmas;
 use utf8;
-use Test::More tests => 300 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+use Test::More tests => 302 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use PPI ();
 
@@ -1842,6 +1842,13 @@ TODO: {
     my @in = $blk ? map { squash( $_->content ) } $blk->schild(0)->schildren : ();
     is_deeply( \@in, [ 'defer { print "b\n" }', 'print "a\n";' ],
                'defer BLOCK ends at its block' );
+    my ($def) = $blk ? $blk->schild(0)->schildren : ();
+    is( $def && $def->isa('PPI::Statement::Compound') && $def->type, 'defer',
+        'defer BLOCK is a compound statement of type defer' );
+}
+{
+    my @s = stmts(q{defer { print "b\n" } print "a\n";});
+    is( scalar(@s), 1, 'without the feature defer is an ordinary word (control)' ) or diag join "\n", @s;
 }
 
 # §53 -- the class feature (perl 5.38): `class NAME BLOCK`, `field`,
