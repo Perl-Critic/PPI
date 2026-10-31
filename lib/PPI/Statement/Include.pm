@@ -279,7 +279,9 @@ sub feature_mods {
 
 	my $module = $self->module or return;
 
-	my %known     = ( signatures => 1, try => 1 );
+	# the features that change how code lexes: defer (5.36) and class (5.38)
+	# are switched on like try, and are in no version bundle
+	my %known     = ( signatures => 1, try => 1, defer => 1, class => 1 );
 	my $on_or_off = $type eq "use";
 
 	if ( $on_or_off

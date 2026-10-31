@@ -1744,8 +1744,7 @@ TODO: {
 # and a lexer that changes how `defer {` and `class NAME` lex has to know
 # they are on.  perl: use feature 'defer'; defer { print "b\n" } print "a\n"
 # prints a then b.  Neither is in a version bundle.
-TODO: {
-    local $TODO = 'PCL §20: Two of perl\'s three ways to enable try are not recognised, so the construct mis-lexes';
+{
     for my $r (
         [ q{use feature 'defer';},      'defer' ],
         [ q{use experimental 'defer';}, 'defer' ],
