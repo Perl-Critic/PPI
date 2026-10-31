@@ -1668,8 +1668,7 @@ TODO: {
         ok( grep( $_ eq "Separator=CORE::$m", @t ), "CORE::$m is a Separator" ) or diag "got: @t";
     }
 }
-TODO: {
-    local $TODO = 'PCL §44: the CORE:: spelling sits in a plain Statement';
+{
     for my $m (qw(__END__ __DATA__)) {
         my $doc = PPI::Document->new(\"print 1;\nCORE::$m\nnot code\n");
         my @s = map { ref $_ } $doc->schildren;

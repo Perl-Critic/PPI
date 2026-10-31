@@ -374,9 +374,12 @@ my %STATEMENT_CLASSES = (
 	'return'    => 'PPI::Statement::Break',
 	'goto'      => 'PPI::Statement::Break',
 
-	# Special sections of the file
+	# Special sections of the file; CORE:: spells the same separators
+	# (toke.c yyl_data_handle)
 	'__DATA__'  => 'PPI::Statement::Data',
 	'__END__'   => 'PPI::Statement::End',
+	'CORE::__DATA__' => 'PPI::Statement::Data',
+	'CORE::__END__'  => 'PPI::Statement::End',
 );
 
 sub _statement {
