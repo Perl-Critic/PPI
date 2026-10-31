@@ -99,6 +99,9 @@ regardless of whether they were declared using C<'for'> or C<'foreach'>.
 
 All of the compounds are a variation on one of these four.
 
+Under their features, C<'try'> (try BLOCK catch ... finally ...) and
+C<'defer'> (defer BLOCK, perl 5.36) are compound statements too.
+
 Returns the simple string C<'if'>, C<'for'>, C<'foreach'> or C<'while'>,
 or C<undef> if the type cannot be determined.
 
@@ -133,6 +136,8 @@ sub type {
 	if ($Element->isa('PPI::Token::Word')) {
 		return 'try'
 			if $content eq 'try' && $self->presumed_features->{try};
+		return 'defer'
+			if $content eq 'defer' && $self->presumed_features->{defer};
 		return $TYPES{$content};
 	}
 	return 'continue' if $Element->isa('PPI::Structure::Block');

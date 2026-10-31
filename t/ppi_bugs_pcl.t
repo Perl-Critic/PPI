@@ -1835,8 +1835,7 @@ for my $code ( 'my @t = map { $_ => 1 } @x;', 'my @u = map { lc($_) => 1 } @x;' 
 
 # §52 -- under the defer feature (perl 5.36) `defer BLOCK` is a statement
 # that ends at its block: the print after it is the next statement.
-TODO: {
-    local $TODO = 'PCL §52: defer BLOCK swallows the next statement';
+{
     my $doc = PPI::Document->new(\q{use feature 'defer'; { defer { print "b\n" } print "a\n"; }});
     my ($blk) = grep { $_->isa('PPI::Statement::Compound') } $doc->schildren;
     my @in = $blk ? map { squash( $_->content ) } $blk->schild(0)->schildren : ();
