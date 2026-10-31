@@ -13,7 +13,7 @@
 use lib 't/lib';
 use PPI::Test::pragmas;
 use utf8;
-use Test::More tests => 295 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+use Test::More tests => 296 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use PPI ();
 
@@ -1859,4 +1859,17 @@ TODO: {
 {
     my @c = bracket_classes( 'require *{"\0a"};', '{' );
     is( $c[0], 'PPI::Structure::Block', 'require *{"..."}: the dereference block is a Block' );
+}
+
+# §14, the list-operator half: after a builtin that takes an operand (sort,
+# reverse, print, return) perl expects a term, so `<...>` is a readline or a
+# glob whatever it holds (toke.c yyl_leftpointy), even a path with a -DIGIT
+# in it: `my @b = sort </tmp/x-1/y/*.pl>; print 1;` globs and prints 1.
+# Read as a less-than, the -1 became a Number and the y/ a transliteration
+# that swallowed the next statement.
+TODO: {
+    local $TODO = 'PCL §14: <FH> / <glob> after a list operator or a block is lexed as < … >';
+    my @t = map { short_class($_) } toks('my @b = sort </tmp/x-1/y/*.pl>; print 1;');
+    is( $t[4], 'QuoteLike::Readline=</tmp/x-1/y/*.pl>',
+        'sort </tmp/x-1/y/*.pl>: the glob after sort is one readline' ) or diag "got: @t";
 }
