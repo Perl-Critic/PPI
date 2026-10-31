@@ -13,7 +13,7 @@
 use lib 't/lib';
 use PPI::Test::pragmas;
 use utf8;
-use Test::More tests => 302 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+use Test::More tests => 304 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use PPI ();
 
@@ -1857,6 +1857,19 @@ TODO: {
     local $TODO = 'PCL §53: the class syntax builds no statements of its own';
     my @s = stmts(q{use feature 'class'; class P { field $v = 1; method get { $v } } print P->new->get;});
     is( scalar(@s), 3, 'class NAME BLOCK ends at its block' ) or diag join "\n", @s;
+    # the shapes of upstream PR #346: class a package, method a sub, field a
+    # variable declaration, ADJUST a scheduled block
+    my $doc = PPI::Document->new(\q{use feature 'class'; class P 1.0 :isa(Q) { field $v :param = 1; method get { $v } ADJUST { $v++ } } class R; field @w;});
+    my @k = map { short_class(ref $_) . ':' . $_->schild(0)->content }
+            grep { $_->schild(0) && $_->schild(0)->content =~ /^(?:class|field|method|ADJUST)\z/ }
+            @{ $doc->find('PPI::Statement') || [] };
+    is( "@k", 'Statement::Package:class Statement::Variable:field Statement::Sub:method'
+            . ' Statement::Scheduled:ADJUST Statement::Package:class Statement::Variable:field',
+        'class / field / method / ADJUST build their statements' );
+}
+{
+    my @s = stmts(q{class P { 1 } print 2;});
+    is( scalar(@s), 1, 'without the feature class is an ordinary word (control)' ) or diag join "\n", @s;
 }
 {
     my @t = map { short_class($_) } toks(q{use feature 'class'; class Q :isa(P);});
