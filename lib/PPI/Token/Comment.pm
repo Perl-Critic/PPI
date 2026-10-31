@@ -86,7 +86,7 @@ sub __TOKENIZER__commit {
 
 	# Get the rest of the line
 	my $rest = substr( $t->{line}, $t->{line_cursor} );
-	if ( chomp $rest ) { # Include the newline separately
+	if ( $rest =~ s/\n\z// ) { # Include the newline separately (not chomp: $/ may be anything)
 		# Add the current token, and the newline
 		$t->_new_token('Comment', $rest);
 		$t->_new_token('Whitespace', "\n");

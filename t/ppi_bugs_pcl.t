@@ -1709,8 +1709,7 @@ TODO: {
 # §13, the root: a PPI::Tokenizer used on its own (no PPI::Document, no
 # Lexer) reads the same tokens whatever the caller's $/ is.  The comment and
 # __END__ arms took their line end with chomp, which removes $/.
-TODO: {
-    local $TODO = 'PCL §13: tokenization of a trailing __END__/__DATA__ section depends on $/';
+{
     my $src = "# c\nx; # d\n__END__ e\nfoo\n";
     my $tokens = sub {
         my $tz = PPI::Tokenizer->new( \$src );

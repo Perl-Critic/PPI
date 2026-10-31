@@ -237,7 +237,7 @@ sub __TOKENIZER__commit {
 		my $end_rest = substr( $t->{line}, $t->{line_cursor} );
 		$t->{line_cursor} = length $t->{line};
 		if ( $end_rest =~ /\n$/ ) {
-			chomp $end_rest;
+			$end_rest =~ s/\n\z//;  # not chomp: the caller's $/ may be anything
 			$t->_new_token( 'Comment', $end_rest ) if length $end_rest;
 			$t->_new_token( 'Whitespace', "\n" );
 		} else {
@@ -261,7 +261,7 @@ sub __TOKENIZER__commit {
 		my $data_rest = substr( $t->{line}, $t->{line_cursor} );
 		$t->{line_cursor} = length $t->{line};
 		if ( $data_rest =~ /\n$/ ) {
-			chomp $data_rest;
+			$data_rest =~ s/\n\z//;  # not chomp: the caller's $/ may be anything
 			$t->_new_token( 'Comment', $data_rest ) if length $data_rest;
 			$t->_new_token( 'Whitespace', "\n" );
 		} else {
