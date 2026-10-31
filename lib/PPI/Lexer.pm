@@ -749,12 +749,21 @@ sub _continues {
 
 	# Handle the simple block case
 	# { print 1; }
+	# A bare block is a loop that runs once, so it takes a continue block
+	# like the labelled form below (perly.y: block cont)
+	# { print 1; } continue { print 2; }
 	if (
 		$Statement->schildren == 1
 		and
 		$Statement->schild(0)->isa('PPI::Structure::Block')
 	) {
-		return '';
+		return (
+			$Statement->isa('PPI::Statement::Compound')
+			and
+			$Token->isa('PPI::Token::Word')
+			and
+			$Token->content eq 'continue'
+		) ? 1 : '';
 	}
 
 	# Alrighty then, there are six implied-end statement types:

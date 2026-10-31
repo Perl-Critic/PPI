@@ -1824,8 +1824,7 @@ for my $code ( 'my @t = map { $_ => 1 } @x;', 'my @u = map { lc($_) => 1 } @x;' 
 # §51 -- a bare block is a loop that runs once, so it takes a continue
 # block (perly.y: block cont): `{ $n++ } continue { $n += 10 }` is one
 # statement, and the statement after it is its own.
-TODO: {
-    local $TODO = 'PCL §51: the continue of a bare block starts a new statement';
+{
     is_deeply( [ stmts('{ $n++ } continue { $n += 10 } print "$n\n";') ],
                [ 'Statement::Compound: { $n++ } continue { $n += 10 }',
                  'Statement: print "$n\n";' ],
