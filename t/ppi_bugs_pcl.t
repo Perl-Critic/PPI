@@ -1627,8 +1627,7 @@ is_deeply( [ stmts("use feature 'try';\ntry { a() } catch (\$e) { b() }\nd();\n"
 
 # §39 -- whitespace may stand between a sigil and its name (toke.c
 # scan_ident skips it): `my $ bits = 5; print $bits` prints 5.
-TODO: {
-    local $TODO = 'PCL §39: a spaced sigil $ name lexes as Cast + Word';
+{
     for my $r ( [ 'my $ bits = 5;', 'Symbol=$ bits' ], [ '$ x = 1;', 'Symbol=$ x' ] ) {
         my ( $code, $want ) = @$r;
         my @t = map { short_class($_) } toks($code);
