@@ -502,8 +502,7 @@ TODO: {
 # `use v5.40` / `use 5.040` all enable the same feature in perl.  PPI knows only
 # the first, so under the other two the construct lexes like the no-pragma case:
 # ONE unterminated statement that swallows the statement after it.
-TODO: {
-    local $TODO = 'PCL §20: Two of perl\'s three ways to enable try are not recognised, so the construct mis-lexes';
+{
     my $doc = PPI::Document->new(\<<'PERL');
 use v5.40;
 try { foo(); } catch ($e) { bar($e); }
@@ -514,8 +513,7 @@ PERL
         'a version bundle >= 5.39 should enable try (its bundle contains it)' )
         or diag "got: " . join(' | ', map { squash($_->content) } @s);
 }
-TODO: {
-    local $TODO = 'PCL §20: Two of perl\'s three ways to enable try are not recognised, so the construct mis-lexes';
+{
     my $doc = PPI::Document->new(\<<'PERL');
 use experimental 'try';
 try { foo(); } catch ($e) { bar($e); }
@@ -529,8 +527,7 @@ PERL
 # …and it must not answer about a feature it was not asked about: the
 # experimental branch returns `signatures => 0` for ANY argument list, so this
 # turns OFF the signatures the line before switched on.
-TODO: {
-    local $TODO = 'PCL §20: Two of perl\'s three ways to enable try are not recognised, so the construct mis-lexes';
+{
     my $doc = PPI::Document->new(\"use feature 'signatures';\nuse experimental 'try';\n");
     my (undef, $exp) = @{ $doc->find('PPI::Statement::Include') || [] };
     my $mods = $exp->feature_mods || {};

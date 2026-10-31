@@ -269,9 +269,12 @@ sub feature_mods {
 		## versions of it, so e.g. a 5.20 install cannot know about
 		## 5.36 features
 
-		# crude proof of concept hack due to above
-		return { signatures => "perl" }
-		  if version::->parse($perl_version) >= 5.035;
+		# crude proof of concept hack due to above: the 5.36 bundle has
+		# signatures, the 5.40 bundle try as well (perl 5.40.3:
+		# use v5.40; try {} catch ($e) {} compiles)
+		my $v = version::->parse($perl_version);
+		return { signatures => "perl", try => "perl" } if $v >= 5.039;
+		return { signatures => "perl" } if $v >= 5.035;
 	}
 
 	my $module = $self->module or return;
@@ -296,8 +299,11 @@ sub feature_mods {
 		return { signatures => $v >= 2023 ? "perl" : 0 };
 	}
 	elsif ( $module eq "experimental" ) {
-		my $wants_signatures = grep /signatures/, $self->_decompose_arguments;
-		return { signatures => $wants_signatures ? "perl" : 0 };
+		# use experimental 'try' IS feature->import('try'): it names the
+		# features it enables and says nothing about the others (the
+		# change of upstream PR #361)
+		my @features = grep $known{$_}, $self->_decompose_arguments;
+		return { map +( $_ => $on_or_off ? "perl" : 0 ), @features };
 	}
 	elsif ( $module eq "Syntax::Keyword::Try" ) {
 		return { try => $on_or_off ? "Syntax::Keyword::Try" : 0 };
