@@ -173,6 +173,8 @@ sub __TOKENIZER__on_char {
 				$t->{class} = $t->{token}->set_class( 'Magic' );
 				return 1;
 			}
+			return $t->_finalize_token->__TOKENIZER__on_char( $t )
+			  if _braced_punct_magic( $t, '$' );
 		}
 
 		# Must be a cast
@@ -196,6 +198,9 @@ sub __TOKENIZER__on_char {
 			$t->{class} = $t->{token}->set_class( 'Symbol' );
 			return 1;
 		}
+
+		return $t->_finalize_token->__TOKENIZER__on_char( $t )
+		  if $char eq '{' and _braced_punct_magic( $t, '@' );
 
 		# Is it a nameless arg in a signature?
 		if ( $char eq ')' and $t->_in_signature ) {
@@ -259,6 +264,9 @@ sub __TOKENIZER__on_char {
 			$t->{class} = $t->{token}->set_class( 'Operator' );
 			return $t->{class}->__TOKENIZER__on_char( $t );
 		}
+
+		return $t->_finalize_token->__TOKENIZER__on_char( $t )
+		  if $char eq '{' and _braced_punct_magic( $t, '%' );
 
 		# Is it a magic variable?
 		if ( $char eq '^' || $MAGIC{ $c . $char } ) {
@@ -386,6 +394,23 @@ sub __TOKENIZER__on_char {
 
 	# erm...
 	PPI::Exception->throw('Unknown value in PPI::Token::Unknown token');
+}
+
+# ${ + }, @{+}, %{-}: braces around a punctuation name are the variable
+# itself, as ${^MATCH} is (toke.c scan_ident reads a name inside the
+# braces, and @{+} IS @+).  A block holding one punctuation character
+# could not be an expression anyway.  The Magic token keeps the braced
+# text.  Called with the cursor on the {; true when it made the token.
+sub _braced_punct_magic {
+	my ( $t, $sigil ) = @_;
+	pos $t->{line} = $t->{line_cursor};
+	return 0 if $t->{line} !~ m/\G(\{[ \t]*([^\w\s{}])[ \t]*\})/gc;
+	my ( $text, $name ) = ( $1, $2 );
+	return 0 if !$MAGIC{ $sigil . $name };
+	$t->{token}->{content} .= $text;
+	$t->{line_cursor} += length $text;
+	$t->{class} = $t->{token}->set_class( 'Magic' );
+	return 1;
 }
 
 sub _is_cast_or_op {

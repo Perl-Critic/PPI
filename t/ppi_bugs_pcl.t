@@ -149,8 +149,7 @@ sub toks {
 # spelling, but leaves the punctuation ones as Cast + Block{lone Operator}.  A
 # deref block holding exactly one Operator token can never be an expression, so
 # the fold is unambiguous.
-TODO: {
-    local $TODO = 'PCL §9: ${ PUNCTUATION } is a variable, but lexes as Cast + Block';
+{
     my @t = toks('@{+}');
     ok( !grep(/^PPI::Token::Structure=\{$/, @t),
         '@{+} should fold to the magic array @+, as @{foo} folds to @foo' )
