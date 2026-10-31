@@ -41,7 +41,7 @@ L<PPI::Token> and L<PPI::Element> classes.
 
 use strict;
 use PPI::Token ();
-use PPI::Singletons qw' %OPERATOR %KEYWORDS %NO_OPERAND ';
+use PPI::Singletons qw' %OPERATOR ';
 
 our $VERSION = '1.292';
 
@@ -67,7 +67,7 @@ sub __TOKENIZER__on_char {
 	}
 	# Where a term is expected, ~~ is two bitwise complements (~~$y), not
 	# the smart match.
-	if ( $content eq '~' and $char eq '~' and __term_expected($t) ) {
+	if ( $content eq '~' and $char eq '~' and $t->_term_expected ) {
 		return $t->_finalize_token->__TOKENIZER__on_char( $t );
 	}
 	return 1 if $OPERATOR{ $content . $char };
@@ -104,23 +104,6 @@ sub __TOKENIZER__on_char {
 
 	# Finalize normally
 	$t->_finalize_token->__TOKENIZER__on_char( $t );
-}
-
-# Is a TERM expected where the tokenizer now stands?  Only what is known
-# counts: after an operator, an opening bracket or a ; (_opcontext), after a
-# block's } (_after_term), at the start of the document, and after a builtin
-# that takes an operand (print, return, ...).  After a match, a method name or
-# a user's word it cannot say, and the answer is no.
-sub __term_expected {
-	my ( $t ) = @_;
-	my ( $prev, $prevprev ) = $t->_previous_significant_tokens(2);
-	return 1 if !$prev;
-	return 1 if $t->_opcontext eq 'operand';
-	# A block's } does not end a term (map { $_ } ~~$y); a subscript's does
-	return !$t->_after_term if $prev->isa('PPI::Token::Structure') and $prev->content eq '}';
-	return '' if !$prev->isa('PPI::Token::Word');
-	return '' if $prevprev and $prevprev->isa('PPI::Token::Operator') and $prevprev->content eq '->';
-	return $KEYWORDS{ $prev->content } && !$NO_OPERAND{ $prev->content };
 }
 
 1;

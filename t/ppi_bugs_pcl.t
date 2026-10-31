@@ -337,8 +337,7 @@ TODO: {
 # it took for the end of a term (`map { $h{$_}++ } <op/*>`), where it emits
 # Operator('<') … Operator('>') — a comparison chain.  This is the same
 # operator-vs-term error as bugs 8 and 9, in the third direction.
-TODO: {
-    local $TODO = 'PCL §14: <FH> / <glob> after a list operator or a block is lexed as < … >';
+{
     my @t = toks('sort <STDIN>;');
     ok( grep(/^PPI::Token::QuoteLike::Readline=/, @t),
         '<STDIN> after a list operator should be a readline, as it is after a comma' )
@@ -352,15 +351,13 @@ TODO: {
 #   $ perl -e 'open(my $f,"<","/etc/hostname"); my $x = 1 ? <$f> // "" : ""; print $x'
 #   <the first line of /etc/hostname>
 #
-TODO: {
-    local $TODO = 'PCL §14: <FH> / <glob> after a list operator or a block is lexed as < … >';
+{
     my @t = toks('my $x = $ok ? <$f> // "" : "";');
     ok( !grep(/^PPI::Token::Regexp::Match=/, @t),
         '`<$f> // ""` in a ternary branch: the // is defined-or, not an empty match' )
         or diag "got: @t";
 }
-TODO: {
-    local $TODO = 'PCL §14: <FH> / <glob> after a list operator or a block is lexed as < … >';
+{
     my @t = toks('my $x = $ok ? <$f> / 2 : 0;');
     ok( !grep(m{^PPI::Token::Regexp::Match=/ 2 : 0;$}, @t),
         '`<$f> / 2` in a ternary branch: the / is division, and must not eat the statement' )
@@ -376,15 +373,13 @@ TODO: {
 #
 # `sort <./nope-*-xyz>; print "y"; print "z";` is FOUR tokens to PPI, the last
 # of them a Regexp::Match holding both prints.
-TODO: {
-    local $TODO = 'PCL §14: <FH> / <glob> after a list operator or a block is lexed as < … >';
+{
     my @t = toks('my @f = sort <./nope-*-xyz>;');
     ok( grep(/^PPI::Token::QuoteLike::Readline=/, @t),
         '`sort <./nope-*-xyz>` — a `.`-relative glob pattern should be a readline token' )
         or diag "got: @t";
 }
-TODO: {
-    local $TODO = 'PCL §14: <FH> / <glob> after a list operator or a block is lexed as < … >';
+{
     my @t = toks('my @f = sort <./a-*>; print "y";');
     ok( !grep(m{^PPI::Token::Regexp::Match=/a-\*>; print "y";$}, @t),
         'the glob-pattern cascade must not swallow the statements that follow' )
@@ -1867,8 +1862,7 @@ TODO: {
 # in it: `my @b = sort </tmp/x-1/y/*.pl>; print 1;` globs and prints 1.
 # Read as a less-than, the -1 became a Number and the y/ a transliteration
 # that swallowed the next statement.
-TODO: {
-    local $TODO = 'PCL §14: <FH> / <glob> after a list operator or a block is lexed as < … >';
+{
     my @t = map { short_class($_) } toks('my @b = sort </tmp/x-1/y/*.pl>; print 1;');
     is( $t[4], 'QuoteLike::Readline=</tmp/x-1/y/*.pl>',
         'sort </tmp/x-1/y/*.pl>: the glob after sort is one readline' ) or diag "got: @t";

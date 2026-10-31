@@ -87,7 +87,7 @@ use PPI::Token      ();
 use PPI::Exception  ();
 use PPI::Exception::ParserRejection ();
 use PPI::Document ();
-use PPI::Singletons qw' %NO_OPERAND ';
+use PPI::Singletons qw' %KEYWORDS %NO_OPERAND ';
 
 our $VERSION = '1.292';
 
@@ -1069,6 +1069,27 @@ sub _after_term {
 	my $cursor = $#{ $self->{tokens} };
 	$cursor-- while $cursor >= 0 and !$self->{tokens}->[$cursor]->significant;
 	return $self->_ends_term_at($cursor);
+}
+
+# Is a TERM expected where the tokenizer now stands (toke.c: PL_expect is
+# not XOPERATOR)?  Only what is known counts: after an operator, an opening
+# bracket or a ; (_opcontext), after a block's } (_after_term), at the start
+# of the document, and after a builtin that takes an operand (print, sort,
+# return, ...).  After a match, a method name or a user's word it cannot
+# say -- a declared sub is a list operator, an undeclared bareword a term --
+# and the answer is no.
+sub _term_expected {
+	my $self = shift;
+	my ( $prev, $prevprev ) = $self->_previous_significant_tokens(2);
+	return 1 if !$prev;
+	return 1 if $self->_opcontext eq 'operand';
+	# A block's } does not end a term (map { $_ } ~~$y); a subscript's does
+	return !$self->_after_term if $prev->isa('PPI::Token::Structure') and $prev->content eq '}';
+	return '' if !$prev->isa('PPI::Token::Word');
+	return '' if $prevprev and $prevprev->isa('PPI::Token::Operator') and $prevprev->content eq '->';
+	my $word = $prev->content;
+	$word =~ s/^CORE:://;
+	return $KEYWORDS{$word} && !$NO_OPERAND{$word};
 }
 
 # Assuming we are currently parsing the word 'x', return true

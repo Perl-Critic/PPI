@@ -302,6 +302,17 @@ sub __TOKENIZER__on_char {
 		my $next_char = substr( $t->{line}, $t->{line_cursor} + 1, 2 );
 		return 'Operator' if $next_char =~ /<[^>]/;
 
+		# Where perl expects a term -- after an operator, and after a
+		# builtin that takes an operand: print <FH>, sort <*.pl>,
+		# return <$fh>, $s .= <STDIN> -- a closed <...> is a readline or a
+		# glob, whatever it holds (toke.c yyl_leftpointy: PL_expect is not
+		# XOPERATOR).  A block's } is decided below.
+		pos $t->{line} = $t->{line_cursor};
+		return 'QuoteLike::Readline'
+		  if $t->{line} =~ m/\G<(?:>|[^<>=\s][^<>]*>)/gc
+		  and not ( $prev and $prev->isa('PPI::Token::Structure') and $prev->content eq '}' )
+		  and $t->_term_expected;
+
 		return 'Operator' if not $prev;
 
 		# The most common group of readlines are used like
