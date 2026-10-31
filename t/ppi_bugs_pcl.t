@@ -13,7 +13,7 @@
 use lib 't/lib';
 use PPI::Test::pragmas;
 use utf8;
-use Test::More tests => 298 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+use Test::More tests => 300 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use PPI ();
 
@@ -1666,6 +1666,16 @@ TODO: {
     for my $m (qw(__END__ __DATA__)) {
         my @t = map { short_class($_) } toks("print 1;\nCORE::$m\nnot code\n");
         ok( grep( $_ eq "Separator=CORE::$m", @t ), "CORE::$m is a Separator" ) or diag "got: @t";
+    }
+}
+TODO: {
+    local $TODO = 'PCL §44: the CORE:: spelling sits in a plain Statement';
+    for my $m (qw(__END__ __DATA__)) {
+        my $doc = PPI::Document->new(\"print 1;\nCORE::$m\nnot code\n");
+        my @s = map { ref $_ } $doc->schildren;
+        ( my $want = $m ) =~ s/_//g;
+        is( $s[-1], 'PPI::Statement::' . ucfirst lc $want,
+            "CORE::$m starts the same statement as $m" ) or diag "got: @s";
     }
 }
 
