@@ -13,7 +13,7 @@
 use lib 't/lib';
 use PPI::Test::pragmas;
 use utf8;
-use Test::More tests => 317 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+use Test::More tests => 323 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use PPI ();
 
@@ -1651,6 +1651,31 @@ TODO: {
     local $TODO = 'PCL §42: a here-doc inside a quote-like body does not consume its body';
     my @t = map { short_class($_) } toks("\$_ = 'a'; s/a/<<END/e;\nfoo\nEND\nprint;\n");
     ok( !grep( $_ eq 'Word=END', @t ), 's/a/<<END/e: the here-doc body is not code' ) or diag "got: @t";
+    # a regex code block introduces a here-doc too (t/base/lex.t)
+    @t = map { short_class($_) } toks("print 1 unless qr/(?{<<END})/ eq 'x';\nfoo\nEND\nprint 2;\n");
+    ok( !grep( $_ eq 'Word=END', @t ), 'qr/(?{<<END})/: the here-doc body is not code' ) or diag "got: @t";
+    # two markers in the replacement and a here-doc after it: the bodies
+    # follow in the order of their markers
+    my $src = "s/a/<<A . <<B/e; print <<C;\na\nA\nb\nB\nc\nC\nprint 4;\n";
+    my $doc = PPI::Document->new(\$src);
+    my ($c) = @{ $doc->find('PPI::Token::HereDoc') || [] };
+    is( $c && join( '', $c->heredoc ), "c\n", 's/a/<<A . <<B/e; print <<C: C reads its own body' );
+}
+# the bodies a quote-like takes are written back by serialize, and counted
+# by the locations (both hold today because the bodies are code tokens)
+{
+    my $src = "s/a/<<A . <<B/e; print <<C;\na\nA\nb\nB\nc\nC\nprint 4;\n";
+    my $doc = PPI::Document->new(\$src);
+    is( $doc->serialize, $src, 's/a/<<A . <<B/e; print <<C: the document round-trips' );
+    $doc->index_locations;
+    my $last = ( grep { $_->significant } $doc->tokens )[-1];
+    is( $last->location->[0], 8, 'the statement after the bodies is on line 8' );
+}
+# a marker on an earlier line of the token has its body inside the token,
+# and 1 << 2 is a shift
+for my $src ( "s/a/<<END\nfoo\nEND\n/e; print 6;\n", "s/a/1 << 2/e; print 7;\n" ) {
+    my $doc = PPI::Document->new(\$src);
+    is( $doc->serialize, $src, 'a here-doc body inside the replacement, or a shift: round-trips (control)' );
 }
 
 # §43 -- a lexical sub may be named like a keyword, and its name is then
