@@ -1228,6 +1228,44 @@ sub _deref_block {
 	return $prior->isa('PPI::Token::Cast') && $prior->content =~ /^[\$\@\%\*]\z/;
 }
 
+# The list operators whose block perl lexes where it expects a reference
+# (toke.c: LOP(..., XREF)): the block of map, grep and sort, and the
+# filehandle block of print, printf, say, exec and system.
+my %XREF_BLOCK_WORD = map { $_ => 1 } qw{map grep sort print printf say exec system};
+
+# Is the (still empty) statement the first thing inside a block that perl
+# opens where it expects a reference -- the block of map, grep or sort, a
+# print-family filehandle block, or the block of a $ @ % & $# dereference?
+# toke.c yyl_leftcurly, block_expectation: a { right after such a { makes
+# perl expect a term, so that { is an anonymous hash ("treat it as a term
+# to make ${{...}}{k} ... dwim"), whatever follows it:
+# map { { %$_, x => 1 } } LIST returns one hash per element.
+sub _opens_xref_block {
+	my $Statement = shift;
+	my $Block = $Statement->parent;
+	return '' if !_INSTANCE($Block, 'PPI::Structure::Block');
+	# the first child that is not whitespace, a comment or POD (a null
+	# statement counts: after map {; the { opens a statement)
+	my ($first) = grep { !$_->isa('PPI::Token') or $_->significant } $Block->children;
+	return '' if !$first or $first != $Statement;
+	my $prior = $Block->sprevious_sibling;
+	if ( !$prior ) {
+		# map({ ... } LIST): the block opens the list after the word
+		my $Outer = $Block->parent;
+		return '' if !$Outer or $Outer->schild(0) != $Block;
+		my $List = $Outer->parent;
+		return '' if !_INSTANCE($List, 'PPI::Structure::List');
+		return '' if $List->schild(0) != $Outer;
+		$prior = $List->sprevious_sibling or return '';
+		return '' if !$prior->isa('PPI::Token::Word');
+	}
+	return 1 if $prior->isa('PPI::Token::Cast') and $prior->content =~ /\A(?:\$\#?|\@|\%|\&)\z/;
+	return '' if !$prior->isa('PPI::Token::Word');
+	my $word = $prior->content;
+	$word =~ s/\ACORE:://;
+	return $XREF_BLOCK_WORD{$word} ? 1 : '';
+}
+
 # Given a parent element, and a [ token to open a structure, determine
 # the class that the structure should be.
 sub _square {
@@ -1413,6 +1451,11 @@ sub _curly {
 	# Unless we are at the start of the statement, everything else should be a block
 	### FIXME This is possibly a bad choice, but will have to do for now.
 	return 'PPI::Structure::Block' if $Element;
+
+	# The first thing inside a block opened where perl expects a reference
+	# -- map { { %$_, x => 1 } } LIST, ${ { $k, 1 } }{a} -- is an anonymous
+	# hash, whatever follows it
+	return 'PPI::Structure::Constructor' if _opens_xref_block($Parent);
 
 	if (
 		$Parent->isa('PPI::Statement')

@@ -1931,8 +1931,7 @@ for my $code ( 'my @t = map { $_ => 1 } @x;', 'my @u = map { lc($_) => 1 } @x;' 
 # whatever follows it (toke.c yyl_leftcurly, block_expectation: "treat it
 # as a term to make ${{...}}{k} ... dwim"):
 # `my @c = map { { %$_, x => 1 } } ({a => 1}); print scalar(@c)` prints 1.
-TODO: {
-    local $TODO = 'PCL §59: a { first inside a map / grep / sort or dereference block is a Block';
+{
     for my $code ( 'my @c = map { { %$_, x => 1 } } @l;', 'my @c = map { { $_, 1 } } @l;',
                    'my @g = grep { { $_, 1 } } @l;', 'my @c = map({ { %$_ } } @l);',
                    'my $v = ${ { $k, 1 } }{a};' ) {
