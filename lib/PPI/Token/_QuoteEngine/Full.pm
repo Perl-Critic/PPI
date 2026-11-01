@@ -134,6 +134,95 @@ sub _fill {
 		$self->{modifiers}->{lc $char} = 1;
 		$t->{line_cursor}++;
 	}
+
+	$self->_read_code_heredocs($t);
+	1;
+}
+
+# A here-doc introduced in the CODE of a quote-like -- the replacement of
+# s///e, or a (?{ }) / (??{ }) block of a pattern -- takes its body from
+# the lines after the line its marker is on, as anywhere else (perl 5.18:
+# "The body of a here-document inside a quote-like operator now always
+# begins on the line after the <<foo marker").  When the code ends on the
+# token's last line those lines follow the token: read them here, as
+# PPI::Token::HereDoc does, so they are not lexed as code, and keep them
+# (body and terminator lines, as written) for serialize.  A marker on an
+# earlier line of the token has its body inside the token's own text.
+sub _read_code_heredocs {
+	my ( $self, $t ) = @_;
+	return if !$self->isa('PPI::Token::Regexp::Match')
+		and !$self->isa('PPI::Token::Regexp::Substitute')
+		and !$self->isa('PPI::Token::QuoteLike::Regexp');
+	my $content  = $self->content;
+	my @sections = @{ $self->{sections} || [] };
+	my @code;
+	if ( $self->{modifiers}->{e} and @sections > 1 ) {
+		push @code, [ $sections[1]->{position}, $sections[1]->{size} ];
+	}
+	if ( @sections ) {
+		push @code, _code_blocks( $content, $sections[0]->{position}, $sections[0]->{size} );
+	}
+	my @lines;
+	foreach my $span ( @code ) {
+		my ( $position, $size ) = @$span;
+		next if substr( $content, $position + $size ) =~ /\n/;
+		my $code   = substr( $content, $position, $size );
+		my $tokens = PPI::Tokenizer->new( \$code )->all_tokens or next;
+		foreach my $HereDoc ( grep { $_->isa('PPI::Token::HereDoc') } @$tokens ) {
+			next if @{ $HereDoc->{_heredoc} || [] } or defined $HereDoc->{_terminator_line};
+			my $terminator = $HereDoc->{_terminator};
+			while ( defined( my $line = $t->_get_line ) ) {
+				if ( $t->{source_eof_chop} and $t->{source} and !@{ $t->{source} } ) {
+					# The last line of the document, which the tokenizer
+					# ended with a space of its own (see PPI::Tokenizer)
+					chop $line;
+					$t->{source_eof_chop} = '';
+				}
+				push @lines, $line;
+				last if PPI::Token::HereDoc->_is_terminator( $terminator, $line, $HereDoc->{_indented} )
+					or PPI::Token::HereDoc->_is_terminator( "$terminator\n", $line, $HereDoc->{_indented} );
+			}
+		}
+	}
+	$self->{_heredoc_lines} = \@lines if @lines;
+	return;
+}
+
+# The ( position, size ) of the code of each (?{ ... }) and (??{ ... })
+# block in the pattern section at ( position, size ) of the content.
+sub _code_blocks {
+	my ( $content, $position, $size ) = @_;
+	my $pattern = substr( $content, $position, $size );
+	my @blocks;
+	while ( $pattern =~ /\(\?\??\{/g ) {
+		my $start = pos $pattern;
+		my $depth = 1;
+		my $i     = $start;
+		while ( $depth and $i < length $pattern ) {
+			my $c = substr( $pattern, $i++, 1 );
+			if ( $c eq '\\' ) { $i++; next }
+			$depth++ if $c eq '{';
+			$depth-- if $c eq '}';
+		}
+		last if $depth;
+		push @blocks, [ $position + $start, $i - 1 - $start ];
+		pos $pattern = $i;
+	}
+	return @blocks;
+}
+
+=pod
+
+=head2 heredoc_lines
+
+The lines that follow a quote-like on its last line and belong to the
+here-docs its code introduces -- C<s/a/E<lt>E<lt>END/e> -- as written:
+each body, then its terminator line.  Empty if there are none.
+
+=cut
+
+sub heredoc_lines {
+	@{ $_[0]->{_heredoc_lines} || [] };
 }
 
 # Handle the content parsing path for normally separated

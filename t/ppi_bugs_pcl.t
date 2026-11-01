@@ -1647,8 +1647,7 @@ TODO: {
 # §42 -- a here-doc introduced inside a quote-like body takes its body
 # from the lines after the statement, as anywhere else:
 # `$_ = "a"; s/a/<<END/e;\nfoo\nEND\nprint;` prints foo.
-TODO: {
-    local $TODO = 'PCL §42: a here-doc inside a quote-like body does not consume its body';
+{
     my @t = map { short_class($_) } toks("\$_ = 'a'; s/a/<<END/e;\nfoo\nEND\nprint;\n");
     ok( !grep( $_ eq 'Word=END', @t ), 's/a/<<END/e: the here-doc body is not code' ) or diag "got: @t";
     # a regex code block introduces a here-doc too (t/base/lex.t)

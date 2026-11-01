@@ -492,23 +492,25 @@ sub serialize {
 			my $content = $Token->content;
 
 			# Handle the trivial cases
-			unless ( $heredoc ne '' and $content =~ /\n/ ) {
-				$output .= $content;
-				next;
-			}
-
-			# We have pending here-doc content that needs to be
-			# inserted just after the first newline in the content.
-			if ( $content eq "\n" ) {
-				# Shortcut the most common case for speed
-				$output .= $content . $heredoc;
+			if ( $heredoc ne '' and $content =~ /\n/ ) {
+				# We have pending here-doc content that needs to be
+				# inserted just after the first newline in the content.
+				if ( $content eq "\n" ) {
+					# Shortcut the most common case for speed
+					$output .= $content . $heredoc;
+				} else {
+					# Slower and more general version
+					$content =~ s/\n/\n$heredoc/;
+					$output .= $content;
+				}
+				$heredoc = '';
 			} else {
-				# Slower and more general version
-				$content =~ s/\n/\n$heredoc/;
 				$output .= $content;
 			}
 
-			$heredoc = '';
+			# A quote-like whose code introduces here-docs
+			# (s/a/<<END/e) carries their lines
+			$heredoc .= join '', @{ $Token->{_heredoc_lines} } if $Token->{_heredoc_lines};
 			next;
 		}
 
@@ -685,6 +687,8 @@ sub index_locations {
 			# Add any here-doc lines to the counter
 			if ( $Token->isa('PPI::Token::HereDoc') ) {
 				$heredoc += $Token->heredoc + 1;
+			} elsif ( $Token->{_heredoc_lines} ) {
+				$heredoc += @{ $Token->{_heredoc_lines} };
 			}
 		}
 	}
