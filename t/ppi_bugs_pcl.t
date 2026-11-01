@@ -1914,8 +1914,7 @@ for my $code ( 'my @t = map { $_ => 1 } @x;', 'my @u = map { lc($_) => 1 } @x;' 
 # method name (toke.c reads it where it expects an operator), so the ( after
 # it holds the method's arguments, as after any other method name:
 # `sub F::if { "if$_[1]" } print F->if(1)` prints if1.
-TODO: {
-    local $TODO = 'PCL §58: the ( after a method named if / elsif / unless / while / until is a Condition';
+{
     for my $kw (qw(if elsif unless while until)) {
         my @c = bracket_classes( "\$f->$kw(1);", '(' );
         is( $c[0], 'PPI::Structure::List', "\$f->$kw(1): the ( after a method named $kw is a List" );

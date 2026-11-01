@@ -1169,8 +1169,13 @@ sub _round {
 	# Get the last significant element in the parent
 	my $Element = $Parent->schild(-1);
 	if ( _INSTANCE($Element, 'PPI::Token::Word') ) {
-		# Can it be determined because it is a keyword?
-		my $rclass = $ROUND{$Element->content};
+		# Can it be determined because it is a keyword?  Not after a ->:
+		# a word there is a method name (toke.c reads it where it expects
+		# an operator), so $obj->if(1) calls the method if, and the ( opens
+		# its arguments.
+		my $prior  = $Parent->schild(-2);
+		my $method = $prior && $prior->isa('PPI::Token::Operator') && $prior->content eq '->';
+		my $rclass = !$method && $ROUND{$Element->content};
 		return $rclass if $rclass;
 	}
 
