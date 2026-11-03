@@ -2002,8 +2002,7 @@ for my $case ( [ 'sub n :prototype($) { 1 }', 'Attribute=prototype($)' ],
 # sigil (toke.c scan_ident), and a [ or { after it makes the block that
 # element, keyword or not:
 # `our %m = (q => 'r'); print ${m{q}}` prints r; `our @y = (5, 6); print ${y[1]}` prints 6.
-TODO: {
-    local $TODO = 'PCL §61: a quote-like word naming a braced element is lexed as a quote';
+{
     for my $case ( [ '${m{q}}', 'Word=m' ], [ '${ m{q} }', 'Word=m' ], [ '${s{x}}', 'Word=s' ],
                    [ '${y[1]}', 'Word=y' ], [ '@{q[1, 2]}', 'Word=q' ], [ '${tr{k}}', 'Word=tr' ],
                    [ '${qw[1]}', 'Word=qw' ], [ '%{qq{a}}', 'Word=qq' ] ) {

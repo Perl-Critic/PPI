@@ -1143,6 +1143,17 @@ sub __current_token_is_forced_word {
 		pos $t->{line} = $t->{line_cursor};
 		return 1 if $content eq '{' and $t->{line} =~ /\G\s*\}/gc;
 
+		# The name of an element in a dereference block, ${name[0]} or
+		# @{name{a, b}}: perl reads an identifier straight after the { of a
+		# sigil (toke.c scan_ident), and a [ or { after it makes the block
+		# that element, keyword or not -- ${m{q}} is $m{q}, ${y[1]} is $y[1]
+		# (but ${sub{...}} is not, as in perl).
+		return 1 if $content eq '{' and $prevprev
+			and $prevprev->isa('PPI::Token::Cast')
+			and $prevprev->{content} =~ /^(?:\$|\@|%|&|\*|\$#)$/
+			and ( $t->{line} =~ /\G\s*\[/gc
+				or ( ( !defined $word or $word ne 'sub' ) and $t->{line} =~ /\G\s*\{/gc ) );
+
 		# sub, package, use, and no all indicate that what immediately follows
 		# is a word not an operator or (in the case of sub and package) a
 		# version string.  However, we don't want to be fooled by 'package
