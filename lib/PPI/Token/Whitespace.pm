@@ -404,6 +404,9 @@ sub __TOKENIZER__on_char {
 			return 'Regexp::Match';
 		}
 
+		# After the body of a format a statement starts
+		return 'Regexp::Match' if $prev->isa('PPI::Token::Format');
+
 		# After the } of a block that opens a statement or follows a word
 		# (BEGIN { } /x/, grep { } /x/), a term starts
 		return 'Regexp::Match' if $t->_after_statement_block;

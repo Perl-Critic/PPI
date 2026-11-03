@@ -754,7 +754,6 @@ my %OBVIOUS_CLASS = (
 	'PPI::Token::Regexp::Substitute'  => 'operator',
 	'PPI::Token::Regexp::Transliterate' => 'operator',
 	'PPI::Token::HereDoc'             => 'operator',
-	'PPI::Token::Format'              => 'operand',   # a statement starts after it
 );
 
 my %OBVIOUS_CONTENT = (
@@ -782,6 +781,7 @@ sub _opcontext {
 
 	# Map the obvious cases
 	return $OBVIOUS_CLASS{$c0}   if defined $OBVIOUS_CLASS{$c0};
+	return 'operand' if $p0->isa('PPI::Token::Format');   # a statement starts after it
 	return 'operator' if $p0->isa('PPI::Token::Number');   # Float, Exp, Hex, Octal, Binary too
 	return $OBVIOUS_CONTENT{$p0} if defined $OBVIOUS_CONTENT{$p0};
 

@@ -1648,8 +1648,7 @@ for my $code ( 'my %h = (format => 1);', '$h{format} = 2;', '$o->format(1);', 's
 }
 # ... and after the format's . a statement starts, as after a ; (perl's
 # t/comp/form_scope.t: `*STDOUT = *STDOUT7{FORMAT};` right after a format).
-TODO: {
-    local $TODO = 'PCL §40: after a format body the next token is read as following a term';
+{
     for my $case ( [ '*STDOUT = *A{FORMAT};', 'Symbol=*STDOUT' ], [ '*{"x"} = 1;', 'Cast=*' ],
                    [ '/x/ and print;', 'Regexp::Match=/x/' ] ) {
         my ( $rest, $want ) = @$case;

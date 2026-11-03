@@ -465,7 +465,8 @@ sub _cast_or_op {
 	  if $token->isa( 'PPI::Token::Structure' ) and $list_start_or_term_end{ $token->content }
 	  or $token->isa( 'PPI::Token::Cast' )
 	  or $token->isa( 'PPI::Token::Operator' )
-	  or $token->isa( 'PPI::Token::Label' );
+	  or $token->isa( 'PPI::Token::Label' )
+	  or $token->isa( 'PPI::Token::Format' );
 
 	return 'Operator' if !$token->isa( 'PPI::Token::Word' );
 
