@@ -1629,8 +1629,7 @@ is_deeply( [ stmts("use feature 'try';\ntry { a() } catch (\$e) { b() }\nd();\n"
 # §40 -- a format body is picture text up to the line holding a lone `.`
 # (toke.c scan_formline), never code:
 # `format STDOUT =\nhello world\n.\nwrite;` prints hello world.
-TODO: {
-    local $TODO = 'PCL §40: a format body is tokenized as code';
+{
     my @t = map { short_class($_) } toks("format STDOUT =\nhello world\n.\nwrite;\n");
     ok( !grep( $_ eq 'Word=hello', @t ), 'the picture line of a format is not code' ) or diag "got: @t";
     my @s = stmts("format STDOUT =\n\@<< \@>>\n\$a, \$b\n.\nwrite;\nprint \"after\\n\";\n");

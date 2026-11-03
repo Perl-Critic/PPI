@@ -322,6 +322,12 @@ sub __TOKENIZER__commit {
 		}
 	}
 
+	# A format declaration: the tokens of its header line, then its body
+	if ( $token_class eq 'Word' and $word eq 'format' ) {
+		my $rv = $t->_format_declaration;
+		return $rv if defined $rv;
+	}
+
 	# A lexical sub's declaration names it for the rest of its block
 	$t->_lexical_sub_word($word)
 		if $token_class eq 'Word' and ( $word eq 'sub' or defined $t->{lexical_sub_pending} );

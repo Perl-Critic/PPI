@@ -410,6 +410,7 @@ based on inheritance.
          PPI::Token::Whitespace
          PPI::Token::Comment
          PPI::Token::Pod
+         PPI::Token::Format
          PPI::Token::Number
             PPI::Token::Number::Binary
             PPI::Token::Number::Octal

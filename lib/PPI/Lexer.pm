@@ -695,6 +695,13 @@ sub _lex_statement {
 			}
 		}
 
+		# The body of a format ends its declaration, as a ; ends a statement
+		if ( $Token->isa('PPI::Token::Format') ) {
+			$self->_add_element( $Statement, $Token );
+			$self->_update_features( $Statement );
+			return 1;
+		}
+
 		# Any normal character just gets added
 		unless ( $Token->isa('PPI::Token::Structure') ) {
 			$self->_add_element( $Statement, $Token );

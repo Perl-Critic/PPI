@@ -754,6 +754,7 @@ my %OBVIOUS_CLASS = (
 	'PPI::Token::Regexp::Substitute'  => 'operator',
 	'PPI::Token::Regexp::Transliterate' => 'operator',
 	'PPI::Token::HereDoc'             => 'operator',
+	'PPI::Token::Format'              => 'operand',   # a statement starts after it
 );
 
 my %OBVIOUS_CONTENT = (
@@ -947,7 +948,8 @@ sub _after_statement_block {
 	my $kind = $self->_curly_kind($cursor);
 	return '' if !$kind or $kind ne 'block';
 	my ( $prev ) = $self->_significant_before( $self->_matching_curly($cursor) );
-	return 1 if !$prev or $prev->isa('PPI::Token::Label');
+	return 1 if !$prev or $prev->isa('PPI::Token::Label')
+		or $prev->isa('PPI::Token::Format');
 	my $content = $prev->content;
 	return 1 if $prev->isa('PPI::Token::Structure') and ( $content eq ';' or $content eq '}' );
 	return $prev->isa('PPI::Token::Word') && $content ne 'sub' && $content ne 'return';
@@ -1050,7 +1052,8 @@ sub _after_declared_variables {
 # an operator.
 sub _label_position {
 	my ( $self, $prev ) = @_;
-	return 1 if !$prev or $prev->isa('PPI::Token::Label');
+	return 1 if !$prev or $prev->isa('PPI::Token::Label')
+		or $prev->isa('PPI::Token::Format');
 	return '' if !$prev->isa('PPI::Token::Structure');
 	my $c = $prev->content;
 	return 1 if $c eq ';' or $c eq '{';
@@ -1059,6 +1062,32 @@ sub _label_position {
 	$cursor-- while $cursor >= 0 and !$self->{tokens}->[$cursor]->significant;
 	my $kind = $self->_curly_kind($cursor);
 	return !$kind || $kind eq 'block';
+}
+
+# A format declaration, format NAME = alone on its line where a statement
+# starts: perl reads the lines after it as the format's picture and
+# argument lines, up to a line holding a lone . (toke.c scan_formline).
+# Called by PPI::Token::Word with the cursor after the word format.  When
+# the rest of the line is such a header, it makes the tokens of the line
+# itself -- the name may be spelled in ways a word cannot, 'one or ::two --
+# and the next line starts the PPI::Token::Format body; it returns 0, the
+# line is done.  Otherwise it returns undef and touches nothing.
+sub _format_declaration {
+	my $t = shift;
+	my ( $prev ) = $t->_previous_significant_tokens(1);
+	return undef unless $t->_label_position($prev);
+	my $rest = substr $t->{line}, $t->{line_cursor};
+	return undef unless $rest =~ /^(?:(\s+)([^\s=][^=\n]*?))?([ \t]*)=([ \t]*\r?\n?)\z/;
+	my @parts = ( [ Whitespace => $1 ], [ Word => $2 ], [ Whitespace => $3 ],
+	              [ Operator => '=' ], [ Whitespace => $4 ] );
+	$t->_new_token( 'Word', 'format' );
+	for my $part ( @parts ) {
+		$t->_new_token( @$part ) if defined $part->[1] and length $part->[1];
+	}
+	$t->_finalize_token;
+	$t->{line_cursor} = $t->{line_length};
+	$t->{format_pending} = 1;
+	return 0;
 }
 
 # True when the token before the current one ends a term (_ends_term_at),
