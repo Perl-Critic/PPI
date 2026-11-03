@@ -13,7 +13,7 @@
 use lib 't/lib';
 use PPI::Test::pragmas;
 use utf8;
-use Test::More tests => 323 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+use Test::More tests => 336 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use PPI ();
 
@@ -1805,14 +1805,19 @@ sub bracket_classes {
 TODO: {
     local $TODO = 'PCL §48: the [ of a list slice is a Constructor';
     for my $code ( 'my @x = (1, 2, 3)[1];', 'print qw(a b c)[1];',
-                   'my ($p) = (sort { $b <=> $a } @a)[0];' ) {
+                   'my ($p) = (sort { $b <=> $a } @a)[0];',
+                   'print +(10, 20)[1];', 'my $s = (stat $f)[7];', 'my $l = (@a)[-1];',
+                   'my @w = qw(a b c)[1, 2];', '$h{ (1, 2)[0] } = 1;', '(1, 2)[0] or die;',
+                   'print "x" if (0, 1)[1];', 'my $e = $code->()[1];', 'my $r = [ (1, 2)[0] ];' ) {
         my @c = bracket_classes( $code, '[' );
         is( $c[-1], 'PPI::Structure::Subscript', "$code: the [ of the list slice is a Subscript" );
     }
+    my @c = bracket_classes( 'my $v = (f())[0]{k};', '{' );
+    is( $c[0], 'PPI::Structure::Subscript', 'my $v = (f())[0]{k};: the { after the slice subscripts it' );
 }
-for my $code ( 'my $r = [1];', 'foo([1, 2]);' ) {
+for my $code ( 'my $r = [1];', 'foo([1, 2]);', 'print [1];', 'return [1];', 'my $r = [ (1, 2)[0] ];' ) {
     my @c = bracket_classes( $code, '[' );
-    is( $c[-1], 'PPI::Structure::Constructor', "$code: an anonymous array (control)" );
+    is( $c[0], 'PPI::Structure::Constructor', "$code: an anonymous array (control)" );
 }
 
 # §49 §57 -- a GLOB SLOT: *NAME is a complete term, so the { after it
