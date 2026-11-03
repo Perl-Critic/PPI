@@ -513,6 +513,8 @@ sub __TOKENIZER__is_an_attribute {
 			not $p2
 			or
 			$p2->isa('PPI::Token::Structure')
+			or
+			$p2->isa('PPI::Token::Format')   # a statement starts after a format body
 			or (
 				$p2->isa('PPI::Token::Whitespace')
 				and

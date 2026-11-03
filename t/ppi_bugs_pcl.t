@@ -1670,8 +1670,7 @@ for my $code ( 'my %h = (format => 1);', '$h{format} = 2;', '$o->format(1);', 's
 # ... and a named sub declared right after a format takes its prototype and
 # its attributes as anywhere else (perl's t/op/write.t: `sub has_format ($)`
 # after three formats).
-TODO: {
-    local $TODO = 'PCL §40: a sub declared after a format body loses its prototype';
+{
     for my $case ( [ 'sub hf ($) { 1 }', 'Prototype=($)' ], [ 'sub hf :lvalue { $v }', 'Attribute=lvalue' ] ) {
         my ( $rest, $want ) = @$case;
         my @t = map { short_class($_) } toks("format A =\nx\n.\n$rest\n");
