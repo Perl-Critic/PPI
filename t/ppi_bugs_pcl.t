@@ -13,7 +13,7 @@
 use lib 't/lib';
 use PPI::Test::pragmas;
 use utf8;
-use Test::More tests => 356 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+use Test::More tests => 365 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use PPI ();
 
@@ -1633,6 +1633,19 @@ TODO: {
     local $TODO = 'PCL §40: a format body is tokenized as code';
     my @t = map { short_class($_) } toks("format STDOUT =\nhello world\n.\nwrite;\n");
     ok( !grep( $_ eq 'Word=hello', @t ), 'the picture line of a format is not code' ) or diag "got: @t";
+    my @s = stmts("format STDOUT =\n\@<< \@>>\n\$a, \$b\n.\nwrite;\nprint \"after\\n\";\n");
+    is( scalar(@s), 3, 'a format, write and print are three statements' ) or diag join ' | ', @s;
+    is( $s[1], 'Statement: write;', 'the statement after the . is its own' );
+    @t = map { short_class($_) } toks("format =\n\@<<\n\$x\n.\nprint 1;\n");
+    ok( grep( $_ eq "Format=\@<<\n\$x\n.\n", @t ), 'format = (STDOUT): the body is one token' ) or diag "got: @t";
+    @s = stmts("{\n    format 'one =\nab\n.\n}\nmy \$y = 2;\n");
+    is( scalar(@s), 2, "format 'one = in a block: the block and the my are two statements" ) or diag join ' | ', @s;
+    @s = stmts("format A =\nx\n.\nformat B =\ny\n.\n1;\n");
+    is( scalar(@s), 3, 'two formats in a row and a statement: three statements' ) or diag join ' | ', @s;
+}
+for my $code ( 'my %h = (format => 1);', '$h{format} = 2;', '$o->format(1);', 'sub format { 1 }' ) {
+    my @t = map { short_class($_) } toks($code);
+    ok( grep( $_ eq 'Word=format', @t ) && !grep( /^Format=/, @t ), "$code: format is a word here (control)" ) or diag "got: @t";
 }
 
 # §41 -- an empty package segment is part of the name (toke.c scan_word6):
