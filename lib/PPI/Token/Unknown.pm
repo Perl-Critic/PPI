@@ -517,6 +517,12 @@ sub __TOKENIZER__is_an_attribute {
 				and
 				$p2->content eq ''
 			)
+			or (
+				# A lexical sub: my sub NAME :attr, our sub, state sub
+				$p2->isa('PPI::Token::Word')
+				and
+				$p2->content =~ /^(?:my|our|state)$/
+			)
 		)
 	) {
 		return 1;

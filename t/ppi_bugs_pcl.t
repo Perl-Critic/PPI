@@ -1976,8 +1976,7 @@ for my $code ( 'my @c = map {; { $_, 1 } } @l;', 'my @c = do { { $_, 1 } };' ) {
 # `state`) a `:` starts the attribute list as after `sub NAME` (toke.c
 # yyl_sub, the same path for both):
 # `my $x = 43; my sub y :prototype() {$x} print y, "\n"` prints 43.
-TODO: {
-    local $TODO = 'PCL §60: the attribute after my sub NAME is an Operator and a Word';
+{
     for my $case ( [ 'my sub y :prototype() {$x}', 'Attribute=prototype()' ],
                    [ 'state sub z :prototype($) { 1 }', 'Attribute=prototype($)' ],
                    [ 'our sub w :lvalue { $v }', 'Attribute=lvalue' ],
