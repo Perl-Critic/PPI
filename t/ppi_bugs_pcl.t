@@ -13,7 +13,7 @@
 use lib 't/lib';
 use PPI::Test::pragmas;
 use utf8;
-use Test::More tests => 370 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+use Test::More tests => 372 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use PPI ();
 
@@ -1666,6 +1666,17 @@ for my $code ( 'my %h = (format => 1);', '$h{format} = 2;', '$o->format(1);', 's
 {
     my @s = stmts("format P =\n{ literal\n.\nprint 1;\n");
     is( scalar(@s), 2, 'a { opening a PICTURE line is text (control)' ) or diag join ' | ', @s;
+}
+# ... and a named sub declared right after a format takes its prototype and
+# its attributes as anywhere else (perl's t/op/write.t: `sub has_format ($)`
+# after three formats).
+TODO: {
+    local $TODO = 'PCL §40: a sub declared after a format body loses its prototype';
+    for my $case ( [ 'sub hf ($) { 1 }', 'Prototype=($)' ], [ 'sub hf :lvalue { $v }', 'Attribute=lvalue' ] ) {
+        my ( $rest, $want ) = @$case;
+        my @t = map { short_class($_) } toks("format A =\nx\n.\n$rest\n");
+        ok( grep( $_ eq $want, @t ), "after a format: $rest -- $want" ) or diag "got: @t";
+    }
 }
 
 # §41 -- an empty package segment is part of the name (toke.c scan_word6):
