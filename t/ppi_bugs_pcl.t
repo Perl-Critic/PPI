@@ -13,7 +13,7 @@
 use lib 't/lib';
 use PPI::Test::pragmas;
 use utf8;
-use Test::More tests => 343 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+use Test::More tests => 356 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use PPI ();
 
@@ -1995,4 +1995,29 @@ for my $case ( [ 'sub n :prototype($) { 1 }', 'Attribute=prototype($)' ],
 {
     my @t = map { short_class($_) } toks('my $r = $c ? sub { 1 } : 2;');
     ok( !grep( /^Attribute/, @t ), 'a ternary : after sub { } is an Operator (control)' ) or diag "got: @t";
+}
+
+# §61 -- a quote-like operator's name as the NAME of an element in a
+# dereference block: perl reads an identifier straight after the { of a
+# sigil (toke.c scan_ident), and a [ or { after it makes the block that
+# element, keyword or not:
+# `our %m = (q => 'r'); print ${m{q}}` prints r; `our @y = (5, 6); print ${y[1]}` prints 6.
+TODO: {
+    local $TODO = 'PCL §61: a quote-like word naming a braced element is lexed as a quote';
+    for my $case ( [ '${m{q}}', 'Word=m' ], [ '${ m{q} }', 'Word=m' ], [ '${s{x}}', 'Word=s' ],
+                   [ '${y[1]}', 'Word=y' ], [ '@{q[1, 2]}', 'Word=q' ], [ '${tr{k}}', 'Word=tr' ],
+                   [ '${qw[1]}', 'Word=qw' ], [ '%{qq{a}}', 'Word=qq' ] ) {
+        my ( $code, $want ) = @$case;
+        my @t = map { short_class($_) } toks($code);
+        ok( grep( $_ eq $want, @t ), "$code: the name is a Word" ) or diag "got: @t";
+    }
+    my @t = map { short_class($_) } toks('my $v = ${s{x}} . ${y[0]};');
+    ok( grep( $_ eq 'Symbol=$v', @t ) && 3 == grep( /^Structure=\}$/, @t ),
+        'my $v = ${s{x}} . ${y[0]};: the statement is not swallowed by an s{}{}' ) or diag "got: @t";
+}
+for my $case ( [ '${\ m{q}}', 'Regexp::Match=m{q}' ], [ 'm{q};', 'Regexp::Match=m{q}' ],
+               [ 's{x}{y};', 'Regexp::Substitute=s{x}{y}' ], [ '$h{s} = 1;', 'Word=s' ] ) {
+    my ( $code, $want ) = @$case;
+    my @t = map { short_class($_) } toks($code);
+    ok( grep( $_ eq $want, @t ), "$code: unchanged (control)" ) or diag "got: @t";
 }
