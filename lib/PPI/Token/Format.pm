@@ -66,12 +66,28 @@ sub lines {
 # Tokenizer Methods
 
 # A format body is line oriented: every line joins the token, and the line
-# holding a lone . ends it.
+# holding a lone . ends it -- except inside the braces of an argument line
+# (perlform: the line after a picture line with a field supplies its
+# values, and spreads over more lines when it starts with a {; the block is
+# code, where a lone . may close a nested format).
 sub __TOKENIZER__on_line_start {
-	my $t = $_[1];
+	my $t    = $_[1];
+	my $line = $t->{line};
+	$t->{token}->{content} .= $line;
 
-	$t->{token}->{content} .= $t->{line};
-	$t->_finalize_token if $t->{line} =~ /^\.\s*$/;
+	my $args = delete $t->{format_args};
+	if ( $t->{format_braces} or ( $args and $line =~ /^\s*\{/ ) ) {
+		my $depth = ( $t->{format_braces} || 0 )
+			+ ( () = $line =~ /\{/g ) - ( () = $line =~ /\}/g );
+		$t->{format_braces} = $depth > 0 ? $depth : 0;
+		return 0;
+	}
+	if ( $line =~ /^\.\s*$/ ) {
+		$t->_finalize_token;
+		return 0;
+	}
+	# A picture line with a field: the next line holds its arguments
+	$t->{format_args} = 1 if !$args and $line !~ /^\s*#/ and $line =~ /[\@^]/;
 
 	0;
 }

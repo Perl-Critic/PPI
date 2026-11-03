@@ -149,6 +149,7 @@ sub __TOKENIZER__on_line_start {
 	# The body of a format starts on the line after its header
 	# (PPI::Tokenizer::_format_declaration), whatever the line holds
 	if ( delete $t->{format_pending} ) {
+		delete @$t{qw( format_args format_braces )};
 		$t->_new_token( 'Format', '' );
 		return PPI::Token::Format->__TOKENIZER__on_line_start( $t );
 	}

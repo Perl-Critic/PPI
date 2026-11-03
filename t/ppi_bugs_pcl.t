@@ -1659,8 +1659,7 @@ for my $code ( 'my %h = (format => 1);', '$h{format} = 2;', '$o->format(1);', 's
 # ... and an argument line that opens a { runs to its matching } -- the block
 # is code, where a lone . may close a NESTED format (perlform; perl's
 # t/op/write.t 'nested formats').
-TODO: {
-    local $TODO = 'PCL §40: a lone . inside the braces of an argument line ends the format';
+{
     my @s = stmts("format NEST =\n\@<<<\n{\n    format BIRDS =\n\@<<<<<\n\$b;\n.\n    \"nest\"\n}\n.\nwrite NEST;\n");
     is( scalar(@s), 2, 'a nested format inside an argument block: the format and write are two statements' ) or diag join ' | ', @s;
 }
