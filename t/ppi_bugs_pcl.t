@@ -13,7 +13,7 @@
 use lib 't/lib';
 use PPI::Test::pragmas;
 use utf8;
-use Test::More tests => 336 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+use Test::More tests => 343 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use PPI ();
 
@@ -1970,4 +1970,30 @@ for my $code ( 'my @t = map { $_ => 1 } @x;', 'my @u = map { lc($_) => 1 } @x;' 
 for my $code ( 'my @c = map {; { $_, 1 } } @l;', 'my @c = do { { $_, 1 } };' ) {
     my @c = bracket_classes( $code, '{' );
     is( $c[1], 'PPI::Structure::Block', "$code: a block where perl starts a statement (control)" );
+}
+
+# §60 -- the attributes of a LEXICAL sub: after `my sub NAME` (and `our` /
+# `state`) a `:` starts the attribute list as after `sub NAME` (toke.c
+# yyl_sub, the same path for both):
+# `my $x = 43; my sub y :prototype() {$x} print y, "\n"` prints 43.
+TODO: {
+    local $TODO = 'PCL §60: the attribute after my sub NAME is an Operator and a Word';
+    for my $case ( [ 'my sub y :prototype() {$x}', 'Attribute=prototype()' ],
+                   [ 'state sub z :prototype($) { 1 }', 'Attribute=prototype($)' ],
+                   [ 'our sub w :lvalue { $v }', 'Attribute=lvalue' ],
+                   [ 'my sub u :prototype($) :lvalue { $v }', 'Attribute=lvalue' ] ) {
+        my ( $code, $want ) = @$case;
+        my @t = map { short_class($_) } toks($code);
+        ok( grep( $_ eq $want, @t ), "$code: the attribute is an Attribute" ) or diag "got: @t";
+    }
+}
+for my $case ( [ 'sub n :prototype($) { 1 }', 'Attribute=prototype($)' ],
+               [ 'my $x : shared = 1;', 'Attribute=shared' ] ) {
+    my ( $code, $want ) = @$case;
+    my @t = map { short_class($_) } toks($code);
+    ok( grep( $_ eq $want, @t ), "$code: the attribute is an Attribute (control)" ) or diag "got: @t";
+}
+{
+    my @t = map { short_class($_) } toks('my $r = $c ? sub { 1 } : 2;');
+    ok( !grep( /^Attribute/, @t ), 'a ternary : after sub { } is an Operator (control)' ) or diag "got: @t";
 }
