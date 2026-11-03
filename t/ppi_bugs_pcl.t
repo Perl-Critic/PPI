@@ -1802,8 +1802,7 @@ sub bracket_classes {
 # §48 -- a LIST SLICE: after the ) of a list or a qw() the lexer expects an
 # operator (toke.c yyl_rightparen TERM), so the [ subscripts the list:
 # `print +(10, 20)[1]` prints 20.
-TODO: {
-    local $TODO = 'PCL §48: the [ of a list slice is a Constructor';
+{
     for my $code ( 'my @x = (1, 2, 3)[1];', 'print qw(a b c)[1];',
                    'my ($p) = (sort { $b <=> $a } @a)[0];',
                    'print +(10, 20)[1];', 'my $s = (stat $f)[7];', 'my $l = (@a)[-1];',

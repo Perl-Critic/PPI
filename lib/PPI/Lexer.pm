@@ -1303,6 +1303,15 @@ sub _square {
 			# ${$aref}[0], ${name}[0], @{$aref}[0, 1], %{$aref}[0, 1]
 			return 'PPI::Structure::Subscript';
 		}
+		if ( $Element->isa('PPI::Structure::List')
+		  or $Element->isa('PPI::Structure::Condition')
+		  or $Element->isa('PPI::Token::QuoteLike::Words') ) {
+			# (1, 2, 3)[1], (stat $f)[7], qw(a b c)[1], EXPR if (0, 1)[1]:
+			# after the ) of a list perl expects an operator (toke.c
+			# yyl_rightparen returns a term), so the [ slices the list.
+			# $code->()[0] is the same subscript with the arrow left out.
+			return 'PPI::Structure::Subscript';
+		}
 		# FIXME - More cases to catch
 	}
 
