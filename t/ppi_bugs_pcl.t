@@ -13,7 +13,7 @@
 use lib 't/lib';
 use PPI::Test::pragmas;
 use utf8;
-use Test::More tests => 400 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+use Test::More tests => 407 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use PPI ();
 
@@ -2114,4 +2114,29 @@ for my $code ( '$a x3;', 'my $s = do { "a" } x3;', 'my $h = { a => 1 } x 2;', 'm
 {
     my @t = map { short_class($_) } toks('my $v = do { 5 } -1;');
     ok( grep( $_ eq 'Operator=-', @t ), 'my $v = do { 5 } -1;: a subtraction (control)' ) or diag "got: @t";
+}
+
+# §64 -- __DATA__ or __END__ before a fat comma is a word: perl tests for
+# => right after a word before it looks the word up as a keyword (toke.c
+# yyl_keylookup), so `our %K = ( __DATA__ => 2 )` is a hash with the key
+# __DATA__, and the rest of the file is still code.
+TODO: {
+    local $TODO = 'PCL §64: __DATA__ / __END__ before => starts the data section';
+    my $k = "our %K = (\n  __DATA__ => 2,\n  __END__  => 3,\n);\nprint 1;\n";
+    for my $case ( [ $k, 'Word=__DATA__', '__DATA__ => at the start of a line in a list' ],
+                   [ $k, 'Word=__END__', '__END__ => at the start of a line in a list' ],
+                   [ 'my @l = (__END__ => 3); print 1;', 'Word=__END__', '(__END__ => 3)' ],
+                   [ "my %h = (x => 1,\n__DATA__=>5);\n", 'Word=__DATA__', '__DATA__=> without a space' ],
+                   [ "my %h = (x => 1,\n__END__\t=> 6);\n", 'Word=__END__', '__END__ and a tab before =>' ] ) {
+        my ( $code, $want, $label ) = @$case;
+        my @t = map { short_class($_) } toks($code);
+        ok( grep( $_ eq $want, @t ) && !grep( /^Separator/, @t ),
+            "$label: the word before => is a Word, not a Separator" ) or diag "got: @t";
+    }
+}
+for my $case ( [ "print 1;\n__DATA__\nx => 1\n", 'Separator=__DATA__' ],
+               [ "print 1;\n__END__ junk => 1\n", 'Separator=__END__' ] ) {
+    my ( $code, $want ) = @$case;
+    my @t = map { short_class($_) } toks($code);
+    ok( grep( $_ eq $want, @t ), "the data section starts (control): $want" ) or diag "got: @t";
 }
