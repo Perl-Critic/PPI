@@ -220,10 +220,17 @@ sub __TOKENIZER__commit {
 			: $t->{class}->__TOKENIZER__on_char($t);
 	}
 
+	# A fat comma after __END__ or __DATA__ (on the same line) makes it an
+	# ordinary word, the string "__END__": perl tests for => right after a
+	# word before it looks the word up as a keyword (toke.c yyl_keylookup),
+	# so our %K = ( __DATA__ => 1 ) is a hash, not the start of the data.
+	my $fat_comma = ( $word eq '__END__' or $word eq '__DATA__' )
+		&& substr( $t->{line}, $t->{line_cursor} ) =~ /^\s*=>/;
+
 	# Check for the end of the file.  CORE::__END__ ends it too: perl
 	# reads either spelling as the end of the code (toke.c
 	# yyl_data_handle), so the rest of the file is never code.
-	if ( $word eq '__END__' or $word eq 'CORE::__END__' ) {
+	if ( !$fat_comma and ( $word eq '__END__' or $word eq 'CORE::__END__' ) ) {
 		# Create the token for the __END__ itself
 		$t->_new_token( 'Separator', $1 );
 		$t->_finalize_token;
@@ -249,7 +256,7 @@ sub __TOKENIZER__commit {
 	}
 
 	# Check for the data section (CORE::__DATA__ is the same)
-	if ( $word eq '__DATA__' or $word eq 'CORE::__DATA__' ) {
+	if ( !$fat_comma and ( $word eq '__DATA__' or $word eq 'CORE::__DATA__' ) ) {
 		# Create the token for the __DATA__ itself
 		$t->_new_token( 'Separator', "$1" );
 		$t->_finalize_token;
