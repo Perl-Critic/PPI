@@ -13,7 +13,7 @@
 use lib 't/lib';
 use PPI::Test::pragmas;
 use utf8;
-use Test::More tests => 407 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+use Test::More tests => 411 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use PPI ();
 
@@ -2138,4 +2138,28 @@ for my $case ( [ "print 1;\n__DATA__\nx => 1\n", 'Separator=__DATA__' ],
     my ( $code, $want ) = @$case;
     my @t = map { short_class($_) } toks($code);
     ok( grep( $_ eq $want, @t ), "the data section starts (control): $want" ) or diag "got: @t";
+}
+
+# §65 -- a CR in the source is a character of the program: perl reads a
+# CR inside a string literal or the __DATA__ section as itself
+# (`eval "'a\r\nb'"` has length 4), and converts only the CR LF line
+# ends inside a here-doc body or a multi-line literal of a source FILE.
+# PPI rewrites every CR LF, CR CR LF and lone CR of the source to LF
+# before it tokenizes, so no token can hold a CR.
+TODO: {
+    local $TODO = 'PCL §65: every CR LF and lone CR in the source is rewritten to LF';
+    for my $case ( [ "my \$x = q{a\r\nb};\n", 'Quote::Literal', "q{a\r\nb}", 'a CR LF inside q{}' ],
+                   [ "my \$y = \"c\rd\";\n", 'Quote::Double', "\"c\rd\"", 'a lone CR inside ""' ],
+                   [ "print 1;\n__DATA__\nj\r\nk\n", 'Data', "j\r\nk\n", 'a CR LF in the __DATA__ section' ] ) {
+        my ( $code, $class, $want, $label ) = @$case;
+        my $doc = PPI::Document->new( \$code );
+        my ($tok) = grep { short_class(ref $_) eq $class } $doc ? $doc->tokens : ();
+        ok( $tok && $tok->content eq $want, "$label: the token keeps the CR" )
+            or diag 'got: ' . ( $tok ? join( ' ', map { sprintf '%02x', ord } split //, $tok->content ) : 'no token' );
+    }
+}
+{
+    my $doc = PPI::Document->new( \"my \$a = 1;\r\nmy \$b = 2;\r\n" );
+    my @s = $doc ? $doc->children : ();
+    ok( 2 == grep( $_->isa('PPI::Statement'), @s ), 'CR LF line ends still end lines (control)' );
 }
