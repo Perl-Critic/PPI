@@ -466,8 +466,7 @@ TODO: {
 # whenever the previous token is a sub definition's closing brace, which is
 # exactly how a sub named `x` is called with neither parens nor arguments.
 # perl's own t/op/lexsub.t writes `{ my sub x {…} x }` twice.
-TODO: {
-    local $TODO = 'PCL §19: A call to a sub named x after a list operator is lexed as the repetition operator';
+{
     my $doc = PPI::Document->new(\'sub x { print "PKG\n" } x');
     my ($op) = grep { $_->isa('PPI::Token::Operator') && $_->content eq 'x' }
                $doc->tokens;
@@ -2095,8 +2094,7 @@ for my $case ( [ 'print -e::foo;', 'Operator=-e' ], [ 'print - Foo::bar;', 'Word
 # a compound statement's block or a map / grep / sort block it expects a
 # statement or a term, so the word is a call:
 # `sub x3 { print "called\n" } x3();` prints called.
-TODO: {
-    local $TODO = 'PCL §63: x<digits> after a statement block is lexed as the repetition operator';
+{
     for my $code ( 'sub x3 { 1 } x3();', 'sub x64 { 1 } x64 1;', 'my @m = map { 1 } x3();',
                    'BEGIN { 1 } x3();', '{ 1 } x3();', 'if (1) { 2 } x3();',
                    'for my $i (1) { } x3();', 'sub z :lvalue { 1 } x3();',

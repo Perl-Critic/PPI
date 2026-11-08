@@ -947,12 +947,70 @@ sub _after_statement_block {
 	return '' if !$close->isa('PPI::Token::Structure') or $close->content ne '}';
 	my $kind = $self->_curly_kind($cursor);
 	return '' if !$kind or $kind ne 'block';
-	my ( $prev ) = $self->_significant_before( $self->_matching_curly($cursor) );
+	my ( $prev, $at ) = $self->_before_sub_decorations(
+		$self->_significant_before( $self->_matching_curly($cursor) ) );
 	return 1 if !$prev or $prev->isa('PPI::Token::Label')
 		or $prev->isa('PPI::Token::Format');
 	my $content = $prev->content;
 	return 1 if $prev->isa('PPI::Token::Structure') and ( $content eq ';' or $content eq '}' );
+	return $self->_paren_heads_statement_block($at)
+		if $prev->isa('PPI::Token::Structure') and $content eq ')';
 	return $prev->isa('PPI::Token::Word') && $content ne 'sub' && $content ne 'return';
+}
+
+# The token before the { of a sub's body may be its prototype or its
+# attributes (sub f ($) { }, sub f :lvalue { }); step back over them to the
+# sub's NAME (a definition, after which a statement starts) or to sub itself
+# (an anonymous sub, a term).  Takes and returns ( token, index ).
+sub _before_sub_decorations {
+	my ( $self, $prev, $at ) = @_;
+	my $attr = '';
+	while ( $prev ) {
+		if ( $prev->isa('PPI::Token::Attribute') ) {
+			$attr = 1;
+		} elsif ( $attr and $prev->isa('PPI::Token::Operator') and $prev->content eq ':' ) {
+			$attr = '';
+		} elsif ( !$prev->isa('PPI::Token::Prototype') ) {
+			last;
+		}
+		( $prev, $at ) = $self->_significant_before($at);
+	}
+	return ( $prev, $at );
+}
+
+# True when the ) at index $cursor closes the condition of a compound
+# statement (if, elsif, unless, while, until, for, foreach -- also with a
+# loop variable) or the signature of a named sub, so the { after it opens a
+# block after which a statement starts (toke.c: an XBLOCK pushes XSTATE).
+my %PAREN_BLOCK_WORD = map { $_ => 1 } qw( if elsif unless while until for foreach );
+my %LOOP_VARIABLE_DECL = map { $_ => 1 } qw( my our state );
+
+sub _paren_heads_statement_block {
+	my ( $self, $cursor ) = @_;
+	my $tokens = $self->{tokens};
+	my $depth  = 1;
+	while ( --$cursor >= 0 ) {
+		my $token = $tokens->[$cursor];
+		next if !$token->isa('PPI::Token::Structure');
+		$depth++ if $token->content eq ')';
+		$depth-- if $token->content eq '(';
+		last if !$depth;
+	}
+	return '' if $cursor < 0;
+	my ( $prev, $at ) = $self->_before_sub_decorations( $self->_significant_before($cursor) );
+	return '' if !$prev;
+	if ( $prev->isa('PPI::Token::Symbol') ) {
+		( $prev, $at ) = $self->_significant_before($at);
+		( $prev, $at ) = $self->_significant_before($at)
+			if $prev and $prev->isa('PPI::Token::Word') and $LOOP_VARIABLE_DECL{ $prev->content };
+		return $prev && $prev->isa('PPI::Token::Word')
+			&& ( $prev->content eq 'for' or $prev->content eq 'foreach' );
+	}
+	return '' if !$prev->isa('PPI::Token::Word');
+	return 1 if $PAREN_BLOCK_WORD{ $prev->content };
+	my ( $sub ) = $self->_significant_before($at);
+	return $sub && $sub->isa('PPI::Token::Word') && $sub->content eq 'sub'
+		&& $prev->content ne 'sub';
 }
 
 # True where a * can only open a glob name: at the start of the document,
@@ -1133,9 +1191,14 @@ sub _current_x_is_operator {
 
 	return !$self->__current_token_is_forced_word('x') if $prev->isa('PPI::Token::Word');
 
+	# After the } of a block that ends a statement (sub x3 { } x3();) or
+	# takes a list (map { } x3()) perl expects a statement or a term, and
+	# x is the repetition operator only where it expects an operator
+	# (toke.c: case 'x' tests PL_expect == XOPERATOR), so x, x3 are words.
 	return (!$prev->isa('PPI::Token::Operator') || $X_CAN_FOLLOW_OPERATOR{$prev})
 		&& (!$prev->isa('PPI::Token::Structure') || $X_CAN_FOLLOW_STRUCTURE{$prev})
 		&& !$prev->isa('PPI::Token::Label')
+		&& !$self->_after_statement_block
 	;
 }
 
