@@ -13,7 +13,7 @@
 use lib 't/lib';
 use PPI::Test::pragmas;
 use utf8;
-use Test::More tests => 382 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+use Test::More tests => 400 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use PPI ();
 
@@ -2086,4 +2086,34 @@ for my $case ( [ 'print -e::foo;', 'Operator=-e' ], [ 'print - Foo::bar;', 'Word
     my ( $code, $want ) = @$case;
     my @t = map { short_class($_) } toks($code);
     ok( grep( $_ eq $want, @t ), "$code: unchanged (control)" ) or diag "got: @t";
+}
+
+# §63 -- x and x<digits> right after the } of a block that ends a
+# statement or takes a list: perl reads x3 as the repetition operator
+# only where it expects an operator (toke.c: case 'x' tests
+# PL_expect == XOPERATOR); after a sub definition, a bare block, BEGIN,
+# a compound statement's block or a map / grep / sort block it expects a
+# statement or a term, so the word is a call:
+# `sub x3 { print "called\n" } x3();` prints called.
+TODO: {
+    local $TODO = 'PCL §63: x<digits> after a statement block is lexed as the repetition operator';
+    for my $code ( 'sub x3 { 1 } x3();', 'sub x64 { 1 } x64 1;', 'my @m = map { 1 } x3();',
+                   'BEGIN { 1 } x3();', '{ 1 } x3();', 'if (1) { 2 } x3();',
+                   'for my $i (1) { } x3();', 'sub z :lvalue { 1 } x3();',
+                   'sub q2 ($) { 1 } x3();', 'sub g :lvalue ($x) { 1 } x3();' ) {
+        my @t = map { short_class($_) } toks($code);
+        ok( !grep( /^Operator=x$/, @t ), "$code: the word after the block is a Word, not the x operator" ) or diag "got: @t";
+    }
+    my @t = map { short_class($_) } toks('if (1) { 2 } -e $f;');
+    ok( grep( $_ eq 'Operator=-e', @t ), 'if (1) { 2 } -e $f;: a filetest starts the next statement' )
+        or diag "got: @t";
+}
+for my $code ( '$a x3;', 'my $s = do { "a" } x3;', 'my $h = { a => 1 } x 2;', 'my $c = sub ($) { 1 } x 2;',
+               'my @l = (1, 2) x3;', '$h{a} x3;' ) {
+    my @t = map { short_class($_) } toks($code);
+    ok( grep( /^Operator=x$/, @t ), "$code: the x operator (control)" ) or diag "got: @t";
+}
+{
+    my @t = map { short_class($_) } toks('my $v = do { 5 } -1;');
+    ok( grep( $_ eq 'Operator=-', @t ), 'my $v = do { 5 } -1;: a subtraction (control)' ) or diag "got: @t";
 }
