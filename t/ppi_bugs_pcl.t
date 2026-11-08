@@ -13,7 +13,7 @@
 use lib 't/lib';
 use PPI::Test::pragmas;
 use utf8;
-use Test::More tests => 372 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+use Test::More tests => 382 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use PPI ();
 
@@ -2059,6 +2059,31 @@ for my $case ( [ 'sub n :prototype($) { 1 }', 'Attribute=prototype($)' ],
 }
 for my $case ( [ '${\ m{q}}', 'Regexp::Match=m{q}' ], [ 'm{q};', 'Regexp::Match=m{q}' ],
                [ 's{x}{y};', 'Regexp::Substitute=s{x}{y}' ], [ '$h{s} = 1;', 'Word=s' ] ) {
+    my ( $code, $want ) = @$case;
+    my @t = map { short_class($_) } toks($code);
+    ok( grep( $_ eq $want, @t ), "$code: unchanged (control)" ) or diag "got: @t";
+}
+
+# §62 -- a NEGATED package-qualified bareword: perl reads the minus, then
+# the whole word, package part and all (toke.c yyl_hyphen: only a single
+# letter before a non-word character is a filetest):
+# `print -Foo::bar` prints -Foo::bar, or -3 when sub Foo::bar returns 3;
+# `-CORE::log(...)` negates the builtin.
+TODO: {
+    local $TODO = 'PCL §62: a negated qualified bareword is split at its first ::';
+    for my $case ( [ 'print -Foo::bar, "\n";', 'Word=-Foo::bar' ],
+                   [ 'my $v = -CORE::log(1);', 'Word=-CORE::log' ],
+                   [ 'print -foo::bar::baz;', 'Word=-foo::bar::baz' ],
+                   [ 'my %h = (-Foo::bar => 1);', 'Word=-Foo::bar' ],
+                   [ 'print -Foo::;', 'Word=-Foo::' ],
+                   [ 'f(-a::b);', 'Word=-a::b' ] ) {
+        my ( $code, $want ) = @$case;
+        my @t = map { short_class($_) } toks($code);
+        ok( grep( $_ eq $want, @t ), "$code: the negated qualified name is one Word" ) or diag "got: @t";
+    }
+}
+for my $case ( [ 'print -e::foo;', 'Operator=-e' ], [ 'print - Foo::bar;', 'Word=Foo::bar' ],
+               [ 'print -foo;', 'Word=-foo' ], [ '$x-Foo::bar;', 'Word=Foo::bar' ] ) {
     my ( $code, $want ) = @$case;
     my @t = map { short_class($_) } toks($code);
     ok( grep( $_ eq $want, @t ), "$code: unchanged (control)" ) or diag "got: @t";
