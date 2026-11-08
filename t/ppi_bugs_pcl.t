@@ -2069,8 +2069,7 @@ for my $case ( [ '${\ m{q}}', 'Regexp::Match=m{q}' ], [ 'm{q};', 'Regexp::Match=
 # letter before a non-word character is a filetest):
 # `print -Foo::bar` prints -Foo::bar, or -3 when sub Foo::bar returns 3;
 # `-CORE::log(...)` negates the builtin.
-TODO: {
-    local $TODO = 'PCL §62: a negated qualified bareword is split at its first ::';
+{
     for my $case ( [ 'print -Foo::bar, "\n";', 'Word=-Foo::bar' ],
                    [ 'my $v = -CORE::log(1);', 'Word=-CORE::log' ],
                    [ 'print -foo::bar::baz;', 'Word=-foo::bar::baz' ],

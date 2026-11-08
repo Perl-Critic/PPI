@@ -64,7 +64,14 @@ sub __TOKENIZER__on_char {
 		# File test operator
 		$t->{class} = $t->{token}->set_class( 'Operator' );
 	} else {
-		# No, normal dashed bareword
+		# No, normal dashed bareword.  Like any bareword it may be
+		# package-qualified: perl reads the minus, then the WHOLE word
+		# (toke.c yyl_hyphen), so -Foo::bar and -CORE::log(...) are one
+		# token here, never -Foo followed by ::bar.
+		if ( $t->{line} =~ m/\G((?:(?:\'|(?:::)+)\w+)*(?:::)?)/gc ) {
+			$t->{token}->{content} .= $1;
+			$t->{line_cursor} += length $1;
+		}
 		$t->{class} = $t->{token}->set_class( 'Word' );
 	}
 
