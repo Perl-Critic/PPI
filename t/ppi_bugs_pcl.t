@@ -475,8 +475,7 @@ TODO: {
              map { ref($_) . '[' . $_->content . ']' }
              grep { $_->significant } $doc->tokens);
 }
-TODO: {
-    local $TODO = 'PCL §19: A call to a sub named x after a list operator is lexed as the repetition operator';
+{
     my $doc = PPI::Document->new(\'my sub x { print "LEX\n" } x');
     my ($op) = grep { $_->isa('PPI::Token::Operator') && $_->content eq 'x' }
                $doc->tokens;
