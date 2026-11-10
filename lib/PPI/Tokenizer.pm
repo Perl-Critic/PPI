@@ -87,6 +87,7 @@ use PPI::Token      ();
 use PPI::Exception  ();
 use PPI::Exception::ParserRejection ();
 use PPI::Document ();
+use PPI::Singletons qw' %KEYWORDS %NO_OPERAND ';
 
 our $VERSION = '1.292';
 
@@ -635,6 +636,7 @@ sub _finalize_token {
 
 	# Add the token to the token buffer
 	push @{ $self->{tokens} }, $self->{token};
+	$self->_lexical_sub_scope( $self->{token} ) if $self->{lexical_subs};
 	$self->{token} = undef;
 
 	# Return the parse class to that of the zone we are in
@@ -748,6 +750,10 @@ my %OBVIOUS_CLASS = (
 	'PPI::Token::QuoteLike::Readline' => 'operator',
 	'PPI::Token::QuoteLike::Regexp'   => 'operator',
 	'PPI::Token::QuoteLike::Words'    => 'operator',
+	'PPI::Token::Regexp::Match'       => 'operator',
+	'PPI::Token::Regexp::Substitute'  => 'operator',
+	'PPI::Token::Regexp::Transliterate' => 'operator',
+	'PPI::Token::HereDoc'             => 'operator',
 );
 
 my %OBVIOUS_CONTENT = (
@@ -756,10 +762,13 @@ my %OBVIOUS_CONTENT = (
 	'[' => 'operand',
 	';' => 'operand',
 	'}' => 'operator',
+	')' => 'operator',
+	']' => 'operator',
 );
 
 
 my %USUALLY_FORCES = map { $_ => 1 } qw( sub package use no );
+my %POSTFIX = map { $_ => 1 } qw( ++ -- );
 
 # Try to determine operator/operand context, if possible.
 # Returns "operator", "operand", or "" if unknown.
@@ -772,7 +781,16 @@ sub _opcontext {
 
 	# Map the obvious cases
 	return $OBVIOUS_CLASS{$c0}   if defined $OBVIOUS_CLASS{$c0};
+	return 'operand' if $p0->isa('PPI::Token::Format');   # a statement starts after it
+	return 'operator' if $p0->isa('PPI::Token::Number');   # Float, Exp, Hex, Octal, Binary too
 	return $OBVIOUS_CONTENT{$p0} if defined $OBVIOUS_CONTENT{$p0};
+
+	# A method name and a postfix ++ or -- end a term too (_ends_term_at)
+	my $cursor = $#{ $self->{tokens} };
+	$cursor-- while $cursor >= 0 and !$self->{tokens}->[$cursor]->significant;
+	if ( $p0->isa('PPI::Token::Word') or $POSTFIX{ $p0->content } ) {
+		return 'operator' if $self->_ends_term_at($cursor);
+	}
 
 	# Most of the time after an operator, we are an operand
 	return 'operand' if $p0->isa('PPI::Token::Operator');
@@ -784,6 +802,384 @@ sub _opcontext {
 	return ''
 }
 
+# In `print $fh %h` (or *STDOUT, or .5) the $fh is a filehandle, not a
+# term, and what follows starts the list.  perl tells the two apart by the
+# whitespace: there is some before the next character and none after it
+# (`print $fh % 2` and `print $fh%2` are a modulo).  True when the tokenizer
+# stands in that slot: the previous significant token is a $scalar right
+# after print, printf, say, exec or system, and whitespace separates it from
+# the current token.
+my %FILEHANDLE_LISTOP = map { $_ => 1 } qw( print printf say exec system );
+
+sub _after_scalar_filehandle {
+	my $self = shift;
+	my ( $prev, $op ) = $self->_previous_significant_tokens(2);
+	return '' if !$prev or !$prev->isa('PPI::Token::Symbol') or $prev->content !~ /^\$/;
+	# The whitespace is the last token, or, when a Whitespace token is still
+	# being built (the tokenizer deciding what starts after it), that one.
+	my $last = ( $self->{token} and $self->{token}->isa('PPI::Token::Whitespace') )
+		? $self->{token} : $self->_last_token;
+	return '' if !$last or !$last->isa('PPI::Token::Whitespace');
+	return $op && $op->isa('PPI::Token::Word') && $FILEHANDLE_LISTOP{ $op->content };
+}
+
+# After a TERM perl expects an operator (toke.c: PL_expect == XOPERATOR).
+# _ends_term_at says whether the significant token at index $cursor of the
+# token list ends a term, including the three cases the class and content
+# tables of _opcontext cannot see:
+#
+#   * a method name -- a Word right after -> ($o->w * 2, $o->name . 2);
+#   * a builtin that takes no operand (time . 2, wait - 1);
+#   * a postfix ++ or -- ($i++ * 2), which is the one that itself follows a
+#     term; the prefix spelling (++$i) opens a term instead;
+#   * the } of a subscript or of a dereference block ($h{a} * 2,
+#     @{$r} * 2), told from a block's } by what comes before its { (see
+#     _curly_kind).  The } of a block does not end a term.
+sub _ends_term_at {
+	my ( $self, $cursor ) = @_;
+	my $tokens = $self->{tokens};
+	return '' if $cursor < 0;
+	my $token = $tokens->[$cursor];
+	if ( $token->isa('PPI::Token::Word') ) {
+		return 1 if $NO_OPERAND{ $token->content };
+		my ( $prev ) = $self->_significant_before($cursor);
+		return $prev && $prev->isa('PPI::Token::Operator') && $prev->content eq '->';
+	}
+	if ( $token->isa('PPI::Token::Operator') ) {
+		return '' if !$POSTFIX{ $token->content };
+		my ( $prev, $at ) = $self->_significant_before($cursor);
+		return $prev && $self->_ends_term_at($at);
+	}
+	if ( $token->isa('PPI::Token::Structure') ) {
+		my $c = $token->content;
+		return 1 if $c eq ')' or $c eq ']';
+		return '' if $c ne '}';
+		my $kind = $self->_curly_kind($cursor);
+		return $kind && ( $kind eq 'subscript' or $kind eq 'deref' or $kind eq 'value' );
+	}
+	return 1 if $OBVIOUS_CLASS{ ref $token } or $token->isa('PPI::Token::Number');
+	return '';
+}
+
+# The significant token before index $cursor, and its index.
+sub _significant_before {
+	my ( $self, $cursor ) = @_;
+	my $tokens = $self->{tokens};
+	while ( --$cursor >= 0 ) {
+		return ( $tokens->[$cursor], $cursor ) if $tokens->[$cursor]->significant;
+	}
+	return ( undef, -1 );
+}
+
+# What the } at index $cursor closes, from the token before its matching {:
+#   'subscript'  after a Symbol, a ->, or another subscript's } or ]  ($h{a}, $r->{a}{b})
+#   'deref'      after a Cast                                         (@{$r}, ${$x})
+#   'value'      after do or eval, whose block yields a value         (do { 1 })
+#   'block'      anything else, and a { that opens the document (perl reads
+#                a { at the start of a statement as a block)
+#   undef        no matching { (an unbalanced })
+sub _curly_kind {
+	my ( $self, $cursor ) = @_;
+	$cursor = $self->_matching_curly($cursor);
+	return if $cursor < 0;
+	my ( $prev, $at ) = $self->_significant_before($cursor);
+	return 'block' if !$prev;
+	return 'subscript' if $prev->isa('PPI::Token::Symbol');
+	my $content = $prev->content;
+	return 'subscript' if $content eq '->' or $content eq ']';
+	if ( $content eq '}' ) {
+		# A chained subscript ($h{a}{b}, @{$r}{qw(a b)}) follows the } of a
+		# subscript or a dereference; after a block's } a { opens the next
+		# block (a bare block after an if, sub or bare block).
+		my $before = $self->_curly_kind($at);
+		return ( $before and ( $before eq 'subscript' or $before eq 'deref' ) ) ? 'subscript' : 'block';
+	}
+	return 'deref' if $prev->isa('PPI::Token::Cast');
+	return 'value' if $prev->isa('PPI::Token::Word') and ( $content eq 'do' or $content eq 'eval' );
+	return 'block';
+}
+
+# The index of the { that the } at index $cursor closes, or -1.
+sub _matching_curly {
+	my ( $self, $cursor ) = @_;
+	my $tokens = $self->{tokens};
+	my $depth  = 1;
+	while ( --$cursor >= 0 ) {
+		my $token = $tokens->[$cursor];
+		next if !$token->isa('PPI::Token::Structure');
+		$depth++ if $token->content eq '}';
+		$depth-- if $token->content eq '{';
+		last if !$depth;
+	}
+	return $cursor;
+}
+
+# A - starts a term although the token before it would end one (perl reads
+# it in term position, toke.c's XTERM) in two places:
+#   * the filehandle slot of print $fh LIST (_after_scalar_filehandle), when
+#     neither whitespace nor = nor > follows the -: print $fh -1 and
+#     print $fh -e $f print to $fh; print $fh - 1 subtracts;
+#   * after the } of a block that ends a statement or takes a list
+#     (_after_statement_block): BEGIN { 1 } -e $f, sort { ... } -1, 2.
+sub _minus_starts_term {
+	my $self = shift;
+	if ( $self->_after_scalar_filehandle ) {
+		my $next = substr $self->{line}, $self->{line_cursor} + 1, 1;
+		return $next ne '' && $next !~ /[\s=>]/;
+	}
+	return $self->_after_statement_block;
+}
+
+# True when the previous significant token is the } of a block after which
+# perl expects a term: a block that opens a statement (its { follows
+# nothing, a ; or a }, or a label) or a block that follows a word, as after
+# BEGIN, END, sort, map, grep or print.  After sub the block is an
+# anonymous sub and after return an anonymous hash, both terms; a { after
+# an operator or a ( opens an anonymous hash too (_curly_kind says 'block'
+# for all of these, so they are told apart here).
+sub _after_statement_block {
+	my $self   = shift;
+	my $tokens = $self->{tokens};
+	my $cursor = $#$tokens;
+	$cursor-- while $cursor >= 0 and !$tokens->[$cursor]->significant;
+	return '' if $cursor < 0;
+	my $close = $tokens->[$cursor];
+	return '' if !$close->isa('PPI::Token::Structure') or $close->content ne '}';
+	my $kind = $self->_curly_kind($cursor);
+	return '' if !$kind or $kind ne 'block';
+	my ( $prev, $at ) = $self->_before_sub_decorations(
+		$self->_significant_before( $self->_matching_curly($cursor) ) );
+	return 1 if !$prev or $prev->isa('PPI::Token::Label')
+		or $prev->isa('PPI::Token::Format');
+	my $content = $prev->content;
+	return 1 if $prev->isa('PPI::Token::Structure') and ( $content eq ';' or $content eq '}' );
+	return $self->_paren_heads_statement_block($at)
+		if $prev->isa('PPI::Token::Structure') and $content eq ')';
+	return $prev->isa('PPI::Token::Word') && $content ne 'sub' && $content ne 'return';
+}
+
+# The token before the { of a sub's body may be its prototype or its
+# attributes (sub f ($) { }, sub f :lvalue { }); step back over them to the
+# sub's NAME (a definition, after which a statement starts) or to sub itself
+# (an anonymous sub, a term).  Takes and returns ( token, index ).
+sub _before_sub_decorations {
+	my ( $self, $prev, $at ) = @_;
+	my $attr = '';
+	while ( $prev ) {
+		if ( $prev->isa('PPI::Token::Attribute') ) {
+			$attr = 1;
+		} elsif ( $attr and $prev->isa('PPI::Token::Operator') and $prev->content eq ':' ) {
+			$attr = '';
+		} elsif ( !$prev->isa('PPI::Token::Prototype') ) {
+			last;
+		}
+		( $prev, $at ) = $self->_significant_before($at);
+	}
+	return ( $prev, $at );
+}
+
+# True when the ) at index $cursor closes the condition of a compound
+# statement (if, elsif, unless, while, until, for, foreach -- also with a
+# loop variable) or the signature of a named sub, so the { after it opens a
+# block after which a statement starts (toke.c: an XBLOCK pushes XSTATE).
+my %PAREN_BLOCK_WORD = map { $_ => 1 } qw( if elsif unless while until for foreach );
+my %LOOP_VARIABLE_DECL = map { $_ => 1 } qw( my our state );
+
+sub _paren_heads_statement_block {
+	my ( $self, $cursor ) = @_;
+	my $tokens = $self->{tokens};
+	my $depth  = 1;
+	while ( --$cursor >= 0 ) {
+		my $token = $tokens->[$cursor];
+		next if !$token->isa('PPI::Token::Structure');
+		$depth++ if $token->content eq ')';
+		$depth-- if $token->content eq '(';
+		last if !$depth;
+	}
+	return '' if $cursor < 0;
+	my ( $prev, $at ) = $self->_before_sub_decorations( $self->_significant_before($cursor) );
+	return '' if !$prev;
+	if ( $prev->isa('PPI::Token::Symbol') ) {
+		( $prev, $at ) = $self->_significant_before($at);
+		( $prev, $at ) = $self->_significant_before($at)
+			if $prev and $prev->isa('PPI::Token::Word') and $LOOP_VARIABLE_DECL{ $prev->content };
+		return $prev && $prev->isa('PPI::Token::Word')
+			&& ( $prev->content eq 'for' or $prev->content eq 'foreach' );
+	}
+	return '' if !$prev->isa('PPI::Token::Word');
+	return 1 if $PAREN_BLOCK_WORD{ $prev->content };
+	my ( $sub ) = $self->_significant_before($at);
+	return $sub && $sub->isa('PPI::Token::Word') && $sub->content eq 'sub'
+		&& $prev->content ne 'sub';
+}
+
+# True where a * can only open a glob name: at the start of the document,
+# where the operator context says an operand follows, or after local or
+# return, which take a term.
+my %GLOB_AFTER_WORD = map { $_ => 1 } qw( local return );
+
+sub _glob_name_expected {
+	my $self = shift;
+	my ( $prev ) = $self->_previous_significant_tokens(1);
+	return 1 if !$prev;
+	return 1 if $prev->isa('PPI::Token::Word') and $GLOB_AFTER_WORD{ $prev->content };
+	return $self->_opcontext eq 'operand';
+}
+
+# True when the signatures feature is on AND the tokenizer stands inside a
+# signature: the innermost open bracket before the current token is a ( that
+# follows sub (an anonymous sub) or sub NAME, with any attributes between.
+# Only there is a $, @ or % before ) , or = a nameless parameter; anywhere
+# else $) $, $= are the magic variables.  The scan is bounded: it stops at
+# the first unmatched opener, or at a ; outside brackets.
+sub _in_signature {
+	my $self = shift;
+	return '' if !$self->_current_token_has_signatures_active;
+	my $tokens = $self->{tokens};
+	my $depth  = 0;
+	my $cursor = $#$tokens;
+	for ( ; $cursor >= 0; $cursor-- ) {
+		my $token = $tokens->[$cursor];
+		next if !$token->isa('PPI::Token::Structure');
+		my $c = $token->content;
+		if ( $c eq ')' or $c eq ']' or $c eq '}' ) {
+			$depth++;
+			next;
+		}
+		return '' if $c eq ';' and !$depth;
+		next if $c eq ';';
+		if ( $depth ) {
+			$depth--;
+			next;
+		}
+		return '' if $c ne '(';
+		last;
+	}
+	return '' if $cursor < 0;
+	my ( $prev, $at ) = $self->_significant_before($cursor);
+	while ( $prev and ( $prev->isa('PPI::Token::Attribute')
+		or ( $prev->isa('PPI::Token::Operator') and $prev->content eq ':' ) ) ) {
+		( $prev, $at ) = $self->_significant_before($at);
+	}
+	return '' if !$prev or !$prev->isa('PPI::Token::Word');
+	return 1 if $prev->content eq 'sub';
+	( $prev ) = $self->_significant_before($at);
+	return $prev && $prev->isa('PPI::Token::Word') && $prev->content eq 'sub';
+}
+
+# True when the previous significant token ends the variable or list of a
+# declaration -- my $x, our ($p, $q), state @s -- where a colon introduces
+# the declaration's attributes (my $x : shared).
+my %DECLARATOR = map { $_ => 1 } qw( my our state );
+
+sub _after_declared_variables {
+	my $self   = shift;
+	my $tokens = $self->{tokens};
+	my $cursor = $#$tokens;
+	$cursor-- while $cursor >= 0 and !$tokens->[$cursor]->significant;
+	return '' if $cursor < 0;
+	my $last = $tokens->[$cursor];
+	if ( $last->isa('PPI::Token::Structure') and $last->content eq ')' ) {
+		my $depth = 1;
+		while ( --$cursor >= 0 ) {
+			my $token = $tokens->[$cursor];
+			next if !$token->isa('PPI::Token::Structure');
+			$depth++ if $token->content eq ')';
+			$depth-- if $token->content eq '(';
+			last if !$depth;
+		}
+		return '' if $cursor < 0;
+	}
+	elsif ( !$last->isa('PPI::Token::Symbol') ) {
+		return '';
+	}
+	my ( $prev, $at ) = $self->_significant_before($cursor);
+	return '' if !$prev or !$prev->isa('PPI::Token::Word');
+	return 1 if $DECLARATOR{ $prev->content };
+
+	# A typed declaration -- my Dog $spot : shared -- has the class name
+	# between the declarator and the variable.
+	( $prev ) = $self->_significant_before($at);
+	return $prev && $prev->isa('PPI::Token::Word') && $DECLARATOR{ $prev->content };
+}
+
+# A word followed by a colon is a LABEL only where a statement starts (perl
+# reads a label only when it expects a statement, toke.c's XSTATE): at the
+# start of the document, after a ; or a { or a block's }, or after another
+# label.  Elsewhere -- (sub :lvalue { }), a ? : -- it is a word and the colon
+# an operator.
+sub _label_position {
+	my ( $self, $prev ) = @_;
+	return 1 if !$prev or $prev->isa('PPI::Token::Label')
+		or $prev->isa('PPI::Token::Format');
+	return '' if !$prev->isa('PPI::Token::Structure');
+	my $c = $prev->content;
+	return 1 if $c eq ';' or $c eq '{';
+	return '' if $c ne '}';
+	my $cursor = $#{ $self->{tokens} };
+	$cursor-- while $cursor >= 0 and !$self->{tokens}->[$cursor]->significant;
+	my $kind = $self->_curly_kind($cursor);
+	return !$kind || $kind eq 'block';
+}
+
+# A format declaration, format NAME = alone on its line where a statement
+# starts: perl reads the lines after it as the format's picture and
+# argument lines, up to a line holding a lone . (toke.c scan_formline).
+# Called by PPI::Token::Word with the cursor after the word format.  When
+# the rest of the line is such a header, it makes the tokens of the line
+# itself -- the name may be spelled in ways a word cannot, 'one or ::two --
+# and the next line starts the PPI::Token::Format body; it returns 0, the
+# line is done.  Otherwise it returns undef and touches nothing.
+sub _format_declaration {
+	my $t = shift;
+	my ( $prev ) = $t->_previous_significant_tokens(1);
+	return undef unless $t->_label_position($prev);
+	my $rest = substr $t->{line}, $t->{line_cursor};
+	return undef unless $rest =~ /^(?:(\s+)([^\s=][^=\n]*?))?([ \t]*)=([ \t]*\r?\n?)\z/;
+	my @parts = ( [ Whitespace => $1 ], [ Word => $2 ], [ Whitespace => $3 ],
+	              [ Operator => '=' ], [ Whitespace => $4 ] );
+	$t->_new_token( 'Word', 'format' );
+	for my $part ( @parts ) {
+		$t->_new_token( @$part ) if defined $part->[1] and length $part->[1];
+	}
+	$t->_finalize_token;
+	$t->{line_cursor} = $t->{line_length};
+	$t->{format_pending} = 1;
+	return 0;
+}
+
+# True when the token before the current one ends a term (_ends_term_at),
+# except in the scalar-filehandle slot of print $fh LIST, where the next
+# token starts the list (_after_scalar_filehandle).
+sub _after_term {
+	my $self = shift;
+	return '' if $self->_after_scalar_filehandle;
+	my $cursor = $#{ $self->{tokens} };
+	$cursor-- while $cursor >= 0 and !$self->{tokens}->[$cursor]->significant;
+	return $self->_ends_term_at($cursor);
+}
+
+# Is a TERM expected where the tokenizer now stands (toke.c: PL_expect is
+# not XOPERATOR)?  Only what is known counts: after an operator, an opening
+# bracket or a ; (_opcontext), after a block's } (_after_term), at the start
+# of the document, and after a builtin that takes an operand (print, sort,
+# return, ...).  After a match, a method name or a user's word it cannot
+# say -- a declared sub is a list operator, an undeclared bareword a term --
+# and the answer is no.
+sub _term_expected {
+	my $self = shift;
+	my ( $prev, $prevprev ) = $self->_previous_significant_tokens(2);
+	return 1 if !$prev;
+	return 1 if $self->_opcontext eq 'operand';
+	# A block's } does not end a term (map { $_ } ~~$y); a subscript's does
+	return !$self->_after_term if $prev->isa('PPI::Token::Structure') and $prev->content eq '}';
+	return '' if !$prev->isa('PPI::Token::Word');
+	return '' if $prevprev and $prevprev->isa('PPI::Token::Operator') and $prevprev->content eq '->';
+	my $word = $prev->content;
+	$word =~ s/^CORE:://;
+	return $KEYWORDS{$word} && !$NO_OPERAND{$word};
+}
+
 # Assuming we are currently parsing the word 'x', return true
 # if previous tokens imply the x is an operator, false otherwise.
 sub _current_x_is_operator {
@@ -793,11 +1189,16 @@ sub _current_x_is_operator {
 	my ($prev, $prevprev) = $self->_previous_significant_tokens(2);
 	return if !$prev;
 
-	return !$self->__current_token_is_forced_word if $prev->isa('PPI::Token::Word');
+	return !$self->__current_token_is_forced_word('x') if $prev->isa('PPI::Token::Word');
 
+	# After the } of a block that ends a statement (sub x3 { } x3();) or
+	# takes a list (map { } x3()) perl expects a statement or a term, and
+	# x is the repetition operator only where it expects an operator
+	# (toke.c: case 'x' tests PL_expect == XOPERATOR), so x, x3 are words.
 	return (!$prev->isa('PPI::Token::Operator') || $X_CAN_FOLLOW_OPERATOR{$prev})
 		&& (!$prev->isa('PPI::Token::Structure') || $X_CAN_FOLLOW_STRUCTURE{$prev})
 		&& !$prev->isa('PPI::Token::Label')
+		&& !$self->_after_statement_block
 	;
 }
 
@@ -808,6 +1209,12 @@ sub _current_x_is_operator {
 # during tokenization.
 sub __current_token_is_forced_word {
 	my ( $t, $word ) = @_;
+
+	# A lexical sub in scope is called by its bare name, also where the
+	# name is a keyword's (my sub s { ... } s(1)) -- but not after a term,
+	# where perl expects an operator ($n x 3 stays a repetition).
+	return 1 if $t->{lexical_subs} and defined $word
+		and $t->_lexical_sub_in_scope($word) and !$t->_after_term;
 
 	# Check if forced by preceding tokens.
 
@@ -827,6 +1234,17 @@ sub __current_token_is_forced_word {
 		# don't check its type.
 		pos $t->{line} = $t->{line_cursor};
 		return 1 if $content eq '{' and $t->{line} =~ /\G\s*\}/gc;
+
+		# The name of an element in a dereference block, ${name[0]} or
+		# @{name{a, b}}: perl reads an identifier straight after the { of a
+		# sigil (toke.c scan_ident), and a [ or { after it makes the block
+		# that element, keyword or not -- ${m{q}} is $m{q}, ${y[1]} is $y[1]
+		# (but ${sub{...}} is not, as in perl).
+		return 1 if $content eq '{' and $prevprev
+			and $prevprev->isa('PPI::Token::Cast')
+			and $prevprev->{content} =~ /^(?:\$|\@|%|&|\*|\$#)$/
+			and ( $t->{line} =~ /\G\s*\[/gc
+				or ( ( !defined $word or $word ne 'sub' ) and $t->{line} =~ /\G\s*\{/gc ) );
 
 		# sub, package, use, and no all indicate that what immediately follows
 		# is a word not an operator or (in the case of sub and package) a
@@ -851,6 +1269,66 @@ sub __current_token_is_forced_word {
 
 	# Otherwise we probably aren't forced
 	return '';
+}
+
+# Lexical subs (perl 5.18): my sub NAME, state sub NAME and our sub NAME
+# declare NAME for the rest of the enclosing block, and there the bare NAME
+# is the sub, also where it is a keyword's name (toke.c yyl_keylookup looks
+# a word up in the pad before the keyword table): after my sub s { ... },
+# s(1) is a call and not a substitution.  The tokenizer keeps the declared
+# names with the brace depth of their block, a bounded set that the } which
+# closes that block empties again; it is only kept once a file declares one.
+my %LEXICAL_SUB_DECLARATOR = map { $_ => 1 } qw( my our state );
+
+# Called by PPI::Token::Word for the word sub, and for the word after it
+# while a declaration is pending (before the new token is created).
+sub _lexical_sub_word {
+	my ( $self, $word ) = @_;
+	if ( defined $self->{lexical_sub_pending} ) {
+		my $depth = delete $self->{lexical_sub_pending};
+		push @{ $self->{lexical_subs} ||= [] }, [ $word, $depth ];
+		$self->{lexical_sub_depth} = $depth if !defined $self->{lexical_sub_depth};
+		return;
+	}
+	my ( $prev ) = $self->_previous_significant_tokens(1);
+	return if !$prev or !$prev->isa('PPI::Token::Word') or !$LEXICAL_SUB_DECLARATOR{ $prev->content };
+	if ( defined $self->{lexical_sub_depth} ) {
+		$self->{lexical_sub_pending} = $self->{lexical_sub_depth};
+		return;
+	}
+	# The first declaration: count the braces still open before it.
+	my $depth = 0;
+	for my $token ( @{ $self->{tokens} } ) {
+		next if !$token->isa('PPI::Token::Structure');
+		$depth++ if $token->content eq '{';
+		$depth-- if $token->content eq '}' and $depth;
+	}
+	$self->{lexical_sub_pending} = $depth;
+}
+
+# Called by _finalize_token for every token while a lexical sub is in scope.
+sub _lexical_sub_scope {
+	my ( $self, $token ) = @_;
+	return if ref $token ne 'PPI::Token::Structure';
+	if ( $token->{content} eq '{' ) {
+		$self->{lexical_sub_depth}++;
+	}
+	elsif ( $token->{content} eq '}' ) {
+		my $depth = --$self->{lexical_sub_depth};
+		my @left = grep { $_->[1] <= $depth } @{ $self->{lexical_subs} };
+		if ( @left ) {
+			$self->{lexical_subs} = \@left;
+		}
+		else {
+			delete $self->{lexical_subs};
+			delete $self->{lexical_sub_depth};
+		}
+	}
+}
+
+sub _lexical_sub_in_scope {
+	my ( $self, $word ) = @_;
+	return scalar grep { $_->[0] eq $word } @{ $self->{lexical_subs} };
 }
 
 sub _features {

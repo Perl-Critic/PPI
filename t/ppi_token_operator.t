@@ -4,7 +4,7 @@
 
 use lib 't/lib';
 use PPI::Test::pragmas;
-use Test::More tests => 3073 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+use Test::More tests => 3200 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 use PPI ();
 use PPI::Singletons qw( %KEYWORDS %OPERATOR );
@@ -690,10 +690,20 @@ OPERATOR_FAT_COMMA: {
 }
 
 OPERATORS_PLUS_MINUS: {
+    # A closing ) or ] ends a term, and so does a number of any kind, so
+    # the - after it is the subtraction operator, not part of a number.
     my @operands = (
-         '1',   '2',
-         '1',  '(2)',
-        '(1)', '(2)'
+         '1',     '2',
+         '1',    '(2)',
+        '(1)',   '(2)',
+        '(1)',    '2',
+        '(1)',   'length',
+        '$x[1]', '2',
+        '1.5',   '2',
+        '1e3',   '2',
+        '0x10',  '2',
+        '010',   '2',
+        '0b1',   '2',
     );
 
     for my $op (qw/- +/) {
@@ -707,24 +717,87 @@ OPERATORS_PLUS_MINUS: {
             is( $ops->[0]->content(), $op, "operator $op text matches" );
         }
     }
+}
 
-    # Add "'(1)', '2'" into operands once TODO is resolved.
-    {
-        my ( $a, $b ) = ( '(1)', '2' );
-        my $op = '+';
-        my $code = "${a}${op}${b}";
-        my $doc  = safe_new \$code;
-        my $ops = $doc->find('Token::Operator');
-        is( ref $ops, 'ARRAY', "found operator $op" );
+LOGICAL_XOR: {
+    # perl 5.40: $a ^^ $b is the logical exclusive or (there is no ^^=)
+    my $doc = safe_new \'my $r = $a ^^ $b;';
+    my $ops = $doc->find('Token::Operator') || [];
+    is( join( ',', map { $_->content } @$ops ), '=,^^', '^^ is one operator' );
+}
+
+TERM_INITIAL_COMPLEMENTS: {
+    # Where a term is expected, ~~ is two bitwise complements -- the
+    # "numify" idiom: perl -e '$y = "3"; print ~~$y' prints 3.  Where an
+    # operator is expected it is the smart match.
+    my @operators = (
+        'my $r = $x ~~ @a;'          => '=,~~',
+        'my $r = (/X/ ~~ @a);'       => '=,~~',
+        'my $r = $o->name ~~ @a;'    => '=,->,~~',
+    );
+    my @complements = (
+        'is(~~$y, 3);'           => '~,~,,',
+        'my $v = $a[~~2];'       => '=,~,~',
+    );
+    for ( my $i = 0; $i < @complements; $i += 2 ) {
+        my $doc = safe_new \$complements[$i];
+        my $ops = $doc->find('Token::Operator') || [];
+        is( join( ',', map { $_->content } @$ops ), $complements[$i + 1], "operators of $complements[$i]" );
+    }
+    for ( my $i = 0; $i < @operators; $i += 2 ) {
+        my $doc = safe_new \$operators[$i];
+        my $ops = $doc->find('Token::Operator') || [];
+        is( join( ',', map { $_->content } @$ops ), $operators[$i + 1], "operators of $operators[$i]" );
     }
 
-    TODO: {
-        my ( $a, $b ) = ( '(1)', '2' );
-        my $op = '-';
-        my $code = "${a}${op}${b}";
-        my $doc  = safe_new \$code;
-        my $ops = $doc->find('Token::Operator');
-        local $TODO = "(1)-2 not parsed correctly";
-        is( ref $ops, 'ARRAY', "found operator $op" );
+    # After a builtin that takes an operand, a term is expected too
+    # (print ~~$y numifies $y); after one that takes none (time,
+    # wantarray) the ~~ is the smart match.
+    my @after_listop = (
+        'print ~~$y;'            => '~,~',
+        'return ~~@a;'           => '~,~',
+    );
+    for ( my $i = 0; $i < @after_listop; $i += 2 ) {
+        my $doc = safe_new \$after_listop[$i];
+        my $ops = $doc->find('Token::Operator') || [];
+        is( join( ',', map { $_->content } @$ops ), $after_listop[$i + 1], "operators of $after_listop[$i]" );
+    }
+    my @no_operand = (
+        'my $r = time ~~ @a;'        => '=,~~',
+        'my $r = wantarray ~~ @a;'   => '=,~~',
+    );
+    for ( my $i = 0; $i < @no_operand; $i += 2 ) {
+        my $doc = safe_new \$no_operand[$i];
+        my $ops = $doc->find('Token::Operator') || [];
+        is( join( ',', map { $_->content } @$ops ), $no_operand[$i + 1], "operators of $no_operand[$i]" );
+    }
+}
+
+DOT_DIGIT_AFTER_A_TERM: {
+    # After a term, .2 is the concatenation operator and the number 2:
+    # perl -e '$_ = 1; print $_.2' prints 12.  Where a term is expected
+    # .5 is the number 0.5.
+    my @concat = (
+        'my $x = $_.2;'      => 'Operator=.,Number=2',
+        'my $z = $y[$i].3;'  => 'Operator=.,Number=3',
+        'my $s = "a".5;'     => 'Operator=.,Number=5',
+    );
+    for ( my $i = 0; $i < @concat; $i += 2 ) {
+        my $doc = safe_new \$concat[$i];
+        my @t = grep { $_->isa('PPI::Token::Operator') && $_->content eq '.' or $_->isa('PPI::Token::Number') }
+            $doc->tokens;
+        my $got = join ',', map { my $c = ref $_; $c =~ s/^PPI::Token:://; "$c=" . $_->content } @t;
+        is( $got, $concat[$i + 1], "tokens of $concat[$i]" );
+    }
+    my $doc = safe_new \'my $x = .5;';
+    my ($num) = grep { $_->isa('PPI::Token::Number') } $doc->tokens;
+    is( ( $num ? ref($num) . '=' . $num->content : '' ), 'PPI::Token::Number::Float=.5', '= .5 is the number 0.5' );
+
+    # A scalar filehandle is not a term: perl -e 'print $fh .5' writes 0.5
+    # to $fh (space before the ., none after it), as print $fh %h does.
+    {
+        my $doc = safe_new \'print $fh .5;';
+        my ($num) = grep { $_->isa('PPI::Token::Number') } $doc->tokens;
+        is( ( $num ? ref($num) . '=' . $num->content : '' ), 'PPI::Token::Number::Float=.5', 'print $fh .5 prints the number 0.5' );
     }
 }

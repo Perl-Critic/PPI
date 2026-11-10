@@ -17,14 +17,13 @@ PPI::Document
   PPI::Statement
     PPI::Token::Word  	'print'
     PPI::Structure::List  	( ... )
-      PPI::Statement::Compound
+      PPI::Statement
         PPI::Structure::Block  	{ ... }
           PPI::Token::Whitespace  	' '
           PPI::Statement
             PPI::Token::Word  	'STDOUT'
           PPI::Token::Whitespace  	' '
-      PPI::Token::Whitespace  	' '
-      PPI::Statement::Expression
+        PPI::Token::Whitespace  	' '
         PPI::Token::Quote::Single  	''Hello''
     PPI::Token::Structure  	';'
   PPI::Token::Whitespace  	'\n'

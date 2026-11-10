@@ -202,8 +202,11 @@ sub lex_tokenizer {
 		$Tokenizer->_features($feat);
 	}
 
-	# Lex the token stream into the document
+	# Lex the token stream into the document.  The tokenizer splits its
+	# source on "\n" and chomps pieces of it, so the caller's $/ (undef
+	# in slurp mode) must not reach it.
 	$self->{Tokenizer} = $Tokenizer;
+	local $/ = "\n";
 	if ( !eval { $self->_lex_document($Document); 1 } ) {
 		# If an error occurs DESTROY the partially built document.
 		$Tokenizer->_document(undef);
@@ -371,9 +374,20 @@ my %STATEMENT_CLASSES = (
 	'return'    => 'PPI::Statement::Break',
 	'goto'      => 'PPI::Statement::Break',
 
-	# Special sections of the file
+	# Special sections of the file; CORE:: spells the same separators
+	# (toke.c yyl_data_handle)
 	'__DATA__'  => 'PPI::Statement::Data',
 	'__END__'   => 'PPI::Statement::End',
+	'CORE::__DATA__' => 'PPI::Statement::Data',
+	'CORE::__END__'  => 'PPI::Statement::End',
+);
+
+# The statements of the class feature (perl 5.38; perly.y KW_CLASS,
+# KW_FIELD, PHASER), only under the feature
+my %CLASS_FEATURE_STATEMENTS = (
+	'class'  => 'PPI::Statement::Package',
+	'field'  => 'PPI::Statement::Variable',
+	'ADJUST' => 'PPI::Statement::Scheduled',
 );
 
 sub _statement {
@@ -422,10 +436,18 @@ sub _statement {
 
 	# Is it a token in our known classes list
 	my $content = $Token->content;
+	# try and defer open a compound statement only under their feature;
+	# under the class feature class declares a package, field a variable
+	# and ADJUST a phaser block (method is a sub, below) -- the shapes of
+	# upstream PR #346
+	my $features = $self->{features_stack}[-1] || {};
 	my $class =
-	  ( $content eq 'try' and ( $self->{features_stack}[-1] || {} )->{try} )
+	  ( ( $content eq 'try' or $content eq 'defer' ) and $features->{$content} )
 	  ? 'PPI::Statement::Compound'
+	  : ( $features->{class} and $CLASS_FEATURE_STATEMENTS{$content} )
+	  ? $CLASS_FEATURE_STATEMENTS{$content}
 	  : $STATEMENT_CLASSES{$content};
+	my $is_method = $features->{class} && $content eq 'method';
 
 	if ( $class ) {
 		# Is the next significant token a =>
@@ -511,8 +533,8 @@ sub _statement {
 	# If it's a token in our list, use that class
 	return $class if $class;
 
-	# Handle the more in-depth sub detection
-	if ( $is_lexsub || $content eq 'sub' ) {
+	# Handle the more in-depth sub detection (a method NAME is a sub too)
+	if ( $is_lexsub || $content eq 'sub' || $is_method ) {
 		# Read ahead to the next significant token
 		my $Next;
 		while ( $Next = $self->_get_token ) {
@@ -524,7 +546,7 @@ sub _statement {
 
 			# Got the next significant token
 			my $sclass = $STATEMENT_CLASSES{$Next->content};
-			if ( $sclass and $sclass eq 'PPI::Statement::Scheduled' ) {
+			if ( !$is_method and $sclass and $sclass eq 'PPI::Statement::Scheduled' ) {
 				$self->_rollback( $Next );
 				return 'PPI::Statement::Scheduled';
 			}
@@ -673,6 +695,13 @@ sub _lex_statement {
 			}
 		}
 
+		# The body of a format ends its declaration, as a ; ends a statement
+		if ( $Token->isa('PPI::Token::Format') ) {
+			$self->_add_element( $Statement, $Token );
+			$self->_update_features( $Statement );
+			return 1;
+		}
+
 		# Any normal character just gets added
 		unless ( $Token->isa('PPI::Token::Structure') ) {
 			$self->_add_element( $Statement, $Token );
@@ -746,12 +775,21 @@ sub _continues {
 
 	# Handle the simple block case
 	# { print 1; }
+	# A bare block is a loop that runs once, so it takes a continue block
+	# like the labelled form below (perly.y: block cont)
+	# { print 1; } continue { print 2; }
 	if (
 		$Statement->schildren == 1
 		and
 		$Statement->schild(0)->isa('PPI::Structure::Block')
 	) {
-		return '';
+		return (
+			$Statement->isa('PPI::Statement::Compound')
+			and
+			$Token->isa('PPI::Token::Word')
+			and
+			$Token->content eq 'continue'
+		) ? 1 : '';
 	}
 
 	# Alrighty then, there are six implied-end statement types:
@@ -846,6 +884,12 @@ sub _continues {
 		return '';
 	}
 
+	# The loop variable of a foreach, up to its ( LIST )
+	if ( $type eq 'for' or $type eq 'foreach' ) {
+		my $head = $self->_foreach_head( \@part, $Token );
+		return $head if defined $head;
+	}
+
 	# Handle the common "after round braces" case
 	if ( $LastChild->isa('PPI::Structure') and $LastChild->braces eq '()' ) {
 		# LABEL while (EXPR) ...
@@ -900,6 +944,12 @@ sub _continues {
 		}
 	}
 
+	if ( $type eq 'defer' ) {
+		# defer BLOCK (perly.y: KW_DEFER mblock): the block ends it
+		return $LastChild->isa('PPI::Token::Word')
+		  && $Token->isa('PPI::Token::Structure') && $Token->content eq '{';
+	}
+
 	# Handle the common continue case
 	if ( $LastChild->isa('PPI::Token::Word') and $LastChild->content eq 'continue' ) {
 		# LABEL while (EXPR) BLOCK continue ...
@@ -910,17 +960,23 @@ sub _continues {
 	}
 
 	if ( $type eq 'try' and $LastChild->presumed_features->{try} ) {
+		# try BLOCK catch (VAR) BLOCK
+		# try BLOCK catch (VAR) BLOCK finally BLOCK
+		# try BLOCK finally BLOCK                    (Syntax::Keyword::Try)
 		return 1 if not $LastChild->isa('PPI::Structure::Block');
 
+		# The block after a finally ends the statement
 		my $NextLast = $Statement->schild(-2);
-		return ''
-		  if $NextLast
-		  and $NextLast->isa('PPI::Token')
-		  and $NextLast->isa('PPI::Token::Word')
-		  and $NextLast->content eq 'catch';
+		my $after =
+		  ( $NextLast and $NextLast->isa('PPI::Token::Word') )
+		  ? $NextLast->content
+		  : '';
+		return '' if $after eq 'finally';
 
-		return 1    #
-		  if $Token->isa('PPI::Token::Word') and $Token->content eq 'catch';
+		# Only a catch (after the try block) or a finally will do
+		return '' if not $Token->isa('PPI::Token::Word');
+		return 1 if $Token->content eq 'finally';
+		return 1 if $Token->content eq 'catch' and $after ne 'catch';
 
 		return '';
 	}
@@ -1037,6 +1093,76 @@ sub _continues {
 
 
 
+# The loop variable of a foreach.  perly.y reads, between the for word and
+# the ( LIST ):
+#
+#   [my|our|state] $x            for my $x (LIST)
+#   a dereference                for $$f (LIST), for ${$r} (LIST)
+#   a refaliasing variable       for \my %h (LIST), for my \%h (LIST)
+#   my and a list of scalars     for my ($q, $r) (LIST)   (5.36)
+#
+# Given the significant children of the compound and the next token,
+# returns true to continue, '' to end, or undef once the variable (and
+# anything else this does not know) is past: the callers' rules decide.
+sub _foreach_head {
+	my ($self, $part, $Token) = @_;
+	my $i = $part->[0]->isa('PPI::Token::Label') ? 1 : 0;
+	return undef if $part->[$i]->content !~ /^for(?:each)?\z/;
+	my @head = @{$part}[ $i + 1 .. $#$part ];
+
+	# Classify the head so far; a part that cannot be in a loop variable
+	# (a C-style head, the LIST itself) hands back to the callers.
+	my $decl = sub {
+		my $e = shift;
+		$e and $e->isa('PPI::Token::Word') and $e->content =~ /^(?:my|our|state)\z/;
+	};
+	my $state = 'start';    # start | open | done
+	for my $j ( 0 .. $#head ) {
+		my $e    = $head[$j];
+		my $prev = $j ? $head[ $j - 1 ] : undef;
+		return undef if $state eq 'done';
+		if ( $decl->($e) or $e->isa('PPI::Token::Cast') ) {
+			$state = 'open';
+		} elsif ( $e->isa('PPI::Token::Symbol') or $e->isa('PPI::Token::Magic') ) {
+			$state = 'done';
+		} elsif ( $e->isa('PPI::Structure::Block') and _INSTANCE( $prev, 'PPI::Token::Cast' ) ) {
+			$state = 'done';
+		} elsif (
+			$e->isa('PPI::Structure') and $e->braces eq '()'
+			and _INSTANCE( $prev, 'PPI::Token::Word' ) and $prev->content eq 'my'
+		) {
+			$state = 'done';
+		} else {
+			return undef;
+		}
+	}
+	return undef if $state eq 'start' and not $Token->isa('PPI::Token::Cast');
+
+	my $open_round = $Token->isa('PPI::Token::Structure') && $Token->content eq '(';
+	my $qw         = $Token->isa('PPI::Token::QuoteLike::Words');
+	if ( $state eq 'done' ) {
+		# The variable is complete: the LIST comes next
+		return ( $open_round or $qw ) ? 1 : '';
+	}
+
+	# Inside the variable: a declarator, a cast, a symbol, a
+	# dereference block after a cast, or the scalar list after my/our
+	my $last = $head[-1];
+	return 1 if $decl->($Token) and not $decl->($last);
+	return 1 if $Token->isa('PPI::Token::Cast');
+	return 1 if $Token->isa('PPI::Token::Symbol') or $Token->isa('PPI::Token::Magic');
+	return 1 if $open_round and $last->isa('PPI::Token::Word') and $last->content eq 'my';
+	return 1
+	  if $Token->isa('PPI::Token::Structure')
+	  and $Token->content eq '{'
+	  and $last->isa('PPI::Token::Cast');
+	return '';
+}
+
+
+
+
+
 #####################################################################
 # Lex Methods - Structure Object
 
@@ -1050,8 +1176,13 @@ sub _round {
 	# Get the last significant element in the parent
 	my $Element = $Parent->schild(-1);
 	if ( _INSTANCE($Element, 'PPI::Token::Word') ) {
-		# Can it be determined because it is a keyword?
-		my $rclass = $ROUND{$Element->content};
+		# Can it be determined because it is a keyword?  Not after a ->:
+		# a word there is a method name (toke.c reads it where it expects
+		# an operator), so $obj->if(1) calls the method if, and the ( opens
+		# its arguments.
+		my $prior  = $Parent->schild(-2);
+		my $method = $prior && $prior->isa('PPI::Token::Operator') && $prior->content eq '->';
+		my $rclass = !$method && $ROUND{$Element->content};
 		return $rclass if $rclass;
 	}
 
@@ -1078,6 +1209,70 @@ sub _round {
 	'PPI::Structure::List'
 }
 
+# The first token after a { that a comma after it makes an anonymous
+# hash (toke.c's curly look-ahead): a quote, or a run of word characters
+# -- a number such as 1 or 0x1F, a word -- unless it starts with a
+# lower-case letter.  { 1.5, 2 } and { foo, 1 } stay blocks.
+sub _hash_comma_head {
+	my $Token = shift or return '';
+	return 1 if $Token->isa('PPI::Token::Quote');
+	return 1 if $Token->isa('PPI::Token::QuoteLike::Words');      # qw()
+	return 1 if $Token->isa('PPI::Token::QuoteLike::Backtick');   # ``
+	return 1 if $Token->isa('PPI::Token::QuoteLike::Command');    # qx()
+	my $content = $Token->content;
+	return '' if $content !~ /\A\w+\z/;
+	return 1 if $Token->isa('PPI::Token::Number');
+	return $Token->isa('PPI::Token::Word') && $content !~ /\A[a-z]/;
+}
+
+# Is the last child of the parent the block of a dereference -- a $, @, %
+# or * cast before it, as in ${$ref}, @{$ref}, %{$ref}, ${name} or
+# *{"name"}?  A [ or { right after it subscripts it, as after the symbol
+# it stands for.
+sub _deref_block {
+	my $Parent = shift;
+	my $prior  = $Parent->schild(-2) or return '';
+	return $prior->isa('PPI::Token::Cast') && $prior->content =~ /^[\$\@\%\*]\z/;
+}
+
+# The list operators whose block perl lexes where it expects a reference
+# (toke.c: LOP(..., XREF)): the block of map, grep and sort, and the
+# filehandle block of print, printf, say, exec and system.
+my %XREF_BLOCK_WORD = map { $_ => 1 } qw{map grep sort print printf say exec system};
+
+# Is the (still empty) statement the first thing inside a block that perl
+# opens where it expects a reference -- the block of map, grep or sort, a
+# print-family filehandle block, or the block of a $ @ % & $# dereference?
+# toke.c yyl_leftcurly, block_expectation: a { right after such a { makes
+# perl expect a term, so that { is an anonymous hash ("treat it as a term
+# to make ${{...}}{k} ... dwim"), whatever follows it:
+# map { { %$_, x => 1 } } LIST returns one hash per element.
+sub _opens_xref_block {
+	my $Statement = shift;
+	my $Block = $Statement->parent;
+	return '' if !_INSTANCE($Block, 'PPI::Structure::Block');
+	# the first child that is not whitespace, a comment or POD (a null
+	# statement counts: after map {; the { opens a statement)
+	my ($first) = grep { !$_->isa('PPI::Token') or $_->significant } $Block->children;
+	return '' if !$first or $first != $Statement;
+	my $prior = $Block->sprevious_sibling;
+	if ( !$prior ) {
+		# map({ ... } LIST): the block opens the list after the word
+		my $Outer = $Block->parent;
+		return '' if !$Outer or $Outer->schild(0) != $Block;
+		my $List = $Outer->parent;
+		return '' if !_INSTANCE($List, 'PPI::Structure::List');
+		return '' if $List->schild(0) != $Outer;
+		$prior = $List->sprevious_sibling or return '';
+		return '' if !$prior->isa('PPI::Token::Word');
+	}
+	return 1 if $prior->isa('PPI::Token::Cast') and $prior->content =~ /\A(?:\$\#?|\@|\%|\&)\z/;
+	return '' if !$prior->isa('PPI::Token::Word');
+	my $word = $prior->content;
+	$word =~ s/\ACORE:://;
+	return $XREF_BLOCK_WORD{$word} ? 1 : '';
+}
+
 # Given a parent element, and a [ token to open a structure, determine
 # the class that the structure should be.
 sub _square {
@@ -1100,8 +1295,8 @@ sub _square {
 			# $foo{}[]
 			return 'PPI::Structure::Subscript';
 		}
-		if ( $Element->isa('PPI::Token::Symbol') and $Element->content =~ /^(?:\$|\@)/ ) {
-			# $foo[], @foo[]
+		if ( $Element->isa('PPI::Token::Symbol') and $Element->content =~ /^[\$\@\%]/ ) {
+			# $foo[], @foo[], %foo[] (a key/value slice)
 			return 'PPI::Structure::Subscript';
 		}
 		if ( $Element->isa('PPI::Token::Cast') and $Element->content =~ /^(?:\@|\%)/ ) {
@@ -1110,6 +1305,19 @@ sub _square {
 				# Postfix dereference: ->@[...] ->%[...]
 				return 'PPI::Structure::Subscript';
 			}
+		}
+		if ( $Element->isa('PPI::Structure::Block') and _deref_block($Parent) ) {
+			# ${$aref}[0], ${name}[0], @{$aref}[0, 1], %{$aref}[0, 1]
+			return 'PPI::Structure::Subscript';
+		}
+		if ( $Element->isa('PPI::Structure::List')
+		  or $Element->isa('PPI::Structure::Condition')
+		  or $Element->isa('PPI::Token::QuoteLike::Words') ) {
+			# (1, 2, 3)[1], (stat $f)[7], qw(a b c)[1], EXPR if (0, 1)[1]:
+			# after the ) of a list perl expects an operator (toke.c
+			# yyl_rightparen returns a term), so the [ slices the list.
+			# $code->()[0] is the same subscript with the arrow left out.
+			return 'PPI::Structure::Subscript';
 		}
 		# FIXME - More cases to catch
 	}
@@ -1147,6 +1355,12 @@ my %CURLY_CLASSES = (
 	'bless'  => 'PPI::Structure::Constructor', # pragmatic --
 				# perlfunc says first arg is a reference, and
 			# bless {; ... } fails to compile.
+	# After these named operators perl expects a term (toke.c: XTERM),
+	# and a { there is always an anonymous hash: die { code => 42 }
+	'die'    => 'PPI::Structure::Constructor',
+	'warn'   => 'PPI::Structure::Constructor',
+	'exists' => 'PPI::Structure::Constructor',
+	'delete' => 'PPI::Structure::Constructor',
 );
 
 my @CURLY_LOOKAHEAD_CLASSES = (
@@ -1183,8 +1397,13 @@ sub _curly {
 			# $foo[]{}
 			return 'PPI::Structure::Subscript';
 		}
-		if ( $content =~ /^(?:\$|\@)/ and $Element->isa('PPI::Token::Symbol') ) {
-			# $foo{}, @foo{}
+		if ( $content =~ /^[\$\@\%]/ and $Element->isa('PPI::Token::Symbol') ) {
+			# $foo{}, @foo{}, %foo{} (a key/value slice)
+			return 'PPI::Structure::Subscript';
+		}
+		if ( $content =~ /^\*/ and $Element->isa('PPI::Token::Symbol') ) {
+			# *STDOUT{IO}, *x{HASH}: a glob is a complete term, and the
+			# { after a term subscripts it (toke.c: XOPERATOR)
 			return 'PPI::Structure::Subscript';
 		}
 		if ( $Element->isa('PPI::Token::Cast') and $Element->content =~ /^(?:\@|\%|\*)/ ) {
@@ -1194,17 +1413,12 @@ sub _curly {
 				return 'PPI::Structure::Subscript';
 			}
 		}
-		if ( $Element->isa('PPI::Structure::Block') ) {
+		if ( $Element->isa('PPI::Structure::Block') and _deref_block($Parent) ) {
 			# deference - ${$hash_ref}{foo}
 			#     or even ${burfle}{foo}
 			# hash slice - @{$hash_ref}{'foo', 'bar'}
-			if ( my $prior = $Parent->schild(-2) ) {
-				my $prior_content = $prior->content();
-				$prior->isa( 'PPI::Token::Cast' )
-					and ( $prior_content eq '@' ||
-						$prior_content eq '$' )
-					and return 'PPI::Structure::Subscript';
-			}
+			# key/value slice - %{$hash_ref}{'foo', 'bar'}
+			return 'PPI::Structure::Subscript';
 		}
 
 		# Are we the last argument of sub?
@@ -1215,6 +1429,12 @@ sub _curly {
 		# E.g.: 'package Foo {}' or 'package Foo v1.2.3 {}'
 		return 'PPI::Structure::Block'
 			if $Parent->isa('PPI::Statement::Package');
+
+		if ( $content =~ /\A(?:map|grep)\z/ and $Element->isa('PPI::Token::Word') ) {
+			# map {a => $_}, LIST builds hashes, map { $_ => 1 } LIST
+			# is a block: the look-ahead perl applies there decides
+			return $self->_curly_hash_lookahead || 'PPI::Structure::Block';
+		}
 
 		if ( $CURLY_CLASSES{$content} ) {
 			# Known type
@@ -1228,8 +1448,13 @@ sub _curly {
 		return 'PPI::Structure::Block';
 	}
 
-	# Are we the second or third argument of use
-	if ( $Parent->isa('PPI::Statement::Include') ) {
+	# Are we the second or third argument of use -- right after the
+	# module name or its version?  (After a cast, as in require *{"name"},
+	# the { opens the cast's dereference block, below.)
+	if ( $Parent->isa('PPI::Statement::Include')
+		and $Element
+		and !$Element->isa('PPI::Token::Cast') )
+	{
 		if ( $Parent->schildren == 2 ||
 		    $Parent->schildren == 3 &&
 			$Parent->schild(2)->isa('PPI::Token::Number')
@@ -1243,6 +1468,11 @@ sub _curly {
 	### FIXME This is possibly a bad choice, but will have to do for now.
 	return 'PPI::Structure::Block' if $Element;
 
+	# The first thing inside a block opened where perl expects a reference
+	# -- map { { %$_, x => 1 } } LIST, ${ { $k, 1 } }{a} -- is an anonymous
+	# hash, whatever follows it
+	return 'PPI::Structure::Constructor' if _opens_xref_block($Parent);
+
 	if (
 		$Parent->isa('PPI::Statement')
 		and
@@ -1251,30 +1481,69 @@ sub _curly {
 		my $function = $Parent->parent->parent->schild(-2);
 
 		# Special case: Are we the param of a core function
-		# i.e. map({ $_ => 1 } @foo)
+		# i.e. map({ $_ => 1 } @foo) -- but map({a => $_}, @foo) builds
+		# hashes, by the same look-ahead as without the parentheses
+		return $self->_curly_hash_lookahead || 'PPI::Structure::Block'
+			if $function and $function->content =~ /^(?:map|grep)$/;
 		return 'PPI::Structure::Block'
-			if $function and $function->content =~ /^(?:map|grep|sort|eval|do)$/;
+			if $function and $function->content =~ /^(?:sort|eval|do)$/;
 
 		# If not part of a block print, list-embedded curlies are most likely constructors
-		return 'PPI::Structure::Constructor'
-			if not $function or $function->content !~ /^(?:print|say)$/;
+		my $block_fh = $function
+		  && $function->content =~ /^(?:CORE::)?(?:print|printf|say|exec|system)$/;
+		return 'PPI::Structure::Constructor' if not $block_fh;
+
+		# print({$fh} LIST): a filehandle (or program) block opens the one
+		# statement of the list; the look-ahead below tells it from
+		# print({a => 1}).  The statement stays plain, so the list
+		# continues after the block.
+		return $self->_curly_lookahead || 'PPI::Structure::Block';
 	}
 
 	# We need to scan ahead.
+	my $class = $self->_curly_lookahead;
+	return $class if $class;
+
+	# Hit the end of the document, or bailed out, go with block
+	if ( ref $Parent eq 'PPI::Statement' ) {
+		bless $Parent, 'PPI::Statement::Compound';
+	}
+	return 'PPI::Structure::Block';
+}
+
+# Look at the tokens after a { whose class its neighbours do not decide,
+# and return the class they decide, or '' (then it is a block).  The
+# tokens are put back.
+sub _curly_lookahead {
+	my $self = shift;
 	my $Next;
 	my $position = 0;
 	my @delayed;
+	my $first;
 	while ( $Next = $self->_get_token ) {
 		unless ( $Next->significant ) {
 			push @delayed, $Next;
 			next;
 		}
 
+		# perl (toke.c): a string, a number or a word that does not
+		# start with a lower-case letter, followed by a comma, makes an
+		# anonymous hash: { 'a', 1 }, { 1, 2 }, { Foo, 1 }
+		$first = $Next if $position == 0;
+		if (
+			$position == 1
+			and $Next->content eq ','
+			and _hash_comma_head($first)
+		) {
+			$self->_buffer( splice(@delayed), $Next );
+			return 'PPI::Structure::Constructor';
+		}
+
 		# If we are off the end of the lookahead array,
 		if ( ++$position >= @CURLY_LOOKAHEAD_CLASSES ) {
 			# default to block.
 			$self->_buffer( splice(@delayed), $Next );
-			last;
+			return '';
 		# If the content at this position is known
 		} elsif ( my $class = $CURLY_LOOKAHEAD_CLASSES[$position]
 			{$Next->content} ) {
@@ -1287,14 +1556,47 @@ sub _curly {
 		push @delayed, $Next;
 	}
 
-	# Hit the end of the document, or bailed out, go with block
+	# Hit the end of the document
 	$self->_buffer( splice(@delayed) );
-	if ( ref $Parent eq 'PPI::Statement' ) {
-		bless $Parent, 'PPI::Statement::Compound';
-	}
-	return 'PPI::Structure::Block';
+	return '';
 }
 
+
+# The look-ahead perl (toke.c yyl_leftcurly) applies to the { of a map or
+# a grep: an immediate }, or a word, number or string followed by => --
+# or by a comma, unless it is a word that starts with a lower-case
+# letter -- opens an anonymous hash.  Returns the class or '' (then it is
+# a block).  The tokens are put back.
+sub _curly_hash_lookahead {
+	my $self = shift;
+	my ( @delayed, @sig );
+	while ( @sig < 2 ) {
+		my $Next = $self->_get_token or last;
+		push @delayed, $Next;
+		push @sig, $Next if $Next->significant;
+	}
+	$self->_buffer(@delayed);
+	return '' if not @sig;
+	return 'PPI::Structure::Constructor'
+		if $sig[0]->isa('PPI::Token::Structure') and $sig[0]->content eq '}';
+	return '' if @sig < 2;
+	my ( $head, $sep ) = @sig;
+	return 'PPI::Structure::Constructor'
+		if $sep->content eq '=>' and _hash_arrow_head($head);
+	return 'PPI::Structure::Constructor'
+		if $sep->content eq ',' and _hash_comma_head($head);
+	return '';
+}
+
+# A word, a number or a string: what perl's look-ahead takes as the key
+# before a =>
+sub _hash_arrow_head {
+	my $Token = shift;
+	return 1 if $Token->isa('PPI::Token::Quote');
+	return 1 if $Token->isa('PPI::Token::QuoteLike::Backtick');
+	return 1 if $Token->isa('PPI::Token::QuoteLike::Command');
+	return $Token->content =~ /\A\w+\z/ ? 1 : '';
+}
 
 sub _lex_structure {
 	my ($self, $Structure) = @_;

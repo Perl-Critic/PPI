@@ -41,7 +41,7 @@ L<PPI::Token> and L<PPI::Element> classes.
 
 use strict;
 use PPI::Token ();
-use PPI::Singletons '%OPERATOR';
+use PPI::Singletons qw' %OPERATOR ';
 
 our $VERSION = '1.292';
 
@@ -65,11 +65,18 @@ sub __TOKENIZER__on_char {
 		$content . substr( $t->{line}, $t->{line_cursor}, 4 - length($content) ) eq '<<>>') {
 		return 1;
 	}
+	# Where a term is expected, ~~ is two bitwise complements (~~$y), not
+	# the smart match.
+	if ( $content eq '~' and $char eq '~' and $t->_term_expected ) {
+		return $t->_finalize_token->__TOKENIZER__on_char( $t );
+	}
 	return 1 if $OPERATOR{ $content . $char };
 
 	# Handle the special case of a .1234 decimal number
 	if ( $content eq '.' ) {
-		if ( $char =~ /^[0-9]$/ ) {
+		# .5 is a number only in TERM position; after a term ($x.2, $h{a}.2,
+		# $o->name.2) it is the concatenation operator
+		if ( $char =~ /^[0-9]$/ and !$t->_after_term ) {
 			# This is a decimal number
 			$t->{class} = $t->{token}->set_class('Number::Float');
 			return $t->{class}->__TOKENIZER__on_char( $t );

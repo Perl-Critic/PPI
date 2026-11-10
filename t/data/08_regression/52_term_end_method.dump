@@ -1,0 +1,34 @@
+PPI::Document
+  PPI::Statement
+    PPI::Token::Symbol  	'$o'
+    PPI::Token::Operator  	'->'
+    PPI::Token::Word  	'w'
+    PPI::Token::Operator  	'*'
+    PPI::Token::Word  	'w'
+    PPI::Structure::List  	( ... )
+    PPI::Token::Structure  	';'
+  PPI::Token::Whitespace  	'\n'
+  PPI::Statement
+    PPI::Token::Symbol  	'$o'
+    PPI::Token::Operator  	'->'
+    PPI::Token::Word  	'name'
+    PPI::Token::Operator  	'.'
+    PPI::Token::Number  	'2'
+    PPI::Token::Structure  	';'
+  PPI::Token::Whitespace  	'\n'
+  PPI::Statement
+    PPI::Token::Symbol  	'$o'
+    PPI::Token::Operator  	'->'
+    PPI::Token::Word  	'h'
+    PPI::Token::Operator  	'%'
+    PPI::Token::Number  	'-1'
+    PPI::Token::Structure  	';'
+  PPI::Token::Whitespace  	'\n'
+  PPI::Statement
+    PPI::Token::Symbol  	'$o'
+    PPI::Token::Operator  	'->'
+    PPI::Token::Word  	'w'
+    PPI::Token::Operator  	'-'
+    PPI::Token::Number  	'1'
+    PPI::Token::Structure  	';'
+  PPI::Token::Whitespace  	'\n'

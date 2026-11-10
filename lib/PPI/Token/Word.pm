@@ -123,7 +123,7 @@ sub __TOKENIZER__on_char {
 
 	# Suck in till the end of the bareword
 	pos $t->{line} = $t->{line_cursor};
-	if ( $t->{line} =~ m/\G(\w+(?:(?:\'|::)\w+)*(?:::)?)/gc ) {
+	if ( $t->{line} =~ m/\G(\w+(?:(?:\'|(?:::)+)\w+)*(?:::)?)/gc ) {
 		my $word = $1;
 		# Special Case: If we accidentally treat eq'foo' like
 		# the word "eq'foo", then just make 'eq' (or whatever
@@ -145,7 +145,7 @@ sub __TOKENIZER__on_char {
 	my $word = $t->{token}->{content};
 	if ( $KEYWORDS{$word} ) {
 		# Check for a Perl keyword that is forced to be a normal word instead
-		if ( $t->__current_token_is_forced_word ) {
+		if ( $t->__current_token_is_forced_word($word) ) {
 			$t->{class} = $t->{token}->set_class( 'Word' );
 			return $t->{class}->__TOKENIZER__on_char( $t );
 		}
@@ -177,9 +177,10 @@ sub __TOKENIZER__on_char {
 		$t->{line_cursor}++;
 		$t->{class} = $t->{token}->set_class( 'Label' );
 
-	# If not a label, '_' on its own is the magic filehandle
+	# If not a label, '_' on its own is the magic filehandle, unless it
+	# names a sub
 	} elsif ( $word eq '_' ) {
-		$t->{class} = $t->{token}->set_class( 'Magic' );
+		$t->{class} = $t->{token}->set_class( __underscore_class($t) );
 
 	}
 
@@ -197,7 +198,7 @@ sub __TOKENIZER__commit {
 	# Our current position is the first character of the bareword.
 	# Capture the bareword.
 	pos $t->{line} = $t->{line_cursor};
-	unless ( $t->{line} =~ m/\G((?!\d)\w+(?:(?:\'|::)\w+)*(?:::)?)/gc ) {
+	unless ( $t->{line} =~ m/\G((?!\d)\w+(?:(?:\'|(?:::)+)\w+)*(?:::)?)/gc ) {
 		# Programmer error
 		die sprintf "Fatal error... regex failed to match in '%s' when expected", substr $t->{line}, $t->{line_cursor};
 	}
@@ -219,8 +220,17 @@ sub __TOKENIZER__commit {
 			: $t->{class}->__TOKENIZER__on_char($t);
 	}
 
-	# Check for the end of the file
-	if ( $word eq '__END__' ) {
+	# A fat comma after __END__ or __DATA__ (on the same line) makes it an
+	# ordinary word, the string "__END__": perl tests for => right after a
+	# word before it looks the word up as a keyword (toke.c yyl_keylookup),
+	# so our %K = ( __DATA__ => 1 ) is a hash, not the start of the data.
+	my $fat_comma = ( $word eq '__END__' or $word eq '__DATA__' )
+		&& substr( $t->{line}, $t->{line_cursor} ) =~ /^\s*=>/;
+
+	# Check for the end of the file.  CORE::__END__ ends it too: perl
+	# reads either spelling as the end of the code (toke.c
+	# yyl_data_handle), so the rest of the file is never code.
+	if ( !$fat_comma and ( $word eq '__END__' or $word eq 'CORE::__END__' ) ) {
 		# Create the token for the __END__ itself
 		$t->_new_token( 'Separator', $1 );
 		$t->_finalize_token;
@@ -234,7 +244,7 @@ sub __TOKENIZER__commit {
 		my $end_rest = substr( $t->{line}, $t->{line_cursor} );
 		$t->{line_cursor} = length $t->{line};
 		if ( $end_rest =~ /\n$/ ) {
-			chomp $end_rest;
+			$end_rest =~ s/\n\z//;  # not chomp: the caller's $/ may be anything
 			$t->_new_token( 'Comment', $end_rest ) if length $end_rest;
 			$t->_new_token( 'Whitespace', "\n" );
 		} else {
@@ -245,8 +255,8 @@ sub __TOKENIZER__commit {
 		return 0;
 	}
 
-	# Check for the data section
-	if ( $word eq '__DATA__' ) {
+	# Check for the data section (CORE::__DATA__ is the same)
+	if ( !$fat_comma and ( $word eq '__DATA__' or $word eq 'CORE::__DATA__' ) ) {
 		# Create the token for the __DATA__ itself
 		$t->_new_token( 'Separator', "$1" );
 		$t->_finalize_token;
@@ -258,7 +268,7 @@ sub __TOKENIZER__commit {
 		my $data_rest = substr( $t->{line}, $t->{line_cursor} );
 		$t->{line_cursor} = length $t->{line};
 		if ( $data_rest =~ /\n$/ ) {
-			chomp $data_rest;
+			$data_rest =~ s/\n\z//;  # not chomp: the caller's $/ may be anything
 			$t->_new_token( 'Comment', $data_rest ) if length $data_rest;
 			$t->_new_token( 'Whitespace', "\n" );
 		} else {
@@ -274,7 +284,7 @@ sub __TOKENIZER__commit {
 		# Since it's not a simple identifier...
 		$token_class = 'Word';
 
-	} elsif ( $KEYWORDS{$word} and $t->__current_token_is_forced_word ) {
+	} elsif ( $KEYWORDS{$word} and $t->__current_token_is_forced_word($word) ) {
 		$token_class = 'Word';
 
 	} elsif ( $QUOTELIKE{$word} ) {
@@ -305,7 +315,7 @@ sub __TOKENIZER__commit {
 				# attribute operator doesn't directly
 				# touch the object name already works.
 				$token_class = 'Word';
-			} elsif ( !($tokens[0] and $tokens[0]->isa('PPI::Token::Operator')) ) {
+			} elsif ( $t->_label_position($tokens[0]) ) {
 				$word .= $1;
 				$t->{line_cursor} += length($1);
 				$token_class = 'Label';
@@ -313,11 +323,21 @@ sub __TOKENIZER__commit {
 				$token_class = 'Word';
 			}
 		} elsif ( $word eq '_' ) {
-			$token_class = 'Magic';
+			$token_class = __underscore_class($t);
 		} else {
 			$token_class = 'Word';
 		}
 	}
+
+	# A format declaration: the tokens of its header line, then its body
+	if ( $token_class eq 'Word' and $word eq 'format' ) {
+		my $rv = $t->_format_declaration;
+		return $rv if defined $rv;
+	}
+
+	# A lexical sub's declaration names it for the rest of its block
+	$t->_lexical_sub_word($word)
+		if $token_class eq 'Word' and ( $word eq 'sub' or defined $t->{lexical_sub_pending} );
 
 	# Create the new token and finalise
 	$t->_new_token( $token_class, $word );
@@ -330,6 +350,23 @@ sub __TOKENIZER__commit {
 }
 
 
+
+# A sub name that opens with the old package separator ' (sub 'Hello'_x):
+# the caller (PPI::Token::Whitespace) has checked that a name follows.
+sub __TOKENIZER__commit_quoted_name {
+	my ( $class, $t ) = @_;
+	pos $t->{line} = $t->{line_cursor};
+	$t->{line} =~ m/\G('(?!\d)\w+(?:(?:'(?!\d)|(?:::)+)\w+)*)/gc
+	  or die "Fatal error... quoted sub name expected";
+	my $word = $1;
+	$t->{line_cursor} += length $word;
+	$t->_new_token( 'Word', $word );
+	if ( $t->{line_cursor} >= $t->{line_length} ) {
+		$t->_finalize_token;
+		return 0;
+	}
+	$t->_finalize_token->__TOKENIZER__on_char($t);
+}
 
 # Is the current Word really a subroutine attribute?
 sub __current_token_is_attribute {
@@ -344,6 +381,15 @@ sub __current_token_is_attribute {
 			or $tokens[0]->isa('PPI::Token::Attribute')
 		)
 	);
+}
+
+# The class of a lone `_`: right after `sub` it names the sub
+# (sub _ { ... }); anywhere else it is the stat filehandle.
+sub __underscore_class {
+	my ( $t ) = @_;
+	my ( $prev ) = $t->_previous_significant_tokens(1);
+	return 'Word' if $prev and $prev->isa('PPI::Token::Word') and $prev->content eq 'sub';
+	return 'Magic';
 }
 
 1;

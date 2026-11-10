@@ -1,0 +1,7 @@
+for $$f (5, 11) { push @seen, $$f }
+for ${*$f} (5, 11) { 1 }
+foreach my ($q, $r) (@l) { print "$q$r" }
+for \my %h (@l) { 1 }
+for my \@a (@l) { 1 }
+L: for \$x (@l) { 1 }
+print "x\n";

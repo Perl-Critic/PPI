@@ -1,0 +1,9 @@
+$h{a}*f();
+$h{a}%-1;
+$x->{a}{b}*f();
+@{$h}*$x;
+do { 1 }*f();
+sub f {} *bar = \&f;
+print {$fh} .5;
+${$r}{a}*f();
+{ my $y = 1; } { my %h; } *trit = *scile;

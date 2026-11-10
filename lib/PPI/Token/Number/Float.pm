@@ -57,6 +57,15 @@ sub literal {
 	my $self = shift;
 	my $str = $self->_literal;
 	my $neg = $str =~ s/^\-//;
+	# A hexadecimal float: hex digits times a power of two
+	if ( $str =~ /^0[xX]([[:xdigit:]_]*)(?:\.([[:xdigit:]_]*))?[pP]([+-]?\d+)$/ ) {
+		my ( $int, $frac, $exp ) = ( $1, defined $2 ? $2 : '', $3 );
+		s/_//g for $int, $frac;
+		my $val = 0;
+		$val = $val * 16 + hex $_ for split //, $int . $frac;
+		$val *= 2 ** ( $exp - 4 * length $frac );
+		return $neg ? -$val : $val;
+	}
 	$str =~ s/^\./0./;
 	my $val = 0+$str;
 	return $neg ? -$val : $val;

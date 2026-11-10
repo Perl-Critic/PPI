@@ -78,6 +78,20 @@ sub __TOKENIZER__on_char {
 		return 1;
 	}
 
+	# A hexadecimal float (perl 5.22+): 0x1.8p+1, 0x1p-3, 0x.8p1.  The
+	# binary exponent is required; without it the . is an operator.
+	if ( $char eq '.' or $char eq 'p' or $char eq 'P' ) {
+		pos $t->{line} = $t->{line_cursor};
+		if ( $t->{line} =~ m/\G((?:\.[[:xdigit:]_]*)?[pP][+-]?\d+)/gc ) {
+			$t->{token}->{content} .= $1;
+			$t->{line_cursor} += length $1;
+			$t->{class} = $t->{token}->set_class( 'Number::Float' );
+			$t->_finalize_token;
+			return ( $t->{line_cursor} >= $t->{line_length} ) ? 0
+				: $t->{class}->__TOKENIZER__on_char( $t );
+		}
+	}
+
 	# Doesn't fit a special case, or is after the end of the token
 	# End of token.
 	$t->_finalize_token->__TOKENIZER__on_char( $t );

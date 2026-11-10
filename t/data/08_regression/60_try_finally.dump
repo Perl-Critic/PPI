@@ -1,0 +1,99 @@
+PPI::Document
+  PPI::Statement::Include
+    PPI::Token::Word  	'use'
+    PPI::Token::Whitespace  	' '
+    PPI::Token::Word  	'feature'
+    PPI::Token::Whitespace  	' '
+    PPI::Token::Quote::Single  	''try''
+    PPI::Token::Structure  	';'
+  PPI::Token::Whitespace  	'\n'
+  PPI::Statement::Compound
+    PPI::Token::Word  	'try'
+    PPI::Token::Whitespace  	' '
+    PPI::Structure::Block  	{ ... }
+      PPI::Token::Whitespace  	' '
+      PPI::Statement
+        PPI::Token::Word  	'foo'
+        PPI::Structure::List  	( ... )
+        PPI::Token::Structure  	';'
+      PPI::Token::Whitespace  	' '
+    PPI::Token::Whitespace  	' '
+    PPI::Token::Word  	'catch'
+    PPI::Token::Whitespace  	' '
+    PPI::Structure::List  	( ... )
+      PPI::Statement::Expression
+        PPI::Token::Symbol  	'$e'
+    PPI::Token::Whitespace  	' '
+    PPI::Structure::Block  	{ ... }
+      PPI::Token::Whitespace  	' '
+      PPI::Statement
+        PPI::Token::Word  	'bar'
+        PPI::Structure::List  	( ... )
+          PPI::Statement::Expression
+            PPI::Token::Symbol  	'$e'
+        PPI::Token::Structure  	';'
+      PPI::Token::Whitespace  	' '
+    PPI::Token::Whitespace  	' '
+    PPI::Token::Word  	'finally'
+    PPI::Token::Whitespace  	' '
+    PPI::Structure::Block  	{ ... }
+      PPI::Token::Whitespace  	' '
+      PPI::Statement
+        PPI::Token::Word  	'baz'
+        PPI::Structure::List  	( ... )
+        PPI::Token::Structure  	';'
+      PPI::Token::Whitespace  	' '
+  PPI::Token::Whitespace  	'\n'
+  PPI::Statement
+    PPI::Token::Word  	'is'
+    PPI::Structure::List  	( ... )
+      PPI::Statement::Expression
+        PPI::Token::Symbol  	'$x'
+        PPI::Token::Operator  	','
+        PPI::Token::Whitespace  	' '
+        PPI::Token::Number  	'1'
+        PPI::Token::Operator  	','
+        PPI::Token::Whitespace  	' '
+        PPI::Token::Quote::Single  	''desc''
+    PPI::Token::Structure  	';'
+  PPI::Token::Whitespace  	'\n'
+  PPI::Statement::Compound
+    PPI::Token::Word  	'try'
+    PPI::Token::Whitespace  	' '
+    PPI::Structure::Block  	{ ... }
+      PPI::Token::Whitespace  	' '
+      PPI::Statement
+        PPI::Token::Word  	'foo'
+        PPI::Structure::List  	( ... )
+        PPI::Token::Structure  	';'
+      PPI::Token::Whitespace  	' '
+    PPI::Token::Whitespace  	' '
+    PPI::Token::Word  	'catch'
+    PPI::Token::Whitespace  	' '
+    PPI::Structure::List  	( ... )
+      PPI::Statement::Expression
+        PPI::Token::Symbol  	'$e'
+    PPI::Token::Whitespace  	' '
+    PPI::Structure::Block  	{ ... }
+      PPI::Token::Whitespace  	' '
+      PPI::Statement
+        PPI::Token::Word  	'bar'
+        PPI::Structure::List  	( ... )
+          PPI::Statement::Expression
+            PPI::Token::Symbol  	'$e'
+        PPI::Token::Structure  	';'
+      PPI::Token::Whitespace  	' '
+  PPI::Token::Whitespace  	'\n'
+  PPI::Statement
+    PPI::Token::Word  	'is'
+    PPI::Structure::List  	( ... )
+      PPI::Statement::Expression
+        PPI::Token::Symbol  	'$y'
+        PPI::Token::Operator  	','
+        PPI::Token::Whitespace  	' '
+        PPI::Token::Number  	'2'
+        PPI::Token::Operator  	','
+        PPI::Token::Whitespace  	' '
+        PPI::Token::Quote::Single  	''desc''
+    PPI::Token::Structure  	';'
+  PPI::Token::Whitespace  	'\n'

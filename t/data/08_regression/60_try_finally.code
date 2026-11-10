@@ -1,0 +1,5 @@
+use feature 'try';
+try { foo(); } catch ($e) { bar($e); } finally { baz(); }
+is($x, 1, 'desc');
+try { foo(); } catch ($e) { bar($e); }
+is($y, 2, 'desc');

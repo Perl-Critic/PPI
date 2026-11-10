@@ -71,7 +71,6 @@ use Digest::MD5                   ();
 use PPI::Util                     ();
 use PPI                           ();
 use PPI::Node                     ();
-use YAML::PP                      ();
 
 use overload 'bool' => \&PPI::Util::TRUE;
 use overload '""'   => 'content';
@@ -278,7 +277,10 @@ sub _setattr {
 	$document->{custom_feature_includes}   = $attr{custom_feature_includes};
 	$document->{custom_feature_include_cb} = $attr{custom_feature_include_cb};
 	if ( $ENV{PPI_CUSTOM_FEATURE_INCLUDES} ) {
-		my $includes = YAML::PP::Load $ENV{PPI_CUSTOM_FEATURE_INCLUDES};
+		# YAML::PP is needed only here, so it is loaded only here: PPI itself
+		# runs without it (dist.ini lists it as a runtime recommendation).
+		require YAML::PP;
+		my $includes = YAML::PP::Load( $ENV{PPI_CUSTOM_FEATURE_INCLUDES} );
 		die "\$ENV{PPI_CUSTOM_FEATURE_INCLUDES} "
 		  . "does not contain valid perl:\n"
 		  . "val: '$ENV{PPI_CUSTOM_FEATURE_INCLUDES}'\nerr: $@"
@@ -490,23 +492,25 @@ sub serialize {
 			my $content = $Token->content;
 
 			# Handle the trivial cases
-			unless ( $heredoc ne '' and $content =~ /\n/ ) {
-				$output .= $content;
-				next;
-			}
-
-			# We have pending here-doc content that needs to be
-			# inserted just after the first newline in the content.
-			if ( $content eq "\n" ) {
-				# Shortcut the most common case for speed
-				$output .= $content . $heredoc;
+			if ( $heredoc ne '' and $content =~ /\n/ ) {
+				# We have pending here-doc content that needs to be
+				# inserted just after the first newline in the content.
+				if ( $content eq "\n" ) {
+					# Shortcut the most common case for speed
+					$output .= $content . $heredoc;
+				} else {
+					# Slower and more general version
+					$content =~ s/\n/\n$heredoc/;
+					$output .= $content;
+				}
+				$heredoc = '';
 			} else {
-				# Slower and more general version
-				$content =~ s/\n/\n$heredoc/;
 				$output .= $content;
 			}
 
-			$heredoc = '';
+			# A quote-like whose code introduces here-docs
+			# (s/a/<<END/e) carries their lines
+			$heredoc .= join '', @{ $Token->{_heredoc_lines} } if $Token->{_heredoc_lines};
 			next;
 		}
 
@@ -683,6 +687,8 @@ sub index_locations {
 			# Add any here-doc lines to the counter
 			if ( $Token->isa('PPI::Token::HereDoc') ) {
 				$heredoc += $Token->heredoc + 1;
+			} elsif ( $Token->{_heredoc_lines} ) {
+				$heredoc += @{ $Token->{_heredoc_lines} };
 			}
 		}
 	}

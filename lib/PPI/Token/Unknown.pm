@@ -51,6 +51,22 @@ sub __TOKENIZER__on_char {
 
 	# Now, we split on the different values of the current content
 	if ( $c eq '*' ) {
+		# A glob is named by whatever names a scalar, so a digit run, a caret
+		# letter and punctuation name globs too (*1, *^R, *-, *!, *@):
+		# perl -e '*X = *-' makes %X the named-capture hash.  Only where a
+		# term is certainly expected; *$x is a glob dereference and *{ a
+		# symbolic glob, so $ and { never start such a name.
+		if ( $t->_glob_name_expected ) {
+			pos $t->{line} = $t->{line_cursor};
+			my ($name) = $t->{line} =~ m/\G(\d+|\^[A-Z\[\]^_?\\]|:(?!:)|[^\w\s\$\{\}\*\#':])/gc;
+			if ( defined $name and ( $name =~ /^[\d^]/ or $MAGIC{ '$' . $name } ) ) {
+				$t->{token}->{content} .= $name;
+				$t->{line_cursor} += length $name;
+				$t->{class} = $t->{token}->set_class( 'Symbol' );
+				return $t->_finalize_token->__TOKENIZER__on_char( $t );
+			}
+		}
+
 		# Is it a number?
 		if ( $char =~ /\d/ ) {
 			# bitwise operator
@@ -59,9 +75,8 @@ sub __TOKENIZER__on_char {
 		}
 
 		if ( $char =~ /[\w:]/ ) {
-			# Symbol (unless the thing before it is a number
-			my ( $prev ) = $t->_previous_significant_tokens(1);
-			if ( not $prev or not $prev->isa('PPI::Token::Number') ) {
+			# Symbol, unless the thing before it ends a term: length($k)*length($k)
+			if ( not $t->_after_term ) {
 				$t->{class} = $t->{token}->set_class( 'Symbol' );
 				return 1;
 			}
@@ -109,20 +124,42 @@ sub __TOKENIZER__on_char {
 			}
 		}
 
-		if ( $char =~ /[a-z_]/i ) {
-			# Symbol
+		if ( $char =~ /[^\W\d]/ ) {
+			# Symbol -- any letter or _, not only ASCII, as the @ % * & arms allow
 			$t->{class} = $t->{token}->set_class( 'Symbol' );
 			return 1;
 		}
 
+		# Whitespace may stand between the sigil and the name (toke.c
+		# scan_ident skips it): my $ bits is $bits.  The Symbol keeps the
+		# text; its canonical form drops the whitespace.  $ is never an
+		# operator, so no position test is needed.
+		if ( $char eq ' ' or $char eq "\t" ) {
+			pos $t->{line} = $t->{line_cursor};
+			if ( $t->{line} =~ m/\G([ \t]+)(?=[^\W\d])/gc ) {
+				$t->{token}->{content} .= $1;
+				$t->{line_cursor} += length $1;
+				$t->{class} = $t->{token}->set_class( 'Symbol' );
+				return $t->{class}->__TOKENIZER__on_char( $t );
+			}
+		}
+
 		# Is it a nameless arg in a signature?
 		my %noname = ( ')' => 1, '=' => 1, ',' => 1 );
-		if ( $noname{$char} and $t->_current_token_has_signatures_active ) {
+		if ( $noname{$char} and $t->_in_signature ) {
 			$t->{class} = $t->{token}->set_class('Symbol');
 			return $t->_finalize_token->__TOKENIZER__on_char($t);
 		}
 
 		if ( $MAGIC{ $c . $char } ) {
+			if ( $char eq '$' ) {
+				my $after = substr( $t->{line}, $t->{line_cursor} + 1, 1 );
+				if ( $after ne '' and $after =~ /[\w\${]/ ) {
+					# $$$var, $$$$var or $${EXPR}: the first $ is a dereference cast
+					$t->{class} = $t->{token}->set_class( 'Cast' );
+					return $t->_finalize_token->__TOKENIZER__on_char( $t );
+				}
+			}
 			# Magic variable
 			$t->{class} = $t->{token}->set_class( 'Magic' );
 			return 1;
@@ -136,6 +173,8 @@ sub __TOKENIZER__on_char {
 				$t->{class} = $t->{token}->set_class( 'Magic' );
 				return 1;
 			}
+			return $t->_finalize_token->__TOKENIZER__on_char( $t )
+			  if _braced_punct_magic( $t, '$' );
 		}
 
 		# Must be a cast
@@ -160,8 +199,11 @@ sub __TOKENIZER__on_char {
 			return 1;
 		}
 
+		return $t->_finalize_token->__TOKENIZER__on_char( $t )
+		  if $char eq '{' and _braced_punct_magic( $t, '@' );
+
 		# Is it a nameless arg in a signature?
-		if ( $char eq ')' and $t->_current_token_has_signatures_active ) {
+		if ( $char eq ')' and $t->_in_signature ) {
 			$t->{class} = $t->{token}->set_class('Symbol');
 			return $t->_finalize_token->__TOKENIZER__on_char($t);
 		}
@@ -212,10 +254,19 @@ sub __TOKENIZER__on_char {
 		}
 
 		# Is it a nameless arg in a signature?
-		if ( $char eq ')' and $t->_current_token_has_signatures_active ) {
+		if ( $char eq ')' and $t->_in_signature ) {
 			$t->{class} = $t->{token}->set_class('Symbol');
 			return $t->_finalize_token->__TOKENIZER__on_char($t);
 		}
+
+		# After a term, % is the modulo operator whatever follows it (7%-3)
+		if ( $t->_after_term ) {
+			$t->{class} = $t->{token}->set_class( 'Operator' );
+			return $t->{class}->__TOKENIZER__on_char( $t );
+		}
+
+		return $t->_finalize_token->__TOKENIZER__on_char( $t )
+		  if $char eq '{' and _braced_punct_magic( $t, '%' );
 
 		# Is it a magic variable?
 		if ( $char eq '^' || $MAGIC{ $c . $char } ) {
@@ -278,6 +329,17 @@ sub __TOKENIZER__on_char {
 
 		return $self->_as_cast_or_op($t) if $self->_is_cast_or_op($char);
 
+		# Where a term is expected & is the code sigil even before
+		# whitespace (toke.c yyl_ampersand: not XOPERATOR => scan_ident),
+		# so & {BLOCK} and & $code call code.
+		if ( $char =~ /\s/ ) {
+			pos $t->{line} = $t->{line_cursor};
+			if ( $t->{line} =~ m/\G\s+[{\$]/gc and _cast_or_op($t) eq 'Cast' ) {
+				$t->{class} = $t->{token}->set_class( 'Cast' );
+				return $t->_finalize_token->__TOKENIZER__on_char( $t );
+			}
+		}
+
 		# Probably the binary and operator
 		$t->{class} = $t->{token}->set_class( 'Operator' );
 		return $t->{class}->__TOKENIZER__on_char( $t );
@@ -334,6 +396,23 @@ sub __TOKENIZER__on_char {
 	PPI::Exception->throw('Unknown value in PPI::Token::Unknown token');
 }
 
+# ${ + }, @{+}, %{-}: braces around a punctuation name are the variable
+# itself, as ${^MATCH} is (toke.c scan_ident reads a name inside the
+# braces, and @{+} IS @+).  A block holding one punctuation character
+# could not be an expression anyway.  The Magic token keeps the braced
+# text.  Called with the cursor on the {; true when it made the token.
+sub _braced_punct_magic {
+	my ( $t, $sigil ) = @_;
+	pos $t->{line} = $t->{line_cursor};
+	return 0 if $t->{line} !~ m/\G(\{[ \t]*([^\w\s{}])[ \t]*\})/gc;
+	my ( $text, $name ) = ( $1, $2 );
+	return 0 if !$MAGIC{ $sigil . $name };
+	$t->{token}->{content} .= $text;
+	$t->{line_cursor} += length $text;
+	$t->{class} = $t->{token}->set_class( 'Magic' );
+	return 1;
+}
+
 sub _is_cast_or_op {
 	my ( $self, $char ) = @_;
 	return 1 if $char eq '$';
@@ -374,40 +453,11 @@ sub _cast_or_op {
 	return 'Cast' if !$token;    # token was first in the document
 
 	if ( $token->isa( 'PPI::Token::Structure' ) and $token->content eq '}' ) {
-
-		# Scan the token stream backwards an arbitrarily long way,
-		# looking for the matching opening curly brace.
-		my $structure_depth = 1;
-		( $token, $cursor ) = _prev_significant_w_cursor(
-			$tokens, $cursor,
-			sub {
-				my ( $token ) = @_;
-				return if !$token->isa( 'PPI::Token::Structure' );
-				if ( $token eq '}' ) {
-					$structure_depth++;
-					return;
-				}
-				if ( $token eq '{' ) {
-					$structure_depth--;
-					return if $structure_depth;
-				}
-				return 1;
-			}
-		);
-		return 'Operator' if !$token;    # no matching '{', probably an unbalanced '}'
-
-		# Scan past any whitespace
-		( $token, $cursor ) = _prev_significant_w_cursor( $tokens, $cursor );
-		return 'Operator' if !$token;                             # Document began with what must be a hash constructor.
-		return 'Operator' if $token->isa( 'PPI::Token::Symbol' ); # subscript
-
-		my %meth_or_subscript_end = map { $_ => 1 } qw@ -> } ] @;
-		return 'Operator' if $meth_or_subscript_end{ $token->content };    # subscript
-
-		my $content = $token->content;
-		my $produces_or_wants_value =
-		  ( $token->isa( 'PPI::Token::Word' ) and ( $content eq 'do' or $content eq 'eval' ) );
-		return $produces_or_wants_value ? 'Operator' : 'Cast';
+		# After a block's } a cast starts the next term; after the } of a
+		# subscript, of a dereference block or of do/eval's block it is an
+		# operator.  An unbalanced } counts as a term.
+		my $kind = $t->_curly_kind( $cursor + 1 );
+		return ( $kind and $kind eq 'block' ) ? 'Cast' : 'Operator';
 	}
 
 	my %list_start_or_term_end = map { $_ => 1 } qw@ ; ( { [ @;
@@ -415,7 +465,8 @@ sub _cast_or_op {
 	  if $token->isa( 'PPI::Token::Structure' ) and $list_start_or_term_end{ $token->content }
 	  or $token->isa( 'PPI::Token::Cast' )
 	  or $token->isa( 'PPI::Token::Operator' )
-	  or $token->isa( 'PPI::Token::Label' );
+	  or $token->isa( 'PPI::Token::Label' )
+	  or $token->isa( 'PPI::Token::Format' );
 
 	return 'Operator' if !$token->isa( 'PPI::Token::Word' );
 
@@ -438,6 +489,9 @@ sub __TOKENIZER__is_an_attribute {
 	# If we just had a prototype, then we are an attribute
 	return 1 if $p0->isa('PPI::Token::Prototype');
 
+	# A declaration's attributes: my $x : shared, our ($p, $q) : unique
+	return 1 if $t->_after_declared_variables;
+
 	# Other than that, we would need to have had a bareword
 	return '' unless $p0->isa('PPI::Token::Word');
 
@@ -459,10 +513,18 @@ sub __TOKENIZER__is_an_attribute {
 			not $p2
 			or
 			$p2->isa('PPI::Token::Structure')
+			or
+			$p2->isa('PPI::Token::Format')   # a statement starts after a format body
 			or (
 				$p2->isa('PPI::Token::Whitespace')
 				and
 				$p2->content eq ''
+			)
+			or (
+				# A lexical sub: my sub NAME :attr, our sub, state sub
+				$p2->isa('PPI::Token::Word')
+				and
+				$p2->content =~ /^(?:my|our|state)$/
 			)
 		)
 	) {

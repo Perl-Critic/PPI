@@ -1,0 +1,127 @@
+PPI::Document
+  PPI::Statement
+    PPI::Token::Symbol  	'$h'
+    PPI::Structure::Subscript  	{ ... }
+      PPI::Statement::Expression
+        PPI::Token::Word  	'a'
+    PPI::Token::Operator  	'*'
+    PPI::Token::Word  	'f'
+    PPI::Structure::List  	( ... )
+    PPI::Token::Structure  	';'
+  PPI::Token::Whitespace  	'\n'
+  PPI::Statement
+    PPI::Token::Symbol  	'$h'
+    PPI::Structure::Subscript  	{ ... }
+      PPI::Statement::Expression
+        PPI::Token::Word  	'a'
+    PPI::Token::Operator  	'%'
+    PPI::Token::Number  	'-1'
+    PPI::Token::Structure  	';'
+  PPI::Token::Whitespace  	'\n'
+  PPI::Statement
+    PPI::Token::Symbol  	'$x'
+    PPI::Token::Operator  	'->'
+    PPI::Structure::Subscript  	{ ... }
+      PPI::Statement::Expression
+        PPI::Token::Word  	'a'
+    PPI::Structure::Subscript  	{ ... }
+      PPI::Statement::Expression
+        PPI::Token::Word  	'b'
+    PPI::Token::Operator  	'*'
+    PPI::Token::Word  	'f'
+    PPI::Structure::List  	( ... )
+    PPI::Token::Structure  	';'
+  PPI::Token::Whitespace  	'\n'
+  PPI::Statement
+    PPI::Token::Cast  	'@'
+    PPI::Structure::Block  	{ ... }
+      PPI::Statement
+        PPI::Token::Symbol  	'$h'
+    PPI::Token::Operator  	'*'
+    PPI::Token::Symbol  	'$x'
+    PPI::Token::Structure  	';'
+  PPI::Token::Whitespace  	'\n'
+  PPI::Statement
+    PPI::Token::Word  	'do'
+    PPI::Token::Whitespace  	' '
+    PPI::Structure::Block  	{ ... }
+      PPI::Token::Whitespace  	' '
+      PPI::Statement
+        PPI::Token::Number  	'1'
+      PPI::Token::Whitespace  	' '
+    PPI::Token::Operator  	'*'
+    PPI::Token::Word  	'f'
+    PPI::Structure::List  	( ... )
+    PPI::Token::Structure  	';'
+  PPI::Token::Whitespace  	'\n'
+  PPI::Statement::Sub
+    PPI::Token::Word  	'sub'
+    PPI::Token::Whitespace  	' '
+    PPI::Token::Word  	'f'
+    PPI::Token::Whitespace  	' '
+    PPI::Structure::Block  	{ ... }
+  PPI::Token::Whitespace  	' '
+  PPI::Statement
+    PPI::Token::Symbol  	'*bar'
+    PPI::Token::Whitespace  	' '
+    PPI::Token::Operator  	'='
+    PPI::Token::Whitespace  	' '
+    PPI::Token::Cast  	'\'
+    PPI::Token::Symbol  	'&f'
+    PPI::Token::Structure  	';'
+  PPI::Token::Whitespace  	'\n'
+  PPI::Statement
+    PPI::Token::Word  	'print'
+    PPI::Token::Whitespace  	' '
+    PPI::Structure::Block  	{ ... }
+      PPI::Statement
+        PPI::Token::Symbol  	'$fh'
+    PPI::Token::Whitespace  	' '
+    PPI::Token::Number::Float  	'.5'
+    PPI::Token::Structure  	';'
+  PPI::Token::Whitespace  	'\n'
+  PPI::Statement
+    PPI::Token::Cast  	'$'
+    PPI::Structure::Block  	{ ... }
+      PPI::Statement
+        PPI::Token::Symbol  	'$r'
+    PPI::Structure::Subscript  	{ ... }
+      PPI::Statement::Expression
+        PPI::Token::Word  	'a'
+    PPI::Token::Operator  	'*'
+    PPI::Token::Word  	'f'
+    PPI::Structure::List  	( ... )
+    PPI::Token::Structure  	';'
+  PPI::Token::Whitespace  	'\n'
+  PPI::Statement::Compound
+    PPI::Structure::Block  	{ ... }
+      PPI::Token::Whitespace  	' '
+      PPI::Statement::Variable
+        PPI::Token::Word  	'my'
+        PPI::Token::Whitespace  	' '
+        PPI::Token::Symbol  	'$y'
+        PPI::Token::Whitespace  	' '
+        PPI::Token::Operator  	'='
+        PPI::Token::Whitespace  	' '
+        PPI::Token::Number  	'1'
+        PPI::Token::Structure  	';'
+      PPI::Token::Whitespace  	' '
+  PPI::Token::Whitespace  	' '
+  PPI::Statement::Compound
+    PPI::Structure::Block  	{ ... }
+      PPI::Token::Whitespace  	' '
+      PPI::Statement::Variable
+        PPI::Token::Word  	'my'
+        PPI::Token::Whitespace  	' '
+        PPI::Token::Symbol  	'%h'
+        PPI::Token::Structure  	';'
+      PPI::Token::Whitespace  	' '
+  PPI::Token::Whitespace  	' '
+  PPI::Statement
+    PPI::Token::Symbol  	'*trit'
+    PPI::Token::Whitespace  	' '
+    PPI::Token::Operator  	'='
+    PPI::Token::Whitespace  	' '
+    PPI::Token::Symbol  	'*scile'
+    PPI::Token::Structure  	';'
+  PPI::Token::Whitespace  	'\n'

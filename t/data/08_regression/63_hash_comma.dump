@@ -1,0 +1,96 @@
+PPI::Document
+  PPI::Statement::Sub
+    PPI::Token::Word  	'sub'
+    PPI::Token::Whitespace  	' '
+    PPI::Token::Word  	'f'
+    PPI::Token::Whitespace  	' '
+    PPI::Structure::Block  	{ ... }
+      PPI::Statement
+        PPI::Token::Whitespace  	' '
+        PPI::Structure::Constructor  	{ ... }
+          PPI::Token::Whitespace  	' '
+          PPI::Statement
+            PPI::Token::Quote::Single  	''a''
+            PPI::Token::Operator  	','
+            PPI::Token::Whitespace  	' '
+            PPI::Token::Quote::Single  	''foo''
+          PPI::Token::Whitespace  	' '
+      PPI::Token::Whitespace  	' '
+  PPI::Token::Whitespace  	'\n'
+  PPI::Statement::Sub
+    PPI::Token::Word  	'sub'
+    PPI::Token::Whitespace  	' '
+    PPI::Token::Word  	'g'
+    PPI::Token::Whitespace  	' '
+    PPI::Structure::Block  	{ ... }
+      PPI::Statement
+        PPI::Token::Whitespace  	' '
+        PPI::Structure::Constructor  	{ ... }
+          PPI::Token::Whitespace  	' '
+          PPI::Statement
+            PPI::Token::Number  	'1'
+            PPI::Token::Operator  	','
+            PPI::Token::Whitespace  	' '
+            PPI::Token::Number  	'2'
+          PPI::Token::Whitespace  	' '
+      PPI::Token::Whitespace  	' '
+  PPI::Token::Whitespace  	'\n'
+  PPI::Statement::Sub
+    PPI::Token::Word  	'sub'
+    PPI::Token::Whitespace  	' '
+    PPI::Token::Word  	'h'
+    PPI::Token::Whitespace  	' '
+    PPI::Structure::Block  	{ ... }
+      PPI::Statement::Compound
+        PPI::Token::Whitespace  	' '
+        PPI::Structure::Block  	{ ... }
+          PPI::Token::Whitespace  	' '
+          PPI::Statement
+            PPI::Token::Word  	'foo'
+            PPI::Token::Operator  	','
+            PPI::Token::Whitespace  	' '
+            PPI::Token::Number  	'1'
+          PPI::Token::Whitespace  	' '
+      PPI::Token::Whitespace  	' '
+  PPI::Token::Whitespace  	'\n'
+  PPI::Statement::Sub
+    PPI::Token::Word  	'sub'
+    PPI::Token::Whitespace  	' '
+    PPI::Token::Word  	'i'
+    PPI::Token::Whitespace  	' '
+    PPI::Structure::Block  	{ ... }
+      PPI::Statement::Compound
+        PPI::Token::Whitespace  	' '
+        PPI::Structure::Block  	{ ... }
+          PPI::Token::Whitespace  	' '
+          PPI::Statement
+            PPI::Token::Symbol  	'$x'
+            PPI::Token::Operator  	','
+            PPI::Token::Whitespace  	' '
+            PPI::Token::Number  	'1'
+          PPI::Token::Whitespace  	' '
+      PPI::Token::Whitespace  	' '
+  PPI::Token::Whitespace  	'\n'
+  PPI::Statement
+    PPI::Structure::Constructor  	{ ... }
+      PPI::Token::Whitespace  	' '
+      PPI::Statement
+        PPI::Token::Word  	'Foo'
+        PPI::Token::Operator  	','
+        PPI::Token::Whitespace  	' '
+        PPI::Token::Number  	'1'
+      PPI::Token::Whitespace  	' '
+    PPI::Token::Structure  	';'
+  PPI::Token::Whitespace  	'\n'
+  PPI::Statement::Compound
+    PPI::Structure::Block  	{ ... }
+      PPI::Token::Whitespace  	' '
+      PPI::Statement
+        PPI::Token::Number::Float  	'1.5'
+        PPI::Token::Operator  	','
+        PPI::Token::Whitespace  	' '
+        PPI::Token::Number  	'2'
+      PPI::Token::Whitespace  	' '
+  PPI::Statement::Null
+    PPI::Token::Structure  	';'
+  PPI::Token::Whitespace  	'\n'

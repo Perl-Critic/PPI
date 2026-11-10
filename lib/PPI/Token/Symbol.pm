@@ -80,7 +80,7 @@ Returns the symbol as a string.
 
 =cut
 
-my %cast_which_trumps_braces = map { $_ => 1 } qw{ $ @ % };
+my %cast_which_trumps_braces = map { $_ => 1 } qw{ $ @ % * };
 
 sub symbol {
 	my $self   = shift;
@@ -169,7 +169,8 @@ sub __TOKENIZER__on_char {
 
 	# Handle magic things
 	my $content = $t->{token}->{content};	
-	if ( $content eq '@_' or $content eq '$_' ) {
+	( my $name = $content ) =~ s/^\$[ \t]+/\$/;    # $ _ is $_
+	if ( $name eq '@_' or $name eq '$_' ) {
 		$t->{class} = $t->{token}->set_class( 'Magic' );
 		return $t->_finalize_token->__TOKENIZER__on_char( $t );
 	}
@@ -197,10 +198,11 @@ sub __TOKENIZER__on_char {
 	}
 
 	# Verify and extract actual full symbol name from sigil to end
-	my $sep = qr/ (?: :: | '(?!\d) ) /x; # :: and ' are namespace separators
+	my $sep = qr/ (?: (?: :: )+ | '(?!\d) ) /x; # :: (a run of them: foo::::bar) and ' are namespace separators
 	my $pattern = qr/
 	^(
 		[\$@%&*]
+		(?: (?<=\$) [ \t]+ )?	# a $ may be spaced from its name ($ bits)
 		(?:
 				: (?! : )			# allow single-colon non-magic variables
 			|

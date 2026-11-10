@@ -146,6 +146,14 @@ sub __TOKENIZER__on_line_start {
 	my $t    = $_[1];
 	my $line = $t->{line};
 
+	# The body of a format starts on the line after its header
+	# (PPI::Tokenizer::_format_declaration), whatever the line holds
+	if ( delete $t->{format_pending} ) {
+		delete @$t{qw( format_args format_braces )};
+		$t->_new_token( 'Format', '' );
+		return PPI::Token::Format->__TOKENIZER__on_line_start( $t );
+	}
+
 	# Can we classify the entire line in one go
 	if ( $line =~ /^\s*$/ ) {
 		# A whitespace line
@@ -191,6 +199,19 @@ sub __TOKENIZER__on_line_start {
 	1;
 }
 
+# Is the ' at the cursor the start of a sub's NAME (sub 'Hello'_he_said)?
+# Only right after the word sub (not a method named sub), and only when a
+# whole name follows: the separator, then a word, and more parts.
+sub __sub_name_expected {
+	my $t = shift;
+	pos $t->{line} = $t->{line_cursor};
+	return 0 if $t->{line} !~ m/\G'(?!\d)\w/gc;
+	my ( $prev, $before ) = $t->_previous_significant_tokens(2);
+	return 0 if !$prev or !$prev->isa('PPI::Token::Word') or $prev->content ne 'sub';
+	return 0 if $before and $before->isa('PPI::Token::Operator') and $before->content eq '->';
+	return 1;
+}
+
 sub __TOKENIZER__on_char {
 	my $t    = $_[1];
 	my $c = substr $t->{line}, $t->{line_cursor}, 1;
@@ -198,6 +219,12 @@ sub __TOKENIZER__on_char {
 
 	# Do we definitely know what something is?
 	return $COMMITMAP{$char}->__TOKENIZER__commit($t) if $COMMITMAP{$char};
+
+	# A sub's name may open with the old package separator ':
+	# sub 'Hello'_he_said is sub main'Hello'_he_said (perl reads a name
+	# after sub, toke.c yyl_sub, and ' separates its parts).
+	return 'PPI::Token::Word'->__TOKENIZER__commit_quoted_name($t)
+	  if $char == 39 and __sub_name_expected($t);
 
 	# Handle the simple option first
 	return $CLASSMAP{$char} if $CLASSMAP{$char};
@@ -233,6 +260,8 @@ sub __TOKENIZER__on_char {
 				not $p2
 				or
 				$p2->isa('PPI::Token::Structure')
+				or
+				$p2->isa('PPI::Token::Format')   # a statement starts after a format body
 				or (
 					$p2->isa('PPI::Token::Whitespace')
 					and
@@ -283,6 +312,17 @@ sub __TOKENIZER__on_char {
 		my $next_char = substr( $t->{line}, $t->{line_cursor} + 1, 2 );
 		return 'Operator' if $next_char =~ /<[^>]/;
 
+		# Where perl expects a term -- after an operator, and after a
+		# builtin that takes an operand: print <FH>, sort <*.pl>,
+		# return <$fh>, $s .= <STDIN> -- a closed <...> is a readline or a
+		# glob, whatever it holds (toke.c yyl_leftpointy: PL_expect is not
+		# XOPERATOR).  A block's } is decided below.
+		pos $t->{line} = $t->{line_cursor};
+		return 'QuoteLike::Readline'
+		  if $t->{line} =~ m/\G<(?:>|[^<>=\s][^<>]*>)/gc
+		  and not ( $prev and $prev->isa('PPI::Token::Structure') and $prev->content eq '}' )
+		  and $t->_term_expected;
+
 		return 'Operator' if not $prev;
 
 		# The most common group of readlines are used like
@@ -305,6 +345,15 @@ sub __TOKENIZER__on_char {
 				# Almost definitely readline
 				return 'QuoteLike::Readline';
 			}
+
+			# After the } of a block that opens a statement or follows a
+			# word (map { ... } <op/*>, grep { ... } <$fh>) perl expects a
+			# term, so a closed <...> is a readline or a glob, whatever it
+			# holds.  After a subscript's } the < compares.
+			pos $t->{line} = $t->{line_cursor};
+			return 'QuoteLike::Readline'
+			  if $t->{line} =~ m/\G<(?:>|[^<>=\s][^<>]*>)/gc
+			  and $t->_after_statement_block;
 		}
 
 		# Otherwise, we guess operator, which has been the default up
@@ -331,6 +380,8 @@ sub __TOKENIZER__on_char {
 		# .. - The second condition in a flip flop
 		# =~ - A bound regex
 		# !~ - Ditto
+		# But after a postfix ++ or -- a term has ended: $i++ / 2 divides
+		return 'Operator' if $prev->isa('PPI::Token::Operator') and $t->_after_term;
 		return 'Regexp::Match' if $prev->isa('PPI::Token::Operator');
 
 		# After a symbol
@@ -355,6 +406,13 @@ sub __TOKENIZER__on_char {
 		) {
 			return 'Regexp::Match';
 		}
+
+		# After the body of a format a statement starts
+		return 'Regexp::Match' if $prev->isa('PPI::Token::Format');
+
+		# After the } of a block that opens a statement or follows a word
+		# (BEGIN { } /x/, grep { } /x/), a term starts
+		return 'Regexp::Match' if $t->_after_statement_block;
 
 		# Functions and keywords
 		if (
@@ -408,7 +466,7 @@ sub __TOKENIZER__on_char {
 	} elsif ( $char == 45 ) { # $char eq '-'
 		# Look for an obvious operator operand context
 		my $context = $t->_opcontext;
-		if ( $context eq 'operator' ) {
+		if ( $context eq 'operator' and !$t->_minus_starts_term ) {
 			return 'Operator';
 		} else {
 			# More logic needed
